@@ -18,7 +18,7 @@ const wmsUrl = "https://wms.birdsai.co/";
 
 class App extends Component {
     componentDidMount() {
-        document.title = "Maps - Ellipsis Earth Intelligence"
+        document.title = "Ellipsis Earth Intelligence"
     }
 
     render() {
@@ -31,6 +31,8 @@ class App extends Component {
                         <Route exact path="/" component={Home}/>
                         <Route path="/maps" render={(props) => <Viewer apiUrl={apiUrl} wmsUrl = {wmsUrl} {...props} />} />
                         <Route path="/products" />
+                        <Route path="/about" />
+                        <Route path="/contact" />
                     </div>               
                 </div>
             </BrowserRouter>           
