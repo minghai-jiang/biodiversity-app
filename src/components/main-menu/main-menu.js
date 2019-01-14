@@ -54,11 +54,11 @@ export class MainMenu extends Component {
                             About Us
                         </NavLink>
                     </li>
-                    <li>
+                    {/* <li>
                         <NavLink to="/contact" className="main-menu-item">
                             Contact
                         </NavLink>
-                    </li>
+                    </li> */}
                     <li style={{float: "right"}}>
                         <NavLink to="/login" className="main-menu-item">
                             Login

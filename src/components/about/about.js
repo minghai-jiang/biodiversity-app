@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
 
 import "./about.css";
 
@@ -17,6 +16,11 @@ export class About extends Component {
                             productively and sustainably. We aim to lower the threshold and empower people to 
                             use good information for good things.
                         </p>
+                        <p className="main-center-paragraph">
+                            Feel free to contact us for any questions or inquiries at info@birdsai.co. 
+                            We are always happy to help.
+                        </p>
+                        
                         <table className="team-table">
                             <tr>
                                 <td className="profile">
