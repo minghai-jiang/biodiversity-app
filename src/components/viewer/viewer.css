@@ -1,3 +1,7 @@
+.map {
+    position: relative;
+}
+
 .map-selector-div {
   position: absolute;
   width: 100%;

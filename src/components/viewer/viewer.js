@@ -587,7 +587,7 @@ class Viewer extends PureComponent {
                     zoom={this.state.zoom}
                     onZoomEnd={this.handleZoomEnd}
                     onDragEnd={this.handleDragEnd}
-                    style={{ height: "100vh" }}
+                    style={{ height: "94vh" }}
                     onClick={this.handleClick}
                     onLocationfound={this.handleLocationFound}
                     ref={this.mapRef}
