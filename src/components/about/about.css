@@ -1,0 +1,26 @@
+.team-table {
+    border-spacing: 2.5em 3em;
+}
+
+.profile {
+    width: 30%;
+    vertical-align: top;
+}
+
+.profile-photo {
+    border-radius: 100vw;
+    width: 100%;
+}
+
+.profile-name {
+    color: #026464;
+    font-weight: bold;
+}
+
+.profile-title {
+    font-weight: bold;
+}
+
+.profile-text {
+    font-size: 11pt;
+}

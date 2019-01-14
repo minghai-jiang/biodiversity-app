@@ -10,6 +10,7 @@ import MainMenu from "./components/main-menu/main-menu";
 
 import Viewer from "./components/viewer/viewer";
 import Home from "./components/home/home";
+import About from "./components/about/about"
 
 import "./App.css";
 
@@ -31,7 +32,7 @@ class App extends Component {
                         <Route exact path="/" component={Home}/>
                         <Route path="/maps" render={(props) => <Viewer apiUrl={apiUrl} wmsUrl = {wmsUrl} {...props} />} />
                         <Route path="/products" />
-                        <Route path="/about" />
+                        <Route path="/about" component={About}/>
                         <Route path="/contact" />
                     </div>               
                 </div>

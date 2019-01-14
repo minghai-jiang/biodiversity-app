@@ -43,7 +43,7 @@
 }
 
 .main-block-header {
-    background-color: #adbccc;
+    background-color: #026464;
     padding: 0.3em 0em;
     margin-bottom: 2em;
 
@@ -80,7 +80,7 @@
     padding: 0.6em 1.5em;
     text-align: center;
     background-color: #ffffff;
-    border: 3px solid #adbccc;
+    border: 3px solid #026464;
     text-decoration: none;
 
     -webkit-transition-duration: 0.2s; /* Safari */
@@ -88,8 +88,8 @@
 }
 
 .button:hover {
-    background-color: #d5e7f8;
-    color: #404040;
+    background-color: #00a3a3;
+    color: #ffffff;
 }
 
 .button-a {
