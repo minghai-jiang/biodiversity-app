@@ -8,7 +8,11 @@ export class Footer extends Component {
     render() {
         return (
             <div className="footer">
-                    
+                <div className="footer-content">
+                    <img src="/images/logo-white.png" className="footer-logo"></img>
+                    <br></br>
+                    info@ellipsis-earth.com
+                </div>
             </div>
         )
     }

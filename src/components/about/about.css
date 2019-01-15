@@ -1,3 +1,12 @@
+.paragraph-accented {
+    color: #ffffff;
+    background-color: #00a3a3;
+}
+
+div.main-block {
+    padding-bottom: 0em;
+}
+
 .team-table {
     border-spacing: 2.5em 3em;
 }

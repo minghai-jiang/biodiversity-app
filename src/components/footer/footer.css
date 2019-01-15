@@ -1,4 +1,16 @@
 .footer {
     height: 5em;
+
+    text-align: right;
+
     background-color: #026464;
+    color: #ffffff;
+}
+
+.footer-content {
+    padding: 1em 3em;
+}
+
+.footer-logo {
+    width: 4.8em;
 }
