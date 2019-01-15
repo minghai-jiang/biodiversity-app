@@ -10,7 +10,8 @@ export class Home extends Component {
                 <div id="banner">
                     <img id="banner-logo" src="images/logo-white-subtitle.png"/>                    
                 </div>
-                <div className="main-block">
+
+                <div className="main-block" style={{paddingTop: "3em"}}>
                     <div className="main-block-content">
                         <p className="main-center-paragraph">
                             We share the planet with an increasing number of people. 
@@ -26,7 +27,7 @@ export class Home extends Component {
                     </div>                        
                 </div>
 
-                <div className="main-block">
+                <div className="main-block main-block-accented">
                     <div className="main-block-header">
                         OUR SOLUTION
                     </div>

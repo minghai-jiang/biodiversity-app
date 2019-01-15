@@ -17,7 +17,7 @@ export class About extends Component {
                             use good information for good things.
                         </p>
                         <p className="main-center-paragraph">
-                            Feel free to contact us for any questions or inquiries at info@birdsai.co. 
+                            Feel free to contact us for any questions or inquiries at&nbsp;<span style={{fontWeight: "bold"}}>info@birdsai.co</span> (Bird'sAI was our previous name). 
                             We are always happy to help.
                         </p>
                         

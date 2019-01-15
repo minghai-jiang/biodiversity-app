@@ -1,7 +1,5 @@
 .App {
   text-align: center;
-  font-size: 14pt;
-  color: #666666;
 }
 
 .App-logo {
@@ -29,11 +27,16 @@
 }
 
 .main-block {
-    padding-top: 3em;
+    /* padding-top: 3em; */
+    padding-bottom: 3em;
 
     font-size: 14pt;
-    font-family: sans-serif;
     line-height: 1.6; 
+}
+
+.main-block-accented {
+    background-color: #00a3a3;
+    color: #ffffff;
 }
 
 .main-block-content {
@@ -59,8 +62,6 @@
 .main-block > p.main-center-paragraph:last-of-type {
     margin-bottom: 1em;
 }
-
-
 
 .main-block-content-list {
     text-align: left
