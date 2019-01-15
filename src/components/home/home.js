@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 
+import { Footer } from "../footer/footer";
+
 import "./home.css";
 
 export class Home extends Component {
@@ -63,7 +65,7 @@ export class Home extends Component {
                                         </NavLink>
                                     </td>
                                     <td className="home-main-block-content-table-two-rows">
-                                        <NavLink to="/products" className="button-a">
+                                        <NavLink to="/products/api" className="button-a">
                                             <div className="button">
                                                 API documentation                                                
                                             </div>
@@ -121,7 +123,7 @@ export class Home extends Component {
                             <NavLink to="/maps">
                                 interactive map 
                             </NavLink>&nbsp;for engagement as well as&nbsp;
-                            <NavLink to="/maps">
+                            <NavLink to="/products/api">
                                 a modern API
                             </NavLink>&nbsp;for system integration.
                         </p>
@@ -156,6 +158,8 @@ export class Home extends Component {
                         </table>
                     </div>                        
                 </div>
+            
+                {/* <Footer></Footer> */}
             </div>
         )
     }
