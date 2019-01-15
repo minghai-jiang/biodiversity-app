@@ -8,10 +8,10 @@ export class Home extends Component {
         return (
             <div>
                 <div id="banner">
-                    <img id="banner-logo" src="images/logo-white-subtitle.png"/>                    
+                    <img id="banner-logo" src="/images/logo-white-subtitle.png"/>                    
                 </div>
 
-                <div className="main-block" style={{paddingTop: "3em"}}>
+                <div className="main-block main-block-first">
                     <div className="main-block-content">
                         <p className="main-center-paragraph">
                             We share the planet with an increasing number of people. 
@@ -29,7 +29,7 @@ export class Home extends Component {
 
                 <div className="main-block main-block-accented">
                     <div className="main-block-header">
-                        OUR SOLUTION
+                        Our Solution
                     </div>
                     <div className="main-block-content">
                         <p className="main-center-paragraph">
@@ -44,7 +44,7 @@ export class Home extends Component {
 
                 <div className="main-block">
                     <div className="main-block-header">
-                        EXPLORE
+                        Explore
                     </div>
                     <div className="main-block-content">
                         <p style={{marginBottom: "3 em"}} className="main-center-paragraph">
@@ -53,29 +53,31 @@ export class Home extends Component {
                             to see how you could integrate this information into your own systems.
                         </p>
                         <table className="home-main-block-content-table">
-                            <tr>
-                                <td style={{marginRight: "5em"}}className="home-main-block-content-table-two-rows">
-                                    <NavLink to="/maps" className="button-a">
-                                        <div className="button">
-                                            Maps                                                
-                                        </div>
-                                    </NavLink>
-                                </td>
-                                <td className="home-main-block-content-table-two-rows">
-                                    <NavLink to="/products" className="button-a">
-                                        <div className="button">
-                                            API documentation                                                
-                                        </div>
-                                    </NavLink>
-                                </td>
-                            </tr>
+                            <tbody>
+                                <tr>
+                                    <td style={{marginRight: "5em"}}className="home-main-block-content-table-two-rows">
+                                        <NavLink to="/maps" className="button-a">
+                                            <div className="button">
+                                                Maps                                                
+                                            </div>
+                                        </NavLink>
+                                    </td>
+                                    <td className="home-main-block-content-table-two-rows">
+                                        <NavLink to="/products" className="button-a">
+                                            <div className="button">
+                                                API documentation                                                
+                                            </div>
+                                        </NavLink>
+                                    </td>
+                                </tr>
+                            </tbody>                            
                         </table>
                     </div>                       
                 </div>
             
                 <div className="main-block">
                     <div className="main-block-header">
-                        GETTING STARTED
+                        Getting Started
                     </div>
                     <div className="main-block-content">
                         <p className="main-center-paragraph">
@@ -104,7 +106,7 @@ export class Home extends Component {
             
                 <div className="main-block">
                     <div className="main-block-header">
-                        OUR MONITORING SYSTEM
+                        Our Monitoring System
                     </div>
                     <div className="main-block-content">
                         <p className="main-center-paragraph">
@@ -136,19 +138,19 @@ export class Home extends Component {
             
                 <div className="main-block">
                     <div className="main-block-header">
-                        FEATURED
+                        Featured
                     </div>
                     <div className="main-block-content">
                         <table>
                             <tr>
                                 <td style={{width: "30%"}}>
-                                    <img style={{width: "60%"}} src="images/wur.jpg"/>
+                                    <img style={{width: "60%"}} src="/images/wur.jpg"/>
                                 </td>
                                 <td style={{width: "30%"}}>
-                                    <img style={{width: "50%"}} src="images/iucn.png"/>                                       
+                                    <img style={{width: "50%"}} src="/images/iucn.png"/>                                       
                                 </td>
                                 <td style={{width: "30%"}}>
-                                    <img style={{width: "100%"}} src="images/lnv.png"/>
+                                    <img style={{width: "100%"}} src="/images/lnv.png"/>
                                 </td>
                             </tr>
                         </table>

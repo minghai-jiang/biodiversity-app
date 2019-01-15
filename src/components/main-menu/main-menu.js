@@ -3,8 +3,6 @@ import { NavLink } from "react-router-dom";
 
 import "./main-menu.css";
 
-const logoWhiteImage = process.env.PUBLIC_URL + '/images/logo-white.png';
-
 export class MainMenu extends Component {
     constructor(props, context) {
         super(props, context)
@@ -31,7 +29,7 @@ export class MainMenu extends Component {
                 <ul>
                     <li>
                         <NavLink to="/" className="main-menu-logo-item">
-                            <img className="main-menu-logo" src="images/logo-white.png"/>
+                            <img className="main-menu-logo" src="/images/logo-white.png"/>
                         </NavLink>
                     </li>
                     <li>

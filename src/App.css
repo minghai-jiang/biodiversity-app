@@ -27,11 +27,14 @@
 }
 
 .main-block {
-    /* padding-top: 3em; */
     padding-bottom: 3em;
 
     font-size: 14pt;
     line-height: 1.6; 
+}
+
+.main-block-first {
+    padding-top: 3em;
 }
 
 .main-block-accented {
@@ -39,10 +42,19 @@
     color: #ffffff;
 }
 
+.main-block-accented h1, .main-block-accented h2, .main-block-accented h3, 
+.main-block-accented h4, .main-block-accented h5 {
+    color: #ffffff;
+}
+
 .main-block-content {
     width: 40em;
     margin-left: auto;
     margin-right: auto;
+}
+
+.main-block-content-left {
+    text-align: left;
 }
 
 .main-block-header {
@@ -57,6 +69,10 @@
 
 .main-center-paragraph {
     margin-bottom: 2em;
+}
+
+.main-center-paragraph-first {
+    margin-top: 2em;
 }
 
 .main-block > p.main-center-paragraph:last-of-type {
@@ -77,12 +93,19 @@
     width: 50%;
 }
 
+.key-words {
+    color: #026464;
+    font-style: italic;
+    font-weight: bold;
+}
+
 .button {
     padding: 0.6em 1.5em;
     text-align: center;
     background-color: #ffffff;
     border: 3px solid #026464;
     text-decoration: none;
+    font-weight: bold;
 
     -webkit-transition-duration: 0.2s; /* Safari */
     transition-duration: 0.2s;
@@ -93,12 +116,27 @@
     color: #ffffff;
 }
 
+.button-accented {
+    border: 3px solid #026464;
+    background-color: #ffffff;
+    color: #00a3a3
+}
+
+.button-accented:hover {
+    background-color: #00a3a3;
+    color: #ffffff
+}
+
 .button-a {
     color: inherit;
     text-decoration: none;
 }
 
-
+.code-block {
+    background-color: #eeeeee;
+    padding: 0.4em 0.6em;
+    font-size: 15px;
+}
 
 @keyframes App-logo-spin {
   from {
