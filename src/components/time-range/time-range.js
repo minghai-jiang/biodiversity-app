@@ -1,7 +1,7 @@
 import React, { PureComponent, createRef } from "react";
 import $ from 'jquery';
-import slider from 'jquery-ui/ui/widgets/slider';
 import produce from "immer";
+import Moment from "moment";
 
 import 'jquery-ui/themes/base/all.css'
 import "./time-range.css";
@@ -42,14 +42,12 @@ export class TimeRange extends PureComponent {
         var dateRangeText = "";    
 
         if (startTimestamp && endTimestamp) {
-            var options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-            var startDate = new Date(startTimestamp.date);
-            var endDate = new Date(endTimestamp.date);
+            let dateFormat = "MMM Do YYYY";
 
             dateRangeText = 
-                startDate.toLocaleDateString("en-US", options) + 
+                Moment(startTimestamp.date).format(dateFormat) + 
                 " - " + 
-                endDate.toLocaleDateString("en-US", options);
+                Moment(endTimestamp.date).format(dateFormat);
         }
 
         let sliderDateElement = $("#slider-date");

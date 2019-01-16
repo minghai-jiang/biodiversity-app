@@ -1,4 +1,3 @@
-/* eslint-disable import/first */
 import React, { PureComponent, createRef } from "react";
 
 import "./viewer.css";
@@ -8,12 +7,10 @@ import {
   Map,
   TileLayer,
   LayersControl,
-  MapProps,
   WMSTileLayer,
   LayerGroup
 } from "react-leaflet";
-import L, { Layer } from "leaflet";
-window.L = L;
+import L from "leaflet";
 import "leaflet-draw";
 import produce from "immer";
 import Moment from "moment";
@@ -23,8 +20,9 @@ import { MapSelector } from "../map-selector/map-selector";
 import { TimeRange } from "../time-range/time-range";
 import { Graph } from "../graph/graph";
 import { MaxMaskedSlider } from "../max-masked-slider/max-masked-slider";
-import { relative } from "path";
-const { BaseLayer, Overlay } = LayersControl;
+
+const { Overlay } = LayersControl;
+window.L = L;
 
 const defaultMapParams = {
     tileSize: 256,
