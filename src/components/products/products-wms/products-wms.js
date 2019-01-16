@@ -22,8 +22,7 @@ export class ProductsWms extends Component {
                         </p>
                         <p>
                             Which maps are available can be obtained through our <NavLink to="/products/api">API</NavLink>
-                            , as well as the available timestamps and 
-                            layers for that map.
+                            , as well as the available timestamps and layers for that map.
                         </p>
                     </div>                        
                 </div>     

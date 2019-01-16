@@ -9,7 +9,7 @@ export class About extends Component {
         return (
             <div>
                 <div className="main-content">
-                    <div className="main-block">
+                    <div className="main-block about-us-block">
                         <div className="main-block-header">
                             About Us
                         </div>
