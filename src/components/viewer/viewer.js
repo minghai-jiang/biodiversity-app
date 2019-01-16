@@ -39,12 +39,13 @@ const defaultMap = {
     wmsName: "Chaco"
 };
 
+const maskLabel = "mask";
+const blancLabel = "blanc";
+
 const clearIndex = "clear";
 const maskedIndex = "masked";
 
-
 const maskGraphLineName = "mask";
-
 
 class Viewer extends PureComponent {
     mapRef = createRef();
@@ -150,6 +151,7 @@ class Viewer extends PureComponent {
                     x: [],
                     y: [],
                     t: [],
+                    p: [],
                     color: $class.color            
                 };
 
@@ -233,27 +235,32 @@ class Viewer extends PureComponent {
                 }            
             }
 
-            // Change the masked and clear graphs in pixels to a general mask graph in percentages from 0 to 1.
-            // Both graphs should have the same number of columns in the same order, as both values should never
-            // contain NaNs.
-            // let maskDataGraph = classificationDataObject[maskLabel];
-            // let blancDataGraph = classificationDataObject[blancLabel];
-            // if (blancDataGraph && maskDataGraph) {
-            //     for (let i = 0; i < blancDataGraph.y.length; i++) {
-            //         let totalPixels = blancDataGraph.y[i] + maskDataGraph.y[i];
-            //         maskDataGraph.y[i] = maskDataGraph.y[i] / totalPixels;
-            //     }
+            // Merge the mask and blanc graphs into a new mask graph.
+            // Then calculate the percent masked pixels.
+            let maskDataGraph = classificationDataObject[maskLabel];
+            let blancDataGraph = classificationDataObject[blancLabel];
+            if (blancDataGraph && maskDataGraph) {
+                for (let i = 0; i < blancDataGraph.y.length; i++) {
+                    let totalPixels = 0;
+                    for (var graph in classificationDataObject) {
+                        if (classificationDataObject.hasOwnProperty(graph)) {
+                            totalPixels += classificationDataObject[graph].y[i];
+                        }
+                    }
+                    maskDataGraph.y[i] += blancDataGraph.y[i];
+                    maskDataGraph.p.push(maskDataGraph.y[i] / totalPixels);
+                }
 
-            //     debugger;
+                debugger;
 
-            //     maskDataGraph.name = maskGraphLineName;
-            //     maskDataGraph.color = "d3d3d3ff";
+                maskDataGraph.name = maskGraphLineName;
+                maskDataGraph.color = "d3d3d3ff";
 
-            //     delete classificationDataObject[maskLabel];
-            //     delete classificationDataObject[blancLabel];
+                delete classificationDataObject[maskLabel];
+                delete classificationDataObject[blancLabel];
 
-            //     classificationDataObject[maskGraphLineName] = maskDataGraph;
-            // }
+                classificationDataObject[maskGraphLineName] = maskDataGraph;
+            }
 
             let clearDataGraph = indicesDataObject[clearIndex];
             let maskedDataGraph = indicesDataObject[maskedIndex];
@@ -333,14 +340,14 @@ class Viewer extends PureComponent {
         let removeDatesLabels = [];
         let removeDatesIndices = [];
 
-        // let maskLabelsGraph = this.state.classificationData[maskGraphLineName];
+        let maskLabelsGraph = this.state.classificationData[maskGraphLineName];
         let maskIndicesGraph = this.state.indicesData[maskGraphLineName];
 
-        // for (let i = 0; i < maskLabelsGraph.y.length; i++) {
-        //     if (maskLabelsGraph.y[i] > this.state.maxMasked) {
-        //         removeDatesLabels.push(maskLabelsGraph.x[i]);
-        //     }
-        // }
+        for (let i = 0; i < maskLabelsGraph.y.length; i++) {
+            if (maskLabelsGraph.p[i] > this.state.maxMasked) {
+                removeDatesLabels.push(maskLabelsGraph.x[i]);
+            }
+        }
 
         for (let i = 0; i < maskIndicesGraph.y.length; i++) {
             if (maskIndicesGraph.y[i] > this.state.maxMasked) {

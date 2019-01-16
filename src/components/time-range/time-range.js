@@ -2,6 +2,7 @@ import React, { PureComponent} from "react";
 import $ from 'jquery';
 import produce from "immer";
 import Moment from "moment";
+import 'jquery-ui/ui/widgets/slider';
 
 import 'jquery-ui/themes/base/all.css'
 import "./time-range.css";

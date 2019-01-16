@@ -1,5 +1,6 @@
 import React, { PureComponent} from "react";
 import $ from 'jquery';
+import 'jquery-ui/ui/widgets/slider';
 
 import 'jquery-ui/themes/base/all.css';
 import "./max-masked-slider.css";
