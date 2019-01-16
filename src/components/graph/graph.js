@@ -13,7 +13,7 @@ export class Graph extends PureComponent {
   }
 
   componentWillReceiveProps = (nextProps) => {
-    if (this.state.data != nextProps.data) {
+    if (this.state.data !== nextProps.data) {
       this.setState({ data: nextProps.data });
     }
   }

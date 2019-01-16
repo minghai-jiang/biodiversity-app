@@ -25,7 +25,7 @@ export class About extends Component {
                         </div>                        
                     </div>
 
-                    <div className="main-block main-block-accented">
+                    <div className="main-block main-block-accented about-accented-block">
                         <div className="main-block-content">
                             <p className="main-center-paragraph">
                                 Feel free to contact us for any questions or inquiries at:
@@ -44,7 +44,7 @@ export class About extends Component {
                                     <tr>
                                         <td className="profile">
                                             <div>
-                                                <img className="profile-photo" src="/images/rosalie.jpg"/>
+                                                <img className="profile-photo" src="/images/rosalie.jpg" alt="CEO Rosalie"/>
                                             </div>
                                             <div className="profile-name">
                                                 Rosalie
@@ -59,7 +59,7 @@ export class About extends Component {
                                         </td>
                                         <td className="profile">
                                             <div>
-                                                <img className="profile-photo" src="/images/daniel.jpg"/>                                       
+                                                <img className="profile-photo" src="/images/daniel.jpg" alt="CTO Daniel"/>                                       
                                             </div>
                                             <div className="profile-name">
                                                 Daniel
@@ -74,7 +74,7 @@ export class About extends Component {
                                         </td>
                                         <td className="profile">
                                             <div>
-                                                <img className="profile-photo" src="/images/minghai.jpg"/>
+                                                <img className="profile-photo" src="/images/minghai.jpg" alt="CIO Minghai"/>
                                             </div>
                                             <div className="profile-name">
                                                 Minghai
@@ -92,7 +92,7 @@ export class About extends Component {
                                     <tr>
                                         <td className="profile">
                                             <div>
-                                                <img className="profile-photo" src="/images/laura.jpg"/>
+                                                <img className="profile-photo" src="/images/laura.jpg" alt="Remote sensing expert Laura"/>
                                             </div>
                                             <div className="profile-name">
                                                 Laura
@@ -106,7 +106,7 @@ export class About extends Component {
                                         </td>
                                         <td className="profile">
                                             <div>
-                                                <img className="profile-photo" src="/images/patrick.jpg"/>                                       
+                                                <img className="profile-photo" src="/images/patrick.jpg" alt="Machine learning expert Patrick"/>                                       
                                             </div>
                                             <div className="profile-name">
                                                 Patrick
@@ -120,7 +120,7 @@ export class About extends Component {
                                         </td>
                                         <td className="profile">
                                             <div>
-                                                <img className="profile-photo" src="/images/florian.jpg"/>
+                                                <img className="profile-photo" src="/images/florian.jpg" alt="Front-end developer Florian"/>
                                             </div>
                                             <div className="profile-name">
                                                 Florian

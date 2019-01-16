@@ -11,7 +11,7 @@ export class Home extends Component {
             <div>
                 <div className="main-content">
                     <div id="banner">
-                        <img id="banner-logo" src="/images/logo-white-subtitle.png"/>                    
+                        <img id="banner-logo" src="/images/logo-white-subtitle.png" alt="Ellipsis Earth Intelligence"/>                    
                     </div>
 
                     <div className="main-block main-block-first">
@@ -144,17 +144,17 @@ export class Home extends Component {
                             Featured
                         </div>
                         <div className="main-block-content">
-                            <table>
+                            <table class="featured-table">
                                 <tbody>
                                     <tr>
-                                        <td style={{width: "30%"}}>
-                                            <img style={{width: "60%"}} src="/images/wur.jpg"/>
+                                        <td className="featured-table-cell" title="Wageningen University & Research">
+                                            <img style={{width: "60%"}} src="/images/wur.png" alt="Wageningen University & Research"/>
                                         </td>
-                                        <td style={{width: "30%"}}>
-                                            <img style={{width: "50%"}} src="/images/iucn.png"/>                                       
+                                        <td className="featured-table-cell" title="International Union for Convervation of Nature">
+                                            <img style={{width: "50%"}} src="/images/iucn.png" alt="International Union for Convervation of Nature"/>                                       
                                         </td>
-                                        <td style={{width: "30%"}}>
-                                            <img style={{width: "100%"}} src="/images/lnv.png"/>
+                                        <td className="featured-table-cell" title="Dutch Ministry of Agriculture, Nature and Food Quality">
+                                            <img style={{width: "100%"}} src="/images/lnv.png" alt="Dutch Ministry of Agriculture, Nature and Food Quality"/>
                                         </td>
                                     </tr>
                                 </tbody>                                

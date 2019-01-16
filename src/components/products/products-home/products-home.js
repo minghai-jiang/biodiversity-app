@@ -7,7 +7,7 @@ export class ProductsHome extends Component {
             <div>
                 <div className="main-block main-block-first product-block-first">
                     <div className="main-block-content main-block-content-left">
-                        <img src="/images/logo-black-subtitle.png" className="products-top-image"/>
+                        <img className="products-top-image" src="/images/logo-black-subtitle.png" alt="Ellipsis Earth Intelligence logo black"/>
 
                         <p>
                             Ellipsis Product is an easy to use API and WMS that allows you to query and visualise

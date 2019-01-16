@@ -39,10 +39,6 @@ const defaultMap = {
     wmsName: "Chaco"
 };
 
-
-const maskLabel = "mask";
-const blancLabel = "blanc";
-
 const clearIndex = "clear";
 const maskedIndex = "masked";
 
@@ -72,9 +68,8 @@ class Viewer extends PureComponent {
         
             showGraph: false,
             classificationData: null,
-            indicesData: null,   
-            graphClassificationData: [],
             indicesData: [],
+            graphClassificationData: [],
             
             maxMasked: 1
         };
@@ -114,7 +109,7 @@ class Viewer extends PureComponent {
             drawnItems.addLayer(layer);
             const latLngs = layer.getLatLngs()[0];
 
-            var shapeCoords = new Array();
+            var shapeCoords = [];
             for (let i = 0; i < latLngs.length; i++) {
                 var coord = {
                 x: latLngs[i].lng,
@@ -126,7 +121,7 @@ class Viewer extends PureComponent {
 
             const request = new Request(`${this.state.apiUrl}getTileData`);      
 
-            let timestampUuids = new Array();
+            let timestampUuids = [];
             for (let i = this.state.timeStart; i <= this.state.timeEnd && i < this.state.map.timestamps.length; i++) {
                 timestampUuids.push(this.state.map.timestamps[i].uuid);
             }
@@ -338,7 +333,7 @@ class Viewer extends PureComponent {
         let removeDatesLabels = [];
         let removeDatesIndices = [];
 
-        let maskLabelsGraph = this.state.classificationData[maskGraphLineName];
+        // let maskLabelsGraph = this.state.classificationData[maskGraphLineName];
         let maskIndicesGraph = this.state.indicesData[maskGraphLineName];
 
         // for (let i = 0; i < maskLabelsGraph.y.length; i++) {

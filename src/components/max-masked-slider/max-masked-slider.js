@@ -1,10 +1,8 @@
-import React, { PureComponent, createRef } from "react";
+import React, { PureComponent} from "react";
 import $ from 'jquery';
-import slider from 'jquery-ui/ui/widgets/slider';
 
 import 'jquery-ui/themes/base/all.css';
 import "./max-masked-slider.css";
-
 
 export class MaxMaskedSlider extends PureComponent {
     maxMaskedSliderId = "max-masked-slider";

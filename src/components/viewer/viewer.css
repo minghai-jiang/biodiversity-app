@@ -6,6 +6,10 @@ div.content {
     position: relative;
 }
 
+.leaflet-control {
+    font-size: 12pt;
+}
+
 .map-selector-div {
   position: absolute;
   width: 100%;

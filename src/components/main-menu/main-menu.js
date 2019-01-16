@@ -29,7 +29,7 @@ export class MainMenu extends Component {
                 <ul>
                     <li>
                         <NavLink to="/" className="main-menu-logo-item">
-                            <img className="main-menu-logo" src="/images/logo-white.png"/>
+                            <img className="main-menu-logo" src="/images/logo-white.png" alt="Ellipsis Earth Intelligence logo white"/>
                         </NavLink>
                     </li>
                     <li>
@@ -57,11 +57,11 @@ export class MainMenu extends Component {
                             Contact
                         </NavLink>
                     </li> */}
-                    <li style={{float: "right"}}>
+                    {/* <li style={{float: "right"}}>
                         <NavLink to="/login" className="main-menu-item">
                             Login
                         </NavLink>
-                    </li>
+                    </li> */}
                 </ul>           
             </div>
         )
