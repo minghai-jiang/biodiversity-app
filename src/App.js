@@ -24,9 +24,14 @@ class App extends Component {
         document.title = "Ellipsis Earth Intelligence"
     }
 
+    closeMenu = () => {
+        var x = document.getElementById("main-menu");
+        x.className = "";
+    }
+
     render() {
         return (
-            <div className="App">
+            <div className="App" onClick={this.closeMenu}>
                 <MainMenu>
                 </MainMenu>
                 <div className="content">

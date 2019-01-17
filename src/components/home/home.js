@@ -55,26 +55,17 @@ export class Home extends Component {
                                 impact through more effective use of time and resources. Or start experimenting with our API 
                                 to see how you could integrate this information into your own systems.
                             </p>
-                            <table className="home-main-block-content-table">
-                                <tbody>
-                                    <tr>
-                                        <td style={{marginRight: "5em"}}className="home-main-block-content-table-two-rows">
-                                            <NavLink to="/maps" className="button-a">
-                                                <div className="button">
-                                                    Maps                                                
-                                                </div>
-                                            </NavLink>
-                                        </td>
-                                        <td className="home-main-block-content-table-two-rows">
-                                            <NavLink to="/products/api" className="button-a">
-                                                <div className="button">
-                                                    API documentation                                                
-                                                </div>
-                                            </NavLink>
-                                        </td>
-                                    </tr>
-                                </tbody>                            
-                            </table>
+                            <NavLink to="/maps" className="button-a">
+                                <div className="button main-block-single-button">
+                                    Maps                                                
+                                </div>
+                            </NavLink>
+                            <br/>
+                            <NavLink to="/products/api" className="button-a">
+                                <div className="button main-block-single-button">
+                                    API documentation                                                
+                                </div>
+                            </NavLink>
                         </div>                       
                     </div>
                 
@@ -143,8 +134,23 @@ export class Home extends Component {
                         <div className="main-block-header">
                             Featured
                         </div>
-                        <div className="main-block-content">
-                            <table class="featured-table">
+                        <div className="main-block-content featured-content">
+                            <div className="featured-container">
+                                <div className="featured-div" title="Wageningen University & Research">
+                                    <span className="helper"></span>
+                                    <img style={{width: "60%"}} src="/images/wur.png" alt="Wageningen University & Research"/>
+                                </div>
+                                <div className="featured-div" title="International Union for Convervation of Nature">
+                                    <span className="helper"></span>
+                                    <img style={{width: "50%"}} src="/images/iucn.png" alt="International Union for Convervation of Nature"/>                            
+                                </div>
+                                <div className="featured-div" title="Dutch Ministry of Agriculture, Nature and Food Quality">
+                                    <span className="helper"></span>
+                                    <img style={{width: "100%"}} src="/images/lnv.png" alt="Dutch Ministry of Agriculture, Nature and Food Quality"/>                            
+                                </div>
+                            </div>
+                            
+                            {/* <table className="featured-table">
                                 <tbody>
                                     <tr>
                                         <td className="featured-table-cell" title="Wageningen University & Research">
@@ -158,7 +164,7 @@ export class Home extends Component {
                                         </td>
                                     </tr>
                                 </tbody>                                
-                            </table>
+                            </table> */}
                         </div>                        
                     </div>
                 </div>

@@ -7,7 +7,9 @@
     position: relative;
     top: 140px;
     font-size: 14pt;
+
     width: 40em;
+    max-width: 80vw;
 }
 
 .home-main-block-content-table {
@@ -22,6 +24,29 @@
     /* background-color: #adbccc; */
 }
 
+.featured-content {
+    overflow: hidden;
+}
+
+.featured-container {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.featured-div {
+    width: 30%;
+    height: 8em;
+    float: left;
+    border: 1px solid #026464;
+    margin: 0.5em;
+}
+
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
 .featured-table {
     border-spacing: 1em 0em;
 }
@@ -31,6 +56,25 @@
     border: 1px solid #026464;
 }
 
-.featured-table-cell > img {
+.featured-div > img {
     padding: 0.5em 0em;
+    vertical-align: middle;
+}
+
+@media only screen and (max-device-width : 640px) {
+    #banner {
+        height: 50vh;
+    }
+
+    #banner-logo {
+        top: 11vh;
+    }
+
+    .featured-div {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        float: none;
+        height: 9em;
+    }
 }

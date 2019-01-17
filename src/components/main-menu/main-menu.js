@@ -15,6 +15,18 @@ export class MainMenu extends Component {
 
     }
 
+    toggleMenu = (event) => {
+        var x = document.getElementById("main-menu");
+        if (x.className === "") {
+            x.className = "responsive";
+        } 
+        else {
+            x.className = "";
+        }
+
+        event.stopPropagation();
+    }
+
     render() {
         let displayStyle = {
             display: "block"
@@ -62,7 +74,10 @@ export class MainMenu extends Component {
                             Login
                         </NavLink>
                     </li> */}
-                </ul>           
+                </ul> 
+                <a href="javascript:void(0);" className="icon" onClick={this.toggleMenu}>
+                    <img src="/images/three-lines.png"></img>
+                </a>          
             </div>
         )
     }

@@ -1,4 +1,4 @@
-.about-us-block {
+div.about-us-block {
     padding-bottom: 0em;
 }
 
@@ -36,4 +36,11 @@ div.about-accented-block {
 
 .profile-text {
     font-size: 11pt;
+}
+
+@media screen and (max-width: 600px) {
+    div.about-us-team-block {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
 }

@@ -38,7 +38,7 @@ export class About extends Component {
                     </div>
 
                     <div className="main-block">
-                        <div className="main-block-content">                            
+                        <div className="main-block-content about-us-team-block">                            
                             <table className="team-table">
                                 <tbody>
                                     <tr>

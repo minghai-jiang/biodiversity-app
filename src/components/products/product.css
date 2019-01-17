@@ -18,3 +18,9 @@ div.product-block-accented {
 div.product-single-button {
     width: 30%;
 }
+
+@media screen and (max-width: 600px) {
+    div.product-single-button {
+        width: 70%;
+    }
+}

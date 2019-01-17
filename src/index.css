@@ -9,7 +9,14 @@ body {
     -moz-osx-font-smoothing: grayscale;
 
     font-size: 14pt;
+    line-height: 1.6; 
     color: #666666;
+}
+
+@media only screen and (max-device-width : 640px) {
+    body {
+        font-size: 13pt;
+    }
 }
 
 code {

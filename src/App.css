@@ -32,9 +32,6 @@
 
 .main-block {
     padding-bottom: 3em;
-
-    font-size: 14pt;
-    line-height: 1.6; 
 }
 
 .main-block-first {
@@ -53,6 +50,7 @@
 
 .main-block-content {
     width: 40em;
+    max-width: 80vw;
     margin-left: auto;
     margin-right: auto;
 }
@@ -140,6 +138,7 @@
     background-color: #eeeeee;
     padding: 0.4em 0.6em;
     font-size: 15px;
+    word-wrap: break-word;
 }
 
 @keyframes App-logo-spin {
@@ -149,4 +148,10 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@media only screen and (max-device-width : 640px) {
+    .main-block-header {    
+        font-size: 22pt;
+    }
 }
