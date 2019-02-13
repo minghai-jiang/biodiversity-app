@@ -5,7 +5,7 @@ import Moment from "moment";
 import $ from 'jquery';
 
 import MapSelector from './map-selector/map-selector';
-import ViewerMap from './viewer-map/viewer-map';
+import ViewerMap from './ViewerMap/ViewerMap';
 
 class Viewer extends PureComponent {
     constructor(props, context) {

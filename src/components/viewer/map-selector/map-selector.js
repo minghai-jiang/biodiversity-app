@@ -37,7 +37,8 @@ export class MapSelector extends PureComponent {
         let mapName = parsedCsv.data[i][mapNameHeaderIndex];
         maps.push({
           id: mapId,
-          name: mapName
+          name: mapName,
+          wmsMapName: mapName.replace(' ', '_')
         });
       }
 
