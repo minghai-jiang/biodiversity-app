@@ -29,9 +29,7 @@ export class ViewerMap extends PureComponent {
     this.state = {
       zoom: 3,
       lat: 40.509865,
-      lon: -0.118092,
-
-      timestampRange: {start: 0, end: 0}
+      lon: -0.118092
     };
   };
 
@@ -39,20 +37,24 @@ export class ViewerMap extends PureComponent {
 
   };
 
-  createLayers = (layerType, stacking) => {
+  createLayers = (layerType, stacking, zIndex) => {
     var layers = [];
 
     let map = this.props.map;
-    if (map) {
+    let timestampRange = this.props.timestampRange;
+
+    if (map && timestampRange) {
+      let timestampStart = stacking ? timestampRange.start : timestampRange.end;
+
       if (map.layerTypes.includes(layerType)) {
         let typeLayers = map.layers[layerType];
   
         for (let i = 0; i < typeLayers.length; i++) {
           let layerName = typeLayers[i].name;
-          let timestampStart = stacking ? this.state.timestampRange.start : this.state.timestampRange.end;
+          let zIndexOffset = i * (timestampRange.end - timestampStart);
           
           let timestampLayers = [];
-          for (let y = timestampStart; y <= this.state.timestampRange.end; y++) 
+          for (let y = timestampStart; y <= timestampRange.end; y++) 
           {
             timestampLayers.push(             
               <TileLayer
@@ -62,7 +64,7 @@ export class ViewerMap extends PureComponent {
                 maxZoom={mapParams.maxZoom}
                 attribution={mapParams.attribution}
                 format={mapParams.format}
-                zIndex={2}
+                zIndex={zIndex + zIndexOffset + timestampLayers.length}
                 key={y}
               />
             );
@@ -93,11 +95,12 @@ export class ViewerMap extends PureComponent {
               url="https://api.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWhqaWFuZyIsImEiOiJjamhkNXU3azcwZW1oMzZvNjRrb214cDVsIn0.QZWgmabi2gRJAWr1Vr3h7w"
               attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href = "https://www.mapbox.com/" > Mapbox</a >'
               noWrap={true}
+              zIndex={0}
             />
           </LayersControl.Overlay>
-          {this.createLayers(imagesLayerType, true)}
-          {this.createLayers(labelsLayerType, false)}
-          {this.createLayers(indicesLayerType, false)}
+          {this.createLayers(imagesLayerType, true, 100)}
+          {this.createLayers(labelsLayerType, false, 200)}
+          {this.createLayers(indicesLayerType, false, 300)}
         </LayersControl>
       </Map>
     );

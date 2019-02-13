@@ -1,10 +1,9 @@
 import React, { PureComponent } from "react";
 
 import "./viewer.css";
-import Moment from "moment";
-import $ from 'jquery';
 
 import MapSelector from './map-selector/map-selector';
+import TimestampSelector from './TimestampSelector/TimestampSelector';
 import ViewerMap from './ViewerMap/ViewerMap';
 
 class Viewer extends PureComponent {
@@ -14,21 +13,19 @@ class Viewer extends PureComponent {
       this.state = {
         timestampNumber: "0",
     
-        timeStart: 0,
-        timeEnd: 0
+        timestampRange: { start: 0, end: 0 }
       };
     }
 
-    selectMap = map => {
+    onSelectMap = map => {
       this.setState({
           map: map
       });
     };
 
-    selectTimestampRange = (start, end) => {
+    onSelectTimestampRange = (start, end) => {
       this.setState({
-        timeStart: start,
-        timeEnd: end
+        timestampRange: { start: start, end: end }
       });
     };
 
@@ -38,12 +35,19 @@ class Viewer extends PureComponent {
           <div className="map-selector-div">
             <MapSelector 
               apiUrl={this.props.apiUrl} 
-              onSelect={this.selectMap} 
+              onSelect={this.onSelectMap} 
+            />
+          </div>
+          <div id="time-range-selector" className="time-range-selector">                   
+            <TimestampSelector
+              timestamps={this.state.map ? this.state.map.timestamps : null}
+              onSlide={this.onSelectTimestampRange}
             />
           </div>
           <ViewerMap
             apiUrl={this.props.apiUrl} 
             map={this.state.map}
+            timestampRange={this.state.timestampRange}
           />
         </div>
       );
