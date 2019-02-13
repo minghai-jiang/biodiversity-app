@@ -1,0 +1,8 @@
+.query-pane {
+  /* width: 50% !important; */
+}
+
+.slide-pane__close {
+  padding-bottom: 0.5em;
+  transform: rotate(180deg);
+}

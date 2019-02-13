@@ -104,3 +104,16 @@ div.content {
 .leaflet-control-layers {
   text-align: left
 }
+
+.open-query-window-button {
+  position: absolute;
+  top: 35vh;
+  right: 0px;
+  width: 20px;
+  height: 100px;
+
+  background-color: red;
+
+  z-index: 100000;
+}
+

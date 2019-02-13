@@ -1,10 +1,11 @@
 import React, { PureComponent } from "react";
 
-import "./viewer.css";
+import "./Viewer.css";
 
 import MapSelector from './map-selector/map-selector';
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 import ViewerMap from './ViewerMap/ViewerMap';
+import QueryPane from './QueryPane/QueryPane';
 
 class Viewer extends PureComponent {
     constructor(props, context) {
@@ -15,7 +16,10 @@ class Viewer extends PureComponent {
     
         timestampRange: { start: 0, end: 0 }
       };
-    }
+    };
+
+    componentDidMount() {
+    };
 
     onSelectMap = map => {
       this.setState({
@@ -49,7 +53,8 @@ class Viewer extends PureComponent {
             map={this.state.map}
             timestampRange={this.state.timestampRange}
           />
-        </div>
+          <QueryPane/>
+      </div>
       );
     }
 }
