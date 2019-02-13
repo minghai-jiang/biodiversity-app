@@ -142,7 +142,7 @@ export class Home extends Component {
                                 </div>
                                 <div className="featured-div" title="International Union for Convervation of Nature">
                                     <span className="helper"></span>
-                                    <img style={{width: "50%"}} src="/images/iucn.png" alt="International Union for Convervation of Nature"/>                            
+                                    <img style={{width: "92%"}} src="/images/iucn.jpg" alt="International Union for Convervation of Nature"/>                            
                                 </div>
                                 <div className="featured-div" title="Dutch Ministry of Agriculture, Nature and Food Quality">
                                     <span className="helper"></span>

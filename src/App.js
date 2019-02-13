@@ -12,12 +12,9 @@ import About from "./components/about/about";
 import Contact from "./components/contact/contact";
 import Products from "./components/products/products";
 
-
-
 import "./App.css";
 
-const apiUrl = "https://api.birdsai.co/api/";
-const wmsUrl = "https://wms.birdsai.co/";
+const apiUrl = "https://dev.api.ellipsis-earth.com/";
 
 class App extends Component {
     componentDidMount() {
@@ -36,7 +33,7 @@ class App extends Component {
                 </MainMenu>
                 <div className="content">
                     <Route exact path="/" component={Home}/>
-                    <Route path="/maps" render={(props) => <Viewer apiUrl={apiUrl} wmsUrl = {wmsUrl} {...props} />} />
+                    <Route path="/maps" render={(props) => <Viewer apiUrl={apiUrl} {...props} />} />
                     <Route path="/products" component={Products}/>
                     <Route path="/about" component={About}/>
                     <Route path="/contact" component={Contact} />
