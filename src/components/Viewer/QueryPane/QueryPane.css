@@ -1,8 +1,23 @@
 .query-pane {
-  /* width: 50% !important; */
+  font-size: 12pt;
 }
 
 .slide-pane__close {
   padding-bottom: 0.5em;
   transform: rotate(180deg);
 }
+
+.query-data-table {
+  border-collapse: collapse
+}
+
+.query-data-table > tr:nth-child(even) {
+  background-color: #f2f2f2;
+} 
+
+.query-data-table-cell {
+  padding: 0.3em 0.7em;
+  border-bottom: 1px solid #ddd;
+  /* border: 1px solid black;  */
+}
+

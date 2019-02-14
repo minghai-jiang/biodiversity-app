@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, createRef } from 'react';
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -24,6 +24,8 @@ let mapParams = {
 };
 
 export class ViewerMap extends PureComponent {
+  mapRef = createRef();
+
   constructor(props) {
     super(props);
     this.state = {
@@ -34,8 +36,46 @@ export class ViewerMap extends PureComponent {
   };
 
   componentDidMount = () => {
-
+    const map = this.mapRef.current.leafletElement;
+    var drawnItems = new L.featureGroup();
+    map.addLayer(drawnItems);
+    var drawControl = new L.Control.Draw({
+      draw: {
+        polygon: {
+          allowIntersection: false
+        },
+        rectangle: true,
+        marker: false,
+        polyline: false,
+        circle: false,
+        circlemarker: false
+      },
+      edit: false
+    });
+    map.addControl(drawControl);
+    map.on(L.Draw.Event.CREATED, this.onShapeDrawnClosure(drawnItems));
   };
+
+  onShapeDrawnClosure(drawnItems) {
+    return function onShapeDrawn(event) {
+      drawnItems.clearLayers();
+      const layer = event.layer;
+      drawnItems.addLayer(layer);
+      const latLngs = layer.getLatLngs()[0];
+
+      var shapeCoords = [];
+      for (let i = 0; i < latLngs.length; i++) {
+        var coord = {
+          x: latLngs[i].lng,
+          y: latLngs[i].lat
+        };
+
+        shapeCoords.push(coord);
+      }
+
+      this.props.onShapeDrawn(shapeCoords);
+    }.bind(this);
+  }
 
   createLayers = (layerType, stacking, zIndex) => {
     var layers = [];
@@ -88,7 +128,9 @@ export class ViewerMap extends PureComponent {
       <Map
         center={[this.state.lat, this.state.lon]}
         zoom={this.state.zoom}
-        style={{ height: "92.4vh" }}      >
+        style={{ height: "92.4vh" }}  
+        ref={this.mapRef}
+      >
         <LayersControl position="topright">
           <LayersControl.Overlay checked name="Base satellite">
             <TileLayer

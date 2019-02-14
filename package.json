@@ -9,7 +9,7 @@
     "leaflet-draw": "^1.0.4",
     "moment": "^2.23.0",
     "papaparse": "^4.6.3",
-    "plotly.js": "^1.43.2",
+    "plotly.js": "^1.44.4",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-leaflet": "^2.1.4",

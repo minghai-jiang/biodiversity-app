@@ -12,26 +12,31 @@ class Viewer extends PureComponent {
       super(props, context);
 
       this.state = {
-        timestampNumber: "0",
-    
-        timestampRange: { start: 0, end: 0 }
+        timestampRange: { start: 0, end: 0 },
+        shape: []
       };
-    };
+    }
 
     componentDidMount() {
-    };
+    }
 
     onSelectMap = map => {
       this.setState({
           map: map
       });
-    };
+    }
+
+    onShapeDrawn = shape => {
+      this.setState({
+        shape: shape
+      });
+    }
 
     onSelectTimestampRange = (start, end) => {
       this.setState({
         timestampRange: { start: start, end: end }
       });
-    };
+    }
 
     render() {
       return (
@@ -52,8 +57,14 @@ class Viewer extends PureComponent {
             apiUrl={this.props.apiUrl} 
             map={this.state.map}
             timestampRange={this.state.timestampRange}
+            onShapeDrawn={this.onShapeDrawn}
           />
-          <QueryPane/>
+          <QueryPane
+            apiUrl={this.props.apiUrl}
+            map={this.state.map}
+            timestampRange={this.state.timestampRange}
+            shape={this.state.shape}
+          />
       </div>
       );
     }
