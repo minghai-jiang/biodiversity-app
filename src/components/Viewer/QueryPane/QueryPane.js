@@ -172,17 +172,21 @@ export class QueryPane extends PureComponent {
           title='Query Data'
           width={'80%'}
           onRequestClose={() => { this.toggleQueryPane(false); }}>
-          <div>
+          <div className='query-pane-div' style={{marginTop: '0px'}}>
             <select ref='querySelect'>
               <option value="">Select a query</option>
               {this.renderQueryOptions()}
             </select>
           </div>
-          <div>
+          <div className='query-pane-div' >
             {this.renderShapeCoords()}
           </div>
-          <button onClick={this.executeQuery}>Execute query</button>
-          <button onClick={this.downloadData}>Download data</button>
+          <div className='query-pane-div' >
+            <button onClick={this.executeQuery}>Execute query</button>
+          </div>
+          <div className='query-pane-div' >
+            <button onClick={this.downloadData}>Download data</button>
+          </div>
           {this.state.dataTable}
         </SlidingPane>
       </div>
