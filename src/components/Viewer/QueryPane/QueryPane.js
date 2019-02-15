@@ -171,7 +171,8 @@ export class QueryPane extends PureComponent {
           isOpen={this.state.openQueryPane}
           title='Query Data'
           width={'80%'}
-          onRequestClose={() => { this.toggleQueryPane(false); }}>
+          onRequestClose={() => { this.toggleQueryPane(false); }}
+        >
           <div className='query-pane-div' style={{marginTop: '0px'}}>
             <select ref='querySelect'>
               <option value="">Select a query</option>
