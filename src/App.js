@@ -16,6 +16,8 @@ import Login from './components/Login/Login';
 
 import "./App.css";
 
+const localStorageUserItem = 'user';
+
 const apiUrl = "https://dev.api.ellipsis-earth.com/";
 
 class App extends Component {
@@ -23,15 +25,11 @@ class App extends Component {
     super(props, context)
     document.title = "Ellipsis Earth Intelligence";
 
-    let user = null;
-    let userJson = localStorage.getItem('user');
-    if (userJson) {
-      user = JSON.parse(userJson);
-    }
-
     this.state = {
-      user: user
+      user: null
     };
+
+    this.retrieveUser();
   }
 
   componentDidMount() {
@@ -43,15 +41,45 @@ class App extends Component {
     x.className = "";
   }
 
+  retrieveUser = () => {
+    let user = null;
+    let userJson = localStorage.getItem(localStorageUserItem);
+
+    if (userJson) {
+      user = JSON.parse(userJson);
+
+      fetch(
+        `${apiUrl}account/ping`,
+        {
+          method: 'GET',
+          headers: {
+            "Authorization": "BEARER " + user.token
+          }
+        }
+      )
+      .then(response => {
+        if (response.ok) {
+          this.setState({ user: user });
+        }
+        else {
+          localStorage.removeItem(localStorageUserItem);
+        }
+      })
+      .catch(error => {
+        localStorage.removeItem(localStorageUserItem);
+      });
+    }
+  }
+
   onLogin = (user) => {
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem(localStorageUserItem, JSON.stringify(user));
     this.setState({ user: user }, () => {
       this.props.history.push('/');
     });
   }
   
   onLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem(localStorageUserItem);
     this.setState({ user: null });
   }
 
@@ -64,7 +92,12 @@ class App extends Component {
         />
         <div className="content" ref={ref => this.el = ref}>
           <Route exact path="/" component={Home}/>
-          <Route path="/maps" render={() => <Viewer apiUrl={apiUrl}/>} />
+          <Route 
+            path="/maps" 
+            render={() => 
+              <Viewer apiUrl={apiUrl} user={this.state.user}/>
+            } 
+          />
           <Route path="/products" component={Products}/>
           <Route path="/about" component={About}/>
           <Route path="/contact" component={Contact} />
