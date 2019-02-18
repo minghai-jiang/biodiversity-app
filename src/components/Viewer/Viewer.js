@@ -13,7 +13,7 @@ class Viewer extends PureComponent {
 
     this.state = {
       timestampRange: { start: 0, end: 0 },
-      shape: []
+      shape: null
     };
   }
 

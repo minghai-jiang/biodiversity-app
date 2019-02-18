@@ -10,13 +10,17 @@ const availableQueries = [
   { id: 1, text: 'Get indices data', name: 'indices_tiles_customPolygon_timestamp' }
 ];
 
+const noDataHeaderText = 'no data';
+
 export class QueryPane extends PureComponent {
   constructor(props, context) {
     super(props, context)
     this.state = {
       openQueryPane: false,
+      selectedQueryId: null,
       dataCsvText: '',
-      dataTable: null
+      dataTable: null,
+      noData: false
     };
   }
 
@@ -27,10 +31,15 @@ export class QueryPane extends PureComponent {
   renderQueryOptions = () => {
     let options = [];
 
+    options.push(
+      <option value="">Select a query</option>
+    );
+
+
     for (let i = 0; i < availableQueries.length; i++) {
       let query = availableQueries[i];
       options.push(
-        <option value={query.id} key={i}>{query.text}</option>
+        <option value={query.id} key={i} selected={query.id == this.state.selectedQueryId}>{query.text}</option>
       );
     }
 
@@ -55,7 +64,7 @@ export class QueryPane extends PureComponent {
       return shapesCoords;
     }
     else {
-      return 'Please draw a shape on the map.';
+      return 'No area selected. Close this pane and select an area of interest on the map using the tools on the left.';
     }
   }
 
@@ -63,8 +72,9 @@ export class QueryPane extends PureComponent {
     let selectedQueryId = this.refs.querySelect.value;
     let query = availableQueries.find(x => x.id == selectedQueryId);
 
-    if (query) {
-      let shape = this.props.shape;
+    let shape = this.props.shape;
+
+    if (query && shape) {
       let shapeCoords = [];
       for (let i = 0; i < shape.length; i++) {
         shapeCoords.push(
@@ -100,22 +110,28 @@ export class QueryPane extends PureComponent {
         let csvData = Papa.parse(text, { skipEmptyLines: true }).data;
 
         let rows = [];
+        let noData = false;
+
         for (let x = 0; x < csvData.length; x++) {
           let cells = [];
           let rowData = csvData[x];
 
           for (let i = 0; i < rowData.length; i++) {
             let cell = null;
+            let data = rowData[i]
             
             if (x === 0) {
+              if (i === 0 && data === noDataHeaderText) {
+                noData = true;
+              }
+
               cell = (
                 <th className='query-data-table-cell query-data-table-header'>
-                  {rowData[i]}
+                  {data}
                 </th>
               );
             }
             else {
-              let data = rowData[i];
               if (!isNaN(data)) {
                 data = parseFloat(data);
                 data = +data.toFixed(4);
@@ -146,7 +162,8 @@ export class QueryPane extends PureComponent {
 
         this.setState({
           dataCsvText: text,
-          dataTable: table
+          dataTable: table,
+          noData: noData
         });
       }
       else {
@@ -167,37 +184,53 @@ export class QueryPane extends PureComponent {
     element.click();
   }
 
+  onQuerySelect = (event) => {
+    this.setState({selectedQueryId: event.target.value});
+  }
+
   render() {
-    return (
-      <div>
-        <div className='open-query-window-button' onClick={() => { this.toggleQueryPane(true); }}></div>
-        <SlidingPane
-          className='query-pane'
-          overlayClassName='modal-overlay'
-          isOpen={this.state.openQueryPane}
-          title='Query Data'
-          width={'80%'}
-          onRequestClose={() => { this.toggleQueryPane(false); }}
-        >
-          <div className='query-pane-div' style={{marginTop: '0px'}}>
-            <select ref='querySelect'>
-              <option value="">Select a query</option>
-              {this.renderQueryOptions()}
-            </select>
+    if (this.props.map) {    
+      return (
+        <div>
+          <div className='button open-query-window-button' onClick={() => { this.toggleQueryPane(true); }}>
+            Queries
           </div>
-          <div className='query-pane-div' >
-            {this.renderShapeCoords()}
-          </div>
-          <div className='query-pane-div' >
-            <button onClick={this.executeQuery}>Execute query</button>
-          </div>
-          <div className='query-pane-div' >
-            <button onClick={this.downloadData}>Download data</button>
-          </div>
-          {this.state.dataTable}
-        </SlidingPane>
-      </div>
-    );
+          <SlidingPane
+            className='query-pane'
+            overlayClassName='modal-overlay'
+            isOpen={this.state.openQueryPane}
+            title='Query Data'
+            width={'80%'}
+            onRequestClose={() => { this.toggleQueryPane(false); }}
+          >
+            <div className='query-pane-div' style={{marginTop: '0px'}}>
+              <select ref='querySelect' onChange={this.onQuerySelect}>
+                {this.renderQueryOptions()}
+              </select>
+            </div>
+            <div className='query-pane-div' >
+              {this.renderShapeCoords()}
+            </div>
+            <div className='query-pane-div' >
+              {this.state.selectedQueryId && this.props.shape ? 
+                <button onClick={this.executeQuery}>Execute query</button> :
+                null}
+            </div>
+            <div className='query-pane-div' >
+              {this.state.dataCsvText && !this.state.noData? 
+                <button onClick={this.downloadData}>Download data</button> :
+                null}
+            </div>
+            {this.state.dataTable}
+          </SlidingPane>
+        </div>
+      );
+    }
+    else {
+      return (
+        <div></div>
+      )
+    }
   }
 }
 
