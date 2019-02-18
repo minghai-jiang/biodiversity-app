@@ -2,72 +2,74 @@ import React, { PureComponent } from "react";
 
 import "./Viewer.css";
 
-import MapSelector from './map-selector/map-selector';
+import MapSelector from './MapSelector/MapSelector';
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 import ViewerMap from './ViewerMap/ViewerMap';
 import QueryPane from './QueryPane/QueryPane';
 
 class Viewer extends PureComponent {
-    constructor(props, context) {
-      super(props, context);
+  constructor(props, context) {
+    super(props, context);
 
-      this.state = {
-        timestampRange: { start: 0, end: 0 },
-        shape: []
-      };
-    }
+    this.state = {
+      timestampRange: { start: 0, end: 0 },
+      shape: []
+    };
+  }
 
-    componentDidMount() {
-    }
+  componentDidMount() {
+  }
 
-    onSelectMap = map => {
-      this.setState({
-          map: map
-      });
-    }
+  onSelectMap = map => {
+    this.setState({
+        map: map
+    });
+  }
 
-    onShapeDrawn = shape => {
-      this.setState({
-        shape: shape
-      });
-    }
+  onShapeDrawn = shape => {
+    this.setState({
+      shape: shape
+    });
+  }
 
-    onSelectTimestampRange = (start, end) => {
-      this.setState({
-        timestampRange: { start: start, end: end }
-      });
-    }
+  onSelectTimestampRange = (start, end) => {
+    this.setState({
+      timestampRange: { start: start, end: end }
+    });
+  }
 
-    render() {
-      return (
-        <div className="map">
-          <div className="map-selector-div">
-            <MapSelector 
-              apiUrl={this.props.apiUrl} 
-              onSelect={this.onSelectMap} 
-            />
-          </div>
-          <div id="time-range-selector" className="time-range-selector">                   
-            <TimestampSelector
-              timestamps={this.state.map ? this.state.map.timestamps : null}
-              onSlide={this.onSelectTimestampRange}
-            />
-          </div>
-          <ViewerMap
+  render() {
+    return (
+      <div className="map">
+        <div className="map-selector-div">
+          <MapSelector 
             apiUrl={this.props.apiUrl} 
-            map={this.state.map}
-            timestampRange={this.state.timestampRange}
-            onShapeDrawn={this.onShapeDrawn}
+            onSelect={this.onSelectMap}
+            user={this.props.user} 
           />
-          <QueryPane
-            apiUrl={this.props.apiUrl}
-            map={this.state.map}
-            timestampRange={this.state.timestampRange}
-            shape={this.state.shape}
+        </div>
+        <div id="time-range-selector" className="time-range-selector">                   
+          <TimestampSelector
+            timestamps={this.state.map ? this.state.map.timestamps : null}
+            onSlide={this.onSelectTimestampRange}
           />
-      </div>
-      );
-    }
+        </div>
+        <ViewerMap
+          apiUrl={this.props.apiUrl} 
+          map={this.state.map}
+          timestampRange={this.state.timestampRange}
+          onShapeDrawn={this.onShapeDrawn}
+        />
+        <QueryPane
+          apiUrl={this.props.apiUrl}
+          map={this.state.map}
+          timestampRange={this.state.timestampRange}
+          shape={this.state.shape}
+          user={this.props.user}
+        />
+    </div>
+    );
+  }
 }
 
 export default Viewer;

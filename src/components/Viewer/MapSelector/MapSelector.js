@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import Papa from 'papaparse';
 
-import "./map-selector.css";
+import "./MapSelector.css";
 
 let csvParseConfig = {
   skipEmptyLines: true
@@ -16,37 +16,64 @@ export class MapSelector extends PureComponent {
   }
 
   componentDidMount = () => {
-    fetch(
+    this.getMaps()
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+  getMaps = async () => {
+    let publicMapsText = null;
+    let myMapsText = null;
+
+    let publicMapsResponse = await fetch(
       `${this.props.apiUrl}queries/publicMaps`,
       {
         method: 'POST'
       }
     )
-    .then(response => {
-      return response.text();
-    })
-    .then(data => {
-      let parsedCsv = Papa.parse(data, csvParseConfig);
+    publicMapsText = await publicMapsResponse.text();
 
-      let mapIdHeaderIndex = parsedCsv.data[0].indexOf('map_id');
-      let mapNameHeaderIndex = parsedCsv.data[0].indexOf('name');
+    if (this.props.user) {
+      let myMapsResponse = await fetch(
+        `${this.props.apiUrl}queries/myMaps`,
+        {
+          method: 'POST',
+          headers: {
+            "Authorization": "BEARER " + this.props.user.token
+          }
+        }
+      )
 
-      let maps = [];
-      for (let i = 1; i < parsedCsv.data.length; i++) {
-        let mapId = parsedCsv.data[i][mapIdHeaderIndex];
-        let mapName = parsedCsv.data[i][mapNameHeaderIndex];
-        maps.push({
-          id: mapId,
-          name: mapName,
-          wmsMapName: mapName.replace(' ', '_')
-        });
-      }
+      myMapsText = await myMapsResponse.text();
+    }
 
-      this.setState({ maps: maps });
-    })
-    .catch(error => {
-      alert(error);
-    });
+    let publicMaps = this.readMaps(publicMapsText);
+    let myMaps = myMapsText ? this.readMaps(myMapsText) : []
+    
+    let maps = publicMaps.concat(myMaps);
+
+    this.setState({ maps: maps });
+  }
+
+  readMaps = (mapsText) => {
+    let parsedCsv = Papa.parse(mapsText, csvParseConfig);
+
+    let mapIdHeaderIndex = parsedCsv.data[0].indexOf('map_id');
+    let mapNameHeaderIndex = parsedCsv.data[0].indexOf('name');
+
+    let maps = [];
+    for (let i = 1; i < parsedCsv.data.length; i++) {
+      let mapId = parsedCsv.data[i][mapIdHeaderIndex];
+      let mapName = parsedCsv.data[i][mapNameHeaderIndex];
+      maps.push({
+        id: mapId,
+        name: mapName,
+        wmsMapName: mapName.replace(' ', '_')
+      });
+    }
+
+    return maps
   }
 
   selectMap = (e) => {
@@ -76,17 +103,22 @@ export class MapSelector extends PureComponent {
         mapId: map.id
       });
 
+      let headers = {
+        "Content-Type": "application/json"
+      };
+
+      if (this.props.user) {
+        headers["Authorization"] = "BEARER " + this.props.user.token
+      }
+
       let response = await fetch(
         `${this.props.apiUrl}queries/timestamps_map`,
         {
           method: 'POST',
-          headers: {
-            "Content-Type": "application/json"
-          },  
+          headers: headers,
           body: bodyJson,
         }
       );
-
 
       if (response.status === 200) {
         let dataCsv = await response.text();
@@ -136,13 +168,19 @@ export class MapSelector extends PureComponent {
         mapId: map.id
       });
 
+      let headers = {
+        "Content-Type": "application/json"
+      };
+
+      if (this.props.user) {
+        headers["Authorization"] = "BEARER " + this.props.user.token
+      }
+
       let response = await fetch(
         `${this.props.apiUrl}queries/layers_map`,
         {
           method: 'POST',
-          headers: {
-            "Content-Type": "application/json"
-          },  
+          headers: headers,
           body: bodyJson,
         }
       )
