@@ -6,8 +6,8 @@ import 'react-sliding-pane/dist/react-sliding-pane.css';
 import "./QueryPane.css";
 
 const availableQueries = [
-  { id: 0, text: 'Get tile classes data', name: 'classes_tiles_timestamp_customPolygon' },
-  { id: 1, text: 'Get tile indices data', name: 'indices_tiles_customPolygon_timestamp_class' }
+  { id: 0, text: 'Get classes data', name: 'classes_tiles_timestamp_customPolygon' },
+  { id: 1, text: 'Get indices data', name: 'indices_tiles_customPolygon_timestamp' }
 ];
 
 export class QueryPane extends PureComponent {
@@ -70,20 +70,26 @@ export class QueryPane extends PureComponent {
         shapeCoords.push(
             `(${shape[i].x}, ${shape[i].y})`  
         );
-      }      
+      }
 
       let bodyJson = JSON.stringify({
         mapId: this.props.map.id,
         args: [this.props.timestampRange.end, ...shapeCoords]
       });
 
+      let headers = {
+        "Content-Type": "application/json"
+      };
+
+      if (this.props.user) {
+        headers["Authorization"] = "BEARER " + this.props.user.token
+      }
+
       let response = await fetch(
         `${this.props.apiUrl}queries/${query.name}`,
         {
           method: 'POST',
-          headers: {
-            "Content-Type": "application/json"
-          },  
+          headers: headers,
           body: bodyJson,
         }
       );
