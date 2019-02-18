@@ -7,6 +7,11 @@ let csvParseConfig = {
   skipEmptyLines: true
 };
 
+String.prototype.replaceAll = function(search, replacement) {
+  var target = this;
+  return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 export class MapSelector extends PureComponent {
   constructor(props) {
     super(props);
@@ -69,7 +74,7 @@ export class MapSelector extends PureComponent {
       maps.push({
         id: mapId,
         name: mapName,
-        wmsMapName: mapName.replace(' ', '_')
+        wmsMapName: mapName.replaceAll(' ', '_')
       });
     }
 
