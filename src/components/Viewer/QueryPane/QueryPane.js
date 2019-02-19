@@ -1,6 +1,7 @@
 import React, { PureComponent} from 'react';
 import SlidingPane from 'react-sliding-pane';
 import Papa from 'papaparse';
+import FileDownload from 'js-file-download';
 
 import 'react-sliding-pane/dist/react-sliding-pane.css';
 import "./QueryPane.css";
@@ -177,11 +178,7 @@ export class QueryPane extends PureComponent {
   }
 
   downloadData = () => {
-    let element = document.createElement('a');
-    let file = new Blob([this.state.dataCsvText], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = 'data.csv';
-    element.click();
+    FileDownload(this.state.dataCsvText, 'data.csv');
   }
 
   onQuerySelect = (event) => {
