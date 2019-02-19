@@ -95,6 +95,12 @@
     width: 50%;
 }
 
+.main-block-double-button
+{
+    width: 35%;
+    margin: 0 1em;
+}
+
 .key-words {
     color: #026464;
     font-style: italic;
@@ -132,13 +138,6 @@
 .button-a {
     color: inherit;
     text-decoration: none;
-}
-
-.code-block {
-    background-color: #eeeeee;
-    padding: 0.4em 0.6em;
-    font-size: 15px;
-    word-wrap: break-word;
 }
 
 @keyframes App-logo-spin {

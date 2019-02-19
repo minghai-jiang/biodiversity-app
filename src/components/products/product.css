@@ -11,16 +11,48 @@ div.product-block-accented {
     padding-bottom: 2em;
 }
 
+.code-block {
+    background-color: #eeeeee;
+    padding: 1em;
+    font-size: 15px;
+    word-wrap: break-word;
+    margin-bottom: 1em;
+}
+
+.code-block p
+{
+    margin: 0.2em;
+}
+
 .product-end-paragraph {
     margin-bottom: 2em;
 }
 
-div.product-single-button {
-    width: 30%;
+a.product-single-button {
+    display: block;
+}
+
+a.product-double-button {
+    display: inline-block;
+}
+
+@media screen and (max-width: 840px) {
+    a.product-double-button
+    {
+       padding: 0.6em 1em;
+       margin: auto 0.8em;
+    }
 }
 
 @media screen and (max-width: 600px) {
-    div.product-single-button {
+    a.product-single-button {
         width: 70%;
+    }
+
+    a.product-double-button
+    {
+    	width: 70%;
+        display: block;
+		margin: 0.5em auto 0.5em auto;
     }
 }

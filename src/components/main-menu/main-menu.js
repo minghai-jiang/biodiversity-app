@@ -37,7 +37,7 @@ export class MainMenu extends Component {
         }
 
         return (
-            <div id="main-menu" style={displayStyle}>
+            <nav id="main-menu" style={displayStyle}>
                 <ul>
                     <li>
                         <NavLink to="/" className="main-menu-logo-item">
@@ -76,9 +76,9 @@ export class MainMenu extends Component {
                     </li> */}
                 </ul> 
                 <a href="javascript:void(0);" className="icon" onClick={this.toggleMenu}>
-                    <img src="/images/three-lines.png"></img>
+                    <img alt="hamburger-menu" src="/images/three-lines.png"></img>
                 </a>          
-            </div>
+            </nav>
         )
     }
 }

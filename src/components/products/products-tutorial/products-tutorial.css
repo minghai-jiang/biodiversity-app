@@ -1,0 +1,54 @@
+h1
+{
+	margin-top: 0;
+}
+
+code
+{
+	color: white;
+	font-size: 14px;
+	word-break: break-word;
+}
+
+pre::-webkit-scrollbar {
+  height: 5px;
+}
+ 
+pre::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #8c8c8c; 
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: #999999; 
+}
+
+pre
+{
+	overflow: auto;
+	border-radius: 5px;
+	padding: 20px 30px;
+	background: #323232;
+}
+
+table
+{
+	width: 100%;
+	font-size: 13px;
+	border: none;
+}
+
+th,td
+{
+	font-size: 0.9em;
+	padding: 0.2em;
+	vertical-align: middle;
+	text-align: center;
+	border: none;
+}
+
+thead
+{
+	background: rgb(2,100,100);
+	color: white;
+}
