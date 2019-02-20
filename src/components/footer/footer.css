@@ -1,5 +1,7 @@
 .footer {
-    height: 5.6em;
+	padding: 1em 3em;
+
+    height: 3.5em;
 
     text-align: right;
 
@@ -8,7 +10,7 @@
 }
 
 .footer-content {
-    padding: 1em 3em;
+    
 }
 
 .footer-logo {

@@ -7,7 +7,7 @@ export class Footer extends Component {
 
     render() {
         return (
-            <div className="footer">
+            <footer className="footer">
                 <div className="footer-content">
                     <NavLink to="/">
                         <img className="footer-logo" src="/images/logo-white.png" alt="Ellipsis Earth Intelligence logo white"/>
@@ -15,7 +15,7 @@ export class Footer extends Component {
                     <br/>
                     info@ellipsis-earth.com
                 </div>
-            </div>
+            </footer>
         )
     }
 }

@@ -19,22 +19,6 @@ export class ProductsHome extends Component {
                 <div className="main-block main-block-first main-block-accented product-block-accented">
                     <div className="main-block-content main-block-content-left">
                         <h3>
-                            WMS
-                        </h3>
-
-                        <p className="product-end-paragraph">
-                            Our WMS is a collection of images in a tile structure. Each individual image can be described
-                            and accessed using a specifically structured URL. Based on this structure one can easily make 
-                            interactive maps in the same way as in the Ellipsis map app.
-                        </p>
-
-                        <NavLink to="/products/wms" className="button-a">
-                            <div className="button button-accented main-block-single-button product-single-button">
-                                WMS Documentation                                                
-                            </div>
-                        </NavLink>
-
-                        <h3>
                             API
                         </h3>
 
@@ -44,11 +28,42 @@ export class ProductsHome extends Component {
                             are tiles of no more than 2.5 by 2.5 kilometers, and custom polygons that are map specific.
                         </p>
 
-                        <NavLink to="/products/api" className="button-a">
-                            <div className="button button-accented main-block-single-button product-single-button">
-                                API Documentation                                               
-                            </div>
+                        <NavLink to="/products/documentation" className="button button-accented main-block-double-button product-double-button">
+                            API Documentation
                         </NavLink>
+                        <NavLink to="/products/tutorial" className="button button-accented main-block-double-button product-double-button">
+                            API Tutorial
+                        </NavLink>
+
+                        <h3>
+                            WMS
+                        </h3>
+
+                        <p className="product-end-paragraph">
+                            Our WMS is a collection of images in a tile structure. Each individual image can be described
+                            and accessed using a specifically structured URL. Based on this structure one can easily make 
+                            interactive maps in the same way as in the Ellipsis map app.
+                        </p>
+
+                        <NavLink to="/products/documentation#wms" className="button button-accented main-block-double-button product-double-button">
+                            WMS Documentation
+                        </NavLink>
+                        <NavLink to="/products/tutorial#wms" className="button button-accented main-block-double-button product-double-button">
+                            WMS Tutorial
+                        </NavLink>
+
+                        <h3>
+                            Viewer
+                        </h3>
+
+                        <p className="product-end-paragraph">
+                            Viewer text
+                        </p>
+
+                        <NavLink to="/maps" className="button button-accented main-block-single-button product-single-button">
+                            Go to Viewer
+                        </NavLink>
+
                     </div>
                 </div>    
 

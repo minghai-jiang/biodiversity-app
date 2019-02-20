@@ -87,7 +87,7 @@ export class MainMenu extends Component {
           </li>
         </ul> 
         <a href="javascript:void(0);" className="icon" onClick={this.toggleMenu}>
-          <img src="/images/three-lines.png"></img>
+          <img alt="hamburger-menu" src="/images/three-lines.png"></img>
         </a>          
       </div>
     )

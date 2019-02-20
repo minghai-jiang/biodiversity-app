@@ -4,8 +4,8 @@ import {
 } from "react-router-dom";
 
 import ProductsHome from "./products-home/products-home";
-import ProductsWms from "./products-wms/products-wms";
-import ProductsApi from "./products-api/products-api";
+import ProductsDocumentation from "./products-documentation/products-documentation";
+import ProductsTutorial from "./products-tutorial/products-tutorial";
 
 import { Footer } from "../footer/footer";
 
@@ -18,8 +18,8 @@ export class Products extends Component {
             <div>
                 <div className="main-content">
                     <Route exact path="/products" component={ProductsHome}/>
-                    <Route path="/products/wms" component={ProductsWms}/>
-                    <Route path="/products/api" component={ProductsApi}/>
+                    <Route path="/products/documentation" component={ProductsDocumentation}/>
+                    <Route path="/products/tutorial" component={ProductsTutorial}/>
                 </div>
                 <Footer></Footer>
             </div>
