@@ -98,7 +98,7 @@ export class ViewerMap extends PureComponent {
           {
             timestampLayers.push(             
               <TileLayer
-                url={`${this.props.apiUrl}wms/${map.wmsMapName}/${y}/${layerType}/${layerName}/{z}/{x}/{y}`}
+                url={`${this.props.apiUrl}wms/${map.id}/${y}/${layerType}/${layerName}/{z}/{x}/{y}`}
                 tileSize={mapParams.tileSize}
                 noWrap={mapParams.noWrap}
                 maxZoom={mapParams.maxZoom}
@@ -132,6 +132,9 @@ export class ViewerMap extends PureComponent {
         ref={this.mapRef}
       >
         <LayersControl position="topright">
+          <label>
+            Open Street Maps
+          </label>
           <LayersControl.Overlay checked name="Base satellite">
             <TileLayer
               url="https://api.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWhqaWFuZyIsImEiOiJjamhkNXU3azcwZW1oMzZvNjRrb214cDVsIn0.QZWgmabi2gRJAWr1Vr3h7w"
