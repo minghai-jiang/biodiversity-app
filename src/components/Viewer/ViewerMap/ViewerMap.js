@@ -77,7 +77,7 @@ export class ViewerMap extends PureComponent {
     }.bind(this);
   }
 
-  createLayers = (layerType, stacking, zIndex) => {
+  createLayers = (layerType, stacking, checked, zIndex) => {
     var layers = [];
 
     let map = this.props.map;
@@ -111,7 +111,7 @@ export class ViewerMap extends PureComponent {
           }
 
           layers.push(
-            <LayersControl.Overlay checked name={layerName} key={i}>
+            <LayersControl.Overlay checked name={layerName} key={i} checked={checked}>
               <LayerGroup name={layerName}>
                 {timestampLayers}
               </LayerGroup>              
@@ -140,9 +140,9 @@ export class ViewerMap extends PureComponent {
               zIndex={0}
             />
           </LayersControl.Overlay>
-          {this.createLayers(imagesLayerType, true, 100)}
-          {this.createLayers(labelsLayerType, false, 200)}
-          {this.createLayers(indicesLayerType, false, 300)}
+          {this.createLayers(imagesLayerType, true, true, 100)}
+          {this.createLayers(labelsLayerType, false, true, 200)}
+          {this.createLayers(indicesLayerType, false, false, 300)}
         </LayersControl>
       </Map>
     );

@@ -53,6 +53,7 @@ const availableQueries = [
 ];
 
 const noDataHeaderText = 'no data';
+const maxDataRows = 100;
 
 export class QueryPane extends PureComponent {
   constructor(props, context) {
@@ -62,9 +63,11 @@ export class QueryPane extends PureComponent {
       query: null,
       polygonId: null,
       className: null,
+
       dataCsvText: '',
       dataTable: null,
       noData: false,
+      dataRowsNumber: 0,
 
       executingQuery: false,
     };
@@ -132,7 +135,7 @@ export class QueryPane extends PureComponent {
         let rows = [];
         let noData = false;
 
-        for (let x = 0; x < csvData.length; x++) {
+        for (let x = 0; x < csvData.length && x < maxDataRows; x++) {
           let cells = [];
           let rowData = csvData[x];
 
@@ -186,6 +189,7 @@ export class QueryPane extends PureComponent {
           dataCsvText: text,
           dataTable: table,
           noData: noData,
+          dataRowsNumber: csvData.length,
           executingQuery: false
         });
       }
@@ -351,6 +355,7 @@ export class QueryPane extends PureComponent {
       query: query,
       dataCsvText: '',
       dataTable: null,
+      dataRowsNumber: 0,
     });
   }
 
@@ -404,6 +409,12 @@ export class QueryPane extends PureComponent {
               {this.state.dataCsvText && !this.state.noData? 
                 <button onClick={this.downloadData}>Download data</button> :
                 null}
+            </div>
+            <div>
+              {this.state.dataRowsNumber > maxDataRows ?
+                 `${maxDataRows} of ${this.state.dataRowsNumber} rows shown. Download the data to see all.` :
+                 null
+              }
             </div>
             {this.state.dataTable}
           </SlidingPane>
