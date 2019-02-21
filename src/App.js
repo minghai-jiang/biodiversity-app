@@ -18,7 +18,7 @@ import "./App.css";
 
 const localStorageUserItem = 'user';
 
-const apiUrl = "https://dev.api.ellipsis-earth.com/";
+const apiUrl = "https://api.ellipsis-earth.com/";
 
 class App extends Component {
   constructor(props, context) {
