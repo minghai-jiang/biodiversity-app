@@ -8,8 +8,15 @@ export class ScrollToTop extends Component {
     		if(loc.length === 2)
     		{
     			let dest = document.getElementById(loc[1]);
-    			window.scrollTo(0, dest.offsetTop);
-     			dest.focus();
+                if (dest !== null)
+                {
+    			     window.scrollTo(0, dest.offsetTop);
+     			    dest.focus(); 
+                }
+                else
+                {
+                    window.scrollTo(0, 0);
+                }
     		}
     		else
     		{
