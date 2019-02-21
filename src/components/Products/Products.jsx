@@ -12,28 +12,28 @@ import { Footer } from "../footer/footer";
 import "./Products.css";
 
 export class Products extends Component {
-    render() {
-        return (
-            <div>
-                <div className="main-content">
-                    <Route exact path="/products" component={ProductsHome}/>
-                    <Route 
-                      path="/products/documentation" 
-                      render={() => 
-                        <ProductsDocumentation publicFilesUrl={this.props.publicFilesUrl}/>
-                      } 
-                    />
-                    <Route 
-                      path="/products/tutorial" 
-                      render={() => 
-                        <ProductsTutorial publicFilesUrl={this.props.publicFilesUrl}/>
-                      } 
-                    />
-                </div>
-                <Footer></Footer>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div>
+        <div className="main-content">
+          <Route exact path="/products" component={ProductsHome}/>
+          <Route 
+            path="/products/documentation" 
+            render={() => 
+              <ProductsDocumentation publicFilesUrl={this.props.publicFilesUrl}/>
+            } 
+          />
+          <Route 
+            path="/products/tutorial" 
+            render={() => 
+              <ProductsTutorial publicFilesUrl={this.props.publicFilesUrl}/>
+            } 
+          />
+        </div>
+        <Footer></Footer>
+      </div>
+    )
+  }
 }
 
 export default Products;
