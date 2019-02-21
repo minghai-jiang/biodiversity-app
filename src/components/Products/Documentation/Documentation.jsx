@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import Markdown  from '../../Markdown/Markdown';
 
-import "./Documentation.css";
+import './Documentation.css';
 
 export class ProductsDocumentation extends Component {
   render() {
@@ -12,7 +12,7 @@ export class ProductsDocumentation extends Component {
           <div className="main-block-header">
             Documentation
           </div>
-          <div className="main-block-content main-block-content-left">
+          <div className='main-block-content main-block-content-left documentation-block'>
             <Markdown publicFilesUrl={this.props.publicFilesUrl} file="documentation"></Markdown>
           </div>                        
         </div>     

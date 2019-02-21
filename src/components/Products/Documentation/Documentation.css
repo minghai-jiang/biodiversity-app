@@ -1,19 +1,20 @@
-p
+.documentation-block p
 {
-	font-size: 14px;
+	font-size: 13pt;
 }
-h2
+
+.documentation-block h2
 {
 	margin-top: 2em;
 }
 
-h4
+.documentation-block h4
 {
 	font-size: 16px;
 	margin: 0;
 }
 
-h4+p
+.documentation-block h4+p
 {
 	margin-top: 0;
 }

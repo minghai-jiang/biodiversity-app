@@ -52,7 +52,6 @@ class Markdown extends Component
   componentDidMount() {
     fetch(`${this.props.publicFilesUrl}markdown/${this.props.file}.md`, { method: 'GET' })
       .then(response => {
-        debugger;
         if (response.ok) {
           return response.text();
         }
@@ -61,7 +60,6 @@ class Markdown extends Component
         }
       })
       .then(text => {
-        debugger;
         let output = this.md.render(text);
         let contentElements = parse(output);
 
