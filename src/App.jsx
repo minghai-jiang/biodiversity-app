@@ -11,7 +11,7 @@ import Viewer from './components/Viewer/Viewer';
 import Home from "./components/home/home";
 import About from "./components/about/about";
 import Contact from "./components/contact/contact";
-import Products from "./components/products/products";
+import Products from "./components/Products/Products";
 import Login from './components/Login/Login';
 
 import "./App.css";
@@ -19,6 +19,10 @@ import "./App.css";
 const localStorageUserItem = 'user';
 
 const apiUrl = "https://api.ellipsis-earth.com/";
+const publicFilesUrl = "https://public.ellipsis-earth.com/";
+
+// const apiUrl = "https://dev.api.ellipsis-earth.com/";
+// const publicFilesUrl = "https://dev,public.ellipsis-earth.com/";
 
 class App extends Component {
   constructor(props, context) {
@@ -98,7 +102,12 @@ class App extends Component {
               <Viewer apiUrl={apiUrl} user={this.state.user}/>
             } 
           />
-          <Route path="/products" component={Products}/>
+          <Route 
+            path="/products" 
+            render={() => 
+              <Products publicFilesUrl={publicFilesUrl}/>
+            }
+          />
           <Route path="/about" component={About}/>
           <Route path="/contact" component={Contact} />
           <Route 

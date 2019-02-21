@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
-import "./products-tutorial.css";
+import "./Tutorial.css";
 
-import Markdown  from '../../markdown/Markdown';
+import Markdown  from '../../Markdown/Markdown';
 
 export class ProductsTutorial extends Component {
 
@@ -14,7 +13,7 @@ export class ProductsTutorial extends Component {
                         Ellipsis-Earth tutorial
                     </h1>
                     <div className="main-block-content main-block-content-left">
-                        <Markdown file="tutorial"></Markdown>
+                        <Markdown publicFilesUrl={this.props.publicFilesUrl} file="tutorial"></Markdown>
                     </div>                        
                 </div>     
             </div>

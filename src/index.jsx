@@ -7,7 +7,7 @@ import * as serviceWorker from './serviceWorker';
 import {
   BrowserRouter as Router
 } from "react-router-dom";
-import { ScrollToTop } from "./components/utilities/scroll-to-top";
+import { ScrollToTop } from "./components/Utilities/ScrollToTop";
 
 
 ReactDOM.render(
