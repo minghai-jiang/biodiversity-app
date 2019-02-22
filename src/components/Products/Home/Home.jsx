@@ -52,7 +52,7 @@ export class ProductsHome extends Component {
             <NavLink to="/products/tutorial" className="button button-accented main-block-triple-button product-double-button">
               Tutorial
             </NavLink>
-            <NavLink to="/maps" className="button button-accented main-block-triple-button product-double-button">
+            <NavLink to="/viewer" className="button button-accented main-block-triple-button product-double-button">
               Viewer
             </NavLink>
 

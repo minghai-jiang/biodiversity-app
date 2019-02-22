@@ -97,7 +97,7 @@ class App extends Component {
         <div className="content" ref={ref => this.el = ref}>
           <Route exact path="/" component={Home}/>
           <Route 
-            path="/maps" 
+            path="/viewer" 
             render={() => 
               <Viewer apiUrl={apiUrl} user={this.state.user}/>
             } 

@@ -54,8 +54,8 @@ export class MainMenu extends Component {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/maps" className="main-menu-item">
-              Maps
+            <NavLink to="/viewer" className="main-menu-item">
+              Viewer
             </NavLink>
           </li>
           <li>
