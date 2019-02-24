@@ -371,7 +371,7 @@ export class QueryPane extends PureComponent {
     if (this.props.map) {    
       return (
         <div>
-          <div className='button open-query-window-button' onClick={() => { this.toggleQueryPane(true); }}>
+          <div className='button viewer-button' onClick={() => { this.toggleQueryPane(true); }} style={{top: '40vh'}}>
             Queries
           </div>
           <SlidingPane

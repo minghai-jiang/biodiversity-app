@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import FileDownload from 'js-file-download';
 
 import "./Viewer.css";
 
@@ -13,6 +14,7 @@ class Viewer extends PureComponent {
 
     this.state = {
       timestampRange: { start: 0, end: 0 },
+      map: null,
       shape: null
     };
   }
@@ -36,6 +38,46 @@ class Viewer extends PureComponent {
     this.setState({
       timestampRange: { start: start, end: end }
     });
+  }
+
+  downloadShape = async () => {
+    let headers = {
+      "Content-Type": "application/json"
+    };
+    if (this.props.user) {
+      headers["Authorization"] = "BEARER " + this.props.user.token;
+    }
+
+    let timestamp = this.state.map.timestamps[this.state.timestampRange.end];
+    let bodyJson = JSON.stringify({
+      mapId: this.state.map.id,
+      timestampNumber: timestamp.number
+    });
+
+    let downloadWindow = window.open();
+    // downloadWindow.blur();
+    window.focus();
+
+    fetch(`${this.props.apiUrl}utilities/requestshapeDownload`,
+      {
+        method: 'POST',
+        headers: headers,
+        body: bodyJson
+      })
+      .then(response => {
+        return response.json();
+      })
+      .then(json => {
+        // debugger;
+        let downloadUrl = `${this.props.apiUrl}utilities/downloadShape/${json.token}`;
+        // FileDownload(downloadUrl, this.state.map.name + '.zip', 'application/zip');
+        downloadWindow.location = downloadUrl;
+        // downloadWindow.blur();
+        // window.focus();
+      })
+      .catch(error =>{
+        alert("Failed to download shape");
+      })
   }
 
   render() {
@@ -67,6 +109,10 @@ class Viewer extends PureComponent {
           shape={this.state.shape}
           user={this.props.user}
         />
+        {this.state.map ? 
+        <div className='button viewer-button' onClick={() => { this.downloadShape(); }} style={{top: '47vh'}}>
+            Download Shape
+        </div> : null}
     </div>
     );
   }

@@ -105,4 +105,12 @@ div.content {
   text-align: left
 }
 
+div.viewer-button {
+  position: absolute;
+  /* top: 40vh; */
+  right: 0px;
+  width: 100px;
+  padding: 0.2em 0.7em;
 
+  z-index: 100000;
+}
