@@ -11,7 +11,7 @@ import Viewer from './components/Viewer/Viewer';
 import Home from "./components/home/home";
 import About from "./components/about/about";
 import Contact from "./components/contact/contact";
-import Products from "./components/products/Products";
+import Products from "./components/Products/Products";
 import Login from './components/Login/Login';
 
 import "./App.css";
