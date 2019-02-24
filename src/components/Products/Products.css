@@ -36,6 +36,18 @@ a.product-double-button {
     display: inline-block;
 }
 
+#iAm
+{
+    margin-bottom: 4em;
+}
+
+select
+{
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+}
+
 @media screen and (max-width: 840px) {
     a.product-double-button
     {

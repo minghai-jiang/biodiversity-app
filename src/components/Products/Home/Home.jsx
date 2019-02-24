@@ -1,7 +1,26 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 
+import IamA  from '../IamA/IamA';
+
 export class ProductsHome extends Component {
+
+   constructor(props) {
+    super(props);
+
+    this.state = {
+      IamA : null
+    };
+  }
+   
+   onChange = e => {
+
+     const valueSelectedByUser = e.target.value;
+     console.log(e.target.value);
+     this.setState({ IamA : e.target.value });
+     console.log(this.state);
+  }
+
   render() {
     return (
       <div>
@@ -60,6 +79,15 @@ export class ProductsHome extends Component {
         </div>    
 
         <div className="main-block">
+            <h2>I am a:</h2>
+         <div className="main-block-content main-block-content-left" id="iAm">
+            <select defaultValue="default" onChange={this.onChange}>
+               <option value="default" disabled hidden>Please Choose...</option>
+               <option value="certifier">Certifier</option>
+               <option value="forester">Forester</option>
+            </select>
+            <IamA user_type={this.state.IamA}></IamA>
+         </div>
           <div className="main-block-content main-block-content-left">
             <h4>
               About the data
