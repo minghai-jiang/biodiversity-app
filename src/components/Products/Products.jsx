@@ -16,7 +16,13 @@ export class Products extends Component {
     return (
       <div>
         <div className="main-content">
-          <Route exact path="/products" component={ProductsHome}/>
+          <Route 
+            exact 
+            path="/products" 
+            render={() => 
+              <ProductsHome publicFilesUrl={this.props.publicFilesUrl}/>
+            } 
+          />
           <Route 
             path="/products/documentation" 
             render={() => 
