@@ -17,7 +17,7 @@ class IamA extends Component
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.user_type && nextProps.user_type != this.props.user_type) {
+    if (nextProps.user_type && nextProps.user_type !== this.props.user_type) {
       const path = './' + nextProps.user_type + '.html';
       fetch(path)
         .then(response => {

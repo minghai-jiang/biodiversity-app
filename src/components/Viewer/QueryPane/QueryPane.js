@@ -225,7 +225,7 @@ export class QueryPane extends PureComponent {
 
       for (let x = 0; x < queryGroup.queries.length; x++) {
         let query = queryGroup.queries[x];
-        // let selected = this.state.query && query.id == this.state.query.id;
+        // let selected = this.state.query && query.id === this.state.query.id;
 
         queryGroupElements.push(
           <option value={query.id}>{query.text}</option>
@@ -344,7 +344,7 @@ export class QueryPane extends PureComponent {
     let selectedQueryId = event.target.value;
     let query = null;
     for (let i = 0; i < availableQueries.length; i++) {
-      query = availableQueries[i].queries.find(x => x.id == selectedQueryId);
+      query = availableQueries[i].queries.find(x => x.id === selectedQueryId);
 
       if (query) {
         break;

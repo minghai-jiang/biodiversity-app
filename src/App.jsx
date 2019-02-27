@@ -11,21 +11,21 @@ import Viewer from './components/Viewer/Viewer';
 import Home from "./components/home/home";
 import About from "./components/about/about";
 import Contact from "./components/contact/contact";
-import Products from "./components/Products/Products";
+import Products from "./components/products/Products";
 import Login from './components/Login/Login';
 
 import "./App.css";
 
 const localStorageUserItem = 'user';
 
-// const apiUrl = "https://api.ellipsis-earth.com/";
-// const publicFilesUrl = "https://public.ellipsis-earth.com/";
+const apiUrl = "https://api.ellipsis-earth.com/";
+const publicFilesUrl = "https://public.ellipsis-earth.com/";
 
 // const apiUrl = "https://dev.api.ellipsis-earth.com/";
 // const publicFilesUrl = "https://dev,public.ellipsis-earth.com/";
 
-const apiUrl = "http://localhost:7552/";
-const publicFilesUrl = "http://localhost:7552/";
+/*const apiUrl = "http://localhost:7552/";
+const publicFilesUrl = "http://localhost:7552/";*/
 
 class App extends Component {
   constructor(props, context) {
