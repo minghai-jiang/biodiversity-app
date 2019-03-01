@@ -55,7 +55,6 @@ class Viewer extends PureComponent {
     });
 
     let downloadWindow = window.open();
-    // downloadWindow.blur();
     window.focus();
 
     fetch(`${this.props.apiUrl}utilities/requestshapeDownload`,
@@ -68,12 +67,8 @@ class Viewer extends PureComponent {
         return response.json();
       })
       .then(json => {
-        // debugger;
         let downloadUrl = `${this.props.apiUrl}utilities/downloadShape/${json.token}`;
-        // FileDownload(downloadUrl, this.state.map.name + '.zip', 'application/zip');
         downloadWindow.location = downloadUrl;
-        // downloadWindow.blur();
-        // window.focus();
       })
       .catch(error =>{
         alert("Failed to download shape");

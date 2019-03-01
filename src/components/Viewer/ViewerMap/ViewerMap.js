@@ -5,6 +5,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import {
   Map,
   TileLayer,
+  GeoJSON,
   LayersControl,
   LayerGroup,
   FeatureGroup,
@@ -29,7 +30,7 @@ let mapParams = {
 
 export class ViewerMap extends PureComponent {
   mapRef = createRef();
-  mapMoveEvents = [];
+  getPolygonJsonTimeout = null;
 
   constructor(props) {
     super(props);
@@ -37,75 +38,126 @@ export class ViewerMap extends PureComponent {
       zoom: 3,
       lat: 40.509865,
       lon: -0.118092,
-      geojson: null,
+      layerGeoJsons: []
     };
-  };
+  }
 
-  getData(url)
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.map || !nextProps.timestampRange) {
+      return;
+    }
+
+    if (nextProps.map !== this.props.map || nextProps.timestampRange !== this.props.timestampRange ||
+      nextProps.timestampRange.start !== this.props.timestampRange.start || 
+      nextProps.timestampRange.end !== this.props.timestampRange.end) {
+        
+      this.getPolygonsJson(nextProps);
+    }
+  }
+
+  getPolygonsJson = async (props) =>
   {
-    fetch(url)
-      .then(response => {
-        if (response.ok) {
-          return response.text();
-        }
-        else {
-          throw "Failed to retrieve documents.";
-        }
-      })
-      .then(text => {
+    let headers = {
+      "Content-Type": "application/json"
+    };
+    if (props.user) {
+      headers["Authorization"] = "BEARER " + props.user.token;
+    }
 
-          this.setState({ geojson: JSON.parse(text) });
+    let bounds = this.mapRef.current.leafletElement.getBounds();
+    let x1 = bounds.getWest();
+    let x2 = bounds.getEast();
+    let y1 = bounds.getSouth();
+    let y2 = bounds.getNorth();
 
-      })
-      .catch(error => {
+    let map = props.map;
+
+    if (!map) {
+      return;
+    }
+
+    let polygonLayers = map.polygonLayers;
+
+    if (!polygonLayers) {
+      return;
+    }
+
+    let timestamp = props.map.timestamps[props.timestampRange.end];
+    let requestArgs = {
+      mapId: props.map.id,
+      timestampNumber: timestamp.number,
+      x1: x1,
+      x2: x2,
+      y1: y1,
+      y2: y2
+    };
+
+    let promises = [];
+    let layerGeoJsons = [];
+
+    for (let i = 0; i < polygonLayers.length; i++) {
+      let polygonLayer = polygonLayers[i];
+      let layerName = polygonLayer.name;
+
+      requestArgs.layer = layerName;
+      let promise = fetch(`${props.apiUrl}utilities/getPolygonsJsonBounds`,
+        {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(requestArgs)
+        });
+
+      promises.push(promise);
+    }
+
+    for (let i = 0; i < polygonLayers.length; i++) {
+      let polygonLayer = polygonLayers[i];
+      let layerName = polygonLayer.name;
+
+      requestArgs.layer = layerName;
+
+      try
+      {
+        let response = await promises[i];
+
+        if (!response.ok) {
+          continue;
+        }
+
+        let json = await response.json();
+        
+        if (!json.features) {
+          console.log(layerName + ' status: ' + json.status);
+          continue;
+        }
+
+        layerGeoJsons.push({
+          name: layerName,
+          geoJson: json
+        });
+      }
+      catch (error) {
         alert(error);
-      });
-  };
+      }
+    }
+    
+    this.setState({ layerGeoJsons: layerGeoJsons });
+  }
 
   onMapMoveEnd = (e) =>
   {
-    var length = 0;
-    if (this.mapMoveEvents)
-    {
-      length = this.mapMoveEvents.length;  
+    let f = () => {
+      this.getPolygonsJson(this.props);
     }
 
-    this.mapMoveEvents.push(length);
-
-    let f = function()
-    {
-      let new_length = this.mapMoveEvents.length;
-
-      if (length === new_length - 1)
-      {
-        console.log(e.target.getBounds());
-        this.mapMoveEvents = [];
-        length = 0;
-      }
-    }
-
-    setTimeout (f.bind(this), 250);
-  }
-
-  onFeatureGroupAdd = (e) => {
-
-    this.mapRef.current.leafletElement.on('moveend', this.onMapMoveEnd);
-
-  }
-
-  onFeatureGroupRemove = (e) => {
-    
-    this.mapRef.current.leafletElement.off('moveend');
-    this.mapMoveEvents = [];
-
+    clearTimeout(this.getShapeJsonTimeout);
+    this.getShapeJsonTimeout = setTimeout(f.bind(this), 2000);
   }
 
   componentDidMount = () => {
-    const map = this.mapRef.current.leafletElement;
+    let map = this.mapRef.current.leafletElement;
+    map.on('moveend', this.onMapMoveEnd);
     
-    //GeoJSON
-    this.getData('./districts.json');
-
     //Draw items
     var drawnItems = new L.featureGroup();
     map.addLayer(drawnItems);
@@ -166,9 +218,10 @@ export class ViewerMap extends PureComponent {
           let timestampLayers = [];
           for (let y = timestampStart; y <= timestampRange.end; y++) 
           {
+            let url = `${this.props.apiUrl}wms/${map.id}/${y}/${layerType}/${layerName}/{z}/{x}/{y}`;
             timestampLayers.push(             
               <TileLayer
-                url={`${this.props.apiUrl}wms/${map.id}/${y}/${layerType}/${layerName}/{z}/{x}/{y}`}
+                url={url}
                 tileSize={mapParams.tileSize}
                 noWrap={mapParams.noWrap}
                 maxZoom={mapParams.maxZoom}
@@ -194,35 +247,70 @@ export class ViewerMap extends PureComponent {
   }
 
   createGeojson = () => {
-      var layers = [];
-      //var popups = [];
+    let map = this.props.map;
+    let timestampRange = this.props.timestampRange;
 
-      let geojson = this.state.geojson;
-      if (geojson !== null)
-      {
-        for (let i = 0; i < geojson.features.length; i++)
+    if (!map || !timestampRange || !map.polygonLayers) {
+      return null;
+    }
+
+    let layerGeoJsons = this.state.layerGeoJsons;
+
+    var layers = [];
+    //var popups = [];
+
+    for (let i = 0; i < map.polygonLayers.length; i++) {
+      // debugger;
+      let polygonLayer = map.polygonLayers[i];
+
+      let polygonsJsonContainer = layerGeoJsons.find(x => x.name === polygonLayer.name);
+      let polygonsJson = null;
+      if (polygonsJsonContainer) {
+        polygonsJson = polygonsJsonContainer.geoJson;
+        // debugger;
+      }   
+
+      let polygons = [];
+      if (polygonsJson) {
+        for (let i = 0; i < polygonsJson.features.length; i++)
         {
           let propertiesArray = [];
-
-          if (geojson.features[i].properties)
+  
+          if (polygonsJson.features[i].properties)
           {
-            let properties = geojson.features[i].properties
+            let properties = polygonsJson.features[i].properties
             for (let key in properties)
             {
-              propertiesArray.push(<span key={i+key}><strong>{key}</strong>: {geojson.features[i].properties[key]}<br/></span>);
+              propertiesArray.push(
+                <span key={i+key}>
+                  <strong>{key}</strong>: {polygonsJson.features[i].properties[key]}
+                  <br/>
+                </span>);
             }
           }
-
+  
           //popups.push(<Popup key={i}>{propertiesArray}</Popup>);
-          layers.push(<Polygon key={'s'+i} positions={geojson.features[i].geometry.coordinates}><Popup key={i}>{propertiesArray}</Popup></Polygon>);
-        }
+          polygons.push(
+            <Polygon key={'s'+i} positions={polygonsJson.features[i].geometry.coordinates}>
+              <Popup key={i}>{propertiesArray}</Popup>
+            </Polygon>
+          );
+        } 
+      }
 
-        return <LayersControl.Overlay name="GeoJSON"><FeatureGroup key='FG' color="purple" onAdd={this.onFeatureGroupAdd} onRemove ={this.onFeatureGroupRemove}>{layers}</FeatureGroup></LayersControl.Overlay>; 
-      }
-      else
-      {
-        return null;
-      }
+      let layer = (
+        <LayersControl.Overlay name={polygonLayer.name}>
+          {/* <GeoJSON key={polygonLayer.name + i} data={polygonsJson} style={{color: '#006400', weight: 5, opacity: 0.65}}/> */}
+          <FeatureGroup key='FG' color="purple">
+            {polygons}
+          </FeatureGroup>
+        </LayersControl.Overlay> 
+      ) 
+
+      layers.push(layer);
+    }
+
+    return layers;
   }
 
   render() {
@@ -246,6 +334,8 @@ export class ViewerMap extends PureComponent {
           {this.createLayers(labelsLayerType, false, true, 200)}
           {this.createLayers(indicesLayerType, false, false, 300)}
           {this.createLayers(changesLayerType, true, false, 400)}
+        </LayersControl>
+        <LayersControl position="topright">
           {this.createGeojson()}
         </LayersControl>
       </Map>

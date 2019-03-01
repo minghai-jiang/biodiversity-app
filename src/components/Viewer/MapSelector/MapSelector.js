@@ -181,8 +181,8 @@ export class MapSelector extends PureComponent {
         headers["Authorization"] = "BEARER " + this.props.user.token
       }
 
-      let response = await fetch(
-        `${this.props.apiUrl}queries/layers_map`,
+      let wmsLayersResponse = await fetch(
+        `${this.props.apiUrl}queries/wmsLayers_map`,
         {
           method: 'POST',
           headers: headers,
@@ -190,8 +190,13 @@ export class MapSelector extends PureComponent {
         }
       )
 
-      if (response.status === 200) {
-        let dataCsv = await response.text();
+
+
+      // let wmsLayersResponse = await wmsLayersPromise;
+      // let polygonsLayersResponse = await polygonsLayersPromise;
+
+      if (wmsLayersResponse.status === 200) {
+        let dataCsv = await wmsLayersResponse.text();
 
         let parsedCsv = Papa.parse(dataCsv, csvParseConfig);
   
@@ -221,8 +226,46 @@ export class MapSelector extends PureComponent {
         map.layers = layers;
       }
       else {
-        throw `${response.status}: ${response.message}`;       
+        throw `${wmsLayersResponse.status}: ${wmsLayersResponse.message}`;       
       }       
+
+      let polygonsLayersResponse = await fetch(
+        `${this.props.apiUrl}queries/polygonsLayers_map`,
+        {
+          method: 'POST',
+          headers: headers,
+          body: bodyJson,
+        }
+      )
+
+      if (polygonsLayersResponse.status === 200) {
+        let dataCsv2 = await polygonsLayersResponse.text();
+        let parsedCsv2 = Papa.parse(dataCsv2, csvParseConfig);
+
+        let layerNameHeaderIndex = parsedCsv2.data[0].indexOf('layer');
+        let layerColorHeaderIndex = parsedCsv2.data[0].indexOf('color');
+
+        let polygonLayers = [];
+
+        for (let i = 1; i < parsedCsv2.data.length; i++) {
+          let name = parsedCsv2.data[i][layerNameHeaderIndex];
+          let color = parsedCsv2.data[i][layerColorHeaderIndex];
+
+          if (!polygonLayers.find(x => x.name === name)) {
+            let polygonLayer = {
+              name: name,
+              color: color
+            };
+
+            polygonLayers.push(polygonLayer);
+          }
+        }
+
+        map.polygonLayers = polygonLayers;
+      }
+      else {
+        throw `${polygonsLayersResponse.status}: ${polygonsLayersResponse.message}`;       
+      }
     }
   };
 
