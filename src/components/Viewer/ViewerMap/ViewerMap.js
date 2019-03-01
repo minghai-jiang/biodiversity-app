@@ -14,6 +14,7 @@ import "leaflet-draw";
 const imagesLayerType = 'images';
 const labelsLayerType = 'labels';
 const indicesLayerType = 'indices';
+const changesLayerType = 'changes';
 
 let mapParams = {
   tileSize: 256,
@@ -143,6 +144,7 @@ export class ViewerMap extends PureComponent {
           {this.createLayers(imagesLayerType, true, true, 100)}
           {this.createLayers(labelsLayerType, false, true, 200)}
           {this.createLayers(indicesLayerType, false, false, 300)}
+          {this.createLayers(changesLayerType, true, false, 400)}
         </LayersControl>
       </Map>
     );
