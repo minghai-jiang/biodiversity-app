@@ -11,15 +11,11 @@ class IamA extends Component
   }
 
   componentDidMount() {
-
-
-
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.user_type && nextProps.user_type !== this.props.user_type) {
-      const path = './' + nextProps.user_type + '.html';
-      fetch(path)
+    if (nextProps.type && nextProps.type != this.props.type) {
+      fetch(`${this.props.publicFilesUrl}iama/${nextProps.type}.html`)
         .then(response => {
           if (response.ok) {
             return response.text();
@@ -36,7 +32,6 @@ class IamA extends Component
           alert(error);
         }); 
     }
-
   }
 
   render()
