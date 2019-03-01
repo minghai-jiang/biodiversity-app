@@ -20,6 +20,8 @@ const labelsLayerType = 'labels';
 const indicesLayerType = 'indices';
 const changesLayerType = 'changes';
 
+const getPolygonJsonWaitTime = 1000;
+
 let mapParams = {
   tileSize: 256,
   attribution: 'Ellipsis Earth Intelligence',
@@ -47,11 +49,21 @@ export class ViewerMap extends PureComponent {
       return;
     }
 
-    if (nextProps.map !== this.props.map || nextProps.timestampRange !== this.props.timestampRange ||
+    if (nextProps.map !== this.props.map || 
+      nextProps.timestampRange !== this.props.timestampRange ||
       nextProps.timestampRange.start !== this.props.timestampRange.start || 
       nextProps.timestampRange.end !== this.props.timestampRange.end) {
-        
-      this.getPolygonsJson(nextProps);
+
+      if (nextProps.map.polygonLayers) {
+        let layerGeoJsons = [];
+        for (let i = 0; i < nextProps.map.polygonLayers.length; i++) {
+          layerGeoJsons.push({
+            name: nextProps.map.polygonLayers[i].name
+          })
+        }
+        this.setState({ layerGeoJsons: layerGeoJsons });
+        this.getPolygonsJson(nextProps);
+      }
     }
   }
 
@@ -125,9 +137,9 @@ export class ViewerMap extends PureComponent {
         }
 
         let json = await response.json();
+        console.log(layerName + ' count: ' + json.count);
         
         if (!json.features) {
-          console.log(layerName + ' status: ' + json.status);
           continue;
         }
 
@@ -151,7 +163,7 @@ export class ViewerMap extends PureComponent {
     }
 
     clearTimeout(this.getShapeJsonTimeout);
-    this.getShapeJsonTimeout = setTimeout(f.bind(this), 2000);
+    this.getShapeJsonTimeout = setTimeout(f.bind(this), getPolygonJsonWaitTime);
   }
 
   componentDidMount = () => {
@@ -299,7 +311,7 @@ export class ViewerMap extends PureComponent {
       }
 
       let layer = (
-        <LayersControl.Overlay name={polygonLayer.name}>
+        <LayersControl.Overlay key={polygonLayer.name + i} name={polygonLayer.name}>
           {/* <GeoJSON key={polygonLayer.name + i} data={polygonsJson} style={{color: '#006400', weight: 5, opacity: 0.65}}/> */}
           <FeatureGroup key='FG' color="purple">
             {polygons}
