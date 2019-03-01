@@ -213,6 +213,7 @@ export class QueryPane extends PureComponent {
   }
 
   renderQueryOptions = () => {
+    debugger;
     let options = [];
 
     options.push(
@@ -263,6 +264,7 @@ export class QueryPane extends PureComponent {
   }
 
   renderShapeCoords = () => {
+    debugger;
     let shape = this.props.shape;
     if (this.state.query)
     {
@@ -341,10 +343,11 @@ export class QueryPane extends PureComponent {
   }
 
   onQuerySelect = (event) => {
+    debugger;
     let selectedQueryId = event.target.value;
     let query = null;
     for (let i = 0; i < availableQueries.length; i++) {
-      query = availableQueries[i].queries.find(x => x.id === selectedQueryId);
+      query = availableQueries[i].queries.find(x => x.id == selectedQueryId);
 
       if (query) {
         break;
