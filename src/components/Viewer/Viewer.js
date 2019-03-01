@@ -24,7 +24,8 @@ class Viewer extends PureComponent {
 
   onSelectMap = map => {
     this.setState({
-        map: map
+        map: map,
+        timestampRange: { start: 0, end: 0 }
     });
   }
 

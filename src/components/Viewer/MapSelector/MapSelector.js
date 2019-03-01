@@ -147,17 +147,22 @@ export class MapSelector extends PureComponent {
           });
         }
 
-        timestamps.sort((a, b) => { 
-          if (a.date > b.date) {
+        timestamps.sort((a, b) => {
+          let aNumber = parseInt(a.number);
+          let bNumber = parseInt(b.number);
+
+          if (aNumber > bNumber) {
             return 1;
           }
-          else if (a.date < b.date) {
+          else if (aNumber < bNumber) {
             return -1;
           }
           else {
             return 0;
           }
         });
+
+        debugger;
 
         map.timestamps = timestamps;
       }
