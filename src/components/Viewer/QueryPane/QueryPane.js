@@ -380,7 +380,8 @@ export class QueryPane extends PureComponent {
   }
 
   onPolygonLayerNameSelect = (event) => {
-    this.setState({ polygonLayerName: event.target.value });
+    let selectedValue = event.target.value;
+    this.setState({ polygonLayerName:selectedValue !== "" ? selectedValue : null });
   }
 
   onPolygonIdChange = (event) => {
@@ -431,6 +432,7 @@ export class QueryPane extends PureComponent {
                     onChange={this.onPolygonLayerNameSelect} 
                     value={this.state.polygonLayerName ? this.polygonLayerNameParamName : null}
                   >
+                    <option value="">Select a polygon layer</option>
                     {this.renderPolygonLayerNameOptions()}
                   </select>
                 </div> :
