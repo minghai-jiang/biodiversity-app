@@ -15,10 +15,37 @@ import {
 import L from "leaflet";
 import "leaflet-draw";
 
-const imagesLayerType = 'images';
-const labelsLayerType = 'labels';
-const indicesLayerType = 'indices';
-const changesLayerType = 'changes';
+const imagesWmsLayerType = 'images';
+const labelsWmsLayerType = 'labels';
+const indicesWmsLayerType = 'indices';
+const changesWmsLayerType = 'changes';
+
+const wmsLayerTypes = [ 
+  {
+    name: imagesWmsLayerType, 
+    checked: true,
+    stacking: true,
+    zIndex: 100
+  },
+  {
+    name: labelsWmsLayerType, 
+    checked: true,
+    stacking: false,
+    zIndex: 200,
+  },
+  {
+    name: indicesWmsLayerType, 
+    checked: false,
+    stacking: false,
+    zIndex: 300
+  },
+  {
+    name: changesWmsLayerType,
+    checked: false,
+    stacking: true,
+    zIndex: 400
+  }
+];
 
 const getPolygonJsonWaitTime = 1000;
 
@@ -40,31 +67,91 @@ export class ViewerMap extends PureComponent {
       zoom: 3,
       lat: 40.509865,
       lon: -0.118092,
-      layerGeoJsons: []
+      layerGeoJsons: [],
+
+      preparedWmsLayerTypes: null
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.map || !nextProps.timestampRange) {
-      return;
-    }
-
     if (nextProps.map !== this.props.map || 
       nextProps.timestampRange !== this.props.timestampRange ||
       nextProps.timestampRange.start !== this.props.timestampRange.start || 
       nextProps.timestampRange.end !== this.props.timestampRange.end) {
 
+      let layerGeoJsons = [];
+
       if (nextProps.map.polygonLayers) {
-        let layerGeoJsons = [];
         for (let i = 0; i < nextProps.map.polygonLayers.length; i++) {
           layerGeoJsons.push({
             name: nextProps.map.polygonLayers[i].name
           })
         }
-        this.setState({ layerGeoJsons: layerGeoJsons });
         this.getPolygonsJson(nextProps);
       }
+
+      let layers = this.prepareLayers(nextProps);
+
+      this.setState({ layerGeoJsons: layerGeoJsons, preparedWmsLayerTypes: layers });
     }
+  }
+
+  prepareLayers = (props) => {
+    let map = props.map;
+    if (!map || !map.wmsLayerTypes) {
+      return {};
+    }
+
+    let preparedWmsLayerTypes = [];
+
+    for (let x = 0; x < wmsLayerTypes.length; x++) {
+      let wmsLayerType = wmsLayerTypes[x];
+
+      let mapWmsLayerType = map.wmsLayerTypes.find(l => l.name === wmsLayerType.name);
+
+      if (!mapWmsLayerType) {
+        continue;
+      }
+
+      let typeWmsLayers = [];
+
+      for (let i = 0; i< mapWmsLayerType.layers.length; i++) {
+        let wmsLayerName = mapWmsLayerType.layers[i];
+
+        let timestampWmsElements = [];
+        for (let y = 0; y < map.timestamps.length; y++) 
+        {
+          let timestamp = map.timestamps[y];
+          let timestampNumber = timestamp.number;
+
+          let url = `${this.props.apiUrl}wms/${map.id}/${timestampNumber}/${wmsLayerType.name}/${wmsLayerName}/{z}/{x}/{y}`;
+          timestampWmsElements.push(             
+            <TileLayer
+              url={url}
+              tileSize={mapParams.tileSize}
+              noWrap={mapParams.noWrap}
+              maxZoom={mapParams.maxZoom}
+              attribution={mapParams.attribution}
+              format={mapParams.format}
+              zIndex={wmsLayerType.zIndex + (y + 1) + timestampWmsElements.length}
+              key={y}
+            />
+          );
+        }
+
+        typeWmsLayers.push({
+          name: wmsLayerName,
+          timestampElements: timestampWmsElements
+        });
+      }
+
+      preparedWmsLayerTypes.push({
+        name: wmsLayerType.name,
+        layers: typeWmsLayers
+      })
+    }
+
+    return preparedWmsLayerTypes;
   }
 
   getPolygonsJson = async (props) =>
@@ -211,51 +298,47 @@ export class ViewerMap extends PureComponent {
     }.bind(this);
   }
 
-  createLayers = (layerType, stacking, checked, zIndex) => {
-    var layers = [];
+  renderWmsLayers = () => {
+    var controlOverlays = [];
 
     let map = this.props.map;
     let timestampRange = this.props.timestampRange;
 
-    if (map && timestampRange) {
-      let timestampStart = stacking ? timestampRange.start : timestampRange.end;
+    if (!map || !timestampRange || !this.state.preparedWmsLayerTypes) {
+      return null;
+    }
 
-      if (map.layerTypes.includes(layerType)) {
-        let typeLayers = map.layers[layerType];
-  
-        for (let i = 0; i < typeLayers.length; i++) {
-          let layerName = typeLayers[i].name;
-          let zIndexOffset = i * (timestampRange.end - timestampStart);
-          
-          let timestampLayers = [];
-          for (let y = timestampStart; y <= timestampRange.end; y++) 
-          {
-            let url = `${this.props.apiUrl}wms/${map.id}/${y}/${layerType}/${layerName}/{z}/{x}/{y}`;
-            timestampLayers.push(             
-              <TileLayer
-                url={url}
-                tileSize={mapParams.tileSize}
-                noWrap={mapParams.noWrap}
-                maxZoom={mapParams.maxZoom}
-                attribution={mapParams.attribution}
-                format={mapParams.format}
-                zIndex={zIndex + zIndexOffset + timestampLayers.length}
-                key={y}
-              />
-            );
-          }
+    for (let x = 0; x < wmsLayerTypes.length; x++) {
+      let wmsLayerType = wmsLayerTypes[x];
 
-          layers.push(
-            <LayersControl.Overlay checked name={layerName} key={i} checked={checked}>
-              <LayerGroup name={layerName}>
-                {timestampLayers}
-              </LayerGroup>              
-            </LayersControl.Overlay>
-          );
-        }
+      let preparedWmsLayerType = this.state.preparedWmsLayerTypes.find(l => l.name === wmsLayerType.name);
+
+      if (!preparedWmsLayerType) {
+        continue;
       }
-      return layers;
-    }  
+
+      for (let i = 0; i < preparedWmsLayerType.layers.length; i++) {
+        let wmsLayer = preparedWmsLayerType.layers[i];
+
+        let layerElements = [];
+        if (wmsLayerType.stacking) {
+          layerElements = wmsLayer.timestampElements.slice(timestampRange.start, timestampRange.end + 1);
+        }
+        else {
+          layerElements = [wmsLayer.timestampElements[timestampRange.end]];
+        }
+
+        controlOverlays.push(
+          <LayersControl.Overlay name={wmsLayer.name} key={wmsLayer.name + i} checked={wmsLayerType.checked}>
+            <LayerGroup name={wmsLayer.name}>
+              {layerElements}
+            </LayerGroup>              
+          </LayersControl.Overlay>
+        );
+      }
+    }
+    
+    return controlOverlays;
   }
 
   createGeojson = () => {
@@ -272,14 +355,12 @@ export class ViewerMap extends PureComponent {
     //var popups = [];
 
     for (let i = 0; i < map.polygonLayers.length; i++) {
-      // debugger;
       let polygonLayer = map.polygonLayers[i];
 
       let polygonsJsonContainer = layerGeoJsons.find(x => x.name === polygonLayer.name);
       let polygonsJson = null;
       if (polygonsJsonContainer) {
         polygonsJson = polygonsJsonContainer.geoJson;
-        // debugger;
       }   
 
       let polygons = [];
@@ -342,10 +423,7 @@ export class ViewerMap extends PureComponent {
               zIndex={0}
             />
           </LayersControl.Overlay>
-          {this.createLayers(imagesLayerType, true, true, 100)}
-          {this.createLayers(labelsLayerType, false, true, 200)}
-          {this.createLayers(indicesLayerType, false, false, 300)}
-          {this.createLayers(changesLayerType, true, false, 400)}
+          {this.renderWmsLayers()}
         </LayersControl>
         <LayersControl position="topright">
           {this.createGeojson()}

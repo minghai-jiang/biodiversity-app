@@ -206,27 +206,28 @@ export class MapSelector extends PureComponent {
         let layerTypeHeaderIndex = parsedCsv.data[0].indexOf('type');
         let layerNameHeaderIndex = parsedCsv.data[0].indexOf('name');
   
-        let layerTypes = []
-        let layers = {};
+        let wmsLayersTypes = [];
         for (let i = 1; i < parsedCsv.data.length; i++) {
-          let type = parsedCsv.data[i][layerTypeHeaderIndex];
-          let name = parsedCsv.data[i][layerNameHeaderIndex];
+          let wmsLayerTypeName = parsedCsv.data[i][layerTypeHeaderIndex];
+          let wmsLayerName = parsedCsv.data[i][layerNameHeaderIndex];
 
-          if (!layerTypes.includes(type)) {
-            layerTypes.push(type);
-            layers[type] = [];
+          let wmsLayerType = wmsLayersTypes.find(x => x.name === wmsLayerTypeName);
+
+          if (!wmsLayerType) {
+            wmsLayerType = {
+              name: wmsLayerTypeName,
+              layers: []
+            }
+            wmsLayersTypes.push(wmsLayerType);
+
           }
 
-          if (!layers[type].find(x => x.name === name)) {
-            layers[type].push({
-              type: type,
-              name: name
-            });
+          if (!wmsLayerType.layers.includes(wmsLayerName)) {
+            wmsLayerType.layers.push(wmsLayerName);
           }
         }
 
-        map.layerTypes = layerTypes;
-        map.layers = layers;
+        map.wmsLayerTypes = wmsLayersTypes;
       }
       else {
         throw `${wmsLayersResponse.status}: ${wmsLayersResponse.message}`;       
