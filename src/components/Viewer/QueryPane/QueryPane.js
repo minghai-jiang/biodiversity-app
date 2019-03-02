@@ -11,6 +11,7 @@ let timestampParamName = 'timestamp';
 let shapeParamName = 'shape';
 let polygonIdParamName = 'polygon';
 let classNameParamName = 'class';
+let polygonLayerNameParamName = 'layer';
 
 const availableQueries = [
   {
@@ -23,7 +24,7 @@ const availableQueries = [
   {
     name: 'Surface area of all classes',
     queries: [
-      { id: 10, text: 'For all polygons for a timestamp', name: 'classes_polygons_timestamp', params: [timestampParamName] },
+      { id: 10, text: 'For all polygons for a timestamp', name: 'classes_polygons_timestamp', params: [timestampParamName, polygonLayerNameParamName] },
       { id: 11, text: 'For all timestamps for a polygon', name: 'classes_timestamps_polygon', params: [polygonIdParamName] },
       { id: 12, text: 'For all tiles within a polygon on a timestamp ', name: 'classes_tiles_timestamp_polygon', params: [polygonIdParamName, timestampParamName]  },
       { id: 13, text: 'For all timestamps for a drawn polygon', name: 'classes_timestamps_customPolygon', params: [shapeParamName]},
@@ -33,7 +34,7 @@ const availableQueries = [
   {
     name: 'Mean spectral indices',
     queries: [
-      { id: 55, text: 'For all polygons for a timestamp', name: 'indices_polygons_timestamp', params: [timestampParamName] },
+      { id: 55, text: 'For all polygons for a timestamp', name: 'indices_polygons_timestamp', params: [timestampParamName, polygonLayerNameParamName] },
       { id: 56, text: 'For all timestamps for a polygon', name: 'indices_timestamps_polygon', params: [polygonIdParamName] },
       { id: 57, text: 'For all tiles for a polygon for a timestamp.', name: 'indices_tiles_polygon_timestamp', params: [polygonIdParamName, timestampParamName] },
       { id: 58, text: 'For all timestamps for a drawn polygon 	', name: 'indices_timestamps_customPolygon', params: [shapeParamName] },
@@ -42,8 +43,8 @@ const availableQueries = [
   }, 
   {
     name: 'Mean spectral indices of a certain class',
-    queries: [    
-      { id: 50, text: 'For all polygons for a timestamp', name: 'indices_polygons_timestamp_class', params: [timestampParamName, classNameParamName] },
+    queries: [        
+      { id: 50, text: 'For all polygons for a timestamp', name: 'indices_polygons_timestamp_class', params: [timestampParamName, classNameParamName, polygonLayerNameParamName, ] },
       { id: 51, text: 'For all timestamps for a polygon', name: 'indices_timestamps_polygon_class', params: [polygonIdParamName, classNameParamName] },
       { id: 52, text: 'For all tiles for a polygon for a timestamp', name: 'indices_tiles_polygon_timestamp_class', params: [polygonIdParamName, timestampParamName, classNameParamName] },
       { id: 53, text: 'For all timestamps for a drawn polygon ', name: 'indices_timestamps_customPolygon_class', params: [classNameParamName, shapeParamName] },
@@ -63,6 +64,7 @@ export class QueryPane extends PureComponent {
       query: null,
       polygonId: null,
       className: null,
+      polygonLayerName: null,
 
       dataCsvText: '',
       dataTable: null,
@@ -100,6 +102,9 @@ export class QueryPane extends PureComponent {
           } 
   
           args = args.concat(shapeCoords);
+        }
+        else if (paramName === polygonLayerNameParamName) {
+          args.push(this.state.polygonLayerName);
         }
       }
 
@@ -324,13 +329,28 @@ export class QueryPane extends PureComponent {
     }
   }
 
+  renderPolygonLayerNameOptions = () => {
+    let polygonLayers = this.props.map.polygonLayers;
+    let polygonLayerNameOptions = []
+
+    for (let i = 0; i < polygonLayers.length; i++) {
+      let polygonLayerName = polygonLayers[i].name
+      polygonLayerNameOptions.push(
+        <option value={polygonLayerName}>{polygonLayerName}</option>
+      )
+    }
+    
+    return polygonLayerNameOptions;    
+  }
+
   renderExecuteButton = () => {
     if (this.state.query) {
       let shapeFulfilled = this.props.shape || !this.state.query.params.includes(shapeParamName);
       let polygonIdFulfilled = this.state.polygonId || !this.state.query.params.includes(polygonIdParamName);
       let classNameFulfilled = this.state.className || !this.state.query.params.includes(classNameParamName);
+      let polygonLayerNameFulfilled = this.state.polygonLayerName || !this.state.query.params.includes(polygonLayerNameParamName);
 
-      if (shapeFulfilled && polygonIdFulfilled && classNameFulfilled) {        
+      if (shapeFulfilled && polygonIdFulfilled && classNameFulfilled && polygonLayerNameFulfilled) {        
         return ( <button onClick={this.executeQuery}>Execute query</button> )
       }
       else {
@@ -357,6 +377,10 @@ export class QueryPane extends PureComponent {
       dataTable: null,
       dataRowsNumber: 0,
     });
+  }
+
+  onPolygonLayerNameSelect = (event) => {
+    this.setState({ polygonLayerName: event.target.value });
   }
 
   onPolygonIdChange = (event) => {
@@ -399,6 +423,19 @@ export class QueryPane extends PureComponent {
             <div className='query-pane-div' >
               {this.renderClassNameInput()}
             </div>
+            {
+              this.state.query && this.state.query.params.includes(polygonLayerNameParamName) ?
+                <div className='query-pane-div'>
+                  <select 
+                    ref='polygonLayerNameSelect' 
+                    onChange={this.onPolygonLayerNameSelect} 
+                    value={this.state.polygonLayerName ? this.polygonLayerNameParamName : null}
+                  >
+                    {this.renderPolygonLayerNameOptions()}
+                  </select>
+                </div> :
+                null
+            }
             <div className='query-pane-div' >
               {this.renderExecuteButton()}
             </div>

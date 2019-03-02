@@ -162,8 +162,6 @@ export class MapSelector extends PureComponent {
           }
         });
 
-        debugger;
-
         map.timestamps = timestamps;
       }
       else {
