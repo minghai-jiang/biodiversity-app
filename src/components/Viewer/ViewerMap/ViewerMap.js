@@ -69,7 +69,8 @@ export class ViewerMap extends PureComponent {
       lon: -0.118092,
       layerGeoJsons: [],
 
-      preparedWmsLayerTypes: null
+      preparedWmsLayerTypes: null,
+      checkedLayers: []
     };
   }
 
@@ -253,9 +254,28 @@ export class ViewerMap extends PureComponent {
     this.getShapeJsonTimeout = setTimeout(f.bind(this), getPolygonJsonWaitTime);
   }
 
+  onOverlayAdd = (e) => {
+    if (!this.state.checkedLayers.includes(e.name)) {
+      this.state.checkedLayers.push(e.name);
+    }
+    
+    console.log(this.state.checkedLayers);
+  }
+
+  onOverlayRemove = (e) => {
+    let index = this.state.checkedLayers.indexOf(e.name);
+    if (index > -1) {
+      this.state.checkedLayers.splice(index, 1);
+    }
+
+    console.log(this.state.checkedLayers);
+  }
+
   componentDidMount = () => {
     let map = this.mapRef.current.leafletElement;
     map.on('moveend', this.onMapMoveEnd);
+    map.on('overlayadd', this.onOverlayAdd);
+    map.on('overlayremove', this.onOverlayRemove);
     
     //Draw items
     var drawnItems = new L.featureGroup();
@@ -352,7 +372,6 @@ export class ViewerMap extends PureComponent {
     let layerGeoJsons = this.state.layerGeoJsons;
 
     var layers = [];
-    //var popups = [];
 
     for (let i = 0; i < map.polygonLayers.length; i++) {
       let polygonLayer = map.polygonLayers[i];
@@ -363,40 +382,9 @@ export class ViewerMap extends PureComponent {
         polygonsJson = polygonsJsonContainer.geoJson;
       }   
 
-      let polygons = [];
-      if (polygonsJson) {
-        for (let i = 0; i < polygonsJson.features.length; i++)
-        {
-          let propertiesArray = [];
-  
-          if (polygonsJson.features[i].properties)
-          {
-            let properties = polygonsJson.features[i].properties
-            for (let key in properties)
-            {
-              propertiesArray.push(
-                <span key={i+key}>
-                  <strong>{key}</strong>: {polygonsJson.features[i].properties[key]}
-                  <br/>
-                </span>);
-            }
-          }
-  
-          //popups.push(<Popup key={i}>{propertiesArray}</Popup>);
-          polygons.push(
-            <Polygon key={'s'+i} positions={polygonsJson.features[i].geometry.coordinates}>
-              <Popup key={i}>{propertiesArray}</Popup>
-            </Polygon>
-          );
-        } 
-      }
-
       let layer = (
-        <LayersControl.Overlay key={polygonLayer.name + i} name={polygonLayer.name}>
-          {/* <GeoJSON key={polygonLayer.name + i} data={polygonsJson} style={{color: '#006400', weight: 5, opacity: 0.65}}/> */}
-          <FeatureGroup key='FG' color="purple">
-            {polygons}
-          </FeatureGroup>
+        <LayersControl.Overlay key={this.makeKey(10)} name={polygonLayer.name} checked={this.state.checkedLayers.includes(polygonLayer.name)}>
+          <GeoJSON  data={polygonsJson} style={{color: '#006400', weight: 5, opacity: 0.65}}/>
         </LayersControl.Overlay> 
       ) 
 
@@ -404,6 +392,18 @@ export class ViewerMap extends PureComponent {
     }
 
     return layers;
+  }
+
+
+
+  makeKey = (length) => {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  
+    for (var i = 0; i < length; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+  
+    return text;
   }
 
   render() {
