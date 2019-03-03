@@ -380,11 +380,11 @@ export class ViewerMap extends PureComponent {
       let polygonsJson = null;
       if (polygonsJsonContainer) {
         polygonsJson = polygonsJsonContainer.geoJson;
-      }   
+      }
 
       let layer = (
         <LayersControl.Overlay key={this.makeKey(10)} name={polygonLayer.name} checked={this.state.checkedLayers.includes(polygonLayer.name)}>
-          <GeoJSON  data={polygonsJson} style={{color: '#006400', weight: 5, opacity: 0.65}}/>
+          <GeoJSON data={polygonsJson} onEachFeature={this.onEachFeature} style={{color: '#0000ff', weight: 5, opacity: 0.65}}/>
         </LayersControl.Overlay> 
       ) 
 
@@ -394,7 +394,19 @@ export class ViewerMap extends PureComponent {
     return layers;
   }
 
+  onEachFeature = (feature, layer) => {
+    if (feature.properties) {
+      let popupContent = '';
 
+      for (let property in feature.properties) {
+        if (feature.properties.hasOwnProperty(property)) {      
+          popupContent += `<span><strong>${property}</strong>: ${feature.properties[property]}<br/></span>`
+        }
+      }
+
+      layer.bindPopup(popupContent);
+    }
+  }
 
   makeKey = (length) => {
     var text = "";
