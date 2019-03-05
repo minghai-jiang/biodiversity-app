@@ -38,13 +38,13 @@ const wmsLayerTypes = [
     checked: false,
     stacking: false,
     zIndex: 300
-  },
-  {
-    name: changesWmsLayerType,
-    checked: false,
-    stacking: true,
-    zIndex: 400
   }
+  // {
+  //   name: changesWmsLayerType,
+  //   checked: false,
+  //   stacking: true,
+  //   zIndex: 400
+  // }
 ];
 
 const getPolygonJsonWaitTime = 1000;

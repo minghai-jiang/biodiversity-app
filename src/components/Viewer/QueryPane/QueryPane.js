@@ -31,16 +31,16 @@ const availableQueries = [
       { id: 14, text: 'For all tiles intersecting a drawn polygon ', name: 'classes_tiles_timestamp_customPolygon', params: [timestampParamName, shapeParamName]}
     ]
   }, 
-  {
-    name: 'Mean spectral indices',
-    queries: [
-      { id: 55, text: 'For all polygons for a timestamp', name: 'indices_polygons_timestamp', params: [timestampParamName, polygonLayerNameParamName] },
-      { id: 56, text: 'For all timestamps for a polygon', name: 'indices_timestamps_polygon', params: [polygonIdParamName] },
-      { id: 57, text: 'For all tiles for a polygon for a timestamp.', name: 'indices_tiles_polygon_timestamp', params: [polygonIdParamName, timestampParamName] },
-      { id: 58, text: 'For all timestamps for a drawn polygon 	', name: 'indices_timestamps_customPolygon', params: [shapeParamName] },
-      { id: 59, text: 'For all tiles for a drawn polygon for a timestamp', name: 'indices_tiles_customPolygon_timestamp', params: [timestampParamName, shapeParamName] }
-    ]
-  }, 
+  // {
+  //   name: 'Mean spectral indices',
+  //   queries: [
+  //     { id: 55, text: 'For all polygons for a timestamp', name: 'indices_polygons_timestamp', params: [timestampParamName, polygonLayerNameParamName] },
+  //     { id: 56, text: 'For all timestamps for a polygon', name: 'indices_timestamps_polygon', params: [polygonIdParamName] },
+  //     { id: 57, text: 'For all tiles for a polygon for a timestamp.', name: 'indices_tiles_polygon_timestamp', params: [polygonIdParamName, timestampParamName] },
+  //     { id: 58, text: 'For all timestamps for a drawn polygon 	', name: 'indices_timestamps_customPolygon', params: [shapeParamName] },
+  //     { id: 59, text: 'For all tiles for a drawn polygon for a timestamp', name: 'indices_tiles_customPolygon_timestamp', params: [timestampParamName, shapeParamName] }
+  //   ]
+  // }, 
   {
     name: 'Mean spectral indices of a certain class',
     queries: [        
