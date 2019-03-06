@@ -675,7 +675,7 @@ r.plot(column = 'layer')
 
 
 
-![png](Northern_Paraguay_deforestation_files/Northern_Paraguay_deforestation_29_1.png)
+![png](https://public.ellipsis-earth.com/markdown/Northern_Paraguay_deforestation_files/Northern_Paraguay_deforestation_29_1.png)
 
 
 Now let's retrieve the actual satellite footage of this polygon and add it as a background map.
@@ -702,7 +702,7 @@ plt.imshow( polys_on_image( polys = r, im = im1 ,alpha = 0.15))
 
 
 
-![png](Northern_Paraguay_deforestation_files/Northern_Paraguay_deforestation_32_2.png)
+![png](https://public.ellipsis-earth.com/markdown/Northern_Paraguay_deforestation_files/Northern_Paraguay_deforestation_32_2.png)
 
 
 
@@ -721,7 +721,7 @@ plt.imshow( polys_on_image( polys = r, im = im2 ,alpha = 0.15))
 
 
 
-![png](Northern_Paraguay_deforestation_files/Northern_Paraguay_deforestation_33_2.png)
+![png](https://public.ellipsis-earth.com/markdown/Northern_Paraguay_deforestation_files/Northern_Paraguay_deforestation_33_2.png)
 
 
 Yes there has indeed been some deforestation in the lower right corner there. Let's now have a look when this occured. To this end we request a timeserie of this particular polygon.
@@ -746,7 +746,7 @@ plt.show()
 ```
 
 
-![png](Northern_Paraguay_deforestation_files/Northern_Paraguay_deforestation_36_0.png)
+![png](https://public.ellipsis-earth.com/markdown/Northern_Paraguay_deforestation_files/Northern_Paraguay_deforestation_36_0.png)
 
 
 It looks like the deforestation took place in august and september of 2016.
