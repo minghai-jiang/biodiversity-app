@@ -23,7 +23,7 @@
   height: 3.5em;
   width: auto;
   position: relative;
-  padding: 10%;
+  padding: 1em;
   top: -3px;
 }
 
@@ -89,7 +89,7 @@
   }
 
   #main-menu .main-menu-logo {
-    padding: 5%;
+    padding: 1em;
   }
 
   #main-menu a.icon {
@@ -157,7 +157,7 @@
   }
 
   #main-menu.responsive .main-menu-logo{
-    padding: 2%;
+    padding: 1em;
   }
 
   #main-menu.responsive .main-menu-logo-item {
@@ -182,10 +182,10 @@
 @media screen and (max-width: 400px)
 {
   #main-menu .main-menu-logo {
-    padding: 12.5%;
+    padding: 1em;
   }
 
   #main-menu.responsive .main-menu-logo {
-    padding: 5%;
+    padding: 1em;
   }
 }
