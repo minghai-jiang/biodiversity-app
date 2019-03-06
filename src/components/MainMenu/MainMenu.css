@@ -62,6 +62,14 @@
   display: none;
 }
 
+@media screen and (max-width: 740px) {
+  #main-menu > ul > li a.main-menu-item
+  {
+    font-size: 0.8em;
+    padding: 1.3em 0.5em;
+  }
+}
+
 /* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
 @media screen and (max-width: 600px) {
 
@@ -72,6 +80,12 @@
   #main-menu li:first-child {
     margin-left: 5.7em;
     width: 40vw;
+  }
+
+  #main-menu > ul > li a.main-menu-item
+  {
+    font-size: 0.9em;
+    padding: 1.1em 1em;
   }
 
   #main-menu .main-menu-logo {
