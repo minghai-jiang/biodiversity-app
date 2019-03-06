@@ -11,7 +11,7 @@ export class About extends Component {
                 <div className="main-content">
                     <div className="main-block about-us-block">
                         <div className="main-block-header">
-                            About Us
+                            <h1>About Us</h1>
                         </div>
                         <div className="main-block-content">
                             <p className="main-center-paragraph">

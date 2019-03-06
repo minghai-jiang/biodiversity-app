@@ -56,6 +56,15 @@ select
     }
 }
 
+@media screen and (max-width: 720px) {
+
+    a.product-double-button
+    {
+        width: 35%;
+        margin: 0.5em;
+    }
+}
+
 @media screen and (max-width: 600px) {
     a.product-single-button {
         width: 70%;

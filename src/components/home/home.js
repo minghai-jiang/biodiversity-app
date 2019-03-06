@@ -55,15 +55,15 @@ export class Home extends Component {
                                 impact through more effective use of time and resources. Or start experimenting with our API 
                                 to see how you could integrate this information into your own systems.
                             </p>
-                            <NavLink to="/maps" className="button-a">
+                            <NavLink to="/products/documentation" className="button-a">
                                 <div className="button main-block-single-button">
-                                    Maps                                                
+                                    API documentation                                                
                                 </div>
                             </NavLink>
                             <br/>
-                            <NavLink to="/products/api" className="button-a">
+                            <NavLink to="/viewer" className="button-a">
                                 <div className="button main-block-single-button">
-                                    API documentation                                                
+                                    Viewer                                                
                                 </div>
                             </NavLink>
                         </div>                       
@@ -112,10 +112,10 @@ export class Home extends Component {
                             <p className="main-center-paragraph">
                                 We believe in both automatisation as well as the human touch. 
                                 That is why we deliver both an intuitive&nbsp;
-                                <NavLink to="/maps">
-                                    interactive map 
+                                <NavLink to="/viewer" target='_blank'>
+                                    viewer
                                 </NavLink>&nbsp;for engagement as well as&nbsp;
-                                <NavLink to="/products/api">
+                                <NavLink to="/products/documentation">
                                     a modern API
                                 </NavLink>&nbsp;for system integration.
                             </p>

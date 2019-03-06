@@ -48,11 +48,11 @@ export class MainMenu extends Component {
               <img className="main-menu-logo" src="/images/logo-white.png" alt="Ellipsis Earth Intelligence logo white"/>
             </NavLink>
           </li>
-          <li>
+          {/*<li>
             <NavLink to="/" className="main-menu-item">
               Home
             </NavLink>
-          </li>
+          </li>*/}
           <li>
             <NavLink to="/viewer" className="main-menu-item">
               Viewer
@@ -61,6 +61,16 @@ export class MainMenu extends Component {
           <li>
             <NavLink to="/products" className="main-menu-item">
               Products
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/Sectors" className="main-menu-item">
+              Sectors
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/Gallery" className="main-menu-item">
+              Gallery
             </NavLink>
           </li>
           <li>

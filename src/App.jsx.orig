@@ -11,23 +11,27 @@ import Viewer from './components/Viewer/Viewer';
 import Home from "./components/home/home";
 import About from "./components/about/about";
 import Contact from "./components/contact/contact";
+<<<<<<< HEAD
 import Products from "./components/Products/Products";
+=======
+import Products from "./components/products/Products";
+import Sector from "./components/Sectors/Sectors";
+import Gallery from "./components/gallery/Gallery";
+>>>>>>> florian-development
 import Login from './components/Login/Login';
-import Sector from './components/Sectors/Sectors';
-import Gallery from './components/gallery/Gallery'
 
 import "./App.css";
 
 const localStorageUserItem = 'user';
 
 const apiUrl = "https://api.ellipsis-earth.com/";
-// const publicFilesUrl = "https://public.ellipsis-earth.com/";
+const publicFilesUrl = "https://public.ellipsis-earth.com/";
 
 // const apiUrl = "https://dev.api.ellipsis-earth.com/";
 // const publicFilesUrl = "https://dev,public.ellipsis-earth.com/";
 
-//const apiUrl = "http://localhost:7552/";
-const publicFilesUrl = "http://localhost:3000/";
+/*const apiUrl = "http://localhost:7552/";
+const publicFilesUrl = "http://localhost:7552/";*/
 
 class App extends Component {
   constructor(props, context) {
@@ -107,7 +111,7 @@ class App extends Component {
               <Viewer apiUrl={apiUrl} user={this.state.user}/>
             } 
           />
-          <Route path="/Products" 
+          <Route path="/products" 
             render={() =>
               <Products publicFilesUrl={publicFilesUrl} />
             }

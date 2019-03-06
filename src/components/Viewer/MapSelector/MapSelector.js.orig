@@ -230,7 +230,11 @@ export class MapSelector extends PureComponent {
         map.wmsLayerTypes = wmsLayersTypes;
       }
       else {
-        throw new Error(`${wmsLayersResponse.status}: ${wmsLayersResponse.message}`);       
+<<<<<<< HEAD
+        throw `${wmsLayersResponse.status}: ${wmsLayersResponse.message}`;       
+=======
+        throw new Error(`${response.status}: ${response.message}`);       
+>>>>>>> florian-development
       }       
 
       let polygonsLayersResponse = await fetch(
