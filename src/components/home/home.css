@@ -1,11 +1,11 @@
 #banner {
-    height: 94vh;
+    height: 70vh;
     background-color: #026464;
 }
 
 #banner-logo {
     position: relative;
-    top: 140px;
+    top: 80px;
     font-size: 14pt;
 
     width: 40em;

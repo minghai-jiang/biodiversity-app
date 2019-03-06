@@ -162,7 +162,7 @@ export class MapSelector extends PureComponent {
         map.timestamps = timestamps;
       }
       else {
-        throw `${response.status}: ${response.message}`;       
+        throw new Error(`${response.status}: ${response.message}`);       
       }
     }
   };
@@ -221,7 +221,7 @@ export class MapSelector extends PureComponent {
         map.layers = layers;
       }
       else {
-        throw `${response.status}: ${response.message}`;       
+        throw new Error(`${response.status}: ${response.message}`);       
       }       
     }
   };

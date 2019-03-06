@@ -43,7 +43,7 @@ class Login extends PureComponent {
         return response.json();
       }
       else {
-        throw 'Invalid username or password.'
+        throw new Error('Invalid username or password.');
       }
     })
     .then(data => {

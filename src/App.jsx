@@ -12,6 +12,8 @@ import Home from "./components/home/home";
 import About from "./components/about/about";
 import Contact from "./components/contact/contact";
 import Products from "./components/products/Products";
+import Sector from "./components/Sectors/Sectors";
+import Gallery from "./components/gallery/Gallery";
 import Login from './components/Login/Login';
 
 import "./App.css";
@@ -105,10 +107,21 @@ class App extends Component {
               <Viewer apiUrl={apiUrl} user={this.state.user}/>
             } 
           />
+          <Route path="/products" 
+            render={() =>
+              <Products publicFilesUrl={publicFilesUrl} />
+            }
+          />
           <Route 
-            path="/products" 
+            path="/Sectors" 
             render={() => 
-              <Products publicFilesUrl={publicFilesUrl}/>
+              <Sector publicFilesUrl={publicFilesUrl}/>
+            }
+          />
+          <Route 
+            path="/Gallery" 
+            render={() => 
+              <Gallery publicFilesUrl={publicFilesUrl}/>
             }
           />
           <Route path="/about" component={About}/>
