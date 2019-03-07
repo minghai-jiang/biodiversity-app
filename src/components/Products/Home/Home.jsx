@@ -87,7 +87,7 @@ export class ProductsHome extends Component {
 
             <p>
               Ellipsis maintains various monitoring services for a broad range of customers.
-              We call these <span className="key-words">self-updating maps</span>. Some of these maps are public and can be viewed and used by anyone, 
+              Some of these maps are public and can be viewed and used by anyone, 
               others are private and can only be accessed if you have the required login credentials.
             </p>
           </div>                    

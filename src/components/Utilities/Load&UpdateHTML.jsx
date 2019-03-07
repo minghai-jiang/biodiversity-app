@@ -19,10 +19,8 @@ class L_U_HTML extends Component
     if (nextProps.contentName && nextProps.contentName !== this.props.contentName) {
       if (this.props.type === 'Sector')
       {
-        debugger;
         fetch(`${this.props.publicFilesUrl}sectors/${nextProps.contentName}.html`)
           .then(response => {
-            debugger;
             if (response.ok) {
               return response.text();
             }
@@ -35,7 +33,6 @@ class L_U_HTML extends Component
             this.setState({ contentElements: contentElements});
           })
           .catch(error => {
-            debugger;
             alert(error);
           }); 
       }

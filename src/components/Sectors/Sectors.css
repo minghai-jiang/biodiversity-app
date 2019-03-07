@@ -1,0 +1,14 @@
+div.product-block-accented
+{
+	margin: 2em auto;
+}
+
+div.pre_dynamic
+{
+	padding-bottom: 0;
+}
+
+.product-block-accented:last-child
+{
+	margin-bottom: 0;
+}

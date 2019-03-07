@@ -7,6 +7,8 @@ import L_U_HTML from '../Utilities/Load&UpdateHTML';
 
 import { Footer } from "../footer/footer";
 
+import "./Sectors.css";
+
 export class Sector extends Component {
     constructor(props) {
     super(props);
@@ -38,14 +40,14 @@ export class Sector extends Component {
             <h1>Select sector</h1>
             <select defaultValue="default" onChange={this.onSectorChange}>
                <option value="default" disabled hidden>Please Choose...</option>
-               <option value="Consultancyengineering">Consultant or Engineer</option>
-               <option value="Forestry">Forester</option>
-               <option value="GovernmentAgencies">Government Agency</option>
+               <option value="Consultancyengineering">Consultanty or Engineering</option>
+               <option value="Forestry">Forestry</option>
+               <option value="GovernmentAgencies">Government</option>
                <option value="NGOs">NGO</option>
             </select>
           </div>
         </div>
-        <div className="main-block">
+        <div className="pre_dynamic main-block">
           <L_U_HTML publicFilesUrl={this.props.publicFilesUrl} type='Sector' contentName={this.state.Sector}></L_U_HTML>
         </div>
         <Footer></Footer>

@@ -47,6 +47,23 @@ export class Home extends Component {
 
                     <div className="main-block">
                         <div className="main-block-header">
+                            Sectors
+                        </div>
+                        <div className="main-block-content">
+                            <p className="main-center-paragraph">
+                                Information on landscape conditions and dynamics is valuable for various fields and purposes.
+                                You can see what we can do for your sector at:
+                            </p>
+                            <NavLink to="/sectors" className="button-a">
+                                <div className="button main-block-single-button">
+                                    Sectors                                                
+                                </div>
+                            </NavLink>
+                        </div>                        
+                    </div>
+
+                    <div className="main-block main-block-accented">
+                        <div className="main-block-header">
                             Explore
                         </div>
                         <div className="main-block-content">
@@ -56,13 +73,13 @@ export class Home extends Component {
                                 to see how you could integrate this information into your own systems.
                             </p>
                             <NavLink to="/products/documentation" className="button-a">
-                                <div className="button main-block-single-button">
+                                <div className="button button-accented main-block-single-button">
                                     API documentation                                                
                                 </div>
                             </NavLink>
                             <br/>
                             <NavLink to="/viewer" className="button-a">
-                                <div className="button main-block-single-button">
+                                <div className="button button-accented main-block-single-button">
                                     Viewer                                                
                                 </div>
                             </NavLink>
@@ -98,7 +115,7 @@ export class Home extends Component {
                         </div>                        
                     </div>
                 
-                    <div className="main-block">
+                    <div className="main-block  main-block-accented">
                         <div className="main-block-header">
                             Our Monitoring System
                         </div>
@@ -123,7 +140,7 @@ export class Home extends Component {
                                 For a detailed description of our product please visit our products page.
                             </p>
                             <NavLink to="/products" className="button-a">
-                                <div className="button main-block-single-button">
+                                <div className="button button-accented main-block-single-button">
                                     Products                                                
                                 </div>
                             </NavLink>
