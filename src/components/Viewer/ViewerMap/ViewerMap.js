@@ -423,7 +423,6 @@ export class ViewerMap extends PureComponent {
       <Map
         center={[this.state.lat, this.state.lon]}
         zoom={this.state.zoom}
-        style={{ height: "92.4vh" }}  
         ref={this.mapRef}
       >
         <LayersControl position="topright">
