@@ -40,7 +40,7 @@ export class Gallery extends Component {
           <div className="main-block-content main-block-content-left">
             <h1>Gallery</h1>
             <select defaultValue="default" onChange={this.onGalleryChange}>
-               <option value="default" disabled hidden>Please Choose...</option>
+               <option value="default" disabled hidden>Please choose...</option>
                <option value="Northern_Paraguay_deforestation">Northern Paraguay deforestation</option>
             </select>
           </div>
