@@ -76,7 +76,7 @@ class Markdown extends Component
                 if (contentElements[index].props.children.props.src)
                 {
                   let url = contentElements[index].props.children.props.src;
-                  let new_img = <img src={this.props.publicFilesUrl + 'markdown/' + url}/>;
+                  let new_img = <img src={this.props.publicFilesUrl + `markdown/${this.props.file}/` + url}/>;
                   clean.push(new_img);
                 }
               }
