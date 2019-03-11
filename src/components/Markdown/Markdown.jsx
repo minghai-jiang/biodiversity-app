@@ -62,7 +62,6 @@ class Markdown extends Component
       .then(text => {
         let output = this.md.render(text);
         let contentElements = parse(output);
-        console.log(contentElements);
         var clean = [];
 
         Object.keys(contentElements).forEach(function(index)
