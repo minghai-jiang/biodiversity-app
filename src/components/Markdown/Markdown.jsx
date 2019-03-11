@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import parse from 'html-react-parser';
 import 'highlight.js/styles/monokai-sublime.css';
+import './Markdown.css'
 
 const hljs       = require('highlight.js');
 const Remarkable = require('remarkable');
@@ -75,7 +76,7 @@ class Markdown extends Component
   render()
   {
     return (
-      <div>
+      <div className={'markdown-div'}>
         {this.state.contentElements}
       </div>
     )
