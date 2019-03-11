@@ -72,15 +72,15 @@ export class Home extends Component {
                                 impact through more effective use of time and resources. Or start experimenting with our API 
                                 to see how you could integrate this information into your own systems.
                             </p>
-                            <NavLink to="/products/documentation" className="button-a">
-                                <div className="button button-accented main-block-single-button">
-                                    API documentation                                                
-                                </div>
-                            </NavLink>
-                            <br/>
                             <NavLink to="/viewer" className="button-a">
                                 <div className="button button-accented main-block-single-button">
                                     Viewer                                                
+                                </div>
+                            </NavLink>
+                            <br/>
+                            <NavLink to="/products/documentation" className="button-a">
+                                <div className="button button-accented main-block-single-button">
+                                    API documentation                                                
                                 </div>
                             </NavLink>
                         </div>                       
@@ -96,20 +96,20 @@ export class Home extends Component {
                             </p>
                             <ol className="main-block-content-list">
                                 <li className="main-block-content-list-item">
-                                    Together we explore your monitoring challenge and pinpoint which landscape based KPIs, requirement,
+                                    Together we explore your monitoring challenge and pinpoint which landscape based KPIs, requirements,
                                     and/or restrictions need to be monitored.
                                 </li>
                                 <li className="main-block-content-list-item">
                                     Together we establish meaningful aggregation levels and geometries.
                                 </li>
                                 <li className="main-block-content-list-item">
-                                    We build and assemble the needed (AI) models to automatically conduct the required analysis.
+                                    We build and assemble the neccessary (AI) models to automatically conduct the required analysis.
                                 </li>
                                 <li className="main-block-content-list-item">
                                     We launch the models in our cloud and start to automatically construct and save the requested information on a running basis.
                                 </li>
                                 <li className="main-block-content-list-item">
-                                    Your system connects with this new data source and gets notified on the relevant developments of your choosing (in step 1)
+                                    Your system connects with this new data source and gets notified on the relevant developments of your choosing (as specified in step 1).
                                 </li>
                             </ol>
                         </div>                        
@@ -166,22 +166,6 @@ export class Home extends Component {
                                     <img style={{width: "100%"}} src="/images/lnv.png" alt="Dutch Ministry of Agriculture, Nature and Food Quality"/>                            
                                 </div>
                             </div>
-                            
-                            {/* <table className="featured-table">
-                                <tbody>
-                                    <tr>
-                                        <td className="featured-table-cell" title="Wageningen University & Research">
-                                            <img style={{width: "60%"}} src="/images/wur.png" alt="Wageningen University & Research"/>
-                                        </td>
-                                        <td className="featured-table-cell" title="International Union for Convervation of Nature">
-                                            <img style={{width: "50%"}} src="/images/iucn.png" alt="International Union for Convervation of Nature"/>                                       
-                                        </td>
-                                        <td className="featured-table-cell" title="Dutch Ministry of Agriculture, Nature and Food Quality">
-                                            <img style={{width: "100%"}} src="/images/lnv.png" alt="Dutch Ministry of Agriculture, Nature and Food Quality"/>
-                                        </td>
-                                    </tr>
-                                </tbody>                                
-                            </table> */}
                         </div>                        
                     </div>
                 </div>

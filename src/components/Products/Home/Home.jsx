@@ -13,7 +13,7 @@ export class ProductsHome extends Component {
             <img className="products-top-image" src="/images/logo-black-subtitle.png" alt="Ellipsis Earth Intelligence logo black"/>
 
             <p>
-              Ellipsis' product is an easy to use API that allows you to query and visualize the vast amount of geographic information in our database. 
+              Ellipsis' main product is an easy to use API that allows you to query and visualize the vast amount of geographic information in our database. 
               On top of this we offer an open-source interactive viewer to easily engage people on your projects.
             </p>
           </div>                    
@@ -43,7 +43,7 @@ export class ProductsHome extends Component {
             </h3>
 
             <p className="product-end-paragraph">              
-              The Ellipsis viewer offers low threshold access to all Ellipsis data.
+              The Ellipsis viewer offers low threshold access to all your Ellipsis data.
               Explore our interactive maps and/or export data to be processed in your application of choice.
             </p>
 
