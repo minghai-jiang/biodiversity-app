@@ -44,7 +44,7 @@ export class MainMenu extends Component {
       <div id="main-menu" style={displayStyle}>
         <ul>
           <li>
-            <NavLink to="/" className="main-menu-logo-item">
+            <NavLink exact to="/" className="main-menu-logo-item">
               <img className="main-menu-logo" src="/images/logo-white.png" alt="Ellipsis Earth Intelligence logo white"/>
             </NavLink>
           </li>

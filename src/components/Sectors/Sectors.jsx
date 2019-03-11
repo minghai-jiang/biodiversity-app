@@ -39,7 +39,7 @@ export class Sector extends Component {
           <div className="main-block-content main-block-content-left">
             <h1>Select sector</h1>
             <select defaultValue="default" onChange={this.onSectorChange}>
-               <option value="default" disabled hidden>Please Choose...</option>
+               <option value="default" disabled hidden>Please choose...</option>
                <option value="Consultancyengineering">Consultanty or Engineering</option>
                <option value="Forestry">Forestry</option>
                <option value="GovernmentAgencies">Government</option>

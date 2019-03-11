@@ -127,7 +127,7 @@ export class Home extends Component {
                                 access to the information you need.
                             </p>
                             <p className="main-center-paragraph">
-                                We believe in both automatisation as well as the human touch. 
+                                We believe in both automation as well as the human touch. 
                                 That is why we deliver both an intuitive&nbsp;
                                 <NavLink to="/viewer" target='_blank'>
                                     viewer

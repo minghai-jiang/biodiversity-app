@@ -63,11 +63,38 @@ class Markdown extends Component
       .then(text => {
         let output = this.md.render(text);
         let contentElements = parse(output);
+        var clean = [];
 
-        this.setState({ contentElements: contentElements});
+        Object.keys(contentElements).forEach(function(index)
+        {
+          if(typeof(contentElements[index]) === 'object')
+          {
+            if(contentElements[index].type === 'p')
+            {
+              if (contentElements[index].props.children.type === 'img')
+              {
+                if (contentElements[index].props.children.props.src)
+                {
+                  let url = contentElements[index].props.children.props.src;
+                  let new_img = <img src={this.props.publicFilesUrl + 'markdown/' + url}/>;
+                  clean.push(new_img);
+                }
+              }
+              else
+              {
+                clean.push(contentElements[index]);
+              }
+            }
+            else
+            {
+              clean.push(contentElements[index]);
+            }
+          }
+        }.bind(this));
+
+        this.setState({ contentElements: clean});
       })
       .catch(error => {
-        debugger;
         alert(error);
       })
   }
