@@ -3,7 +3,7 @@ import React, { Component } from "react";
     Route
 } from "react-router-dom";*/
 
-import L_U_HTML from '../Utilities/Load&UpdateHTML';
+import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 
 import { Footer } from "../footer/footer";
 
@@ -47,7 +47,7 @@ export class Gallery extends Component {
         </div>
         <div className="main-block">
           <div className="main-block-content main-block-content-left">
-            <L_U_HTML publicFilesUrl={this.props.publicFilesUrl} type='Gallery' contentName={this.state.Gallery}></L_U_HTML>
+            <LoadUpdateUtil publicFilesUrl={this.props.publicFilesUrl} type='Gallery' contentName={this.state.Gallery}></LoadUpdateUtil>
           </div>
         </div>
         <Footer></Footer>

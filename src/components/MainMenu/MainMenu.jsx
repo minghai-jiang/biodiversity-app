@@ -96,7 +96,7 @@ export class MainMenu extends Component {
             {/* {this.props.user.username} */}
           </li>
         </ul> 
-        <a href="javascript:void(0);" className="icon" onClick={this.toggleMenu}>
+        <a href={void(0)} className="icon" onClick={this.toggleMenu}>
           <img alt="hamburger-menu" src="/images/three-lines.png"></img>
         </a>          
       </div>

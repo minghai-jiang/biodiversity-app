@@ -3,7 +3,7 @@ import React, { Component } from "react";
     Route
 } from "react-router-dom";*/
 
-import L_U_HTML from '../Utilities/Load&UpdateHTML';
+import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 
 import { Footer } from "../footer/footer";
 
@@ -48,7 +48,7 @@ export class Sector extends Component {
           </div>
         </div>
         <div className="pre_dynamic main-block">
-          <L_U_HTML publicFilesUrl={this.props.publicFilesUrl} type='Sector' contentName={this.state.Sector}></L_U_HTML>
+          <LoadUpdateUtil publicFilesUrl={this.props.publicFilesUrl} type='Sector' contentName={this.state.Sector}></LoadUpdateUtil>
         </div>
         <Footer></Footer>
         </div>
