@@ -8,13 +8,13 @@ import { withRouter } from 'react-router';
 import MainMenu from "./components/MainMenu/MainMenu";
 
 import Viewer from './components/Viewer/Viewer';
-import Home from "./components/home/home";
+import Home from "./components/Home/Home";
 import About from "./components/about/about";
 import Contact from "./components/contact/contact";
 import Products from "./components/Products/Products";
 import Login from './components/Login/Login';
 import Sector from './components/Sectors/Sectors';
-import Gallery from './components/gallery/Gallery'
+import Gallery from './components/Gallery/Gallery'
 
 import "./App.css";
 
@@ -34,9 +34,16 @@ class App extends Component {
     super(props, context)
     document.title = "Ellipsis Earth Intelligence";
 
+    let language = localStorage.getItem(localStorageUserItem);
+    if (!language) {
+      language = 'english';
+    }
+
     this.state = {
-      user: null
+      user: null,
+      language: language
     };
+
 
     this.retrieveUser();
   }
@@ -80,6 +87,10 @@ class App extends Component {
     }
   }
 
+  retrieveLanguage = () => {
+
+  }
+
   onLogin = (user) => {
     localStorage.setItem(localStorageUserItem, JSON.stringify(user));
     this.setState({ user: user }, () => {
@@ -97,10 +108,17 @@ class App extends Component {
       <div className="App" onClick={this.closeMenu}>
         <MainMenu
           user={this.state.user}
+          language={this.state.language}
           onLogout={this.onLogout}
         />
         <div className="content" ref={ref => this.el = ref}>
-          <Route exact path="/" component={Home}/>
+          <Route exact path="/"
+            render={() => 
+              <Home
+                language={this.state.language}
+              />
+            }
+          />
           <Route 
             path="/viewer" 
             render={() => 
@@ -109,19 +127,28 @@ class App extends Component {
           />
           <Route path="/Products" 
             render={() =>
-              <Products publicFilesUrl={publicFilesUrl} />
+              <Products 
+                publicFilesUrl={publicFilesUrl} 
+                language={this.state.language}
+              />
             }
           />
           <Route 
             path="/Sectors" 
             render={() => 
-              <Sector publicFilesUrl={publicFilesUrl}/>
+              <Sector 
+                publicFilesUrl={publicFilesUrl}
+                language={this.state.language}
+              />
             }
           />
           <Route 
             path="/Gallery" 
             render={() => 
-              <Gallery publicFilesUrl={publicFilesUrl}/>
+              <Gallery 
+                publicFilesUrl={publicFilesUrl}
+                language={this.state.language}                
+              />
             }
           />
           <Route path="/about" component={About}/>

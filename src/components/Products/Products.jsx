@@ -20,19 +20,19 @@ export class Products extends Component {
             exact 
             path="/products" 
             render={() => 
-              <ProductsHome publicFilesUrl={this.props.publicFilesUrl}/>
+              <ProductsHome publicFilesUrl={this.props.publicFilesUrl} language={this.props.language}/>
             } 
           />
           <Route 
             path="/products/documentation" 
             render={() => 
-              <ProductsDocumentation publicFilesUrl={this.props.publicFilesUrl}/>
+              <ProductsDocumentation publicFilesUrl={this.props.publicFilesUrl} language={this.props.language}/>
             } 
           />
           <Route 
             path="/products/tutorial" 
             render={() => 
-              <ProductsTutorial publicFilesUrl={this.props.publicFilesUrl}/>
+              <ProductsTutorial publicFilesUrl={this.props.publicFilesUrl} language={this.props.language}/>
             } 
           />
         </div>

@@ -13,32 +13,49 @@ class L_U_HTML extends Component
   }
 
   componentDidMount() {
+    this.getContent(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.contentName && nextProps.contentName !== this.props.contentName) {
-      if (this.props.type === 'Sector')
+    this.getContent(nextProps);
+    
+  }
+
+  getContent(props) {
+    if (props.contentUrl) {
+      if (props.isMarkdown === true)
       {
-        fetch(`${this.props.publicFilesUrl}sectors/${nextProps.contentName}.html`)
-          .then(response => {
-            if (response.ok) {
-              return response.text();
-            }
-            else {
-              throw new Error("Failed to retrieve documents.");
-            }
-          })
-          .then(text => {
-            let contentElements = parse(text);
-            this.setState({ contentElements: contentElements});
-          })
-          .catch(error => {
-            alert(error);
-          }); 
+        debugger;
+        let imagesUrl = props.contentUrl.substring(0, props.contentUrl.length - 3) + '/';
+        let markdownElement = (
+          <Markdown
+            contentUrl={props.contentUrl}
+            imagesUrl={imagesUrl}
+          />
+        )
+        this.setState({ 
+          contentElements: markdownElement
+        });
       }
-      else if (this.props.type === 'Gallery')
-      {
-        this.setState({ contentElements: <Markdown publicFilesUrl={this.props.publicFilesUrl} file={nextProps.contentName}></Markdown>});
+      else {
+        let r = Math.random();
+
+        fetch(props.contentUrl + '?' + r)
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          }
+          else {
+            throw new Error("Failed to retrieve documents.");
+          }
+        })
+        .then(text => {
+          let contentElements = parse(text);
+          this.setState({ contentElements: contentElements});
+        })
+        .catch(error => {
+          alert(error);
+        }); 
       }
     }
   }
@@ -46,7 +63,7 @@ class L_U_HTML extends Component
   render()
   {
     return(
-      <div className={this.props.type + "_content"}>
+      <div className='dynamic-content'>
         {this.state.contentElements}
       </div>
     )

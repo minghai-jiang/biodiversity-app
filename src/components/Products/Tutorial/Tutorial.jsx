@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import "./Tutorial.css";
 
-import Markdown  from '../../Markdown/Markdown';
+import L_U_HTML from '../../Utilities/Load&UpdateHTML';
+
 
 export class ProductsTutorial extends Component {
 
@@ -13,7 +14,11 @@ export class ProductsTutorial extends Component {
                         Ellipsis-Earth tutorial
                     </h1>
                     <div className="main-block-content main-block-content-left">
-                        <Markdown publicFilesUrl={this.props.publicFilesUrl} file="tutorial"></Markdown>
+                        {/* <Markdown publicFilesUrl={this.props.publicFilesUrl} file="tutorial"></Markdown> */}
+                        <L_U_HTML 
+                          contentUrl={'/markdown/tutorial.md'}
+                          isMarkdown={true}
+                        />
                     </div>                        
                 </div>     
             </div>
