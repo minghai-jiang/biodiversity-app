@@ -32,7 +32,6 @@ export class MainMenu extends Component {
   }
 
   changeLanguage = (language) => {
-    debugger;
     if (this.props.onLanguageChange) {
       this.props.onLanguageChange(language);
     }
@@ -80,7 +79,7 @@ export class MainMenu extends Component {
               {this.props.localization['AboutUs']}
             </NavLink>
           </li>
-          <li style={{float: "right"}}>              
+          {/* <li style={{float: "right"}}>              
             <a class="main-menu-item dropdown">
               <button class="dropbtn">
                 Language 
@@ -90,7 +89,7 @@ export class MainMenu extends Component {
                 <a href="#" onClick={() => this.changeLanguage('spanish')}>Spanish</a>
               </div>
             </a> 
-          </li>
+          </li> */}
           <li style={{display: this.props.user ? 'none' : 'block', float: "right"}}>
             <NavLink to="/login" className="main-menu-item">
               {this.props.localization['Login']}

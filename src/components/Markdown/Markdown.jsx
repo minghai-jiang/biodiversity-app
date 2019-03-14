@@ -51,10 +51,8 @@ class Markdown extends Component
   }
 
   componentDidMount() {
-    debugger;
     fetch(this.props.contentUrl)
       .then(response => {
-        debugger;
         if (response.ok) {
           return response.text();
         }
@@ -63,7 +61,6 @@ class Markdown extends Component
         }
       })
       .then(text => {
-        debugger;
         let output = this.md.render(text);
         let contentElements = parse(output);
         var clean = [];
@@ -80,7 +77,6 @@ class Markdown extends Component
                 {
                   let url = contentElements[index].props.children.props.src;
                   let new_img = <img src={this.props.imagesUrl + url}/>;
-                  debugger;
                   clean.push(new_img);
                 }
               }

@@ -80,61 +80,48 @@ export class ViewerMap extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (  nextProps.map !== this.props.map || 
-          nextProps.timestampRange !== this.props.timestampRange ||
-          nextProps.timestampRange.start !== this.props.timestampRange.start || 
-          nextProps.timestampRange.end !== this.props.timestampRange.end) {
+    let differentMap = nextProps.map !== this.props.map;
+    
+    if (differentMap ||
+        nextProps.timestampRange !== this.props.timestampRange ||
+        nextProps.timestampRange.start !== this.props.timestampRange.start || 
+        nextProps.timestampRange.end !== this.props.timestampRange.end) {
 
-        let bounds = L.latLngBounds(L.latLng(nextProps.map.yMin, nextProps.map.xMin), L.latLng(nextProps.map.yMax, nextProps.map.xMax));
+        if (differentMap) {
+          let bounds = L.latLngBounds(L.latLng(nextProps.map.yMin, nextProps.map.xMin), L.latLng(nextProps.map.yMax, nextProps.map.xMax));
         
-        if (this.props.map === null)
-        {
-          console.log(this.props.map);
-          this.mapRef.current.leafletElement.flyToBounds(bounds);
-        }
-        else
-        {
-          let old_bounds = L.latLngBounds(L.latLng(this.props.map.yMin, this.props.map.xMin), L.latLng(this.props.map.yMax, this.props.map.xMax));
-          
-          if (!bounds.contains(old_bounds))
+          if (this.props.map === null)
           {
             this.mapRef.current.leafletElement.flyToBounds(bounds);
           }
-        }
+          else
+          {
+            let old_bounds = L.latLngBounds(L.latLng(this.props.map.yMin, this.props.map.xMin), L.latLng(this.props.map.yMax, this.props.map.xMax));
+            
+            if (!bounds.contains(old_bounds))
+            {
+              this.mapRef.current.leafletElement.flyToBounds(bounds);
+            }
+          }
 
-/*      let layerGeoJsons = [];
+          this.prepareLayers(nextProps)
+            .then(layers => {
+              this.setState({ preparedtileLayers: layers });
+            });
+        }      
 
-      if (nextProps.map.polygonLayers)
-      {
-        //console.log(nextProps.map.polygonLayers);
-      }*/
-      /*if (nextProps.map.polygonLayers) {
-        console.log(layerGeoJsons);
-        for (let i = 0; i < nextProps.map.polygonLayers.length; i++) {
-          console.log(nextProps.map.polygonLayers[i].name);
-          layerGeoJsons.push({
-            name: nextProps.map.polygonLayers[i].name
-          })
-        }
-        this.getPolygonsJson(nextProps);
-      }
-*/
-      let polygons = this.getPolygonsJson(nextProps);
-      let layers = this.prepareLayers(nextProps);
-
-      this.setState(
-      {
-        layerGeoJsons: polygons,
-        preparedtileLayers: layers
-      });
+      // this.getPolygonsJson(nextProps);
     }
+
   }
 
-  prepareLayers = (props) => {
+  prepareLayers = async (props) => {
     let map = props.map;
     if (!map || !map.tileLayers) {
       return {};
     }
+
+    this.state.checkedLayers.length = 0;
     
     let preparedtileLayers = [];
 
@@ -147,7 +134,7 @@ export class ViewerMap extends PureComponent {
       for (var j = 0; j < timestamp.layers.length; j++)
       {
         let tileLayer = timestamp.layers[j];
-        let url = this.props.apiUrl + 'tileLayer/' + map.uuid + '/' + timestamp.timestampNumber + '/' + tileLayer.name + '/{z}/{x}/{y}';
+        let url = props.apiUrl + 'tileLayer/' + map.uuid + '/' + timestamp.timestampNumber + '/' + tileLayer.name + '/{z}/{x}/{y}';
 
         let zIndex;
         let checked;
@@ -159,7 +146,12 @@ export class ViewerMap extends PureComponent {
             zIndex = tileLayers[k].zIndex;
             checked = tileLayers[k].checked;
             stacking = tileLayers[k].stacking;
+            break;
           }
+        }
+
+        if (checked && !this.state.checkedLayers.includes(tileLayer.name)) {
+          this.state.checkedLayers.push(tileLayer.name);
         }
         
         layerTypes.push({
@@ -176,18 +168,19 @@ export class ViewerMap extends PureComponent {
             format={mapParams.format}
             zIndex={zIndex + (j + 1) + map.tileLayers.length}
             key={i}
-            errorTileUrl={this.props.publicFilesUrl + 'images/dummy_tile.png'}
+            // errorTileUrl={props.publicFilesUrl + 'images/dummy_tile.png'}
             bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
           />
         });
       }
+
       preparedtileLayers.push({
         timestampNumber: timestamp.timestampNumber,
         layers: layerTypes
       });
     }
 
-    return(preparedtileLayers);
+    return preparedtileLayers;
   }
 
   getPolygonsJson = async (props) =>
@@ -257,115 +250,6 @@ export class ViewerMap extends PureComponent {
     }
 
     this.setState({ layerGeoJsons: layerGeoJsons });
-
-
-
-    /*let responseJson = await QueryUtil.getData(
-      this.props.apiUrl + 'geometry/polygon/bounds',
-      {"mapId":  map.uuid },
-      { headers }
-    );
-    map.timestamps = responseJson;*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*let headers = {
-      "Content-Type": "application/json"
-    };
-
-    let bounds = this.mapRef.current.leafletElement.getBounds();
-    let x1 = bounds.getWest();
-    let x2 = bounds.getEast();
-    let y1 = bounds.getSouth();
-    let y2 = bounds.getNorth();
-    //console.log(bounds);
-
-
-
-    let polygonLayers = map.polygonLayers;
-    let map = props.map;
-
-    if (!polygonLayers) {
-      return;
-    }
-
-    let timestamp = props.map.timestamps[props.timestampRange.end];
-    let requestArgs = {
-      mapId: props.map.id,
-      timestampNumber: timestamp.number,
-      x1: x1,
-      x2: x2,
-      y1: y1,
-      y2: y2
-    };
-
-    let promises = [];
-    let layerGeoJsons = [];
-
-    for (let i = 0; i < polygonLayers.length; i++) {
-      let polygonLayer = polygonLayers[i];
-      let layerName = polygonLayer.name;
-
-      requestArgs.layer = layerName;
-      let promise = fetch(`${props.apiUrl}utilities/getPolygonsJsonBounds`,
-        {
-          method: 'POST',
-          headers: headers,
-          body: JSON.stringify(requestArgs)
-        });
-
-      promises.push(promise);
-    }
-
-    for (let i = 0; i < polygonLayers.length; i++) {
-      let polygonLayer = polygonLayers[i];
-      let layerName = polygonLayer.name;
-
-      requestArgs.layer = layerName;
-
-      try
-      {
-        let response = await promises[i];
-
-        if (!response.ok) {
-          continue;
-        }
-
-        let json = await response.json();
-        console.log(layerName + ' count: ' + json.count);
-        
-        if (!json.features) {
-          continue;
-        }
-
-        layerGeoJsons.push({
-          name: layerName,
-          geoJson: json
-        });
-      }
-      catch (error) {
-        alert(error);
-      }
-    }
-    
-    this.setState({ layerGeoJsons: layerGeoJsons });*/
   }
 
   onMapMoveEnd = (e) =>
@@ -382,8 +266,6 @@ export class ViewerMap extends PureComponent {
     if (!this.state.checkedLayers.includes(e.name)) {
       this.state.checkedLayers.push(e.name);
     }
-    
-    console.log(this.state.checkedLayers);
   }
 
   onOverlayRemove = (e) => {
@@ -443,7 +325,7 @@ export class ViewerMap extends PureComponent {
   }
 
   renderTileLayers = () => {
-    var controlOverlays = [];
+    let controlOverlays = [];
     let tileLayers = [];
 
     let map = this.props.map;
@@ -463,11 +345,13 @@ export class ViewerMap extends PureComponent {
 
         if (tileLayer.stacking || i === timestampRange.end)
         {
+
           if (!tileLayers[tileLayer.layerName])
           {
             tileLayers[tileLayer.layerName] = []
             tileLayers[tileLayer.layerName]['checked'] = tileLayer.checked;
-          }
+            tileLayers[tileLayer.layerName]['key'] = tileLayer.key;
+          }          
 
           tileLayers[tileLayer.layerName].push(tileLayer.layer);
         }
@@ -476,9 +360,10 @@ export class ViewerMap extends PureComponent {
 
     for (let key in tileLayers)
     {
+      let r = Math.random();
       controlOverlays.push(
-        <LayersControl.Overlay name={key} key={key} checked={tileLayers[key].checked}>
-          <LayerGroup name={key} key={key}>
+        <LayersControl.Overlay name={key} key={r} checked={this.state.checkedLayers.includes(key)}>
+          <LayerGroup name={key}>
             {tileLayers[key]}
           </LayerGroup>
         </LayersControl.Overlay>
@@ -504,32 +389,28 @@ export class ViewerMap extends PureComponent {
       let geoJson;
       if (layerGeoJsons[i]['count'] <= maxPolygon)
       {
-        geoJson = <GeoJSON
-          data={layerGeoJsons[i]}
-          onEachFeature={this.onEachFeature}
-          style=
-          {{
-            color: '#' + layerGeoJsons[i].color,
-            weight: 1
-          }}/>
+        let r = Math.random();
+        geoJson = 
+          <GeoJSON
+            data={layerGeoJsons[i]}
+            onEachFeature={this.onEachFeature}
+            style={{color: '#' + layerGeoJsons[i].color, weight: 1}}
+            key={r}
+          />
       }
       else
       {
         polygonCount += layerGeoJsons[i].count;
-/*        function getRandom()
-        {
-          return Math.floor((Math.random() * 10) + 1);
-        }*/
-
-
       }
 
+      let checked = this.state.checkedLayers.includes(layerGeoJsons[i].name);
+
+      let r = Math.random();
       let layer = (
         <LayersControl.Overlay
-          key={i}
+          key={r}
           name={layerGeoJsons[i].name}
-          //checked={this.state.checkedLayers.includes(layerGeoJsons[i].name)}
-          checked
+          checked={checked}
         >
           <LayerGroup name={layerGeoJsons[i].name} key={i}>
             {geoJson}
@@ -567,23 +448,6 @@ export class ViewerMap extends PureComponent {
       layers.push(marker);
     }
     return layers;
-
-    /*
-
-    var layers = [];
-
-    for (let i = 0; i < map.polygonLayers.length; i++) {
-      let polygonLayer = map.polygonLayers[i];
-      //console.log(polygonLayer);
-      let polygonsJsonContainer = layerGeoJsons.find(x => x.name === polygonLayer.name);
-      let polygonsJson = null;
-      if (polygonsJsonContainer) {
-        polygonsJson = polygonsJsonContainer.geoJson;
-      }
-
-    }
-
-    return layers;*/
   }
 
   onEachFeature = (feature, layer) => {

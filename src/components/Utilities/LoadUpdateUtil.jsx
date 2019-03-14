@@ -25,7 +25,6 @@ class LoadUpdateUtil extends Component
     if (props.contentUrl) {
       if (props.isMarkdown === true)
       {
-        debugger;
         let imagesUrl = props.contentUrl.substring(0, props.contentUrl.length - 3) + '/';
         let markdownElement = (
           <Markdown
