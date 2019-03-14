@@ -104,7 +104,7 @@ class App extends Component {
           <Route 
             path="/viewer" 
             render={() => 
-              <Viewer apiUrl={apiUrl} user={this.state.user}/>
+              <Viewer apiUrl={apiUrl} publicFilesUrl={publicFilesUrl} user={this.state.user}/>
             } 
           />
           <Route path="/Products" 

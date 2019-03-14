@@ -94,6 +94,7 @@ class Viewer extends PureComponent {
         </div>
         <ViewerMap
           apiUrl={this.props.apiUrl} 
+          publicFilesUrl={this.props.publicFilesUrl}
           map={this.state.map}
           timestampRange={this.state.timestampRange}
           onShapeDrawn={this.onShapeDrawn}

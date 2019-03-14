@@ -10,10 +10,14 @@ import {
   LayerGroup,
   FeatureGroup,
   Popup,
-  Polygon
+  Polygon,
+  Marker
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-draw";
+
+import "./ViewerMap.css";
+const QueryUtil = require('../../Utilities/QueryUtil').default;
 
 const imagesTileLayer = 'images';
 const labelsTileLayer = 'labels';
@@ -48,6 +52,7 @@ const tileLayers = [
 ];
 
 const getPolygonJsonWaitTime = 1000;
+const maxPolygon = 200;
 
 let mapParams = {
   tileSize: 256,
@@ -75,25 +80,53 @@ export class ViewerMap extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.map !== this.props.map || 
-      nextProps.timestampRange !== this.props.timestampRange ||
-      nextProps.timestampRange.start !== this.props.timestampRange.start || 
-      nextProps.timestampRange.end !== this.props.timestampRange.end) {
+    if (  nextProps.map !== this.props.map || 
+          nextProps.timestampRange !== this.props.timestampRange ||
+          nextProps.timestampRange.start !== this.props.timestampRange.start || 
+          nextProps.timestampRange.end !== this.props.timestampRange.end) {
 
-      let layerGeoJsons = [];
+        let bounds = L.latLngBounds(L.latLng(nextProps.map.yMin, nextProps.map.xMin), L.latLng(nextProps.map.yMax, nextProps.map.xMax));
+        
+        if (this.props.map === null)
+        {
+          console.log(this.props.map);
+          this.mapRef.current.leafletElement.flyToBounds(bounds);
+        }
+        else
+        {
+          let old_bounds = L.latLngBounds(L.latLng(this.props.map.yMin, this.props.map.xMin), L.latLng(this.props.map.yMax, this.props.map.xMax));
+          
+          if (!bounds.contains(old_bounds))
+          {
+            this.mapRef.current.leafletElement.flyToBounds(bounds);
+          }
+        }
 
-      if (nextProps.map.polygonLayers) {
+/*      let layerGeoJsons = [];
+
+      if (nextProps.map.polygonLayers)
+      {
+        //console.log(nextProps.map.polygonLayers);
+      }*/
+      /*if (nextProps.map.polygonLayers) {
+        console.log(layerGeoJsons);
         for (let i = 0; i < nextProps.map.polygonLayers.length; i++) {
+          console.log(nextProps.map.polygonLayers[i].name);
           layerGeoJsons.push({
             name: nextProps.map.polygonLayers[i].name
           })
         }
-        //this.getPolygonsJson(nextProps);
+        this.getPolygonsJson(nextProps);
       }
-
+*/
+      let polygons = this.getPolygonsJson(nextProps);
       let layers = this.prepareLayers(nextProps);
 
-      this.setState({ layerGeoJsons: layerGeoJsons, preparedtileLayers: layers });
+      this.setState(
+      {
+        layerGeoJsons: polygons,
+        preparedtileLayers: layers
+      });
     }
   }
 
@@ -143,6 +176,8 @@ export class ViewerMap extends PureComponent {
             format={mapParams.format}
             zIndex={zIndex + (j + 1) + map.tileLayers.length}
             key={i}
+            errorTileUrl={this.props.publicFilesUrl + 'images/dummy_tile.png'}
+            bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
           />
         });
       }
@@ -157,26 +192,115 @@ export class ViewerMap extends PureComponent {
 
   getPolygonsJson = async (props) =>
   {
-    let headers = {
-      "Content-Type": "application/json"
-    };
+    let headers = [];
+    let map = props.map;
+    let layerGeoJsons = [];
+    let mapRef = this.mapRef.current.leafletElement;
+    let screenBounds = mapRef.getBounds();
+    let screenXY = 
+    {
+      xMin: screenBounds.getWest(),
+      xMax: screenBounds.getEast(),
+      yMin: screenBounds.getSouth(),
+      yMax: screenBounds.getNorth()
+    }
+    
+    if (!map) {
+      return;
+    }
+
     if (props.user) {
       headers["Authorization"] = "BEARER " + props.user.token;
     }
+
+    for (let i = 0; i < map.polygonLayers.length; i++) {
+      if(map.polygonLayers[i].timestampNumber === props.timestampRange.end)
+      {
+        for (let j = 0; j < map.polygonLayers[i].layers.length; j++)
+        {
+          let responseJson = await QueryUtil.getData(
+            this.props.apiUrl + 'metadata/polygonsCount',
+            {
+              mapId:  map.uuid,
+              timestamp: props.timestampRange.end,
+              layer: map.polygonLayers[i].layers[j].name,
+              xMin: screenXY.xMin,
+              xMax: screenXY.xMax,
+              yMin: screenXY.yMin,
+              yMax: screenXY.yMax
+            },
+            { headers }
+          );
+
+          if(responseJson.count <= maxPolygon)
+          {
+            responseJson = await QueryUtil.getData(
+              this.props.apiUrl + 'geometry/polygon/bounds',
+              {
+                mapId:  map.uuid,
+                timestamp: props.timestampRange.end,
+                layer: map.polygonLayers[i].layers[j].name,
+                xMin: screenXY.xMin,
+                xMax: screenXY.xMax,
+                yMin: screenXY.yMin,
+                yMax: screenXY.yMax
+              },
+              { headers }
+            );
+          }
+
+          responseJson['name'] = map.polygonLayers[i].layers[j].name;
+          responseJson['color'] = map.polygonLayers[i].layers[j].color;
+          layerGeoJsons.push(responseJson);
+        }
+      }
+    }
+
+    this.setState({ layerGeoJsons: layerGeoJsons });
+
+
+
+    /*let responseJson = await QueryUtil.getData(
+      this.props.apiUrl + 'geometry/polygon/bounds',
+      {"mapId":  map.uuid },
+      { headers }
+    );
+    map.timestamps = responseJson;*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*let headers = {
+      "Content-Type": "application/json"
+    };
 
     let bounds = this.mapRef.current.leafletElement.getBounds();
     let x1 = bounds.getWest();
     let x2 = bounds.getEast();
     let y1 = bounds.getSouth();
     let y2 = bounds.getNorth();
+    //console.log(bounds);
 
-    let map = props.map;
 
-    if (!map) {
-      return;
-    }
 
     let polygonLayers = map.polygonLayers;
+    let map = props.map;
 
     if (!polygonLayers) {
       return;
@@ -241,13 +365,13 @@ export class ViewerMap extends PureComponent {
       }
     }
     
-    this.setState({ layerGeoJsons: layerGeoJsons });
+    this.setState({ layerGeoJsons: layerGeoJsons });*/
   }
 
   onMapMoveEnd = (e) =>
   {
     let f = () => {
-      //this.getPolygonsJson(this.props);
+      this.getPolygonsJson(this.props);
     }
 
     clearTimeout(this.getShapeJsonTimeout);
@@ -325,8 +449,6 @@ export class ViewerMap extends PureComponent {
     let map = this.props.map;
     let timestampRange = this.props.timestampRange;
 
-    console.log(timestampRange);
-
     if (!map || !timestampRange || !this.state.preparedtileLayers) {
       return null;
     }
@@ -356,7 +478,7 @@ export class ViewerMap extends PureComponent {
     {
       controlOverlays.push(
         <LayersControl.Overlay name={key} key={key} checked={tileLayers[key].checked}>
-          <LayerGroup name={key}>
+          <LayerGroup name={key} key={key}>
             {tileLayers[key]}
           </LayerGroup>
         </LayersControl.Overlay>
@@ -366,37 +488,104 @@ export class ViewerMap extends PureComponent {
     return controlOverlays;
   }
 
-  createGeojson = () => {
+  createGeojsonLayerControl = () => {
     let map = this.props.map;
-    let timestampRange = this.props.timestampRange;
+    let layers = [];
 
-    if (!map || !timestampRange || !map.polygonLayers) {
+    if (!map) {
       return null;
     }
 
     let layerGeoJsons = this.state.layerGeoJsons;
 
+    for (let i = 0; i < layerGeoJsons.length; i++)
+    {
+      let content;
+      let geoJson;
+      if (layerGeoJsons[i]['count'] <= maxPolygon)
+      {
+        geoJson = <GeoJSON
+          data={layerGeoJsons[i]}
+          onEachFeature={this.onEachFeature}
+          style=
+          {{
+            color: '#' + layerGeoJsons[i].color,
+            weight: 1
+          }}/>
+      }
+      else
+      {
+/*        function getRandom()
+        {
+          return Math.floor((Math.random() * 10) + 1);
+        }*/
+
+        let bounds = L.latLngBounds(
+          L.latLng(map.yMin + Math.random(), map.xMin + Math.random()),
+          L.latLng(map.yMax + Math.random(), map.xMax + Math.random())
+        );
+
+          let color = layerGeoJsons[i].color.substring(0,6) + '33';
+          /*let style = JSON.stringify({
+            'background-color': '#' + color,
+            'border-radius': '50%',
+            'border': '2px solid #' + layerGeoJsons[i].color
+          }).replace(/[,]/g, ";").replace(/[{}\"']/g, "");*/
+
+          let style = '' +
+            'background-color: #' + color + '; ' +
+            'border-radius: 50%; ' +
+            'border: 2px solid #' + layerGeoJsons[i].color + ';';
+
+          let icon = L.divIcon(
+          {
+            html: '<div style='+ JSON.stringify(style) +'>'+
+                layerGeoJsons[i].count +
+              '</div>',
+            iconSize: [50, 50],
+            iconAnchor: [0, 0],
+            popupAnchor: [0, 0],
+            className: 'polygonCircle'
+          });
+        content = <Marker position={bounds.getCenter()} icon={icon} style={''}/>
+      }
+
+      let layer = (
+        <LayersControl.Overlay
+          key={i}
+          name={layerGeoJsons[i].name}
+          //checked={this.state.checkedLayers.includes(layerGeoJsons[i].name)}
+          checked
+        >
+          <LayerGroup name={layerGeoJsons[i].name} key={i}>
+            {geoJson}
+            {content}
+            {console.log(geoJson, content)}
+          </LayerGroup>
+        </LayersControl.Overlay> 
+      ); 
+
+      layers.push(layer);
+    }
+
+    return layers;
+
+    /*
+
     var layers = [];
 
     for (let i = 0; i < map.polygonLayers.length; i++) {
       let polygonLayer = map.polygonLayers[i];
-
+      //console.log(polygonLayer);
       let polygonsJsonContainer = layerGeoJsons.find(x => x.name === polygonLayer.name);
       let polygonsJson = null;
       if (polygonsJsonContainer) {
         polygonsJson = polygonsJsonContainer.geoJson;
       }
 
-      let layer = (
-        <LayersControl.Overlay key={this.makeKey(10)} name={polygonLayer.name} checked={this.state.checkedLayers.includes(polygonLayer.name)}>
-          <GeoJSON data={polygonsJson} onEachFeature={this.onEachFeature} style={{color: '#0000ff', weight: 5, opacity: 0.65}}/>
-        </LayersControl.Overlay> 
-      ) 
-
-      layers.push(layer);
     }
 
-    return layers;
+    return layers;*/
   }
 
   onEachFeature = (feature, layer) => {
@@ -439,10 +628,10 @@ export class ViewerMap extends PureComponent {
               zIndex={0}
             />
           </LayersControl.Overlay>
-          {this.renderTileLayers()}
+          { this.renderTileLayers() }
         </LayersControl>
         <LayersControl position="topright">
-          {this.createGeojson()}
+          { this.createGeojsonLayerControl() }
         </LayersControl>
       </Map>
     );

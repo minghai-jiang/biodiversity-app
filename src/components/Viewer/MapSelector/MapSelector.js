@@ -83,8 +83,8 @@ export class MapSelector extends PureComponent {
 
   render() {
     return (
-      <select className="map-selector" onChange={this.selectMap}>
-          <option value="">Select a map</option>
+      <select className="map-selector" onChange={this.selectMap} defaultValue="default">
+          <option value="default" disabled hidden>Select a Map</option>
           {this.renderMapOptions()}
       </select>
     );

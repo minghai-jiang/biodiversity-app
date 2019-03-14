@@ -2,7 +2,7 @@ const createReactClass = require('create-react-class');
 
 const QueryUtil = createReactClass({
   statics: {
-    getData: async (url, body) => {
+    getData: async (url, body, header = { "Content-Type": "application/json" }) => {
       if(url)
       {      
         try
@@ -10,10 +10,14 @@ const QueryUtil = createReactClass({
           var response;
           if(body)
           {
+            if (!header['Content-Type'])
+            {
+              header['Content-Type'] = "application/json";
+            }
             response = await fetch(url, 
               {
                 method:   'POST',
-                headers:  { "Content-Type": "application/json" },
+                headers:  header,
                 body:     JSON.stringify(body),
               });
           }
