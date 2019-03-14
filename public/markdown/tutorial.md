@@ -95,7 +95,7 @@ All requests to the Ellipsis API should be sent to the following webadress, that
 
 
 ```python
-url = 'https://dev.api.ellipsis-earth.com'
+url = 'https://api.ellipsis-earth.com'
 ```
 
 <a id='requests'></a>
@@ -174,7 +174,7 @@ r =requests.post(url + '/account/login',
 print(r.text)
 ```
 
-    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MjIxNTM4OSwiZXhwIjoxNTUyMzAxNzg5fQ.5EvPDwtHcI2Qn6tDqQn_ril0v49s4yU4WZivvnEau30"}
+    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MjQ4MTY2OSwiZXhwIjoxNTUyNTY4MDY5fQ.X7dXfcjE62pGg8IBA2cn5jiDqskt9sIgORpgse5dxz8"}
 
 
 Our token is quite long, so let's save the token to a variable that we can send with our other requests.
@@ -193,12 +193,12 @@ token = 'Bearer ' + token
 print(token)
 ```
 
-    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MjIxNTM4OSwiZXhwIjoxNTUyMzAxNzg5fQ.5EvPDwtHcI2Qn6tDqQn_ril0v49s4yU4WZivvnEau30
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MjQ4MTY2OSwiZXhwIjoxNTUyNTY4MDY5fQ.X7dXfcjE62pGg8IBA2cn5jiDqskt9sIgORpgse5dxz8
 
 
 To test whether our token is working, we send a get request with this token to the following authentication testing URL.
 
-#### account/ping
+#### account/validate
 
 
 ```python
@@ -241,7 +241,7 @@ Seems there are quite some maps available. Lets have a look at the Suriname map.
 
 
 ```python
-mapId = r[map_names == 'Suriname']['uuid']
+mapId = [map['uuid'] for map in r if map['name'] == 'Suriname'][0]
 mapId
 ```
 
@@ -1865,7 +1865,7 @@ In the same manner we can request all timestamps for some particular polygon.
 
 ```python
 r = requests.post(url + '/data/spectral/polygon/timestamps',
-                 json = {"mapId":  mapId, 'polygonId': 4, 'layer': 'Mine', 'class': 'disturbance'})
+                 json = {"mapId":  mapId, 'polygonId': 4, 'class': 'disturbance'})
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -2590,69 +2590,7 @@ r.plot()
 
 
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>geometry</th>
-      <th>xOsm</th>
-      <th>yOsm</th>
-      <th>zoom</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>POLYGON ((-55.6787109375 4.850154078505645, -5...</td>
-      <td>5658</td>
-      <td>7970</td>
-      <td>14</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>POLYGON ((-55.6787109375 4.828259746866975, -5...</td>
-      <td>5658</td>
-      <td>7971</td>
-      <td>14</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>POLYGON ((-55.6787109375 4.806364708499998, -5...</td>
-      <td>5658</td>
-      <td>7972</td>
-      <td>14</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>POLYGON ((-55.6787109375 4.784468966579362, -5...</td>
-      <td>5658</td>
-      <td>7973</td>
-      <td>14</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>POLYGON ((-55.6787109375 4.762572524280281, -5...</td>
-      <td>5658</td>
-      <td>7974</td>
-      <td>14</td>
-    </tr>
-  </tbody>
-</table>
-</div>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f6ffbe090b8>
 
 
 
@@ -2742,7 +2680,6 @@ r = requests.post(url + '/visual/bounds',
                  json = {"mapId":  mapId, 'timestampMin':1, 'timestampMax':8, 'layerName':'rgb', 'xMin': -55 ,'xMax':-53, 'yMin':4, 'yMax':5 })
 
 
-#img = Image.open(BytesIO(response.content))
 img = mpimg.imread(BytesIO(r.content))
 plt.imshow(img)
 ```

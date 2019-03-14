@@ -200,7 +200,7 @@ mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 coords: A list of coordinates describing the polygon.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of area per class] and total area.
+CSV with columns tileX, tileY, [columns of area per class], total area, date from and date to.
 
 <a id='data_class_polygon'></a>
 ### /data/class/polygon
@@ -277,7 +277,7 @@ mapId: The uuid of the particular map.<br/>
 tileX: The x position of the tile..<br/>
 tileY: The y position of the tile.<br/>
 **Returns**<br/>
-CSV with columns polygon, [columns of area per class] and total area.
+CSV with columns polygon, [columns of area per class], total area date from and date to.
 
 <a id='data_index'></a>
 ## /data/spectral
@@ -363,6 +363,8 @@ class: name of the class to take the mean over, in case means are not saved per 
 **Returns**<br/>
 CSV with columns tileX, tileY, [columns of mean per index] and total area.
 
+### data/spectral/tile
+<a id='data_index_tile'></a>
 #### Post tiles
 
 
@@ -377,8 +379,6 @@ class: name of the class to take the mean over, in case means are not saved per 
 **Returns**<br/>
 CSV with columns polygon, [columns of mean per index] and total area.
 
-### data/spectral/tile
-<a id='data_index_tile'></a>
 #### Post timestamps
 
 
@@ -393,7 +393,7 @@ class: name of the class to take the mean over, in case means are not saved per 
 tileX: The x position of the tile..<br/>
 tileY: The y position of the tile.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of mean per index] and total area.
+CSV with columns tileX, tileY, [columns of mean per index], total area, date from and date to.
 
 <a id='geometry'></a>
 # /geometry
@@ -524,14 +524,14 @@ A Web Mercator projected PNG image of no more than 1024 by 1024 pixels.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/tileLayer/[mapUuid]/[timestamp]/[layerType]/[tileZoom]/[tileX]/[tileY]'
+url = 'https://api.ellipsis-earth.com/tileLayer/[mapUuid]/[timestamp]/[layerName]/[tileZoom]/[tileX]/[tileY]'
 ```
 
 Request to obtain a png image of tile layer [layerName] of standard tile [tileX], [tileY] at zoom level [tileZoom] for a certain timestamp [timestamp].<br/>
 **Parameters**<br/>
 [mapName]: Name of the particular map.<br/> 
 [timestamp]: An integer identifying the timestamp.<br/>
-[layerType], [layerName]: Specifying layer type and name.<br/>
+[layerName]: Specifying layer name.<br/>
 [tileZoom], [tileX], [tileY]: Specifying the standard tile.<br/>
 **Returns**<br/>
 A PNG image.
