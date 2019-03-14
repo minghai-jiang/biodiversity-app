@@ -112,6 +112,12 @@ div.content {
   text-align: left
 }
 
+.leaflet-control-layers-expanded
+{
+  min-height: 48px;
+  min-width: 48px;
+}
+
 div.viewer-button {
   position: absolute;
   /* top: 40vh; */

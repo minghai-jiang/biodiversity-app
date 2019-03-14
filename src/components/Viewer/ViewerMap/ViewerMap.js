@@ -10,44 +10,49 @@ import {
   LayerGroup,
   FeatureGroup,
   Popup,
-  Polygon
+  Polygon,
+  Marker
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-draw";
 
-const imagesWmsLayerType = 'images';
-const labelsWmsLayerType = 'labels';
-const indicesWmsLayerType = 'indices';
-const changesWmsLayerType = 'changes';
+import "./ViewerMap.css";
+const QueryUtil = require('../../Utilities/QueryUtil').default;
 
-const wmsLayerTypes = [ 
+const imagesTileLayer = 'images';
+const labelsTileLayer = 'labels';
+const indicesTileLayer = 'indices';
+//const changesTileLayer = 'changes';
+
+const tileLayers = [ 
   {
-    name: imagesWmsLayerType, 
+    name: imagesTileLayer, 
     checked: true,
     stacking: true,
     zIndex: 100
   },
   {
-    name: labelsWmsLayerType, 
+    name: labelsTileLayer, 
     checked: true,
     stacking: false,
     zIndex: 200,
   },
   {
-    name: indicesWmsLayerType, 
+    name: indicesTileLayer, 
     checked: false,
     stacking: false,
     zIndex: 300
   }
-  // {
-  //   name: changesWmsLayerType,
-  //   checked: false,
-  //   stacking: true,
-  //   zIndex: 400
-  // }
+/*  {
+    name: changesTileLayer,
+    checked: false,
+    stacking: true,
+    zIndex: 400
+  }*/
 ];
 
 const getPolygonJsonWaitTime = 1000;
+const maxPolygon = 200;
 
 let mapParams = {
   tileSize: 256,
@@ -69,114 +74,233 @@ export class ViewerMap extends PureComponent {
       lon: -0.118092,
       layerGeoJsons: [],
 
-      preparedWmsLayerTypes: null,
+      preparedtileLayers: null,
       checkedLayers: []
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.map !== this.props.map || 
-      nextProps.timestampRange !== this.props.timestampRange ||
-      nextProps.timestampRange.start !== this.props.timestampRange.start || 
-      nextProps.timestampRange.end !== this.props.timestampRange.end) {
+    if (  nextProps.map !== this.props.map || 
+          nextProps.timestampRange !== this.props.timestampRange ||
+          nextProps.timestampRange.start !== this.props.timestampRange.start || 
+          nextProps.timestampRange.end !== this.props.timestampRange.end) {
 
-      let layerGeoJsons = [];
+        let bounds = L.latLngBounds(L.latLng(nextProps.map.yMin, nextProps.map.xMin), L.latLng(nextProps.map.yMax, nextProps.map.xMax));
+        
+        if (this.props.map === null)
+        {
+          console.log(this.props.map);
+          this.mapRef.current.leafletElement.flyToBounds(bounds);
+        }
+        else
+        {
+          let old_bounds = L.latLngBounds(L.latLng(this.props.map.yMin, this.props.map.xMin), L.latLng(this.props.map.yMax, this.props.map.xMax));
+          
+          if (!bounds.contains(old_bounds))
+          {
+            this.mapRef.current.leafletElement.flyToBounds(bounds);
+          }
+        }
 
-      if (nextProps.map.polygonLayers) {
+/*      let layerGeoJsons = [];
+
+      if (nextProps.map.polygonLayers)
+      {
+        //console.log(nextProps.map.polygonLayers);
+      }*/
+      /*if (nextProps.map.polygonLayers) {
+        console.log(layerGeoJsons);
         for (let i = 0; i < nextProps.map.polygonLayers.length; i++) {
+          console.log(nextProps.map.polygonLayers[i].name);
           layerGeoJsons.push({
             name: nextProps.map.polygonLayers[i].name
           })
         }
         this.getPolygonsJson(nextProps);
       }
-
+*/
+      let polygons = this.getPolygonsJson(nextProps);
       let layers = this.prepareLayers(nextProps);
 
-      this.setState({ layerGeoJsons: layerGeoJsons, preparedWmsLayerTypes: layers });
+      this.setState(
+      {
+        layerGeoJsons: polygons,
+        preparedtileLayers: layers
+      });
     }
   }
 
   prepareLayers = (props) => {
     let map = props.map;
-    if (!map || !map.wmsLayerTypes) {
+    if (!map || !map.tileLayers) {
       return {};
     }
+    
+    let preparedtileLayers = [];
 
-    let preparedWmsLayerTypes = [];
+    for (var i = 0; i < map.tileLayers.length; i++)
+    {
+      let timestamp = map.tileLayers[i];
 
-    for (let x = 0; x < wmsLayerTypes.length; x++) {
-      let wmsLayerType = wmsLayerTypes[x];
+      let layerTypes = [];
 
-      let mapWmsLayerType = map.wmsLayerTypes.find(l => l.name === wmsLayerType.name);
+      for (var j = 0; j < timestamp.layers.length; j++)
+      {
+        let tileLayer = timestamp.layers[j];
+        let url = this.props.apiUrl + 'tileLayer/' + map.uuid + '/' + timestamp.timestampNumber + '/' + tileLayer.name + '/{z}/{x}/{y}';
 
-      if (!mapWmsLayerType) {
-        continue;
-      }
-
-      let typeWmsLayers = [];
-
-      for (let i = 0; i< mapWmsLayerType.layers.length; i++) {
-        let wmsLayerName = mapWmsLayerType.layers[i];
-
-        let timestampWmsElements = [];
-        for (let y = 0; y < map.timestamps.length; y++) 
+        let zIndex;
+        let checked;
+        let stacking;
+        for (var k = 0; k < tileLayers.length; k++)
         {
-          let timestamp = map.timestamps[y];
-          let timestampNumber = timestamp.number;
-
-          let url = `${this.props.apiUrl}wms/${map.id}/${timestampNumber}/${wmsLayerType.name}/${wmsLayerName}/{z}/{x}/{y}`;
-          timestampWmsElements.push(             
-            <TileLayer
-              url={url}
-              tileSize={mapParams.tileSize}
-              noWrap={mapParams.noWrap}
-              maxZoom={mapParams.maxZoom}
-              attribution={mapParams.attribution}
-              format={mapParams.format}
-              zIndex={wmsLayerType.zIndex + (y + 1) + timestampWmsElements.length}
-              key={y}
-            />
-          );
+          if (tileLayers[k].name === tileLayer.type)
+          {
+            zIndex = tileLayers[k].zIndex;
+            checked = tileLayers[k].checked;
+            stacking = tileLayers[k].stacking;
+          }
         }
-
-        typeWmsLayers.push({
-          name: wmsLayerName,
-          timestampElements: timestampWmsElements
+        
+        layerTypes.push({
+          layerName: tileLayer.name,
+          stacking: stacking,
+          checked: checked,
+          layer: 
+          <TileLayer
+            url={url}
+            tileSize={mapParams.tileSize}
+            noWrap={mapParams.noWrap}
+            maxZoom={mapParams.maxZoom}
+            attribution={mapParams.attribution}
+            format={mapParams.format}
+            zIndex={zIndex + (j + 1) + map.tileLayers.length}
+            key={i}
+            errorTileUrl={this.props.publicFilesUrl + 'images/dummy_tile.png'}
+            bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
+          />
         });
       }
-
-      preparedWmsLayerTypes.push({
-        name: wmsLayerType.name,
-        layers: typeWmsLayers
-      })
+      preparedtileLayers.push({
+        timestampNumber: timestamp.timestampNumber,
+        layers: layerTypes
+      });
     }
 
-    return preparedWmsLayerTypes;
+    return(preparedtileLayers);
   }
 
   getPolygonsJson = async (props) =>
   {
-    let headers = {
-      "Content-Type": "application/json"
-    };
+    let headers = [];
+    let map = props.map;
+    let layerGeoJsons = [];
+    let mapRef = this.mapRef.current.leafletElement;
+    let screenBounds = mapRef.getBounds();
+    let screenXY = 
+    {
+      xMin: screenBounds.getWest(),
+      xMax: screenBounds.getEast(),
+      yMin: screenBounds.getSouth(),
+      yMax: screenBounds.getNorth()
+    }
+    
+    if (!map) {
+      return;
+    }
+
     if (props.user) {
       headers["Authorization"] = "BEARER " + props.user.token;
     }
+
+    for (let i = 0; i < map.polygonLayers.length; i++) {
+      if(map.polygonLayers[i].timestampNumber === props.timestampRange.end)
+      {
+        for (let j = 0; j < map.polygonLayers[i].layers.length; j++)
+        {
+          let responseJson = await QueryUtil.getData(
+            this.props.apiUrl + 'metadata/polygonsCount',
+            {
+              mapId:  map.uuid,
+              timestamp: props.timestampRange.end,
+              layer: map.polygonLayers[i].layers[j].name,
+              xMin: screenXY.xMin,
+              xMax: screenXY.xMax,
+              yMin: screenXY.yMin,
+              yMax: screenXY.yMax
+            },
+            { headers }
+          );
+
+          if(responseJson.count <= maxPolygon)
+          {
+            responseJson = await QueryUtil.getData(
+              this.props.apiUrl + 'geometry/polygon/bounds',
+              {
+                mapId:  map.uuid,
+                timestamp: props.timestampRange.end,
+                layer: map.polygonLayers[i].layers[j].name,
+                xMin: screenXY.xMin,
+                xMax: screenXY.xMax,
+                yMin: screenXY.yMin,
+                yMax: screenXY.yMax
+              },
+              { headers }
+            );
+          }
+
+          responseJson['name'] = map.polygonLayers[i].layers[j].name;
+          responseJson['color'] = map.polygonLayers[i].layers[j].color;
+          layerGeoJsons.push(responseJson);
+        }
+      }
+    }
+
+    this.setState({ layerGeoJsons: layerGeoJsons });
+
+
+
+    /*let responseJson = await QueryUtil.getData(
+      this.props.apiUrl + 'geometry/polygon/bounds',
+      {"mapId":  map.uuid },
+      { headers }
+    );
+    map.timestamps = responseJson;*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*let headers = {
+      "Content-Type": "application/json"
+    };
 
     let bounds = this.mapRef.current.leafletElement.getBounds();
     let x1 = bounds.getWest();
     let x2 = bounds.getEast();
     let y1 = bounds.getSouth();
     let y2 = bounds.getNorth();
+    //console.log(bounds);
 
-    let map = props.map;
 
-    if (!map) {
-      return;
-    }
 
     let polygonLayers = map.polygonLayers;
+    let map = props.map;
 
     if (!polygonLayers) {
       return;
@@ -241,7 +365,7 @@ export class ViewerMap extends PureComponent {
       }
     }
     
-    this.setState({ layerGeoJsons: layerGeoJsons });
+    this.setState({ layerGeoJsons: layerGeoJsons });*/
   }
 
   onMapMoveEnd = (e) =>
@@ -318,80 +442,150 @@ export class ViewerMap extends PureComponent {
     }.bind(this);
   }
 
-  renderWmsLayers = () => {
+  renderTileLayers = () => {
     var controlOverlays = [];
+    let tileLayers = [];
 
     let map = this.props.map;
     let timestampRange = this.props.timestampRange;
 
-    if (!map || !timestampRange || !this.state.preparedWmsLayerTypes) {
+    if (!map || !timestampRange || !this.state.preparedtileLayers) {
       return null;
     }
 
-    for (let x = 0; x < wmsLayerTypes.length; x++) {
-      let wmsLayerType = wmsLayerTypes[x];
+    for (var i = timestampRange.start; i <= timestampRange.end; i++)
+    {
+      let timestamp = this.state.preparedtileLayers[i];
 
-      let preparedWmsLayerType = this.state.preparedWmsLayerTypes.find(l => l.name === wmsLayerType.name);
+      for (var j = 0; j < timestamp.layers.length; j++)
+      {
+        let tileLayer = timestamp.layers[j];
 
-      if (!preparedWmsLayerType) {
-        continue;
-      }
+        if (tileLayer.stacking || i === timestampRange.end)
+        {
+          if (!tileLayers[tileLayer.layerName])
+          {
+            tileLayers[tileLayer.layerName] = []
+            tileLayers[tileLayer.layerName]['checked'] = tileLayer.checked;
+          }
 
-      for (let i = 0; i < preparedWmsLayerType.layers.length; i++) {
-        let wmsLayer = preparedWmsLayerType.layers[i];
-
-        let layerElements = [];
-        if (wmsLayerType.stacking) {
-          layerElements = wmsLayer.timestampElements.slice(timestampRange.start, timestampRange.end + 1);
+          tileLayers[tileLayer.layerName].push(tileLayer.layer);
         }
-        else {
-          layerElements = [wmsLayer.timestampElements[timestampRange.end]];
-        }
-
-        controlOverlays.push(
-          <LayersControl.Overlay name={wmsLayer.name} key={wmsLayer.name + i} checked={wmsLayerType.checked}>
-            <LayerGroup name={wmsLayer.name}>
-              {layerElements}
-            </LayerGroup>              
-          </LayersControl.Overlay>
-        );
       }
     }
-    
+
+    for (let key in tileLayers)
+    {
+      controlOverlays.push(
+        <LayersControl.Overlay name={key} key={key} checked={tileLayers[key].checked}>
+          <LayerGroup name={key} key={key}>
+            {tileLayers[key]}
+          </LayerGroup>
+        </LayersControl.Overlay>
+      );
+    }
+
     return controlOverlays;
   }
 
-  createGeojson = () => {
+  createGeojsonLayerControl = () => {
     let map = this.props.map;
-    let timestampRange = this.props.timestampRange;
+    let layers = [];
 
-    if (!map || !timestampRange || !map.polygonLayers) {
+    if (!map) {
       return null;
     }
 
     let layerGeoJsons = this.state.layerGeoJsons;
 
+    for (let i = 0; i < layerGeoJsons.length; i++)
+    {
+      let content;
+      let geoJson;
+      if (layerGeoJsons[i]['count'] <= maxPolygon)
+      {
+        geoJson = <GeoJSON
+          data={layerGeoJsons[i]}
+          onEachFeature={this.onEachFeature}
+          style=
+          {{
+            color: '#' + layerGeoJsons[i].color,
+            weight: 1
+          }}/>
+      }
+      else
+      {
+/*        function getRandom()
+        {
+          return Math.floor((Math.random() * 10) + 1);
+        }*/
+
+        let bounds = L.latLngBounds(
+          L.latLng(map.yMin + Math.random(), map.xMin + Math.random()),
+          L.latLng(map.yMax + Math.random(), map.xMax + Math.random())
+        );
+
+          let color = layerGeoJsons[i].color.substring(0,6) + '33';
+          /*let style = JSON.stringify({
+            'background-color': '#' + color,
+            'border-radius': '50%',
+            'border': '2px solid #' + layerGeoJsons[i].color
+          }).replace(/[,]/g, ";").replace(/[{}\"']/g, "");*/
+
+          let style = '' +
+            'background-color: #' + color + '; ' +
+            'border-radius: 50%; ' +
+            'border: 2px solid #' + layerGeoJsons[i].color + ';';
+
+          let icon = L.divIcon(
+          {
+            html: '<div style='+ JSON.stringify(style) +'>'+
+                layerGeoJsons[i].count +
+              '</div>',
+            iconSize: [50, 50],
+            iconAnchor: [0, 0],
+            popupAnchor: [0, 0],
+            className: 'polygonCircle'
+          });
+        content = <Marker position={bounds.getCenter()} icon={icon} style={''}/>
+      }
+
+      let layer = (
+        <LayersControl.Overlay
+          key={i}
+          name={layerGeoJsons[i].name}
+          //checked={this.state.checkedLayers.includes(layerGeoJsons[i].name)}
+          checked
+        >
+          <LayerGroup name={layerGeoJsons[i].name} key={i}>
+            {geoJson}
+            {content}
+            {console.log(geoJson, content)}
+          </LayerGroup>
+        </LayersControl.Overlay> 
+      ); 
+
+      layers.push(layer);
+    }
+
+    return layers;
+
+    /*
+
     var layers = [];
 
     for (let i = 0; i < map.polygonLayers.length; i++) {
       let polygonLayer = map.polygonLayers[i];
-
+      //console.log(polygonLayer);
       let polygonsJsonContainer = layerGeoJsons.find(x => x.name === polygonLayer.name);
       let polygonsJson = null;
       if (polygonsJsonContainer) {
         polygonsJson = polygonsJsonContainer.geoJson;
       }
 
-      let layer = (
-        <LayersControl.Overlay key={this.makeKey(10)} name={polygonLayer.name} checked={this.state.checkedLayers.includes(polygonLayer.name)}>
-          <GeoJSON data={polygonsJson} onEachFeature={this.onEachFeature} style={{color: '#0000ff', weight: 5, opacity: 0.65}}/>
-        </LayersControl.Overlay> 
-      ) 
-
-      layers.push(layer);
     }
 
-    return layers;
+    return layers;*/
   }
 
   onEachFeature = (feature, layer) => {
@@ -434,10 +628,10 @@ export class ViewerMap extends PureComponent {
               zIndex={0}
             />
           </LayersControl.Overlay>
-          {this.renderWmsLayers()}
+          { this.renderTileLayers() }
         </LayersControl>
         <LayersControl position="topright">
-          {this.createGeojson()}
+          { this.createGeojsonLayerControl() }
         </LayersControl>
       </Map>
     );

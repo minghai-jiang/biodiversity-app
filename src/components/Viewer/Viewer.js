@@ -1,12 +1,12 @@
 import React, { PureComponent } from "react";
-import FileDownload from 'js-file-download';
+//import FileDownload from 'js-file-download';
 
 import "./Viewer.css";
 
 import MapSelector from './MapSelector/MapSelector';
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 import ViewerMap from './ViewerMap/ViewerMap';
-import QueryPane from './QueryPane/QueryPane';
+//import QueryPane from './QueryPane/QueryPane';
 
 class Viewer extends PureComponent {
   constructor(props, context) {
@@ -94,11 +94,12 @@ class Viewer extends PureComponent {
         </div>
         <ViewerMap
           apiUrl={this.props.apiUrl} 
+          publicFilesUrl={this.props.publicFilesUrl}
           map={this.state.map}
           timestampRange={this.state.timestampRange}
           onShapeDrawn={this.onShapeDrawn}
         />
-        <QueryPane
+{/*        <QueryPane
           apiUrl={this.props.apiUrl}
           map={this.state.map}
           timestampRange={this.state.timestampRange}
@@ -108,7 +109,7 @@ class Viewer extends PureComponent {
         {this.state.map ? 
         <div className='button viewer-button' onClick={() => { this.downloadShape(); }} style={{top: '47vh'}}>
             Download Shape
-        </div> : null}
+        </div> : null}*/}
     </div>
     );
   }

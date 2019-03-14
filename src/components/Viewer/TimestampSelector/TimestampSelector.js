@@ -32,7 +32,7 @@ export class TimestampSelector extends PureComponent {
         min: 0,
         max: max,
         values: [this.state.start, this.state.end],
-        step: true,
+        step: 1,
         slide: this.onSlide
       });
   

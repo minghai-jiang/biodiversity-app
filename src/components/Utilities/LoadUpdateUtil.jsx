@@ -3,7 +3,7 @@ import parse from 'html-react-parser';
 
 import Markdown  from '../Markdown/Markdown';
 
-class L_U_HTML extends Component
+class LoadUpdateUtil extends Component
 {
   constructor(props){
     super(props);
@@ -70,4 +70,4 @@ class L_U_HTML extends Component
   }
 }
 
-export default L_U_HTML;
+export default LoadUpdateUtil;
