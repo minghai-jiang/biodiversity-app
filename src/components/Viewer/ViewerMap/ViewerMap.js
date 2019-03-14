@@ -491,6 +491,7 @@ export class ViewerMap extends PureComponent {
   createGeojsonLayerControl = () => {
     let map = this.props.map;
     let layers = [];
+    let polygonCount = 0;
 
     if (!map) {
       return null;
@@ -500,7 +501,6 @@ export class ViewerMap extends PureComponent {
 
     for (let i = 0; i < layerGeoJsons.length; i++)
     {
-      let content;
       let geoJson;
       if (layerGeoJsons[i]['count'] <= maxPolygon)
       {
@@ -515,39 +515,13 @@ export class ViewerMap extends PureComponent {
       }
       else
       {
+        polygonCount += layerGeoJsons[i].count;
 /*        function getRandom()
         {
           return Math.floor((Math.random() * 10) + 1);
         }*/
 
-        let bounds = L.latLngBounds(
-          L.latLng(map.yMin + Math.random(), map.xMin + Math.random()),
-          L.latLng(map.yMax + Math.random(), map.xMax + Math.random())
-        );
 
-          let color = layerGeoJsons[i].color.substring(0,6) + '33';
-          /*let style = JSON.stringify({
-            'background-color': '#' + color,
-            'border-radius': '50%',
-            'border': '2px solid #' + layerGeoJsons[i].color
-          }).replace(/[,]/g, ";").replace(/[{}\"']/g, "");*/
-
-          let style = '' +
-            'background-color: #' + color + '; ' +
-            'border-radius: 50%; ' +
-            'border: 2px solid #' + layerGeoJsons[i].color + ';';
-
-          let icon = L.divIcon(
-          {
-            html: '<div style='+ JSON.stringify(style) +'>'+
-                layerGeoJsons[i].count +
-              '</div>',
-            iconSize: [50, 50],
-            iconAnchor: [0, 0],
-            popupAnchor: [0, 0],
-            className: 'polygonCircle'
-          });
-        content = <Marker position={bounds.getCenter()} icon={icon} style={''}/>
       }
 
       let layer = (
@@ -559,8 +533,6 @@ export class ViewerMap extends PureComponent {
         >
           <LayerGroup name={layerGeoJsons[i].name} key={i}>
             {geoJson}
-            {content}
-            {console.log(geoJson, content)}
           </LayerGroup>
         </LayersControl.Overlay> 
       ); 
@@ -568,6 +540,32 @@ export class ViewerMap extends PureComponent {
       layers.push(layer);
     }
 
+    if(polygonCount !== 0)
+    {
+      let bounds = L.latLngBounds(
+            L.latLng(map.yMin, map.xMin),
+            L.latLng(map.yMax, map.xMax)
+          );
+
+      let style = '"' +
+        'background-color: #02646433; ' +
+        'border-radius: 50%; ' +
+        'border: 2px solid #026464;"';
+
+      let icon = L.divIcon(
+      {
+        html: '<div style='+ style +'>'+
+            polygonCount +
+          '</div>',
+        iconSize: [50, 50],
+        iconAnchor: [0, 0],
+        popupAnchor: [0, 0],
+        className: 'polygonCircle'
+      });
+      
+      let marker = <Marker position={bounds.getCenter()} icon={icon} style={''}/>
+      layers.push(marker);
+    }
     return layers;
 
     /*
