@@ -6,7 +6,6 @@ import "./Viewer.css";
 import MapSelector from './MapSelector/MapSelector';
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 import ViewerMap from './ViewerMap/ViewerMap';
-//import QueryPane from './QueryPane/QueryPane';
 
 class Viewer extends PureComponent {
   constructor(props, context) {
@@ -24,8 +23,8 @@ class Viewer extends PureComponent {
 
   onSelectMap = map => {
     this.setState({
-        map: map,
-        timestampRange: { start: 0, end: 0 }
+      map: map,
+      timestampRange: { start: 0, end: 0 }
     });
   }
 

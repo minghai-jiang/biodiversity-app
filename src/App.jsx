@@ -20,14 +20,14 @@ import "./App.css";
 
 const localStorageUserItem = 'user';
 
-const apiUrl = "https://api.ellipsis-earth.com/";
-//const publicFilesUrl = "https://public.ellipsis-earth.com/";
+// const apiUrl = "https://api.ellipsis-earth.com/";
+const publicFilesUrl = "https://public.ellipsis-earth.com/";
 
-// const apiUrl = "https://dev.api.ellipsis-earth.com/";
+const apiUrl = "https://dev.api.ellipsis-earth.com/";
 // const publicFilesUrl = "https://dev,public.ellipsis-earth.com/";
 
 //const apiUrl = "http://localhost:7552/";
-const publicFilesUrl = "http://localhost:3000/";
+// const publicFilesUrl = "http://localhost:3000/";
 
 class App extends Component {
   constructor(props, context) {

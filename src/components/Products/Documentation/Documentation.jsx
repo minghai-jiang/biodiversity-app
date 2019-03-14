@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import L_U_HTML from '../../Utilities/Load&UpdateHTML';
+import L_U_HTML from '../../Utilities/LoadUpdateUtil';
 
 import './Documentation.css';
 
