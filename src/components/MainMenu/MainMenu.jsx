@@ -31,6 +31,13 @@ export class MainMenu extends Component {
     this.props.onLogout();
   }
 
+  changeLanguage = (language) => {
+    debugger;
+    if (this.props.onLanguageChange) {
+      this.props.onLanguageChange(language);
+    }
+  }
+
   render() {
     let displayStyle = {
         display: "block"
@@ -48,46 +55,48 @@ export class MainMenu extends Component {
               <img className="main-menu-logo" src="/images/logo-white.png" alt="Ellipsis Earth Intelligence logo white"/>
             </NavLink>
           </li>
-          {/*<li>
-            <NavLink to="/" className="main-menu-item">
-              Home
-            </NavLink>
-          </li>*/}
           <li>
             <NavLink to="/viewer" className="main-menu-item">
-              Viewer
+              {this.props.localization['Viewer']}
             </NavLink>
           </li>
           <li>
             <NavLink to="/products" className="main-menu-item">
-              Products
+              {this.props.localization['Products']}
             </NavLink>
           </li>
           <li>
-            <NavLink to="/Sectors" className="main-menu-item">
-              Sectors
+            <NavLink to="/sectors" className="main-menu-item">
+              {this.props.localization['Sectors']}
             </NavLink>
           </li>
           <li>
-            <NavLink to="/Gallery" className="main-menu-item">
-              Gallery
+            <NavLink to="/gallery" className="main-menu-item">
+              {this.props.localization['Gallery']}
             </NavLink>
           </li>
           <li>
             <NavLink to="/about" className="main-menu-item">
-              About Us
+              {this.props.localization['AboutUs']}
             </NavLink>
           </li>
-          {/* <li>
-              <NavLink to="/contact" className="main-menu-item">
-                  Contact
-              </NavLink>
-          </li> */}
+          <li style={{float: "right"}}>              
+            <a class="main-menu-item dropdown">
+              <button class="dropbtn">
+                Language 
+              </button>
+              <div class="dropdown-content">
+                <a href="#" onClick={() => this.changeLanguage('english')}>English</a>
+                <a href="#" onClick={() => this.changeLanguage('spanish')}>Spanish</a>
+              </div>
+            </a> 
+          </li>
           <li style={{display: this.props.user ? 'none' : 'block', float: "right"}}>
             <NavLink to="/login" className="main-menu-item">
-              Login
+              {this.props.localization['Login']}
             </NavLink>
           </li>
+
           <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>              
             <a className='main-menu-item' style={{cursor: 'pointer'}} onClick={this.logout.bind(this)}>Logout</a>
           </li>

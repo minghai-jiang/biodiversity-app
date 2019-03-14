@@ -1,0 +1,19 @@
+{
+  "Home": "Home",
+  "Viewer": "Viewer",
+  "Products": "Products",
+  "Sectors": "Sectors",
+  "Gallery": "Gallery",
+  "AboutUs": "About Us",
+  "Login": "Login",
+
+  "ChoosePrompt": "Please choose",
+
+  "SelectSector": "Select sector",
+  "Forestry": "Forestry",
+  "ConsultancyEngineering": "Consultancy or Engineering",
+  "Government": "Government",
+  "Ngo": "NGO",
+
+  "ApiTutorial": "API Tutorial"
+}

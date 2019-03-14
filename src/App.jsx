@@ -34,18 +34,13 @@ class App extends Component {
     super(props, context)
     document.title = "Ellipsis Earth Intelligence";
 
-    let language = localStorage.getItem(localStorageUserItem);
-    if (!language) {
-      language = 'english';
-    }
-
     this.state = {
+      init: false,
       user: null,
-      language: language
     };
 
-
     this.retrieveUser();
+    this.retrieveLanguage();
   }
 
   componentDidMount() {
@@ -88,7 +83,31 @@ class App extends Component {
   }
 
   retrieveLanguage = () => {
+    let language = localStorage.getItem(localStorageUserItem);
+    if (!language) {
+      language = 'english';
+    }
 
+    this.setLanguage(language);
+  }
+
+  setLanguage = (language) => {
+    fetch('/localization/' + language + '.json')
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then(json => {
+        this.setState({ 
+          init: true, 
+          language: language, 
+          localization: json 
+        });
+      })
+      .catch(err => {
+        alert(err);
+      });
   }
 
   onLogin = (user) => {
@@ -103,66 +122,83 @@ class App extends Component {
     this.setState({ user: null });
   }
 
-  render() {
-    return (
-      <div className="App" onClick={this.closeMenu}>
-        <MainMenu
-          user={this.state.user}
-          language={this.state.language}
-          onLogout={this.onLogout}
-        />
-        <div className="content" ref={ref => this.el = ref}>
-          <Route exact path="/"
-            render={() => 
-              <Home
-                language={this.state.language}
-              />
-            }
-          />
-          <Route 
-            path="/viewer" 
-            render={() => 
-              <Viewer apiUrl={apiUrl} user={this.state.user}/>
-            } 
-          />
-          <Route path="/Products" 
-            render={() =>
-              <Products 
-                publicFilesUrl={publicFilesUrl} 
-                language={this.state.language}
-              />
-            }
-          />
-          <Route 
-            path="/Sectors" 
-            render={() => 
-              <Sector 
-                publicFilesUrl={publicFilesUrl}
-                language={this.state.language}
-              />
-            }
-          />
-          <Route 
-            path="/Gallery" 
-            render={() => 
-              <Gallery 
-                publicFilesUrl={publicFilesUrl}
-                language={this.state.language}                
-              />
-            }
-          />
-          <Route path="/about" component={About}/>
-          <Route path="/contact" component={Contact} />
-          <Route 
-            path="/login" 
-            render={() => 
-              <Login apiUrl={apiUrl} onLogin={this.onLogin}/> 
-            }
-          />
-        </div>               
-      </div>   
-    );
+  onLanguageChange = (language) => {
+    debugger;
+    if (language !== this.state.language) {
+      this.setLanguage(language);
+    }
   }
+
+  render() {
+    if (this.state.init) {
+      return (
+        <div className="App" onClick={this.closeMenu}>
+          <MainMenu
+            user={this.state.user}
+            language={this.state.language}
+            localization={this.state.localization}
+            onLogout={this.onLogout}
+            onLanguageChange={this.onLanguageChange}
+          />
+          <div className="content" ref={ref => this.el = ref}>
+            <Route exact path="/"
+              render={() => 
+                <Home
+                  language={this.state.language}
+                />
+              }
+            />
+            <Route 
+              path="/viewer" 
+              render={() => 
+                <Viewer apiUrl={apiUrl} user={this.state.user}/>
+              } 
+            />
+            <Route path="/products" 
+              render={() =>
+                <Products 
+                  publicFilesUrl={publicFilesUrl} 
+                  language={this.state.language}
+                />
+              }
+            />
+            <Route 
+              path="/sectors" 
+              render={() => 
+                <Sector 
+                  publicFilesUrl={publicFilesUrl}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              }
+            />
+            <Route 
+              path="/gallery" 
+              render={() => 
+                <Gallery 
+                  publicFilesUrl={publicFilesUrl}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              }
+            />
+            <Route path="/about" component={About}/>
+            <Route path="/contact" component={Contact} />
+            <Route 
+              path="/login" 
+              render={() => 
+                <Login apiUrl={apiUrl} onLogin={this.onLogin}/> 
+              }
+            />
+          </div>               
+        </div>   
+      );
+    }
+    else {
+      return null;
+    }
+  }
+
 }
 
 export default withRouter(App);

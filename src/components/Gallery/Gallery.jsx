@@ -41,10 +41,10 @@ export class Gallery extends Component {
             />
           </div>
           <div className="main-block-content main-block-content-left">
-            <h1>Gallery</h1>
+            <h1>{this.props.localization['Gallery']}</h1>
             <select defaultValue="default" onChange={this.onGalleryChange}>
-                <option value="default" disabled hidden>Please Choose...</option>
-                <option value="tutorial">API Tutorial</option>
+                <option value="default" disabled hidden>{this.props.localization['ChoosePrompt']}</option>
+                <option value="tutorial">{this.props.localization['ApiTutorial']}</option>
             </select>
           </div>
         </div>

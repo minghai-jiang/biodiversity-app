@@ -37,13 +37,13 @@ export class Sector extends Component {
 
         <div className="main-block main-block-first main-block-accented product-block-accented">
           <div className="main-block-content main-block-content-left">
-            <h1>Select sector</h1>
+            <h1>{this.props.localization['SelectSector']}</h1>
             <select defaultValue="default" onChange={this.onSectorChange}>
-              <option value="default" disabled hidden>Please choose...</option>
-              <option value="Consultancyengineering">Consultanty or Engineering</option>
-              <option value="Forestry">Forestry</option>
-              <option value="GovernmentAgencies">Government</option>
-              <option value="NGOs">NGO</option>
+              <option value="default" disabled hidden>{this.props.localization['ChoosePrompt']}</option>
+              <option value="Consultancyengineering">{this.props.localization['ConsultancyEngineering']}</option>
+              <option value="Forestry">{this.props.localization['Forestry']}</option>
+              <option value="GovernmentAgencies">{this.props.localization['Government']}</option>
+              <option value="NGOs">{this.props.localization['Ngo']}</option>
             </select>
           </div>
         </div>
