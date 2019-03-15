@@ -39,7 +39,8 @@ export class Gallery extends Component {
             <select defaultValue="default" onChange={this.onGalleryChange}>
                 <option value="default" disabled hidden>{this.props.localization['ChoosePrompt']}</option>
                 <option value="tutorial">{this.props.localization['ApiTutorial']}</option>
-		<option value="Northern Paraguay deforestation">{this.props.localization['Northern Paraguay deforestation']}</option>
+		       <option value="Northern Paraguay deforestation">{this.props.localization['Northern Paraguay deforestation']}</option>
+		       <option value="Flora management in the Netherlands">{this.props.localization['Flora management in the Netherlands']}</option>
             </select>
           </div>
           <div className="main-block-content main-block-content-left">

@@ -5,6 +5,8 @@ The Chaco in Paraguay is a large area of about 150.000 square kilometers where h
 
 Deforestation falls into three classes. Deforesation for which a permit has been granted, illegal deforestation in reserves of various types, and deforestation outside reserves for which no permit is administered. We will have a look at all of these.
 
+The acquisition of the data has been paid for and made publicly available by IUCN the Netherlands comittee.
+
 ## Setting things up
 
 In this notebook we shall analyse the public 'Chaco Demo' map. This map contains 3 classes forest, natural shrubland and other. Furthermore it contains an NDVI index.
@@ -18,6 +20,7 @@ We will be requiring the following python packages
 import requests
 
 import pandas as pd
+import numpy as np
 import geopandas as gpd
 import rasterio
 
@@ -46,13 +49,6 @@ r = r.json()
 mapId = [map['uuid'] for map in r if map['name'] == 'Chaco Demo'][0]
 mapId
 ```
-
-
-
-
-    'f7f5ae51-1ff6-4e8b-98e0-37f5d0a97cb7'
-
-
 
 ## Deforestation in areas that have been marked as reserves
 
@@ -853,7 +849,10 @@ We use the following function to plot polygons over an image.
 
 
 ```python
-def polys_on_image(im, polys, alpha, xmin,xmax,ymin,ymax, colors = [(0,0,1)] , column= None):
+from shapely.geometry import Polygon
+from rasterio.features import rasterize
+
+def polys_on_image(polys, xmin,xmax,ymin,ymax, alpha, im = None, colors = [(0,0,1)] , column= None):
     polys.crs = {'init': 'epsg:4326'}
     polys = polys.to_crs({'init': 'epsg:3395'})
     
@@ -861,6 +860,8 @@ def polys_on_image(im, polys, alpha, xmin,xmax,ymin,ymax, colors = [(0,0,1)] , c
     bbox.crs = {'init': 'epsg:4326'}
     bbox = bbox.to_crs({'init': 'epsg:3395'})
 
+    if im == None:
+        im = np.zeros((1024,1024,4))
     if column == None:
         column = 'extra'
         polys[column] = 0
@@ -873,9 +874,8 @@ def polys_on_image(im, polys, alpha, xmin,xmax,ymin,ymax, colors = [(0,0,1)] , c
         raster = np.stack([raster * colors[i][0], raster*colors[i][1],raster*colors[i][2], raster ], axis = 2)
         rasters = np.add(rasters, raster)
      
-    np.clip(rasters, 0,1)
-    
-    image = im * (1 - alpha) + raster*alpha 
+    rasters = np.clip(rasters, 0,1)
+    image = im * (1 - alpha) + rasters*alpha 
     return(image)
  
 ```
