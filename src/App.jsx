@@ -60,7 +60,7 @@ class App extends Component {
       user = JSON.parse(userJson);
 
       fetch(
-        `${apiUrl}account/ping`,
+        `${apiUrl}account/validate`,
         {
           method: 'GET',
           headers: {
@@ -83,7 +83,7 @@ class App extends Component {
   }
 
   retrieveLanguage = () => {
-    let language = localStorage.getItem(localStorageUserItem);
+    let language = localStorage.getItem('language');
     if (!language) {
       language = 'english';
     }
@@ -99,6 +99,7 @@ class App extends Component {
         }
       })
       .then(json => {
+        localStorage.setItem('language', language);
         this.setState({ 
           init: true, 
           language: language, 

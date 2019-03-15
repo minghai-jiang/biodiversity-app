@@ -8,3 +8,18 @@
   text-align: center;
   -webkit-text-stroke: 1px #00000080;
 }
+
+.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-draw-rectangle
+{
+	background-image: url('/images/bug_report.png');
+	background-image: -webkit-linear-gradient(transparent,transparent),url('/images/bug_report.svg');
+	background-image: linear-gradient(transparent,transparent),url('/images/bug_report.svg');
+	background-position: 0;
+	background-size: contain;
+}
+
+.mapContainer
+{
+	height: 100%;
+	width: 100%;
+}

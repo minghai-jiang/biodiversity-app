@@ -17,6 +17,7 @@ import L from "leaflet";
 import "leaflet-draw";
 
 import "./ViewerMap.css";
+import PopupForm from '../../Popup-form/Popup-form';
 const QueryUtil = require('../../Utilities/QueryUtil').default;
 
 const imagesTileLayer = 'images';
@@ -75,7 +76,8 @@ export class ViewerMap extends PureComponent {
       layerGeoJsons: [],
 
       preparedtileLayers: null,
-      checkedLayers: []
+      checkedLayers: [],
+      popupProps: {}
     };
   }
 
@@ -277,6 +279,36 @@ export class ViewerMap extends PureComponent {
     console.log(this.state.checkedLayers);
   }
 
+  createDrawButton = (map, type) => {
+    var drawnItems = new L.featureGroup();
+    map.addLayer(drawnItems);
+    
+    let draw = {
+      polygon: false,
+      rectangle: false,
+      marker: false,
+      polyline: false,
+      circle: false,
+      circlemarker: false
+    };
+
+    if(type)
+    {
+      for (let key in type)
+      {
+        draw[key] = type[key];
+      }
+    }
+
+    var drawControl = new L.Control.Draw({
+      draw: draw,
+      edit: false
+    });
+    
+    map.addControl(drawControl);
+    map.on(L.Draw.Event.CREATED, this.onShapeDrawnClosure(drawnItems));
+  }
+
   componentDidMount = () => {
     let map = this.mapRef.current.leafletElement;
     map.on('moveend', this.onMapMoveEnd);
@@ -284,23 +316,8 @@ export class ViewerMap extends PureComponent {
     map.on('overlayremove', this.onOverlayRemove);
     
     //Draw items
-    var drawnItems = new L.featureGroup();
-    map.addLayer(drawnItems);
-    var drawControl = new L.Control.Draw({
-      draw: {
-        polygon: {
-          allowIntersection: false
-        },
-        rectangle: true,
-        marker: false,
-        polyline: false,
-        circle: false,
-        circlemarker: false
-      },
-      edit: false
-    });
-    map.addControl(drawControl);
-    map.on(L.Draw.Event.CREATED, this.onShapeDrawnClosure(drawnItems));
+    this.createDrawButton(map, {polygon: {allowIntersection: false }});
+    this.createDrawButton(map, {rectangle: true});
   }
 
   onShapeDrawnClosure(drawnItems) {
@@ -318,6 +335,27 @@ export class ViewerMap extends PureComponent {
         };
 
         shapeCoords.push(coord);
+      }
+
+      let map = this.props.map;
+      
+      if (event.layerType === 'rectangle' && map)
+      {
+        let headers = [];
+        if (this.props.user)
+        {
+          headers["Authorization"] = "BEARER " + this.props.user.token;
+        }
+
+        this.setState({popupProps: {
+          uuid: map.uuid,
+          bounds: event.layer.getBounds(),
+          timestamp: this.props.timestampRange.end,
+          header: headers
+        }});
+
+        let form = document.getElementById('formDiv');
+        form.classList.add('block');
       }
 
       this.props.onShapeDrawn(shapeCoords);
@@ -459,7 +497,6 @@ export class ViewerMap extends PureComponent {
           popupContent += `<span><strong>${property}</strong>: ${feature.properties[property]}<br/></span>`
         }
       }
-
       layer.bindPopup(popupContent);
     }
   }
@@ -476,26 +513,29 @@ export class ViewerMap extends PureComponent {
 
   render() {
     return (
-      <Map
-        center={[this.state.lat, this.state.lon]}
-        zoom={this.state.zoom}
-        ref={this.mapRef}
-      >
-        <LayersControl position="topright">
-          <LayersControl.Overlay checked name="Base satellite">
-            <TileLayer
-              url="https://api.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWhqaWFuZyIsImEiOiJjamhkNXU3azcwZW1oMzZvNjRrb214cDVsIn0.QZWgmabi2gRJAWr1Vr3h7w"
-              attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href = "https://www.mapbox.com/" > Mapbox</a >'
-              noWrap={true}
-              zIndex={0}
-            />
-          </LayersControl.Overlay>
-          { this.renderTileLayers() }
-        </LayersControl>
-        <LayersControl position="topright">
-          { this.createGeojsonLayerControl() }
-        </LayersControl>
-      </Map>
+      <div className='mapContainer'>
+        <Map
+          center={[this.state.lat, this.state.lon]}
+          zoom={this.state.zoom}
+          ref={this.mapRef}
+        >
+          <LayersControl position="topright">
+            <LayersControl.Overlay checked name="Base satellite">
+              <TileLayer
+                url="https://api.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWhqaWFuZyIsImEiOiJjamhkNXU3azcwZW1oMzZvNjRrb214cDVsIn0.QZWgmabi2gRJAWr1Vr3h7w"
+                attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href = "https://www.mapbox.com/" > Mapbox</a >'
+                noWrap={true}
+                zIndex={0}
+              />
+            </LayersControl.Overlay>
+            { this.renderTileLayers() }
+          </LayersControl>
+          <LayersControl position="topright">
+            { this.createGeojsonLayerControl() }
+          </LayersControl>
+        </Map>
+        <PopupForm props={this.state.popupProps} />
+      </div>
     );
   }
 }
