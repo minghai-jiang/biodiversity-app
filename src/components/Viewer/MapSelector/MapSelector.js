@@ -31,23 +31,25 @@ export class MapSelector extends PureComponent {
     }
   }
 
-  selectMap = (e) => {
+  selectMap = async (e) => {
     if (!e.target.value) {
       this.props.onSelect();
     } 
     else {
       let map = this.state.maps.find(x => x.uuid === e.target.value);
       if (map) {        
-        this.getMapTimestamps(map)
-          .then(() => {
-            return this.getMapLayers(map);
-          })
-          .then(() => {
-            this.props.onSelect(map);
-          })
-          .catch(error => {
-            alert(error);
-          });
+        try {
+          let mapTimestampsPromise = this.getMapTimestamps(map);
+          let mapLayersPromise = this.getMapLayers(map);
+
+          await mapTimestampsPromise;
+          await mapLayersPromise;
+
+          this.props.onSelect(map);
+        }
+        catch (err) {
+          alert(err);
+        }
       }
     }
   };
@@ -58,10 +60,39 @@ export class MapSelector extends PureComponent {
   };
 
   getMapLayers = async (map) => {
-    let responseJsonTileLayers = await QueryUtil.getData(this.props.apiUrl + 'metadata/tileLayers', {"mapId":  map.uuid });
-    map.tileLayers = responseJsonTileLayers;
+    let tileLayersPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/tileLayers', {"mapId":  map.uuid });
+    let polygonLayersPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/polygonLayers', {"mapId":  map.uuid });
 
-    let responseJsonPolygonLayers = await QueryUtil.getData(this.props.apiUrl + 'metadata/polygonLayers', {"mapId":  map.uuid });
+    let responseJsonTileLayers = await tileLayersPromise;
+
+    let tileLayers = [];
+    responseJsonTileLayers.forEach(timestampLayers => {
+      timestampLayers.layers.forEach(layer => {
+        let tileLayer = tileLayers.find(x => x.type === layer.type);
+
+        if (!tileLayer) {
+          tileLayer = {
+            type: layer.type,
+            layers: [],
+            timestamps: []
+          };
+
+          tileLayers.push(tileLayer);
+        }
+        
+        if (!tileLayer.layers.includes(layer.name)) {
+          tileLayer.layers.push(layer.name);
+        }
+        
+        if (!tileLayer.timestamps.includes(timestampLayers.timestampNumber)) {
+          tileLayer.timestamps.push(timestampLayers.timestampNumber);
+        }
+      });
+    });
+
+    let responseJsonPolygonLayers = await polygonLayersPromise;
+
+    map.tileLayers = tileLayers;
     map.polygonLayers = responseJsonPolygonLayers;
   };
 

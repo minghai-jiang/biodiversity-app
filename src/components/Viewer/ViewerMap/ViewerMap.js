@@ -24,7 +24,7 @@ const labelsTileLayer = 'labels';
 const indicesTileLayer = 'indices';
 //const changesTileLayer = 'changes';
 
-const tileLayers = [ 
+const tileLayerTypes = [ 
   {
     name: imagesTileLayer, 
     checked: true,
@@ -53,6 +53,8 @@ const tileLayers = [
 
 const getPolygonJsonWaitTime = 1000;
 const maxPolygon = 200;
+
+let randomKey = 0;
 
 let mapParams = {
   tileSize: 256,
@@ -108,75 +110,75 @@ export class ViewerMap extends PureComponent {
             .then(layers => {
               this.setState({ preparedtileLayers: layers });
             });
-        }      
-
-      // this.getPolygonsJson(nextProps);
+        }
     }
-
   }
 
   prepareLayers = async (props) => {
     let map = props.map;
     if (!map || !map.tileLayers) {
-      return {};
+      return [];
     }
 
     this.state.checkedLayers.length = 0;
     
     let preparedtileLayers = [];
 
-    for (var i = 0; i < map.tileLayers.length; i++)
+    for (var i = 0; i < tileLayerTypes.length; i++)
     {
-      let timestamp = map.tileLayers[i];
+      let tileLayerType = tileLayerTypes[i];
 
-      let layerTypes = [];
+      let mapTileLayerType = map.tileLayers.find(x => x.type === tileLayerType.name);
 
-      for (var j = 0; j < timestamp.layers.length; j++)
+      if (!mapTileLayerType) {
+        continue;
+      }
+
+      let tileLayersOfTypes = [];
+
+      for (var j = 0; j < mapTileLayerType.layers.length; j++)
       {
-        let tileLayer = timestamp.layers[j];
-        let url = props.apiUrl + 'tileLayer/' + map.uuid + '/' + timestamp.timestampNumber + '/' + tileLayer.name + '/{z}/{x}/{y}';
+        let tileLayerName = mapTileLayerType.layers[j];
 
-        let zIndex;
-        let checked;
-        let stacking;
-        for (var k = 0; k < tileLayers.length; k++)
-        {
-          if (tileLayers[k].name === tileLayer.type)
-          {
-            zIndex = tileLayers[k].zIndex;
-            checked = tileLayers[k].checked;
-            stacking = tileLayers[k].stacking;
-            break;
-          }
+        if (tileLayerType.checked && !this.state.checkedLayers.includes(tileLayerName)) {
+          this.state.checkedLayers.push(tileLayerName);
         }
 
-        if (checked && !this.state.checkedLayers.includes(tileLayer.name)) {
-          this.state.checkedLayers.push(tileLayer.name);
+        let tileLayersOfType = tileLayerTypes.find(x => x.name === tileLayerName);
+
+        if (!tileLayersOfType) {
+          tileLayersOfType = {
+            name: tileLayerName,
+            timestampElements: []
+          };
+
+          tileLayersOfTypes.push(tileLayersOfType);
         }
-        
-        layerTypes.push({
-          layerName: tileLayer.name,
-          stacking: stacking,
-          checked: checked,
-          layer: 
-          <TileLayer
-            url={url}
-            tileSize={mapParams.tileSize}
-            noWrap={mapParams.noWrap}
-            maxZoom={mapParams.maxZoom}
-            attribution={mapParams.attribution}
-            format={mapParams.format}
-            zIndex={zIndex + (j + 1) + map.tileLayers.length}
-            key={i}
-            // errorTileUrl={props.publicFilesUrl + 'images/dummy_tile.png'}
-            bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
-          />
-        });
+
+        mapTileLayerType.timestamps.forEach(timestampNumber => {
+          let url = `${props.apiUrl}tileLayer/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
+
+          tileLayersOfType.timestampElements.push({
+            timestampNumber: timestampNumber,
+            element: (<TileLayer
+              url={url}
+              tileSize={mapParams.tileSize}
+              noWrap={mapParams.noWrap}
+              maxZoom={mapParams.maxZoom}
+              attribution={mapParams.attribution}
+              format={mapParams.format}
+              zIndex={tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1)}
+              key={j}
+              errorTileUrl={props.publicFilesUrl + 'images/dummy_tile.png'}
+              // bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
+            />)
+          });
+        })
       }
 
       preparedtileLayers.push({
-        timestampNumber: timestamp.timestampNumber,
-        layers: layerTypes
+        type: tileLayerType.name,
+        layers: tileLayersOfTypes
       });
     }
 
@@ -185,12 +187,10 @@ export class ViewerMap extends PureComponent {
 
   getPolygonsJson = async (props) =>
   {
-    let headers = [];
     let map = props.map;
-    let layerGeoJsons = [];
     let mapRef = this.mapRef.current.leafletElement;
     let screenBounds = mapRef.getBounds();
-    let screenXY = 
+    let bounds = 
     {
       xMin: screenBounds.getWest(),
       xMax: screenBounds.getEast(),
@@ -202,54 +202,82 @@ export class ViewerMap extends PureComponent {
       return;
     }
 
-    if (props.user) {
-      headers["Authorization"] = "BEARER " + props.user.token;
-    }
+    let geoJsonPromises = [];
 
     for (let i = 0; i < map.polygonLayers.length; i++) {
-      if(map.polygonLayers[i].timestampNumber === props.timestampRange.end)
+      if (map.polygonLayers[i].timestampNumber === props.timestampRange.end)
       {
         for (let j = 0; j < map.polygonLayers[i].layers.length; j++)
         {
-          let responseJson = await QueryUtil.getData(
-            this.props.apiUrl + 'metadata/polygonsCount',
-            {
-              mapId:  map.uuid,
-              timestamp: props.timestampRange.end,
-              layer: map.polygonLayers[i].layers[j].name,
-              xMin: screenXY.xMin,
-              xMax: screenXY.xMax,
-              yMin: screenXY.yMin,
-              yMax: screenXY.yMax
-            },
-            { headers }
-          );
+          let geoJsonPromise = this.getPolygonsJsonAux(
+            props.apiUrl,
+            props.user, 
+            map.uuid, 
+            props.timestampRange.end, 
+            bounds, 
+            map.polygonLayers[i].layers[j].name,
+            map.polygonLayers[i].layers[j].color);
 
-          if(responseJson.count <= maxPolygon)
-          {
-            responseJson = await QueryUtil.getData(
-              this.props.apiUrl + 'geometry/polygon/bounds',
-              {
-                mapId:  map.uuid,
-                timestamp: props.timestampRange.end,
-                layer: map.polygonLayers[i].layers[j].name,
-                xMin: screenXY.xMin,
-                xMax: screenXY.xMax,
-                yMin: screenXY.yMin,
-                yMax: screenXY.yMax
-              },
-              { headers }
-            );
-          }
-
-          responseJson['name'] = map.polygonLayers[i].layers[j].name;
-          responseJson['color'] = map.polygonLayers[i].layers[j].color;
-          layerGeoJsons.push(responseJson);
+          geoJsonPromises.push(geoJsonPromise);          
         }
       }
     }
 
+    let layerGeoJsons = [];
+
+    for (let i = 0; i < geoJsonPromises.length; i++) {
+      let layerGeoJson = await geoJsonPromises[i];
+      layerGeoJsons.push(layerGeoJson);
+    }
+
+    randomKey = Math.random();
+
     this.setState({ layerGeoJsons: layerGeoJsons });
+  }
+
+  getPolygonsJsonAux = async (apiUrl, user, mapUuid, timestampEnd, bounds, layerName, layerColor) => {
+    let headers = {};
+    if (user) {
+      headers["Authorization"] = "BEARER " + user.token;
+    }
+
+    let polygonIdResult = await QueryUtil.getData(
+      apiUrl + 'metadata/polygons',
+      {
+        mapId:  mapUuid,
+        timestamp: timestampEnd,
+        layer: layerName,
+        xMin: bounds.xMin,
+        xMax: bounds.xMax,
+        yMin: bounds.yMin,
+        yMax: bounds.yMax,
+        limit: maxPolygon
+      },
+      { headers }
+    );
+
+    if (polygonIdResult.ids)
+    {
+      let polygonsGeoJson = await QueryUtil.getData(
+        apiUrl + 'geometry/polygons',
+        {
+          mapId:  mapUuid,
+          timestamp: timestampEnd,
+          polygonIds: polygonIdResult.ids
+        },
+        { headers }
+      );
+
+      polygonsGeoJson.name = layerName;
+      polygonsGeoJson.color = layerColor;
+
+      return polygonsGeoJson;
+    }
+    else {
+      return {
+        count: polygonIdResult.count
+      };
+    }
   }
 
   onMapMoveEnd = (e) =>
@@ -273,8 +301,6 @@ export class ViewerMap extends PureComponent {
     if (index > -1) {
       this.state.checkedLayers.splice(index, 1);
     }
-
-    console.log(this.state.checkedLayers);
   }
 
   componentDidMount = () => {
@@ -326,7 +352,6 @@ export class ViewerMap extends PureComponent {
 
   renderTileLayers = () => {
     let controlOverlays = [];
-    let tileLayers = [];
 
     let map = this.props.map;
     let timestampRange = this.props.timestampRange;
@@ -335,39 +360,42 @@ export class ViewerMap extends PureComponent {
       return null;
     }
 
-    for (var i = timestampRange.start; i <= timestampRange.end; i++)
-    {
-      let timestamp = this.state.preparedtileLayers[i];
+    for (let i = 0; i < tileLayerTypes.length; i++) {
+      let tileLayerType = tileLayerTypes[i];
 
-      for (var j = 0; j < timestamp.layers.length; j++)
-      {
-        let tileLayer = timestamp.layers[j];
+      let tileLayersOfTypes = this.state.preparedtileLayers.find(x => x.type === tileLayerType.name);
 
-        if (tileLayer.stacking || i === timestampRange.end)
-        {
-
-          if (!tileLayers[tileLayer.layerName])
-          {
-            tileLayers[tileLayer.layerName] = []
-            tileLayers[tileLayer.layerName]['checked'] = tileLayer.checked;
-            tileLayers[tileLayer.layerName]['key'] = tileLayer.key;
-          }          
-
-          tileLayers[tileLayer.layerName].push(tileLayer.layer);
-        }
+      if (!tileLayersOfTypes) {
+        continue;
       }
-    }
 
-    for (let key in tileLayers)
-    {
-      let r = Math.random();
-      controlOverlays.push(
-        <LayersControl.Overlay name={key} key={r} checked={this.state.checkedLayers.includes(key)}>
-          <LayerGroup name={key}>
-            {tileLayers[key]}
-          </LayerGroup>
-        </LayersControl.Overlay>
-      );
+      let timestampStart = tileLayerType.stacking ? timestampRange.start : timestampRange.end;
+
+      let layerElements = [];
+
+      tileLayersOfTypes.layers.forEach(layer => {
+        let layerName = layer.name;
+
+        for (let j = timestampStart; j <= timestampRange.end; j++) {
+
+          let timestampNumber = map.timestamps[j].timestampNumber;
+          let timestampElement = layer.timestampElements.find(x => x.timestampNumber === timestampNumber);
+
+          if (!timestampElement) {
+            continue;
+          }
+
+          layerElements.push(timestampElement.element);
+        }
+
+        controlOverlays.push(
+          <LayersControl.Overlay name={layerName} key={map.name + layerName} checked={this.state.checkedLayers.includes(layerName)}>
+            <LayerGroup name={layerName}>
+              {layerElements}
+            </LayerGroup>
+          </LayersControl.Overlay>
+        );
+      })
     }
 
     return controlOverlays;
@@ -387,15 +415,15 @@ export class ViewerMap extends PureComponent {
     for (let i = 0; i < layerGeoJsons.length; i++)
     {
       let geoJson;
-      if (layerGeoJsons[i]['count'] <= maxPolygon)
+      if (layerGeoJsons[i].count <= maxPolygon)
       {
-        let r = Math.random();
         geoJson = 
           <GeoJSON
             data={layerGeoJsons[i]}
             onEachFeature={this.onEachFeature}
             style={{color: '#' + layerGeoJsons[i].color, weight: 1}}
-            key={r}
+            key={randomKey}
+            zIndex={1000}
           />
       }
       else
@@ -444,7 +472,7 @@ export class ViewerMap extends PureComponent {
         className: 'polygonCircle'
       });
       
-      let marker = <Marker position={bounds.getCenter()} icon={icon} style={''}/>
+      let marker = <Marker position={bounds.getCenter()} icon={icon} style={''} zIndex={2000}/>
       layers.push(marker);
     }
     return layers;
@@ -462,16 +490,6 @@ export class ViewerMap extends PureComponent {
 
       layer.bindPopup(popupContent);
     }
-  }
-
-  makeKey = (length) => {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  
-    for (var i = 0; i < length; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-  
-    return text;
   }
 
   render() {
