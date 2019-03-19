@@ -97,6 +97,7 @@ class Viewer extends PureComponent {
           map={this.state.map}
           timestampRange={this.state.timestampRange}
           onShapeDrawn={this.onShapeDrawn}
+          user={this.props.user}
         />
 {/*        <QueryPane
           apiUrl={this.props.apiUrl}
