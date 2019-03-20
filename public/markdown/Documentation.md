@@ -15,11 +15,10 @@ This brief documentation outlines all post and get requests that can be sent to 
       3.2.2 <a href='#data_index'>/data/spectral/polygon</a> <br/>
       3.2.3 <a href='#data_index'>/data/spectral/tile</a> <br/>
 4. <a href='#geometry'>**/geometry**</a><br/>
-    4.1 <a href='#geometry_polygon'>*/geometry/polygon*</a><br/>
-    4.2 <a href='#geometry_tile'>*/geometry/tile*</a>
 5. <a href='#visual'>**/visual**</a>
 6. <a href='#tileLayer'>**/tileLayer**</a>
-7. <a href='#download'>**/download**</a>
+7. <a href='#Feedback'>**/Feedback**</a>
+8. <a href='#download'>**/download**</a>
 
 <a id='account'></a>
 # /account
@@ -130,42 +129,44 @@ mapId: The uuid of the particular map.<br/>
 **Returns**<br/>
 JSON with all polygon layers of all timestamps of a given map. 
 
-#### Post polygonsCount
+#### Post polygons
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/polygonsCount'
+url = 'https://api.ellipsis-earth.com/metadata/polygonsBounds'
 ```
 
-Request to obtain the amount of polygons in a boundingbox.<br/>
+Request to obtain the id's of predefined polygons.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-timestamp: The number of the timestamp.<br/>
+timestamp: The number of the timestamp, default is 0.<br/>
+limit: maximum amount of id's to return, default is infinity. <br />
 layer: The name of the polygon layer. <br/>
-xMin: Minimum x coordinate. <br />
-xMax: Maximum x coordinate. <br />
-yMin: Minimum y coordinate. <br />
-yMax: Maximum y coordinate. <br />
+xMin: Minimum x coordinate wgs84 (optional). <br />
+xMax: Maximum x coordinate wgs84 (optional). <br />
+yMin: Minimum y coordinate wgs84 (optional). <br />
+yMax: Maximum y coordinate wgs84 (optional). <br />
 **Returns**<br/>
-JSON with a count.
+JSON with a count of the number of polygons within the given bounds and list of id's of these polygons. In case the number of polygons exceeds the specified limit the list of id's is left undefined. In case no bounding box is given all polygon id's within the layer are returned.
 
-#### Post tilesCount
+#### Post tiles
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/tilesCount'
+url = 'https://api.ellipsis-earth.com/metadata/tilesBounds'
 ```
 
-Request to obtain the amount of tiles in a boundingbox.<br/>
+Request to obtain the tiles of a map.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-timestamp: A timestamp number.<br/>
-xMin: Minimum x coordinate. <br />
-xMax: Maximum x coordinate. <br />
-yMin: Minimum y coordinate. <br />
-yMax: Maximum y coordinate. <br />
+timestamp: A timestamp number, default is 0.<br/>
+limit: maximum amount of id's to return, default is infinity. <br />
+xMin: Minimum x coordinate in wgs84 (optional). <br />
+xMax: Maximum x coordinate wgs84 (optional). <br />
+yMin: Minimum y coordinate wgs84 (optional). <br />
+yMax: Maximum y coordinate wgs84 (optional). <br />
 **Returns**<br/>
-JSON with a count.
+JSON with a count of the number of tiles within the given bounds and list of triples (tileX,tileY,zoom) of these tiles. In case the number of tiles exceeds the specified max the list of triples is undefined. In case no bounds are given all tiles present in the map are returend.
 
 <a id='data'></a>
 # /data
@@ -204,18 +205,18 @@ CSV with columns tileX, tileY, [columns of area per class], total area, date fro
 
 <a id='data_class_polygon'></a>
 ### /data/class/polygon
-#### Post polygons
+#### Post polygonIds
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/class/polygon/polygons'
+url = 'https://api.ellipsis-earth.com/data/class/polygon/polygonIds'
 ```
 
 Request to obtain the surface area of each class for each polygon for a certain timestamp.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
-layer: A string indicating the polygonslayer<br/>
+polygonIds: A list of polygon ids, cannot be longer than 3000.<br/>
 **Returns**<br/>
 CSV with columns polygon ids, [columns of area per class] and total area.
 
@@ -250,7 +251,22 @@ CSV with columns tileX, tileY, [columns of area per class] and total area.
 
 <a id='data_class_tile'></a>
 ### data/class/tile
-#### Post tiles
+#### Post tileIds
+
+
+```python
+url = 'https://api.ellipsis-earth.com/data/class/tile/tileIds'
+```
+
+
+Request to obtain the surface area of each class for each tile for a certain timestamp.<br/>
+**Parameters**<br/>
+mapId: The uuid of the particular map.<br/>
+tileIds: a list of key value pairs with keys tileX, tileY and optionally zoom, cannot be longer than 3000.<br/>
+**Returns**<br/>
+CSV with columns polygon, [columns of area per class], total area date from and date to.
+
+#### Post timestamps
 
 
 ```python
@@ -263,21 +279,6 @@ mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 **Returns**<br/>
 CSV with columns tileX, tileY, [columns of area per class] and total area.
-
-#### Post timestamps
-
-
-```python
-url = 'https://api.ellipsis-earth.com/data/class/tile/tiles'
-```
-
-Request to obtain the surface area of each class for each polygon for a certain timestamp.<br/>
-**Parameters**<br/>
-mapId: The uuid of the particular map.<br/>
-tileX: The x position of the tile..<br/>
-tileY: The y position of the tile.<br/>
-**Returns**<br/>
-CSV with columns polygon, [columns of area per class], total area date from and date to.
 
 <a id='data_index'></a>
 ## /data/spectral
@@ -316,19 +317,19 @@ CSV with columns tileX, tileY, [columns of mean per index] and total area.
 
 ### data/spectral/polygon
 <a id='data_index_polygon'></a>
-#### Post polygons
+#### Post polygonIds
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/polygon/polygons'
+url = 'https://api.ellipsis-earth.com/data/spectral/polygon/polygonIds'
 ```
 
-Request to obtain the mean indices of each index over a certain class for each polygon for a certain timestamp.<br/>
+Request to obtain the surface area of each class for each polygon for a certain timestamp.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
-layer: A string indicating the polygonslayer
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
+ids: A list of polygon ids, cannot be longer than 3000. <br/>
 **Returns**<br/>
 CSV with columns polygon ids, [columns of mean per index] and total area.
 
@@ -365,17 +366,18 @@ CSV with columns tileX, tileY, [columns of mean per index] and total area.
 
 ### data/spectral/tile
 <a id='data_index_tile'></a>
-#### Post tiles
+#### Post tileIds
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/tile/tiles'
+url = 'https://api.ellipsis-earth.com/data/spectral/tile/tileIds'
 ```
 
 Request to obtain the mean indices of each index over a certain class for all tiles at a certain timestamp.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
+tileIds: List of key value pairs with key TileX, tileY and optionally zoom, cannot be longer than 3000.<br/>
 **Returns**<br/>
 CSV with columns polygon, [columns of mean per index] and total area.
 
@@ -397,105 +399,34 @@ CSV with columns tileX, tileY, [columns of mean per index], total area, date fro
 
 <a id='geometry'></a>
 # /geometry
-<a id='geometry_polygon'></a>
-## /geometry/polygon
-#### Post all
+
+#### Post polygons
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geometry/polygon/all'
-```
-
-Request to obtain all polygons in a layer.<br/>
-**Parameters**<br/>
-mapId: The uuid of the particular map.<br/>
-timestamp: The number of the timestamp.<br/>
-layer: The name of the polygon layer. <br/>
-**Returns**<br/>
-GeoJSON of polygons.
-
-#### Post bounds
-
-
-```python
-url = 'https://api.ellipsis-earth.com/geometry/polygon/bounds'
-```
-
-Request to obtain all polygons in a boundingbox.<br/>
-**Parameters**<br/>
-mapId: The uuid of the particular map.<br/>
-timestamp: The number of the timestamp.<br/>
-xMin: Minimum x coordinate.<br/>
-xMax: Maximum x coordinate.<br/>
-yMin: Minimum y coordinate.<br/>
-yMax: Maximum y coordinate.<br/>
-layer: The name of the polygon layer. <br/>
-**Returns**<br/>
-GeoJSON of polygons.
-
-#### Post ids
-
-
-```python
-url = 'https://api.ellipsis-earth.com/geometry/polygon/ids'
+url = 'https://api.ellipsis-earth.com/geometry/polygons'
 ```
 
 Request to obtain all polygons by a list of id's.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-timestamp: The number of the timestamp.<br/>
-polygonIds: List of polygon id's.<br/>
+timestamp: The number of the timestamp, default is 0.<br/>
+polygonIds: List of polygon id's, cannot be longer than 3000.<br/>
 **Returns**<br/>
 GeoJSON of polygons.
 
-<a id='geometry_tile'></a>
-## geometry/tile
-#### Post all
+#### Post tiles
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geometry/tile/all'
-```
-
-Request to obtain all standard tiles in a layer.<br/>
-**Parameters**<br/>
-mapId: The uuid of the particular map.<br/>
-timestamp: The number of the timestamp.<br/>
-layer: The name of the polygon layer. <br/>
-**Returns**<br/>
-GeoJSON of polygons.
-
-#### Post bounds
-
-
-```python
-url = 'https://api.ellipsis-earth.com/geometry/tile/bounds'
-```
-
-Request to obtain all standard tiles in a boundingbox.<br/>
-**Parameters**<br/>
-mapId: The uuid of the particular map.<br/>
-timestamp: The number of the timestamp.<br/>
-xMin: Minimum x coordinate.<br/>
-xMax: Maximum x coordinate.<br/>
-yMin: Minimum y coordinate.<br/>
-yMax: Maximum y coordinate.<br/>
-layer: The name of the polygon layer. <br/>
-**Returns**<br/>
-GeoJSON of polygons.
-
-#### Post ids
-
-
-```python
-url = 'https://api.ellipsis-earth.com/geometry/tile/ids'
+url = 'https://api.ellipsis-earth.com/geometry/tiles'
 ```
 
 Request to obtain all standard tiles by a list of id's.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-timestamp: The number of the timestamp.<br/>
-ids: An array of arrays of the form ['tileX': tileX, 'tileY': tileY] <br/>
+timestamp: The number of the timestamp, default is 0.<br/>
+ids: An array of arrays of the form ['tileX': tileX, 'tileY': tileY], cannot be longer than 3000 <br/>
 layer: The name of the polygon layer. <br/>
 **Returns**<br/>
 GeoJSON of polygons.
@@ -517,7 +448,7 @@ timestampMin: The date from which to start the mosaic.<br/>
 timestampMax: The date at which to end the mosaic.<br/>
 layerName: Name of the layer that you wish to visualise<br/>
 **Returns**<br/>
-A Web Mercator projected PNG image of no more than 1024 by 1024 pixels.
+A Web Mercator projected PNG image of no more than 2048 by 2048 pixels.
 
 <a id='tileLayer'></a>
 # /tileLayer
@@ -570,3 +501,26 @@ Request to download the shapefile. <br/>
 token: The download token that was obtained via the post download token request.<br/>
 **Returns**<br/>
 Starts the download of the shape.
+
+<a id='Feedback'></a>
+# /feedback
+#### Post
+
+
+```python
+url =  'https://api.ellipsis-earth.com/feedback'
+```
+
+Submits feedback to the system, notifying it of classification errors in the given area.<br/>
+**Parameters**<br/>
+mapId: The id of the map on which the error occurs.<br/>
+timestamp: The number of the timestamp on whic the error occurs.<br/>
+xMin: The minimum longitude of the area.<br/>
+xMax: The maximum longitude of the area.<br/>
+yMin: The minimum latitude of the area.<br/>
+yMax: The maximum latitude of the area.<br/>
+isCloud: If true, indicates that the error is a cloud related error, otherwise it's a classification error.<br/>
+message: A custom message describing the error.<br/>
+
+**Returns**<br/>
+Status 200 if the submission was successful.

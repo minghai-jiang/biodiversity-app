@@ -1,11 +1,9 @@
 
-This document is meant as a brief tutorial for anyone who wants to use Ellipsis-Earth data through our API for analysis. 
+Our database stores a treasure of GeoData aqcuired by our cluster. We suport a large number of requests rendering data, geometries and visualisations on this database. This tutorial, meant for people who want to start using the Ellipsis-Earth API for analysis or reporting purposes. It will take you through all relevant requests you can make to our server.
 
-Our database stores a treasure of GeoData aqcuired by our cluster and we suport a large number of requests rendering data, geometries and visualisations. In this tutorial we will step by step go through all possible requests you can make to our server.
+This document is meant as a quick tutorial to get you started. It will show you all the options without going into depth or specifics. To see the full potential and power of the API when applied to specific use cases, please visit one of our demo-notebooks in the Ellipsis-Gallery. This tutorial is directed to Python users, but should be readable for people using other languages as well.
 
-This document is meant as a quick tutorial to get you started. It will show you all the options without going into depth or specifics. To see the full potential and power of the API when applied to certain use cases, please visit one of our demo-notebooks in the Ellipsis-Gallery. The tutorial is directed to Python users, but should be readeble for people using other languages as well.
-
-The Ellipsis API suports a number of feedback and download requests, as well as tile layers for all maps. As these are meant for app developers and not for analists, these are not treated in the tutorial. See the documentation for more information on this topic.
+Some of the for analysis lesser relevant API calls in the documentation are skipped.
 
 # Contents
 
@@ -24,55 +22,54 @@ The Ellipsis API suports a number of feedback and download requests, as well as 
      6.2.2 <a href='#data/index/polygon'> for predefined polygons</a> <br/>
      6.2.3 <a href='#data/index/tile'> for standard tiles</a> <br/>
 7. <a href='#geometry'>**Acquiring geometries**</a><br/>
-    6.1 <a href='#geometry/polygon'>*Geometries for polygons*</a><br/>
-    6.2 <a href='#geometry/tile'>*Geometries for standard tiles*</a>
 8. <a href='#visual'>**Acquiring visualisations**</a>
 
 <a id='Ellipsis'></a>
-# Ellipsis Data
+# Ellipsis-Earth Data
 
-Ellipsis data is always connected to a map. When we refer to a map, we mean all available data and visualisations of a certain monitoring project. Maps consist of multiple timestamps, each of which contain all data and visualisations of that map acquired at a certain period.
+Ellipsis-Earth data is always connected to a map. When we refer to map, we mean a single montiroring project. Maps consist of multiple timestamps, each of which contain all data and visualisations of that map acquired at a certain period.
 
-## Standard tiles and custom polygons
+## Standard tiles and predefined polygons
 
-Ellipsis-Earth uses a large set of predefined standard tiles covering the entire globe. In fact we use the same covering into standard tiles as the webmercator projected open street map on zoomlevel 14.  A tile can be uniquely identified by a tile_x and tile_y, identifying the respectieve x and y positions on the map.
+Ellipsis-Earth uses a large set of predefined standard tiles covering the entire globe. In fact the same  covering is used as the webmercator projected open street map on zoomlevel 14. A tile can be uniquely identified by a tile_x and tile_y, identifying the respectieve x and y positions on the map.
 
-On top of this specific custom polygons can be defined on maps. These can be everything from agricultural parcels or administrative districts. These polygons are grouped into layers, polygons in the same layer are of the same type (for example all provinces of a country would form a layer).
+On top of these standard tiles each map can have specific predined polygons. These can be everything from agricultural plots to administrative districts. These polygons are grouped into layers. Polygons in the same layer are of the same type (for example all provinces of a country would form a layer).
 
 ## Aggregation
 
-Data is always both aggregated to standard tiles as well as to predefined polygons. In case of predefined polygons the data is actually saved per tile per polygon. This means that in larger polygons you also have a sense of 'where' something occured.
+Data is always both aggregated to standard tiles as well as to predefined polygons. That is to say spectral indices and the areas of land cover types are always saved for all polygons and tiles. 
+
+In case of predefined polygons the data is actually saved per tile per polygon. This means that in larger polygons you also have a sense of 'where' something occured.
 
 In case of land cover classes,  aggregations are made by taking the total surface area of each class within the aggregated region. In case of spectral indices, means are taken over the whole area.
 
 ## Map layers
-All timestamps consist of map layers. Each layer contains a certain type of visualization of the timestamp. There are four types of layers:
+All timestamps of a map consist of map layers. Each layer contains a certain type of visualization of the timestamp. There are four types of layers:
 
 1.	**Images**: Visualizations of the raw satellite data, for example, RGB, false color or infrared.
-2.	**Indices**: Heatmaps of the indices.
-3.	**Labels**: Maps in which each class has a certain color.
-4.	**Changes**: Maps in which each pixel that underwent a certain change has a certain color.
+2.	**Indices**: Heatmaps of the spectral indices.
+3.	**Labels**: Maps in which each land cover type has a certain color.
+4.	**Changes**: Maps in which each pixel that underwent a certain type of change is colored red.
 
 ## Request types
 
 <a id='thedestination'></a>
 Ellipsis supports a large number of requests to our API. We categorise them in the following way:
 
-1. <a href='#login'>**account**</a>: All requests that gather information about what data is available.<br/>
-2. <a href='#metadata'>**metadata**</a>: All requests that gather information about what data is available.<br/>
-3. <a href='#data/class'>**data/class**</a>: All requests that gather surface areas of classes<br/>
+1. <a href='#login'>**account**</a>: All requests regarding accesing information.<br/>
+2. <a href='#metadata'>**metadata**</a>: All requests that gather information about what data is available in a certain map.<br/>
+3. <a href='#data/class'>**data/class**</a>: All requests that gather surface areas of land cover classes<br/>
 4. <a href='#data/index'>**data/index**</a>: All requests that gather mean spectral indices<br/>
-5. <a href='#geometry/polygon'>**geometries/polygon**</a>: All requests that gather mean spectral indices when restricted to a specific class.<br/>
-6. <a href='#geometry/tile'>**geometries/tile**</a>: All requests that retrieve PNG images.<br/>
-7. <a href='#visual'>**visual**</a>: All requests that collect the geometries of predefined polygons.<br/>
+5. <a href='#geometry'>**geometries**</a>: All requests for obtaining geometries of predefined polygons or tiles.
+6. <a href='#visual'>**visual**</a>: All requests for obtaining visualisations.<br/>
 
-This categorisation is reflected in the sections below.
+This categorisation is somewhat, but not completley, reflected in the sections below.
 
 <a id='setup'></a>
 # Setting things up
 ## Required packages
 
-We will be requiring the following python packages. The Requests package allows us to make post and get requests to the API. Pandas, Geopandas and raserio is meant to help us handling data comming from the API. Matplotlib helps us with handling images. the io package allows us to directly get a requested PNG or CSV as a Python object instead of saving it to our local disk first.
+We will be requiring the following python packages. The Requests package allows us to make post and get requests to the API. Pandas, Matplotlib and Geopandas help us to interpret responses as sensible Python objects.The io package allows us to directly interpret a requested PNG, GeoJSON or CSV as a Python object instead of saving it to our local disk first.
 
 
 ```python
@@ -80,8 +77,6 @@ import requests
 
 import pandas as pd
 import geopandas as gpd
-import rasterio
-
 from matplotlib import pyplot as plt
 from matplotlib import image as mpimg
 
@@ -131,6 +126,8 @@ r = requests.post('http://www.example.com',
                   headers = {"Authorization":'Your_token'})
 ```
 
+In case we do not want to wait forever for a return from the server we can add an additional timeout argument to the request. This argument should be a float indicating the number of seconds that you are willing to wait for the response.
+
 ## Interpreting responses
 
 Now let's have a look at the response r. If we print it directly we get the response code of our request.
@@ -161,7 +158,7 @@ The ellipsis API returns data in JSON, CSV and PNG. We can interpret these as Py
 
 ## Loging in
 
-Some maps are public and can be accessed without a token. However, if you want to access maps that are private, meaning accessible only to specific people or organizations, you will need to send a token with your request. We can obtain this token by sending a post request with a username and password as parameters. In case you are interested in public maps only, you can skip this step.
+Some maps are public and can be accessed without a token. However, if you want to access maps that are private, meaning accessible only to specific people or organizations, you will need to send a token with your request. We can obtain this token by sending a post request with a username and password. In case you are interested in public maps only, you can skip this step.
 
 For this tutorial we will use the account demo_user.
 
@@ -174,7 +171,7 @@ r =requests.post(url + '/account/login',
 print(r.text)
 ```
 
-    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MjQ4MTY2OSwiZXhwIjoxNTUyNTY4MDY5fQ.X7dXfcjE62pGg8IBA2cn5jiDqskt9sIgORpgse5dxz8"}
+    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MzA3OTYzMiwiZXhwIjoxNTUzMTY2MDMyfQ.NG-RyEnnmsj_4qZjRIc40VrVlldG3qVdLcMJipnu_fs"}
 
 
 Our token is quite long, so let's save the token to a variable that we can send with our other requests.
@@ -193,7 +190,7 @@ token = 'Bearer ' + token
 print(token)
 ```
 
-    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MjQ4MTY2OSwiZXhwIjoxNTUyNTY4MDY5fQ.X7dXfcjE62pGg8IBA2cn5jiDqskt9sIgORpgse5dxz8
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MzA3OTYzMiwiZXhwIjoxNTUzMTY2MDMyfQ.NG-RyEnnmsj_4qZjRIc40VrVlldG3qVdLcMJipnu_fs
 
 
 To test whether our token is working, we send a get request with this token to the following authentication testing URL.
@@ -210,7 +207,9 @@ print(r)
     <Response [200]>
 
 
-We get 200 as a response code which means that our request was valid and that we can use it perform actions that require authentication! The token we got will remain valid for a limited amount of time, the expiration time of a token is currently set to 12 hours. After that you will need to request a new token.
+We get 200 as a response code, which means that our request was succesfull and therfore our token valid. The token we got will only remain valid for a limited amount of time, the expiration time of a token is currently set to 12 hours. After that you will need to request a new token via the same procedure.
+
+In this tutorial we are using public maps only, so for now, we leave this token for what it is.
 
 ## Available maps
 
@@ -233,11 +232,17 @@ map_names
 
 
 
-    ['Suriname', 'Belgium Clouds', 'Chaco Demo', 'Gran Chaco']
+    ['Netherlands Fields',
+     'Suriname',
+     'Belgium Clouds',
+     'Chaco Demo',
+     'Gran Chaco',
+     'Amazon Santarem',
+     'Yucatan Coast']
 
 
 
-Seems there are quite some maps available. Lets have a look at the Suriname map.
+Seems there are quite some maps available. Lets have a look at the Suriname map. To this end we store the mapId of this map in a variable.
 
 
 ```python
@@ -255,12 +260,12 @@ mapId
 <a id='metadata'></a>
 # Acquiring metadata
 
-Now we found what maps we have access to we can start looking at what data is available for these maps. To do this the Ellipsis API supports a couple of metadata requests.
+Now we found the maps we have access to we can start looking at what data is available for these maps. To do this the Ellipsis API supports a couple of metadata requests.
 
 All responses to metadata requests are in JSON format.
 
 
-We already stored the map id of our map of interest in the variable map_id Let's see what timestamps are available for this map.
+We already stored the map id of our map of interest in the variable mapId for convenience. Let's see what timestamps are available for this map.
 
 #### metadata/timestamps
 
@@ -294,29 +299,29 @@ There seem to be a couple of timestamps available! Let's have a look at what dat
 
 
 ```python
-r = requests.post(url + '/metadata/classes',
+r1 = requests.post(url + '/metadata/classes',
                  json = {"mapId":  mapId })
 
-r = r.json()
+r1 = r1.json()
 
-r[1:3]
+r1[1:3]
 ```
 
 
 
 
-    [{'timestampNumber': 10,
+    [{'timestampNumber': 1,
       'modelVersion': 1,
-      'classes': [{'name': 'blanc', 'color': '00000000'},
-       {'name': 'mask', 'color': '00000000'},
+      'classes': [{'name': 'disturbance', 'color': 'ff0000ff'},
        {'name': 'no class', 'color': '00000000'},
-       {'name': 'disturbance', 'color': 'ff0000ff'}]},
-     {'timestampNumber': 9,
+       {'name': 'mask', 'color': '00000000'},
+       {'name': 'blanc', 'color': '00000000'}]},
+     {'timestampNumber': 2,
       'modelVersion': 1,
-      'classes': [{'name': 'blanc', 'color': '00000000'},
-       {'name': 'mask', 'color': '00000000'},
+      'classes': [{'name': 'disturbance', 'color': 'ff0000ff'},
        {'name': 'no class', 'color': '00000000'},
-       {'name': 'disturbance', 'color': 'ff0000ff'}]}]
+       {'name': 'mask', 'color': '00000000'},
+       {'name': 'blanc', 'color': '00000000'}]}]
 
 
 
@@ -324,11 +329,11 @@ r[1:3]
 
 
 ```python
-r = requests.post(url + '/metadata/spectral',
+r2 = requests.post(url + '/metadata/spectral',
                  json = {"mapId":  mapId })
 
-r = r.json()
-r[1:3]
+r2 = r2.json()
+r2[1:3]
 ```
 
 
@@ -343,7 +348,19 @@ r[1:3]
 
 
 
-For each timestamp we are also given version of the model under which conclusions have been drawn. The color is the standard legend color that is used in the Ellipsis Viewer.
+For each timestamp we are given the classes or indices that have been measured. We are also given the model version under which conclusions have been drawn and the legend color in the Ellpsis-Earth Viewer.
+
+As classes and spectral indices usually do not change from timstamp to timestamp it makes sense to just print the classes of the first timestamp.
+
+
+```python
+print([ cl['name'] for cl in r1[0]['classes']])
+print([ index['name'] for index in r2[0]['indices']])
+```
+
+    ['disturbance', 'no class', 'mask', 'blanc']
+    ['NDVI', 'NDWI']
+
 
 Next we could wonder about what type of predefined polygons are available for this map.
 
@@ -371,6 +388,77 @@ r[1:3]
       'layers': [{'name': 'Reserve', 'color': 'ff0000ff'},
        {'name': 'Mine', 'color': 'ff0000ff'},
        {'name': 'polygon', 'color': 'ff0000ff'}]}]
+
+
+
+We get all polygon layers per timestamp. Overall these layers should not change to much over time so it might be sensible to just take the layers of the first timestamp and print them.
+
+
+```python
+[ layer['name'] for layer in r[0]['layers']]
+```
+
+
+
+
+    ['Reserve', 'Mine', 'polygon']
+
+
+
+Now we know the polygon layers we can request the id's of the polygons within that layer. Based on these id's we can request the available data and geometries of these polygons.
+#### metadata/polygons
+
+
+```python
+r = requests.post(url + '/metadata/polygons',
+                 json = {"mapId":  mapId, 'layer': 'Mine' })
+
+r = r.json()
+r
+```
+
+
+
+
+    {'count': 7, 'ids': [1, 2, 3, 4, 5, 6, 7]}
+
+
+
+Optionally we can restrict to a bounding box of wgs84 coordinates.
+
+
+```python
+r = requests.post(url + '/metadata/polygons',
+                 json = {"mapId":  mapId, 'layer': 'Mine', 'xMin': -55 ,'xMax':-53, 'yMin':4, 'yMax':5})
+
+r = r.json()
+r
+```
+
+
+
+
+    {'count': 2, 'ids': [1, 4]}
+
+
+
+We can do the same thing for the available standard tiles, again we could optionally restrict to a bounding box.
+#### metadata/tiles
+
+
+```python
+r = requests.post(url + '/metadata/tiles',
+                 json = {"mapId":  mapId})
+r = r.json()
+r['ids'][1:4]
+```
+
+
+
+
+    [{'tileX': 5658, 'tileY': 7971, 'zoom': 14},
+     {'tileX': 5658, 'tileY': 7972, 'zoom': 14},
+     {'tileX': 5658, 'tileY': 7973, 'zoom': 14}]
 
 
 
@@ -403,16 +491,30 @@ r[1:3]
 
 
 
-<a id='data'></a>
-## Acquiring data
+So we have the following tile layers available:
 
-Now we know what data is available in our map we can start requesting information from it. In this section we have a look at all tabular data that we can request for both the classes and the indices. This tabular data is always returned in CSV format.
+
+```python
+[ layer['name'] for layer in r[0]['layers']]
+```
+
+
+
+
+    ['label', 'rgb', 'ndvi', 'ndwi']
+
+
+
+<a id='data'></a>
+# Acquiring data
+
+Now we know what data is available in our map we can start requesting actual information from it. In this section we have a look at retrieving tabular data concerining both the classes and the spectral indices. This tabular data is always returned in CSV format.
 
 We can request tabular data for custom polygons defined by the user, predefined polygons and standard tiles.
 
 <a id='data/class'></a>
 ## Data for classes
-We can obtain data for the classes based on custom polygons, predefined polygons or standard tiles. The data returned is always expressed as the area of a class in square kilometers.
+As mentioned we can obtain data for the classes based on custom polygons, predefined polygons or standard tiles. We treat these three cases sepretely in the below. The data returned is always expressed as the area of a class in square kilometers.
 <a id='data/class/custom'></a>
 ### For a custom polygon
 
@@ -426,7 +528,7 @@ coords = [[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]
 If we are interested in information about the surface area of landcover classes on this polygon, we have two queries at our disposal.
 
 First off we can obtain the aggregated surface area of each class for this polygon for all timestamps.
-#### data/cutomPolygon/timestamps
+#### data/class/cutomPolygon/timestamps
 
 
 ```python
@@ -585,10 +687,10 @@ r.head(10)
 
 
 
-As these are custom polygons, these surface areas are not precise. The custom polygon has been covered fully by standard tiles whose land covers have been summed over.
+As these are custom polygons, the given surface areas are not precise. The custom polygon has been fully covered by standard tiles whose surface areas of land cover classes have been summed over.
 
-Secondly, we can get these surface areas per tile for a certain timestamp. Say in this case timestamp 0.
-#### data/customPolygon/tiles
+Secondly, we can get these surface areas per land cover class for each tile covering the custom polygon at a certain timestamp.
+#### data/class/customPolygon/tiles
 
 
 ```python
@@ -739,18 +841,20 @@ r.head(10)
 <a id='data/class/polygon'></a>
 ### For predefined polygons
 
-There are also predefined polygons available for a map. As oposed to predefined polygons land cover areas for these predefined areas are exact.
+Instead of defining cutom polygons we can also make use of the predefined polygons of this map. As oposed to custom polygons, the land cover areas for these predefined areas are precise.
 
-See the /geometry/polygon section for how to retrieve the geometry of these polygons.
+Thanks to the metadata/polygonIds request we know the id's of the available polygons. Using these id's we can start requesting data concerining these polygons.
 
-There are three queries available for land cover classes on predefined polygons First of all, we can retrieve all polygons for a certain timestamp.
+If we are interested in the geometry of these polygons we can use the /geometry/polygon request discussed in the <a href='#geometry'>**geometry section.**</a>.
 
-#### data/class/polygon/polygons
+There are three queries available for land cover classes on predefined polygons First of all, we can retrieve polygons at a certain timestamp by their id's.
+
+#### data/class/polygon/polygonIds
 
 
 ```python
-r = requests.post(url + '/data/class/polygon/polygons',
-                 json = {"mapId":  mapId, 'timestamp':1, 'layer': 'Mine' })
+r = requests.post(url + '/data/class/polygon/polygonIds',
+                 json = {"mapId":  mapId, 'timestamp':1, 'polygonIds': [1,5,4] })
 r = pd.read_csv(StringIO(r.text))
 r
 ```
@@ -776,93 +880,41 @@ r
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>polygon</th>
+      <th>id</th>
       <th>blanc</th>
       <th>disturbance</th>
       <th>mask</th>
       <th>no class</th>
       <th>area</th>
-      <th>layer</th>
-      <th>name</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>1</td>
-      <td>0.000000</td>
+      <td>0.0</td>
       <td>3.581839</td>
       <td>19.940976</td>
       <td>15.135185</td>
       <td>38.658</td>
-      <td>Mine</td>
-      <td>Mine1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
-      <td>0.000000</td>
-      <td>1.891067</td>
-      <td>2.164558</td>
-      <td>1.256375</td>
-      <td>5.312</td>
-      <td>Mine</td>
-      <td>Mine2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>0.000000</td>
-      <td>3.194770</td>
-      <td>2.913799</td>
-      <td>3.846431</td>
-      <td>9.955</td>
-      <td>Mine</td>
-      <td>Mine3</td>
-    </tr>
-    <tr>
-      <th>3</th>
       <td>4</td>
-      <td>0.000000</td>
+      <td>0.0</td>
       <td>3.657095</td>
       <td>20.714430</td>
       <td>14.863475</td>
       <td>39.235</td>
-      <td>Mine</td>
-      <td>Mine4</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>2</th>
       <td>5</td>
-      <td>0.000000</td>
+      <td>0.0</td>
       <td>0.330621</td>
       <td>0.093677</td>
       <td>0.353702</td>
       <td>0.778</td>
-      <td>Mine</td>
-      <td>Mine5</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>6</td>
-      <td>0.321840</td>
-      <td>4.467514</td>
-      <td>27.034183</td>
-      <td>11.970464</td>
-      <td>43.794</td>
-      <td>Mine</td>
-      <td>Mine6</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>7</td>
-      <td>10.391874</td>
-      <td>16.971280</td>
-      <td>135.943489</td>
-      <td>37.206357</td>
-      <td>200.513</td>
-      <td>Mine</td>
-      <td>Mine7</td>
     </tr>
   </tbody>
 </table>
@@ -870,7 +922,7 @@ r
 
 
 
-The resulting data frame has a row for each polygon, describing the total area in square kilometers for each particular class. Additional metadata is appended on the right side and is specific to the map we are studying.
+The resulting data frame has a row for each polygon, describing the total area in square kilometers for each particular class.
 
 Secondly, we can request all timestamps for a particular polygon.
 
@@ -879,7 +931,7 @@ Secondly, we can request all timestamps for a particular polygon.
 
 ```python
 r = requests.post(url + '/data/class/polygon/timestamps',
-                 json = {"mapId":  mapId, 'polygonId':3})
+                 json = {"mapId":  mapId, 'polygonId':4})
 r = pd.read_csv(StringIO(r.text))
 r
 ```
@@ -911,6 +963,8 @@ r
       <th>mask</th>
       <th>no class</th>
       <th>area</th>
+      <th>date_from</th>
+      <th>date_to</th>
     </tr>
   </thead>
   <tbody>
@@ -918,109 +972,133 @@ r
       <th>0</th>
       <td>0</td>
       <td>0.0</td>
-      <td>0.977871</td>
-      <td>7.760044</td>
-      <td>1.217085</td>
-      <td>9.955</td>
+      <td>1.449953</td>
+      <td>35.478269</td>
+      <td>2.306778</td>
+      <td>39.235</td>
+      <td>2018-01-01</td>
+      <td>2018-01-15</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
       <td>0.0</td>
-      <td>3.194770</td>
-      <td>2.913799</td>
-      <td>3.846431</td>
-      <td>9.955</td>
+      <td>3.657095</td>
+      <td>20.714430</td>
+      <td>14.863475</td>
+      <td>39.235</td>
+      <td>2018-02-01</td>
+      <td>2018-02-15</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
       <td>0.0</td>
-      <td>3.199635</td>
-      <td>2.700752</td>
-      <td>4.054613</td>
-      <td>9.955</td>
+      <td>3.657095</td>
+      <td>20.573790</td>
+      <td>15.004115</td>
+      <td>39.235</td>
+      <td>2018-03-01</td>
+      <td>2018-03-15</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3</td>
       <td>0.0</td>
-      <td>3.193522</td>
-      <td>2.583946</td>
-      <td>4.177531</td>
-      <td>9.955</td>
+      <td>3.657095</td>
+      <td>20.573790</td>
+      <td>15.004115</td>
+      <td>39.235</td>
+      <td>2018-04-01</td>
+      <td>2018-04-15</td>
     </tr>
     <tr>
       <th>4</th>
       <td>4</td>
       <td>0.0</td>
-      <td>3.366972</td>
-      <td>1.879114</td>
-      <td>4.708914</td>
-      <td>9.955</td>
+      <td>3.657095</td>
+      <td>20.573790</td>
+      <td>15.004115</td>
+      <td>39.235</td>
+      <td>2018-05-01</td>
+      <td>2018-05-15</td>
     </tr>
     <tr>
       <th>5</th>
       <td>5</td>
       <td>0.0</td>
-      <td>3.366972</td>
-      <td>1.879114</td>
-      <td>4.708914</td>
-      <td>9.955</td>
+      <td>4.014701</td>
+      <td>15.391037</td>
+      <td>19.829262</td>
+      <td>39.235</td>
+      <td>2018-06-01</td>
+      <td>2018-06-15</td>
     </tr>
     <tr>
       <th>6</th>
       <td>6</td>
       <td>0.0</td>
-      <td>3.786952</td>
-      <td>0.319638</td>
-      <td>5.848410</td>
-      <td>9.955</td>
+      <td>5.568670</td>
+      <td>1.303989</td>
+      <td>32.362341</td>
+      <td>39.235</td>
+      <td>2018-07-01</td>
+      <td>2018-07-15</td>
     </tr>
     <tr>
       <th>7</th>
       <td>7</td>
       <td>0.0</td>
-      <td>3.880725</td>
-      <td>0.000000</td>
-      <td>6.074275</td>
-      <td>9.955</td>
+      <td>5.624018</td>
+      <td>0.041097</td>
+      <td>33.569885</td>
+      <td>39.235</td>
+      <td>2018-08-01</td>
+      <td>2018-08-15</td>
     </tr>
     <tr>
       <th>8</th>
       <td>8</td>
       <td>0.0</td>
-      <td>3.687068</td>
+      <td>5.758523</td>
       <td>0.000000</td>
-      <td>6.267932</td>
-      <td>9.955</td>
+      <td>33.476477</td>
+      <td>39.235</td>
+      <td>2018-09-01</td>
+      <td>2018-09-15</td>
     </tr>
     <tr>
       <th>9</th>
       <td>9</td>
       <td>0.0</td>
-      <td>3.848149</td>
+      <td>6.076213</td>
       <td>0.000000</td>
-      <td>6.106851</td>
-      <td>9.955</td>
+      <td>33.158787</td>
+      <td>39.235</td>
+      <td>2018-10-01</td>
+      <td>2018-10-15</td>
     </tr>
     <tr>
       <th>10</th>
       <td>10</td>
       <td>0.0</td>
-      <td>3.955575</td>
+      <td>6.297776</td>
       <td>0.000000</td>
-      <td>5.999425</td>
-      <td>9.955</td>
+      <td>32.937224</td>
+      <td>39.235</td>
+      <td>2018-11-01</td>
+      <td>2018-11-15</td>
     </tr>
     <tr>
       <th>11</th>
       <td>11</td>
       <td>0.0</td>
-      <td>3.758150</td>
+      <td>6.219074</td>
       <td>0.000000</td>
-      <td>6.196850</td>
-      <td>9.955</td>
+      <td>33.015926</td>
+      <td>39.235</td>
+      <td>2018-12-01</td>
+      <td>2018-12-15</td>
     </tr>
   </tbody>
 </table>
@@ -1143,18 +1221,18 @@ This time we receive all information per standard tile. The standard tiles are i
 
 <a id='data/class/tile'></a>
 ## For standard tiles
-The predefined polygons may vary from map to map, but in each and every map data is aggregated to standard Web Mercator tiles. These tiles can be uniquely identified by their tileX and tileY position.
+The predefined polygons may vary from map to map, but in each and every map data is aggregated to the same standard Web Mercator tiles that cover the globe. These tiles can be uniquely identified by their tileX and tileY position. Using the metadata/tileIds request you can see what tiles are available.
 
-See the /geometry/tile section to learn how to retrieve the geometry of these tiles.
+If we are interested in the geometry of these tiles we can use the /geometry/polygon request discussed in the <a href='#geometry'>**geometry section.**</a>.
 
-There are two requests we can make for standard tiles. First off we can request all availabel tiles for a timestamp
+There are two requests we can make for standard tiles. First off we can request tiles for a timestamp using their id's.
 
-#### data/class/tile/tiles
+#### data/class/tile/tileIds
 
 
 ```python
-r = requests.post(url + '/data/class/tile/tiles',
-                 json = {"mapId":  mapId, 'timestamp':3})
+r = requests.post(url + '/data/class/tile/tileIds',
+                 json = {"mapId":  mapId, 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959},{'tileX':5691,'tileY':7960},{'tileX':5692,'tileY':7959}]})
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -1193,103 +1271,33 @@ r.head(10)
   <tbody>
     <tr>
       <th>0</th>
-      <td>5658</td>
-      <td>7970</td>
-      <td>5.364169</td>
-      <td>0.00000</td>
-      <td>0.273008</td>
-      <td>0.263823</td>
-      <td>5.901</td>
+      <td>5691</td>
+      <td>7959</td>
+      <td>0.0</td>
+      <td>0.096370</td>
+      <td>5.255255</td>
+      <td>0.545375</td>
+      <td>5.897</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>5658</td>
-      <td>7971</td>
-      <td>5.277008</td>
-      <td>0.00000</td>
-      <td>0.170000</td>
-      <td>0.453992</td>
-      <td>5.901</td>
+      <td>5691</td>
+      <td>7960</td>
+      <td>0.0</td>
+      <td>0.587756</td>
+      <td>1.956099</td>
+      <td>3.353145</td>
+      <td>5.897</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>5658</td>
-      <td>7972</td>
-      <td>5.325363</td>
-      <td>0.00000</td>
-      <td>0.000000</td>
-      <td>0.576637</td>
-      <td>5.902</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>5658</td>
-      <td>7973</td>
-      <td>5.372733</td>
-      <td>0.00018</td>
-      <td>0.000000</td>
-      <td>0.529087</td>
-      <td>5.902</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5658</td>
-      <td>7974</td>
-      <td>5.419923</td>
-      <td>0.00000</td>
-      <td>0.000000</td>
-      <td>0.482077</td>
-      <td>5.902</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>5658</td>
-      <td>7975</td>
-      <td>5.468309</td>
-      <td>0.00000</td>
-      <td>0.220948</td>
-      <td>0.213742</td>
-      <td>5.903</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>5658</td>
-      <td>7976</td>
-      <td>5.515688</td>
-      <td>0.00000</td>
-      <td>0.310751</td>
-      <td>0.076562</td>
-      <td>5.903</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>5658</td>
-      <td>7977</td>
-      <td>5.562796</td>
-      <td>0.00000</td>
-      <td>0.202213</td>
-      <td>0.137991</td>
-      <td>5.903</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>5658</td>
-      <td>7978</td>
-      <td>5.611214</td>
-      <td>0.00000</td>
-      <td>0.196482</td>
-      <td>0.096304</td>
-      <td>5.904</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>5658</td>
-      <td>7979</td>
-      <td>5.679501</td>
-      <td>0.00000</td>
-      <td>0.075764</td>
-      <td>0.148735</td>
-      <td>5.904</td>
+      <td>5692</td>
+      <td>7959</td>
+      <td>0.0</td>
+      <td>0.136861</td>
+      <td>3.903199</td>
+      <td>1.856940</td>
+      <td>5.897</td>
     </tr>
   </tbody>
 </table>
@@ -1303,8 +1311,8 @@ Secondly we can request all timestamps for a specific tile
 
 
 ```python
-r = requests.post(url + '/data/class/tile/tiles',
-                 json = {"mapId":  mapId, 'timestamp':3})
+r = requests.post(url + '/data/class/tile/timestamps',
+                 json = {"mapId":  mapId, 'tileX':5658, 'tileY': 7970})
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -1331,115 +1339,126 @@ r.head(10)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>tileX</th>
-      <th>tileY</th>
+      <th>timestamp</th>
       <th>blanc</th>
       <th>disturbance</th>
       <th>mask</th>
       <th>no class</th>
       <th>area</th>
+      <th>date_to</th>
+      <th>date_from</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>5658</td>
-      <td>7970</td>
+      <td>0</td>
       <td>5.364169</td>
-      <td>0.00000</td>
-      <td>0.273008</td>
-      <td>0.263823</td>
+      <td>0.0</td>
+      <td>0.374125</td>
+      <td>0.162706</td>
       <td>5.901</td>
+      <td>2018-01-15</td>
+      <td>2018-01-01</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>5658</td>
-      <td>7971</td>
-      <td>5.277008</td>
-      <td>0.00000</td>
-      <td>0.170000</td>
-      <td>0.453992</td>
+      <td>1</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.273008</td>
+      <td>0.263823</td>
       <td>5.901</td>
+      <td>2018-02-15</td>
+      <td>2018-02-01</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>5658</td>
-      <td>7972</td>
-      <td>5.325363</td>
-      <td>0.00000</td>
-      <td>0.000000</td>
-      <td>0.576637</td>
-      <td>5.902</td>
+      <td>2</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.273008</td>
+      <td>0.263823</td>
+      <td>5.901</td>
+      <td>2018-03-15</td>
+      <td>2018-03-01</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>5658</td>
-      <td>7973</td>
-      <td>5.372733</td>
-      <td>0.00018</td>
-      <td>0.000000</td>
-      <td>0.529087</td>
-      <td>5.902</td>
+      <td>3</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.273008</td>
+      <td>0.263823</td>
+      <td>5.901</td>
+      <td>2018-04-15</td>
+      <td>2018-04-01</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>5658</td>
-      <td>7974</td>
-      <td>5.419923</td>
-      <td>0.00000</td>
-      <td>0.000000</td>
-      <td>0.482077</td>
-      <td>5.902</td>
+      <td>4</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.273008</td>
+      <td>0.263823</td>
+      <td>5.901</td>
+      <td>2018-05-15</td>
+      <td>2018-05-01</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>5658</td>
-      <td>7975</td>
-      <td>5.468309</td>
-      <td>0.00000</td>
-      <td>0.220948</td>
-      <td>0.213742</td>
-      <td>5.903</td>
+      <td>5</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.273008</td>
+      <td>0.263823</td>
+      <td>5.901</td>
+      <td>2018-06-15</td>
+      <td>2018-06-01</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>5658</td>
-      <td>7976</td>
-      <td>5.515688</td>
-      <td>0.00000</td>
-      <td>0.310751</td>
-      <td>0.076562</td>
-      <td>5.903</td>
+      <td>6</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.536831</td>
+      <td>5.901</td>
+      <td>2018-07-15</td>
+      <td>2018-07-01</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>5658</td>
-      <td>7977</td>
-      <td>5.562796</td>
-      <td>0.00000</td>
-      <td>0.202213</td>
-      <td>0.137991</td>
-      <td>5.903</td>
+      <td>7</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.536831</td>
+      <td>5.901</td>
+      <td>2018-08-15</td>
+      <td>2018-08-01</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>5658</td>
-      <td>7978</td>
-      <td>5.611214</td>
-      <td>0.00000</td>
-      <td>0.196482</td>
-      <td>0.096304</td>
-      <td>5.904</td>
+      <td>8</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.536831</td>
+      <td>5.901</td>
+      <td>2018-09-15</td>
+      <td>2018-09-01</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>5658</td>
-      <td>7979</td>
-      <td>5.679501</td>
-      <td>0.00000</td>
-      <td>0.075764</td>
-      <td>0.148735</td>
-      <td>5.904</td>
+      <td>9</td>
+      <td>5.364169</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.536831</td>
+      <td>5.901</td>
+      <td>2018-10-15</td>
+      <td>2018-10-01</td>
     </tr>
   </tbody>
 </table>
@@ -1448,17 +1467,17 @@ r.head(10)
 
 
 <a id='data/index'></a>
-## For data of indices
-In the same way as for the classes we can obtain data for the indices based on custom polygons, predefined polygons or standard tiles. The situation this time is however a little bit more nuanced. An aggregated index is always the mean index of all pixels of a certain class that were not covered by clouds.
+## For data of spectral indices
+In the same way as for the classes we can obtain data concerning spectral indices based on custom polygons, predefined polygons or standard tiles. The situation this time is however a little bit more nuanced. An aggregated spectral index is always the mean spectral index of all pixels of a certain land cover class within a given geometry that were not covered by clouds.
 
 For this reason you always need to specify the class over which you want to have the mean spectral indices. (For example you can restrict to the class forest or agriculture). In some maps indices are not save per class, in this case you should specify the class parameters as 'all classes'.
 
-As all clouded pixels are simply discarded there is always a cloudcover column present that represtents the percentatge of pixels that was not visible.
+As all clouded pixels are simply discarded there is always a cloudcover column in the table that represtents the percentatge of pixels that have been left out.
 
 <a id='data/index/custom'></a>
 ### For a custom polygon
 
-We we start out with specifying some polygon that we might be interested in.
+We start out with specifying some polygon that we might be interested in.
 
 
 ```python
@@ -1504,6 +1523,8 @@ r.head(10)
       <th>NDWI</th>
       <th>cloud_cover</th>
       <th>area</th>
+      <th>date_from</th>
+      <th>date_to</th>
     </tr>
   </thead>
   <tbody>
@@ -1514,6 +1535,8 @@ r.head(10)
       <td>0.478672</td>
       <td>0.852675</td>
       <td>1542.664</td>
+      <td>2018-01-01</td>
+      <td>2018-01-15</td>
     </tr>
     <tr>
       <th>1</th>
@@ -1522,6 +1545,8 @@ r.head(10)
       <td>0.469612</td>
       <td>0.683103</td>
       <td>1542.664</td>
+      <td>2018-02-01</td>
+      <td>2018-02-15</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1530,6 +1555,8 @@ r.head(10)
       <td>0.218599</td>
       <td>0.898113</td>
       <td>1542.664</td>
+      <td>2018-03-01</td>
+      <td>2018-03-15</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1538,6 +1565,8 @@ r.head(10)
       <td>-0.007053</td>
       <td>0.992451</td>
       <td>1542.664</td>
+      <td>2018-04-01</td>
+      <td>2018-04-15</td>
     </tr>
     <tr>
       <th>4</th>
@@ -1546,6 +1575,8 @@ r.head(10)
       <td>0.092783</td>
       <td>0.936130</td>
       <td>1542.664</td>
+      <td>2018-05-01</td>
+      <td>2018-05-15</td>
     </tr>
     <tr>
       <th>5</th>
@@ -1554,6 +1585,8 @@ r.head(10)
       <td>0.177563</td>
       <td>0.877889</td>
       <td>1542.664</td>
+      <td>2018-06-01</td>
+      <td>2018-06-15</td>
     </tr>
     <tr>
       <th>6</th>
@@ -1562,6 +1595,8 @@ r.head(10)
       <td>0.413940</td>
       <td>0.403466</td>
       <td>1542.664</td>
+      <td>2018-07-01</td>
+      <td>2018-07-15</td>
     </tr>
     <tr>
       <th>7</th>
@@ -1570,6 +1605,8 @@ r.head(10)
       <td>0.388528</td>
       <td>0.387444</td>
       <td>1542.664</td>
+      <td>2018-08-01</td>
+      <td>2018-08-15</td>
     </tr>
     <tr>
       <th>8</th>
@@ -1578,6 +1615,8 @@ r.head(10)
       <td>0.437617</td>
       <td>0.219172</td>
       <td>1542.664</td>
+      <td>2018-09-01</td>
+      <td>2018-09-15</td>
     </tr>
     <tr>
       <th>9</th>
@@ -1586,6 +1625,8 @@ r.head(10)
       <td>0.372065</td>
       <td>0.130757</td>
       <td>1542.664</td>
+      <td>2018-10-01</td>
+      <td>2018-10-15</td>
     </tr>
   </tbody>
 </table>
@@ -1735,20 +1776,19 @@ r.head(10)
 <a id='data/index/polygon'></a>
 ### For predefined polygons
 
-Similar to the case of the classes there are three requests we can make in case of predefine polygons.
+Similar to the case of the classes there are three requests we can make in case of predefined polygons.
 
-See the /geometry/polygon section to learn how you can retrieve the geometry of these predefined polygons.
+Again see <a href='#geometry'>**geometry section**</a> in case you would like to retrieve the geometries of these polygons. 
 
-Let's start with requesting all spectral indices for all polygons in a certain timestamp.
-#### data/spectral/polygon/polygons
+Let's start with requesting all spectral indices for some polygons at a certain timestamp.
+#### data/spectral/polygon/polygonIds
 
 
 ```python
-r = requests.post(url + '/data/spectral/polygon/polygons',
-                 json = {"mapId":  mapId, 'timestamp': 1, 'layer': 'Mine', 'class': 'disturbance'})
-
+r = requests.post(url + '/data/spectral/polygon/polygonIds',
+                 json = {"mapId":  mapId, 'timestamp':1, 'polygonIds': [1,5,4], 'class': 'disturbance' })
 r = pd.read_csv(StringIO(r.text))
-r.head(10)
+r
 ```
 
 
@@ -1772,11 +1812,9 @@ r.head(10)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>polygon</th>
+      <th>id</th>
       <th>NDVI</th>
       <th>NDWI</th>
-      <th>layer</th>
-      <th>name</th>
       <th>cloud_cover</th>
       <th>area</th>
     </tr>
@@ -1787,70 +1825,24 @@ r.head(10)
       <td>1</td>
       <td>0.989887</td>
       <td>0.505977</td>
-      <td>Mine</td>
-      <td>Mine1</td>
       <td>0.529641</td>
       <td>38.658</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
-      <td>1.000000</td>
-      <td>0.309390</td>
-      <td>Mine</td>
-      <td>Mine2</td>
-      <td>0.495851</td>
-      <td>5.312</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>0.998866</td>
-      <td>0.491174</td>
-      <td>Mine</td>
-      <td>Mine3</td>
-      <td>0.311504</td>
-      <td>9.955</td>
-    </tr>
-    <tr>
-      <th>3</th>
       <td>4</td>
       <td>0.995728</td>
       <td>0.468509</td>
-      <td>Mine</td>
-      <td>Mine4</td>
       <td>0.593817</td>
       <td>39.235</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>2</th>
       <td>5</td>
       <td>1.000000</td>
       <td>0.632000</td>
-      <td>Mine</td>
-      <td>Mine5</td>
       <td>0.120000</td>
       <td>0.778</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>6</td>
-      <td>0.984245</td>
-      <td>0.429537</td>
-      <td>Mine</td>
-      <td>Mine6</td>
-      <td>0.622045</td>
-      <td>43.794</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>7</td>
-      <td>0.960538</td>
-      <td>0.330776</td>
-      <td>Mine</td>
-      <td>Mine7</td>
-      <td>0.777421</td>
-      <td>200.513</td>
     </tr>
   </tbody>
 </table>
@@ -1897,6 +1889,8 @@ r.head(10)
       <th>NDWI</th>
       <th>cloud_cover</th>
       <th>area</th>
+      <th>date_from</th>
+      <th>date_to</th>
     </tr>
   </thead>
   <tbody>
@@ -1907,6 +1901,8 @@ r.head(10)
       <td>0.330398</td>
       <td>0.905335</td>
       <td>39.235</td>
+      <td>2018-01-01</td>
+      <td>2018-01-15</td>
     </tr>
     <tr>
       <th>1</th>
@@ -1915,6 +1911,8 @@ r.head(10)
       <td>0.468509</td>
       <td>0.593817</td>
       <td>39.235</td>
+      <td>2018-02-01</td>
+      <td>2018-02-15</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1923,6 +1921,8 @@ r.head(10)
       <td>0.000000</td>
       <td>0.996004</td>
       <td>39.235</td>
+      <td>2018-03-01</td>
+      <td>2018-03-15</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1931,6 +1931,8 @@ r.head(10)
       <td>0.000000</td>
       <td>1.000000</td>
       <td>39.235</td>
+      <td>2018-04-01</td>
+      <td>2018-04-15</td>
     </tr>
     <tr>
       <th>4</th>
@@ -1939,6 +1941,8 @@ r.head(10)
       <td>0.000000</td>
       <td>1.000000</td>
       <td>39.235</td>
+      <td>2018-05-01</td>
+      <td>2018-05-15</td>
     </tr>
     <tr>
       <th>5</th>
@@ -1947,6 +1951,8 @@ r.head(10)
       <td>0.231363</td>
       <td>0.660828</td>
       <td>39.235</td>
+      <td>2018-06-01</td>
+      <td>2018-06-15</td>
     </tr>
     <tr>
       <th>6</th>
@@ -1955,6 +1961,8 @@ r.head(10)
       <td>0.403357</td>
       <td>0.053883</td>
       <td>39.235</td>
+      <td>2018-07-01</td>
+      <td>2018-07-15</td>
     </tr>
     <tr>
       <th>7</th>
@@ -1963,6 +1971,8 @@ r.head(10)
       <td>0.363662</td>
       <td>0.038336</td>
       <td>39.235</td>
+      <td>2018-08-01</td>
+      <td>2018-08-15</td>
     </tr>
     <tr>
       <th>8</th>
@@ -1971,6 +1981,8 @@ r.head(10)
       <td>0.408166</td>
       <td>0.003560</td>
       <td>39.235</td>
+      <td>2018-09-01</td>
+      <td>2018-09-15</td>
     </tr>
     <tr>
       <th>9</th>
@@ -1979,6 +1991,8 @@ r.head(10)
       <td>0.339575</td>
       <td>0.039668</td>
       <td>39.235</td>
+      <td>2018-10-01</td>
+      <td>2018-10-15</td>
     </tr>
   </tbody>
 </table>
@@ -2067,17 +2081,17 @@ Only the section of the tile intersected with the field is considered. For this 
 
 <a id='data/index/tile'></a>
 ### For standard tiles
-Predefined polygons can vary from map to map. But data is always aggregated to standard Web Mercator tiles. 
+Predefined polygons can vary from map to map. But data is always aggregated to the same standard Web Mercator tiles. 
 
-In case you are intersted in the geometry of these tiles, have a look at the /geometry/tile section.
+In case you are intersted in the geometry of these tiles, have a look at the <a href='#geometry'>**geometry section.**</a>.
 
 There are two queries available to retrieve data about these tiles. First off we can simply request all tiles for a certain timestamp.
-#### data/spectral/tile/tiles
+#### data/spectral/tile/tileIds
 
 
 ```python
-r = requests.post(url + '/data/spectral/tile/tiles',
-                 json = {"mapId":  mapId, 'timestamp':1, 'class': 'disturbance' })
+r = requests.post(url + '/data/spectral/tile/tileIds',
+                 json = {"mapId":  mapId,  'class': 'disturbance', 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959},{'tileX':5691,'tileY':7960},{'tileX':5692,'tileY':7959}]})
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -2115,93 +2129,30 @@ r.head(10)
   <tbody>
     <tr>
       <th>0</th>
-      <td>5659</td>
-      <td>7974</td>
-      <td>1.0</td>
-      <td>0.660</td>
-      <td>0.24</td>
-      <td>5.902</td>
+      <td>5691</td>
+      <td>7959</td>
+      <td>0.828</td>
+      <td>0.455</td>
+      <td>0.98</td>
+      <td>5.897</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>5659</td>
-      <td>7990</td>
-      <td>1.0</td>
-      <td>0.592</td>
-      <td>0.75</td>
-      <td>5.908</td>
+      <td>5691</td>
+      <td>7960</td>
+      <td>1.000</td>
+      <td>0.364</td>
+      <td>0.97</td>
+      <td>5.897</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>5659</td>
-      <td>7991</td>
-      <td>1.0</td>
-      <td>0.766</td>
-      <td>0.83</td>
-      <td>5.908</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>5659</td>
-      <td>7996</td>
-      <td>1.0</td>
-      <td>0.842</td>
-      <td>0.55</td>
-      <td>4.411</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5660</td>
-      <td>7990</td>
-      <td>1.0</td>
-      <td>0.634</td>
-      <td>0.10</td>
-      <td>5.908</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>5660</td>
-      <td>7991</td>
-      <td>1.0</td>
-      <td>0.660</td>
-      <td>0.84</td>
-      <td>5.908</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>5660</td>
-      <td>7969</td>
-      <td>1.0</td>
-      <td>0.393</td>
-      <td>0.09</td>
-      <td>4.640</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>5660</td>
-      <td>7970</td>
-      <td>1.0</td>
-      <td>0.506</td>
-      <td>0.41</td>
-      <td>5.901</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>5660</td>
-      <td>7971</td>
-      <td>1.0</td>
-      <td>0.443</td>
-      <td>0.68</td>
-      <td>5.901</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>5660</td>
-      <td>7972</td>
-      <td>1.0</td>
-      <td>0.741</td>
-      <td>0.68</td>
-      <td>5.902</td>
+      <td>5692</td>
+      <td>7959</td>
+      <td>1.000</td>
+      <td>0.648</td>
+      <td>0.92</td>
+      <td>5.897</td>
     </tr>
   </tbody>
 </table>
@@ -2246,6 +2197,8 @@ r.head(10)
       <th>NDVI</th>
       <th>NDWI</th>
       <th>area</th>
+      <th>date_from</th>
+      <th>date_to</th>
     </tr>
   </thead>
   <tbody>
@@ -2255,69 +2208,44 @@ r.head(10)
       <td>1.0</td>
       <td>0.660</td>
       <td>5.902</td>
+      <td>2018-02-01</td>
+      <td>2018-02-15</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1</td>
+      <td>2</td>
       <td>1.0</td>
-      <td>0.660</td>
+      <td>0.659</td>
       <td>5.902</td>
+      <td>2018-03-01</td>
+      <td>2018-03-15</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
+      <td>7</td>
       <td>1.0</td>
-      <td>0.659</td>
+      <td>0.569</td>
       <td>5.902</td>
+      <td>2018-08-01</td>
+      <td>2018-08-15</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>2</td>
+      <td>9</td>
       <td>1.0</td>
-      <td>0.659</td>
+      <td>0.511</td>
       <td>5.902</td>
+      <td>2018-10-01</td>
+      <td>2018-10-15</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>7</td>
-      <td>1.0</td>
-      <td>0.569</td>
-      <td>5.902</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>7</td>
-      <td>1.0</td>
-      <td>0.569</td>
-      <td>5.902</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>9</td>
-      <td>1.0</td>
-      <td>0.511</td>
-      <td>5.902</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>9</td>
-      <td>1.0</td>
-      <td>0.511</td>
-      <td>5.902</td>
-    </tr>
-    <tr>
-      <th>8</th>
       <td>10</td>
       <td>1.0</td>
       <td>0.506</td>
       <td>5.902</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>10</td>
-      <td>1.0</td>
-      <td>0.506</td>
-      <td>5.902</td>
+      <td>2018-11-01</td>
+      <td>2018-11-15</td>
     </tr>
   </tbody>
 </table>
@@ -2327,107 +2255,15 @@ r.head(10)
 
 <a id='geometry'></a>
 # Acquiring geometries
-As we saw in the above data is aggregated to predefined polygons and standard tiles. It is of course helpfull to have the geometries of these polygons and tiles. For this reason the Ellipsis API suports three ways of obtaining these geometries. You can either request all geometries, all geometries in a certain bounding box or all geometries by id.
+In the previous section we saw how we could retrieve data aggregated to predefined polygons and standard tiles. Of course it is also important to know the geometries of these polygons and tiles. These geometries can be requested using a list of id's. The geometries are always returend as GeoJSON.
 
-Geometries are always returend as GeoJSON.
-
-<a id='geometry/polygon'></a>
-## Geometries for predefined polygons
-
-The most straightforeward thing we could do is of course downloading all polygons of a certian layer. We saw in the metadata requests that our current map has the polygon layers 'reserve' and mine. Let's retrieve all polygons of type 'mine'.
-
-#### geometry/polygon/all
+We can request the geometries and features of predefined polygons as follows.
+#### geometry/polygons
 
 
 ```python
-r = requests.post(url + '/geometry/polygon/all',
-                 json = {"mapId":  mapId,'layer': 'Mine', 'timestamp':0})
-
-r  = gpd.GeoDataFrame.from_features(r.json()['features'])
-r.plot()
-r.head(5)
-```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>geometry</th>
-      <th>id</th>
-      <th>layer</th>
-      <th>name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>POLYGON Z ((-54.65552 4.889224 0, -54.6505432 ...</td>
-      <td>1</td>
-      <td>Mine</td>
-      <td>Mine1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>POLYGON Z ((-54.82143 5.1544714 0, -54.81791 5...</td>
-      <td>2</td>
-      <td>Mine</td>
-      <td>Mine2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>POLYGON Z ((-54.9401321 5.098449 0, -54.92769 ...</td>
-      <td>3</td>
-      <td>Mine</td>
-      <td>Mine3</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>POLYGON Z ((-54.7134552 4.375063 0, -54.74607 ...</td>
-      <td>4</td>
-      <td>Mine</td>
-      <td>Mine4</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>POLYGON Z ((-55.40319 4.38190937 0, -55.400444...</td>
-      <td>5</td>
-      <td>Mine</td>
-      <td>Mine5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-![png](output_103_1.png)
-
-
-In case we want to retrieve specific polygons we can also request them by id.
-#### geometry/polygon/ids
-
-
-```python
-r = requests.post(url + '/geometry/polygon/ids',
-                 json = {"mapId":  mapId, 'polygonIds':[1,2], 'timestamp':0})
+r = requests.post(url + '/geometry/polygons',
+                 json = {"mapId":  mapId, 'polygonIds':[1,2]})
 
 r  = gpd.GeoDataFrame.from_features(r.json()['features'])
 r.plot()
@@ -2483,105 +2319,16 @@ r.head(5)
 
 
 
-![png](output_105_1.png)
+![png](output_115_1.png)
 
 
-Lastly we can request all polygons that are within a certain bounding box. As we cannot on forehand now how many polygons we will get as a response it might be wise to first probe how many polygons are contained in a certain bounding box. For this we can use the polygonsCount request.
-#### metadata/polygonsCount
-
-
-```python
-r = requests.post(url + '/metadata/polygonsCount',
-                 json = {"mapId":  mapId, 'timestamp': 0, 'layer': 'Mine' , 'xMin': -55 ,'xMax':-53, 'yMin':4, 'yMax':5 })
-
-r = r.json()
-r
-```
-
-
-
-
-    {'count': 2}
-
-
-
-Well just two polygons is nothing to worry about. So let's request all polygons withing this bounding boxe then!
-#### geometry/polygon/bounds
+We can request standard tiles by specifying their tileX and tileY coordinates.
+#### geometry/tiles
 
 
 ```python
-r = requests.post(url + '/geometry/polygon/bounds',
-                 json = {"mapId":  mapId, 'timestamp': 0, 'layer': 'Mine' , 'xMin': -55 ,'xMax':-53, 'yMin':4, 'yMax':5 })
-
-r  = gpd.GeoDataFrame.from_features(r.json()['features'])
-r.plot()
-r.head(5)
-```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>geometry</th>
-      <th>id</th>
-      <th>layer</th>
-      <th>name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>POLYGON Z ((-54.7134552 4.375063 0, -54.74607 ...</td>
-      <td>4</td>
-      <td>Mine</td>
-      <td>Mine4</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>POLYGON Z ((-54.65552 4.889224 0, -54.6505432 ...</td>
-      <td>1</td>
-      <td>Mine</td>
-      <td>Mine1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-![png](output_109_1.png)
-
-
-<a id='geometry/tile'></a>
-## Geometries for standard tiles
-In the same way as for the predefined polygons we can request the geometries of predefined polygons.
-
-We start by simply requesting all tiles of the map.
-
-#### geometry/tiles/all
-
-
-```python
-r = requests.post(url + '/geometry/tile/all',
-                 json = {"mapId":  mapId,'layer': 'Mine', 'timestamp':0})
+r = requests.post(url + '/geometry/tiles',
+                 json = {"mapId":  mapId, 'tileIds':[{'tileX':5704,'tileY':7971}, {'tileX':5705,'tileY':7973}]})
 
 r  = gpd.GeoDataFrame.from_features(r.json()['features'])
 r.plot()
@@ -2590,89 +2337,21 @@ r.plot()
 
 
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f6ffbe090b8>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f4228ebb1d0>
 
 
 
 
-![png](output_112_1.png)
-
-
-Secondly we can request standart tiles by specifying their tileX and tileY coordinates.
-#### geometry/tiles/ids
-
-
-```python
-r = requests.post(url + '/geometry/tile/ids',
-                 json = {"mapId":  mapId, 'tileIds':[{'tileX':5704,'tileY':7971}, {'tileX':5705,'tileY':7973}], 'timestamp':0})
-
-r  = gpd.GeoDataFrame.from_features(r.json()['features'])
-r.plot()
-```
-
-
-
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f6ffb8ea6a0>
-
-
-
-
-![png](output_114_1.png)
-
-
-Laslty we request all tiles within a certain bounding box.
-
-First we probe how many tiles we are dealing with.
-#### metadata/tilesCount
-
-
-```python
-r = requests.post(url + '/metadata/tilesCount',
-                 json = {"mapId":  mapId, 'timestamp': 0, 'xMin': -55 ,'xMax':-53, 'yMin':4, 'yMax':5 })
-
-r = r.json()
-r
-```
-
-
-
-
-    {'count': 916}
-
-
-
-916 is not too band, let's request them.
-#### geometry/tiles/bounds
-
-
-```python
-r = requests.post(url + '/geometry/tile/bounds',
-                 json = {"mapId":  mapId, 'timestamp': 0 , 'xMin': -55 ,'xMax':-53, 'yMin':4, 'yMax':5 })
-
-r  = gpd.GeoDataFrame.from_features(r.json()['features'])
-r.plot()
-
-```
-
-
-
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f6ffb8fb4a8>
-
-
-
-
-![png](output_118_1.png)
+![png](output_117_1.png)
 
 
 <a id='visual'></a>
 # Acquiring visualisations
 
-Aside from data we of course would also like to retrieve visualisations. We can obtain these visualisations for all tile layers that we found in the metadata section.
+Aside from raw data it is of course also handy to have visualisations. We can obtain these visualisations for all tile layers that we found in the metadata section.
 
 It is very easy to obtain an image of an area. You can simply specify the boudning box coordinates of your area of interest, the timerange over which you want to mosaic and the layer that you want to visualise.
-#### visual
+#### visual/bounds
 
 
 ```python
@@ -2687,14 +2366,16 @@ plt.imshow(img)
 
 
 
-    <matplotlib.image.AxesImage at 0x7f6ffbdff1d0>
+    <matplotlib.image.AxesImage at 0x7fddd3875240>
 
 
 
 
-![png](output_121_1.png)
+![png](output_120_1.png)
 
 
-The API always makes sure that the returned image is addapted to you level of zoom. It prevents the largest dimension of your image to get larger then 1024 pixels.
+The API always makes sure that the resolution of the returned image is addapted to your level of zoom. It prevents the largest dimension of your image to be over 2048 pixels.
 
-The API mosaics the images from more recent to less recent. In case no cloudless footage is found that area of the map will render as blanc.
+A response image is in PNG format and has four channels. Red, green, blue and transperant.
+
+The API mosaics the images from more recent to less recent. In case no cloudless footage is found that area of the map will rendered as transparent.
