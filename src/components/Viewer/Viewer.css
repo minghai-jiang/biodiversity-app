@@ -34,7 +34,7 @@ div.content {
   position: absolute;
   width: 100%;
   text-align: center;
-  z-index: 999;
+  z-index: 650;
   top: 40px;
 }
 
@@ -112,11 +112,11 @@ div.content {
   text-align: left
 }
 
-.leaflet-control-layers-expanded
+/*.leaflet-control-layers-expanded
 {
   min-height: 48px;
   min-width: 48px;
-}
+}*/
 
 div.viewer-button {
   position: absolute;

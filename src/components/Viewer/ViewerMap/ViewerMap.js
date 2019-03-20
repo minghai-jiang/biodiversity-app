@@ -16,6 +16,8 @@ import {
 import L from "leaflet";
 import "leaflet-draw";
 
+import {Portal} from "react-leaflet-portal";
+
 import "./ViewerMap.css";
 import PopupForm from '../../Popup-form/Popup-form';
 const QueryUtil = require('../../Utilities/QueryUtil').default;
@@ -170,9 +172,9 @@ export class ViewerMap extends PureComponent {
               attribution={mapParams.attribution}
               format={mapParams.format}
               zIndex={tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1)}
-              key={j}
+              key={timestampNumber + '.' + j}
               errorTileUrl={props.publicFilesUrl + 'images/dummy_tile.png'}
-              // bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
+              bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
             />)
           });
         })
@@ -277,6 +279,8 @@ export class ViewerMap extends PureComponent {
     }
     else {
       return {
+        name: layerName,
+        color: layerColor,
         count: polygonIdResult.count
       };
     }
@@ -343,7 +347,7 @@ export class ViewerMap extends PureComponent {
     
     //Draw items
     this.createDrawButton(map, {polygon: {allowIntersection: false }});
-    this.createDrawButton(map, {rectangle: true});
+    // this.createDrawButton(map, {rectangle: true});
   }
 
   onShapeDrawnClosure(drawnItems) {
@@ -428,7 +432,7 @@ export class ViewerMap extends PureComponent {
 
         controlOverlays.push(
           <LayersControl.Overlay name={layerName} key={map.name + layerName} checked={this.state.checkedLayers.includes(layerName)}>
-            <LayerGroup name={layerName}>
+            <LayerGroup name={layerName} key={layerName}>
               {layerElements}
             </LayerGroup>
           </LayersControl.Overlay>
@@ -464,10 +468,6 @@ export class ViewerMap extends PureComponent {
             zIndex={1000}
           />
       }
-      else
-      {
-        polygonCount += layerGeoJsons[i].count;
-      }
 
       let checked = this.state.checkedLayers.includes(layerGeoJsons[i].name);
 
@@ -487,33 +487,88 @@ export class ViewerMap extends PureComponent {
       layers.push(layer);
     }
 
-    if(polygonCount !== 0)
+    if (layers.length > 0)
     {
-      let bounds = L.latLngBounds(
-            L.latLng(map.yMin, map.xMin),
-            L.latLng(map.yMax, map.xMax)
-          );
-
-      let style = '"' +
-        'background-color: #02646433; ' +
-        'border-radius: 50%; ' +
-        'border: 2px solid #026464;"';
-
-      let icon = L.divIcon(
-      {
-        html: '<div style='+ style +'>'+
-            polygonCount +
-          '</div>',
-        iconSize: [50, 50],
-        iconAnchor: [0, 0],
-        popupAnchor: [0, 0],
-        className: 'polygonCircle'
-      });
-      
-      let marker = <Marker position={bounds.getCenter()} icon={icon} style={''} zIndex={2000}/>
-      layers.push(marker);
+      return (<LayersControl position="topright">{layers}</LayersControl>);
     }
-    return layers;
+    else
+    {
+      return null;
+    }
+  }
+
+  getLegend = () => {
+    let map = this.props.map;
+    let legend = [];
+    let timestamp = this.props.timestampRange
+
+    if (!map || !timestamp) {
+      return null;
+    }
+
+    function reuseLoop(type)
+    {
+      let type2 = '';
+      let name = '';
+      if(type === 'polygon')
+      {
+        type = 'polygonLayers';
+        type2 = 'layers';
+      }
+      else
+      {
+        type2 = type;
+        name = type[0].toUpperCase() + type.substr(1);;
+      }
+
+      if (type && map[type] !== undefined)
+      {
+        if (map[type].length > 0)
+        {
+          if(name !== '')
+          {
+            legend.push(<h2 key={type + 'Header'}>{name}</h2>);
+          } 
+
+          for (let i = 0; i < map[type].length; i++)
+          {
+            if(map[type][i].timestampNumber === timestamp.end)
+            {
+              if (map[type][i][type2])
+              {
+                for (let j = 0; j < map[type][i][type2].length; j++)
+                {
+                  if (map[type][i][type2][j].name !== 'no class' && map[type][i][type2][j].name !== 'blanc' && map[type][i][type2][j].name !== 'mask')
+                  {
+                    let style = {background: '#'+map[type][i][type2][j].color};
+                    legend.push(<p key={type + i + j}><i key={i} style={style}></i>{map[type][i][type2][j].name}</p>)
+                  }
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    //Classes
+    if (map.classes.length > 0 || map.spectral.length > 0)
+    {
+      legend.push(<h1 key='tileLayerHeader'>Tile Layers</h1>);
+      reuseLoop('classes');
+    }
+
+    
+    //Polygon Layers
+    if (map.polygonLayers.length > 0)
+    {
+      legend.push(<h1 key='PolygonLayerHeader'>Polygon Layers</h1>);
+      reuseLoop('polygon');
+    }
+
+
+    return (<div className='leaflet-control-layers legend' key='legendContainer'>{legend}</div>);
   }
 
   onEachFeature = (feature, layer) => {
@@ -548,9 +603,10 @@ export class ViewerMap extends PureComponent {
             </LayersControl.Overlay>
             { this.renderTileLayers() }
           </LayersControl>
-          <LayersControl position="topright">
-            { this.createGeojsonLayerControl() }
-          </LayersControl>
+          { this.createGeojsonLayerControl() }
+          <Portal position="bottomright">
+            { this.getLegend() }
+          </Portal>
         </Map>
         <PopupForm props={this.state.popupProps} />
       </div>

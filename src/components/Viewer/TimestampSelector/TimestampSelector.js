@@ -1,10 +1,14 @@
 import React, { PureComponent} from 'react';
-import $ from 'jquery';
+import Slider from 'rc-slider';
 import Moment from 'moment';
-import 'jquery-ui/ui/widgets/slider';
 
-import 'jquery-ui/themes/base/all.css'
+import 'rc-slider/assets/index.css';
+import 'rc-tooltip/assets/bootstrap.css'; //<--- Nodig?
 import './TimestampSelector.css';
+
+const createSliderWithTooltip = Slider.createSliderWithTooltip;
+const Range = createSliderWithTooltip(Slider.Range);
+var marks = {};
 
 export class TimestampSelector extends PureComponent {
   constructor(props, context) {
@@ -15,90 +19,57 @@ export class TimestampSelector extends PureComponent {
     };
   }
 
-  componentDidMount = () => {
-    this.renderSlider();
-  }
-
-  renderSlider = () => {
-    let timestamps = this.props.timestamps;
-    if (timestamps) {
-      let max = timestamps.length - 1;
-      if (!max || max < 0) {
-        max = 0;
-      }
-  
-      $('#slider').slider({
-        range: true,
-        min: 0,
-        max: max,
-        values: [this.state.start, this.state.end],
-        step: 1,
-        slide: this.onSlide
-      });
-  
-      var startTimestamp = timestamps[this.state.start];
-      var endTimestamp = timestamps[this.state.end];
-      var dateRangeText = '';    
-  
-      if (startTimestamp && endTimestamp) {
-        let dateFormat = 'MMM Do YYYY';
-  
-        dateRangeText = 
-          Moment(startTimestamp.dateFrom).format(dateFormat) + 
-          ' - ' + 
-          Moment(endTimestamp.dateFrom).format(dateFormat);
-      }
-  
-      let sliderDateElement = $('#slider-date');
-  
-      if (dateRangeText === '') {
-        sliderDateElement.hide();
-      }
-      else {
-        sliderDateElement.show();
-        sliderDateElement.text(dateRangeText);
-      }
-    }
-  }
-
   componentWillReceiveProps = (nextProps) => {
-    if (this.props.timestamps !== nextProps.timestamps) {
-      this.setState({
-        start: 0,
-        end: 0,
-      },
-      () => { this.renderSlider(); });
+    if (this.props.timestamps !== nextProps.timestamps)
+    {
+      this.setState({ start: 0, end: 0 });
     }
   }
 
-  onSlide = (event, ui) => {
-    this.setState({
-      start: ui.values[0],
-      end: ui.values[1]
-    },
-    () => { 
-      this.renderSlider();
-      this.props.onSlide(this.state.start, this.state.end); 
+  handleChange = (value) => {
+    this.setState({start: value[0], end: value[1]}, () => {
+      this.props.onSlide(this.state.start, this.state.end);
+    });
+  }
+
+  getMarks = () => {
+    let timestamps = this.props.timestamps;
+    let dateFormat = 'MMM Do YYYY';
+    
+    for (let i = 0; i < timestamps.length; i++)
+    {
+      marks[timestamps[i].timestampNumber] = Moment(timestamps[i].dateFrom).format(dateFormat);
     }
-    );
   }
 
   render() {
-    if (this.props.timestamps) {
+    console.log(this.state)
+    
+    if (this.props.timestamps)
+    {
+      let timestamps = this.props.timestamps;
+      let style = {width: '50%', margin: 'auto', marginTop: '1em'}
+
+      this.getMarks();
+
       return (
-        <div>
-          <div id='slider'></div>
-          <div id='slider-date-div'>
-            <span id='slider-date'>Date</span>
-          </div>
-        </div>
-      )
+      <div style={style}>
+        <Range
+          key='range'
+          dots={false}
+          step={1}
+          defaultValue={[this.state.start, this.state.end]}
+          value={[this.state.start, this.state.end]}
+          min={0}
+          max={timestamps.length - 1}
+          onChange={this.handleChange}
+          tipFormatter={value => marks[value]}
+        />
+      </div>);
     }
-    else {
-      return (
-        <div>
-        </div>
-      )
+    else
+    {
+      return <div></div>
     }
   }
 }

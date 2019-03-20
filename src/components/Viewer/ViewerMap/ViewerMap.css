@@ -23,3 +23,44 @@
 	height: 100%;
 	width: 100%;
 }
+
+.leaflet-bottom
+{
+  z-index: 999;
+}
+
+.legend
+{
+  padding: 1em;
+  background: #ffffffbf;
+  z-index: 800;
+}
+
+.legend i
+{
+  height: 18px;
+  width: 18px;
+  border: 1px solid black;
+  display: inline-block;
+  margin-right: 0.5em;
+}
+
+.legend h1
+{
+  font-size: 14pt;
+  margin: 0;
+}
+
+.legend h2
+{
+  font-size: 12pt;
+  margin: 0;
+}
+
+.legend p
+{
+  font-size: 12pt;
+  margin: 0.2em ;
+  height: 18px;
+  display: block;
+}

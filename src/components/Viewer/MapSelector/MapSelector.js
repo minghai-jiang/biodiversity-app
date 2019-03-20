@@ -62,6 +62,8 @@ export class MapSelector extends PureComponent {
   getMapLayers = async (map) => {
     let tileLayersPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/tileLayers', {"mapId":  map.uuid });
     let polygonLayersPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/polygonLayers', {"mapId":  map.uuid });
+    let classPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/classes', {"mapId":  map.uuid });
+    let spectralPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/spectral', {"mapId":  map.uuid });
 
     let responseJsonTileLayers = await tileLayersPromise;
 
@@ -91,9 +93,13 @@ export class MapSelector extends PureComponent {
     });
 
     let responseJsonPolygonLayers = await polygonLayersPromise;
+    let responseClasses = await classPromise;
+    let responseSpectral = await spectralPromise;
 
     map.tileLayers = tileLayers;
     map.polygonLayers = responseJsonPolygonLayers;
+    map.classes = responseClasses;
+    map.spectral = responseSpectral;
   };
 
   renderMapOptions = () => {
