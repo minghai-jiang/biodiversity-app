@@ -33,3 +33,4 @@ src/components/products/products-documentation/products-documentation - Copy.js
 
 build.tar
 src/components/Viewer/TimestampSelector/TimestampSelector - Copy.js
+src/components/Viewer/ViewerMap/ViewerMap - copy.js

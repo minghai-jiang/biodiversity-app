@@ -43,7 +43,6 @@ export class TimestampSelector extends PureComponent {
   }
 
   render() {
-    console.log(this.state)
     
     if (this.props.timestamps)
     {

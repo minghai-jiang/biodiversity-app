@@ -1,5 +1,14 @@
-.map-selector {
-    font-size: 1em;
-    height: 3.5vh;
-    width: 15vw;
+.map-selector
+{
+	font-size: 0.8em;
+	height: 4.5vh;
+	width: 30vw;
+	opacity: 1;
+  	-webkit-transition: opacity 0.25s; /* Safari */
+  	transition: opacity 0.25s;
+}
+
+.map-selector:hover, .map-selector:active, .map-selector:focus
+{
+	opacity: 1;
 }

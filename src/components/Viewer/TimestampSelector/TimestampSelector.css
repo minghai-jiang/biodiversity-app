@@ -33,3 +33,15 @@
 {
     z-index: 1000;
 }
+
+.time-range-selector
+{
+    opacity: 0.25;
+    -webkit-transition: opacity 0.25s; /* Safari */
+    transition: opacity 0.25s;
+}
+
+.time-range-selector:hover, .time-range-selector:active, .time-range-selector:focus
+{
+    opacity: 1;
+}
