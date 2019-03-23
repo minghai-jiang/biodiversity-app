@@ -34,7 +34,7 @@ div.content {
   position: absolute;
   width: 100%;
   text-align: center;
-  z-index: 999;
+  z-index: 650;
   top: 40px;
 }
 
