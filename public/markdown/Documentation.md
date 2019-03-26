@@ -153,7 +153,7 @@ JSON with a count of the number of polygons within the given bounds and list of 
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/tilesBounds'
+url = 'https://api.ellipsis-earth.com/metadata/tiles'
 ```
 
 Request to obtain the tiles of a map.<br/>
@@ -426,8 +426,7 @@ Request to obtain all standard tiles by a list of id's.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 timestamp: The number of the timestamp, default is 0.<br/>
-ids: An array of arrays of the form ['tileX': tileX, 'tileY': tileY], cannot be longer than 3000 <br/>
-layer: The name of the polygon layer. <br/>
+TileIds: An array of arrays of the form ['tileX': tileX, 'tileY': tileY], cannot be longer than 3000 <br/>
 **Returns**<br/>
 GeoJSON of polygons.
 
@@ -504,23 +503,55 @@ Starts the download of the shape.
 
 <a id='Feedback'></a>
 # /feedback
-#### Post
+#### Post /error/add
 
 
 ```python
-url =  'https://api.ellipsis-earth.com/feedback'
+url = 'https://api.ellipsis-earth.com/feedback/error/add'
 ```
 
 Submits feedback to the system, notifying it of classification errors in the given area.<br/>
 **Parameters**<br/>
-mapId: The id of the map on which the error occurs.<br/>
-timestamp: The number of the timestamp on whic the error occurs.<br/>
-xMin: The minimum longitude of the area.<br/>
-xMax: The maximum longitude of the area.<br/>
-yMin: The minimum latitude of the area.<br/>
-yMax: The maximum latitude of the area.<br/>
-isCloud: If true, indicates that the error is a cloud related error, otherwise it's a classification error.<br/>
+mapId: The id of the map.<br/>
+timestamp: The number of the timestamp.<br/>
+tileX: The x of the tile in web mercator projection.<br/>
+tileY: The y of the tile in web mercator projection<br/>
+zoom: The zoom level of the tile.<br/>
+isMask: If true, indicates that the error is a mask related error, otherwise it's a classification error.<br/>
 message: A custom message describing the error.<br/>
-
 **Returns**<br/>
 Status 200 if the submission was successful.
+
+#### Post /error/remove
+
+
+```python
+url = 'https://api.ellipsis-earth.com/feedback/error/remove'
+```
+
+Removes all errors for a specific tile.<br/>
+**Parameters**<br/>
+mapId: The id of the map..<br/>
+timestamp: The number of the timestamp.<br/>
+tileX: The x of the tile in web mercator projection.<br/>
+tileY: The y of the tile in web mercator projection.<br/>
+zoom: The zoom level of the tile.<br/>
+isMask: Deletes all mask errors if true, otherwise, deletes all classification errors.<br/>
+message: A custom message describing the error.<br/>
+**Returns**<br/>
+Status 200 if the removeal was successful.
+
+#### Post /error/get
+
+
+```python
+url = 'https://api.ellipsis-earth.com/feedback/error/get'
+```
+
+Gets all errors of a certain map and a timestamp.<br/>
+**Parameters**
+mapId: The id of the map.<br/>
+timestamp: The number of the timestamp.<br/>
+isMask: Gets all mask errors if true, otherwise, get all classification errors.<br/>
+**Returns**<br/>
+Json with all the errors.
