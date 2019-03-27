@@ -103,10 +103,34 @@ p.maxPolygon
 
 .leaflet-control
 {
-  opacity: 0.5;
+  opacity: 0.75;
 }
 
 .leaflet-control-attribution, .leaflet-control:hover
 {
   opacity: 1;
+}
+
+.leaflet-popup-content p
+{
+  margin: 0;
+}
+
+.leaflet-popup-content div
+{
+  margin-bottom: 1em;
+}
+
+.leaflet-popup-content a
+{
+  color: #00a3a3;
+  margin-bottom: 0.25em;
+  display: block;
+}
+
+.leaflet-popup-content a:hover
+{
+  cursor: pointer;
+  color: #026464;
+  text-decoration: underline;
 }

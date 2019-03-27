@@ -57,7 +57,7 @@ class Markdown extends Component
           return response.text();
         }
         else {
-          throw "Failed to retrieve documents.";
+          throw new Error("Failed to retrieve documents.");
         }
       })
       .then(text => {
@@ -76,7 +76,7 @@ class Markdown extends Component
                 if (contentElements[index].props.children.props.src)
                 {
                   let url = contentElements[index].props.children.props.src;
-                  let new_img = <img src={this.props.imagesUrl + url}/>;
+                  let new_img = <img alt="Markdown" src={this.props.imagesUrl + url}/>;
                   clean.push(new_img);
                 }
               }
