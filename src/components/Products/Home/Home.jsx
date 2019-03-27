@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
+//import { NavLink } from "react-router-dom";
 
-import L_U_HTML from '../../Utilities/LoadUpdateUtil';
+import LoadUpdateUtil from '../../Utilities/LoadUpdateUtil';
 
 export class ProductsHome extends Component {
   render() {
@@ -11,7 +11,7 @@ export class ProductsHome extends Component {
             <h1>Products</h1>
         </div>
 
-        <L_U_HTML 
+        <LoadUpdateUtil 
           contentUrl={'/html/' + this.props.language + '/products/products-home.html'} 
         />
 

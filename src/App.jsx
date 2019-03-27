@@ -44,7 +44,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    Modal.setAppElement(this.el);
+    Modal.setAppElement('body');
   }
 
   closeMenu = () => {
