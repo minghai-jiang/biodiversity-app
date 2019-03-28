@@ -3,7 +3,7 @@ import React, { Component } from "react";
     Route
 } from "react-router-dom";*/
 
-import L_U_HTML from '../Utilities/LoadUpdateUtil';
+import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 
 import { Footer } from "../footer/footer";
 
@@ -31,7 +31,7 @@ export class Sector extends Component {
             <h1>Sectors</h1>
         </div>
 
-        <L_U_HTML 
+        <LoadUpdateUtil 
             contentUrl={'/html/' + this.props.language + '/sectors/sectors-home.html'}
         />
 
@@ -49,7 +49,7 @@ export class Sector extends Component {
         </div>
 
         <div className="pre_dynamic main-block">
-          <L_U_HTML contentUrl={this.state.sectorItemUrl}/>
+          <LoadUpdateUtil contentUrl={this.state.sectorItemUrl}/>
         </div>
         <Footer></Footer>
         </div>

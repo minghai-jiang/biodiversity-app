@@ -55,15 +55,15 @@ export class MapSelector extends PureComponent {
   };
 
   getMapTimestamps = async (map) => {
-    let responseJson = await QueryUtil.getData(this.props.apiUrl + 'metadata/timestamps', {"mapId":  map.uuid });
+    let responseJson = await QueryUtil.postData(this.props.apiUrl + 'metadata/timestamps', {"mapId":  map.uuid });
     map.timestamps = responseJson;
   };
 
   getMapLayers = async (map) => {
-    let tileLayersPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/tileLayers', {"mapId":  map.uuid });
-    let polygonLayersPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/polygonLayers', {"mapId":  map.uuid });
-    let classPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/classes', {"mapId":  map.uuid });
-    let spectralPromise = QueryUtil.getData(this.props.apiUrl + 'metadata/spectral', {"mapId":  map.uuid });
+    let tileLayersPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/tileLayers', {"mapId":  map.uuid });
+    let polygonLayersPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/polygonLayers', {"mapId":  map.uuid });
+    let classPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/classes', {"mapId":  map.uuid });
+    let spectralPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/spectral', {"mapId":  map.uuid });
 
     let responseJsonTileLayers = await tileLayersPromise;
 

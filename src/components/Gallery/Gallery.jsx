@@ -3,7 +3,7 @@ import React, { Component } from "react";
     Route
 } from "react-router-dom";*/
 
-import L_U_HTML from '../Utilities/LoadUpdateUtil';
+import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 
 import { Footer } from "../footer/footer";
 
@@ -29,7 +29,7 @@ export class Gallery extends Component {
           <h1>Gallery</h1>
         </div>
         <div className="main-block main-block-first product-block-first">            
-          <L_U_HTML 
+          <LoadUpdateUtil 
             contentUrl={'/html/' + this.props.language + '/gallery/gallery.html'}
           />
         </div>
@@ -46,7 +46,7 @@ export class Gallery extends Component {
             </select>
           </div>
           <div className="main-block-content main-block-content-left">
-            <L_U_HTML 
+            <LoadUpdateUtil 
               contentUrl={this.state.galleryItemUrl} 
               isMarkdown={true}
             />

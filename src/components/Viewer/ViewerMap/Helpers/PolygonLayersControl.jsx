@@ -1,17 +1,18 @@
-import React, { PureComponent, createRef } from 'react';
+//import React, { PureComponent, createRef } from 'react';
+import React from 'react';
 
 import {
-  Map,
-  TileLayer,
+  //Map,
+  //TileLayer,
   GeoJSON,
   LayersControl,
   LayerGroup,
-  FeatureGroup,
-  Popup,
-  Polygon,
-  Marker
+  //FeatureGroup,
+  //Popup,
+  //Polygon,
+  //Marker
 } from "react-leaflet";
-import L from "leaflet";
+//import L from "leaflet";
 
 import QueryUtil from '../../../Utilities/QueryUtil';
 
@@ -29,9 +30,8 @@ let polygonLayersControl_map = null;
 
 const PolygonLayersControl = {
   getElement: () => {
-    debugger;
     return { 
-      polygonControlOverlays: polygonLayersControl_controlOverlays.length > 0 ? polygonLayersControl_controlOverlays : null, 
+      polygonControlOverlays: polygonLayersControl_controlOverlays && polygonLayersControl_controlOverlays.length > 0 ? polygonLayersControl_controlOverlays : null, 
       polygonCounts: polygonLayersControl_polygonCounts 
     };
   },
@@ -121,12 +121,15 @@ async function getPolygonsJson(props, bounds) {
   }
 
   let layerGeoJsons = [];
-  let polygonCounts ={};
+  let polygonCounts = [];
 
   for (let i = 0; i < geoJsonPromises.length; i++) {
     let layerGeoJson = await geoJsonPromises[i];
     layerGeoJsons.push(layerGeoJson);
-    polygonCounts[layerGeoJson.name] = layerGeoJson.count;
+    polygonCounts.push({
+      name: layerGeoJson.name,
+      count: layerGeoJson.count,
+    });
   }
 
   polygonLayersControl_randomKey = Math.random();
@@ -140,10 +143,10 @@ async function getPolygonsJson(props, bounds) {
 async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, layerName, layerColor) {
   let headers = {};
   if (user) {
-    headers["Authorization"] = "BEARER " + user.token;
+    headers["Authorization"] = "Bearer " + user.token;
   }
 
-  let polygonIdResult = await QueryUtil.getData(
+  let polygonIdResult = await QueryUtil.postData(
     apiUrl + 'metadata/polygons',
     {
       mapId:  mapUuid,
@@ -154,20 +157,18 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
       yMin: bounds.yMin,
       yMax: bounds.yMax,
       limit: polygonLayersControl_maxPolygon
-    },
-    { headers }
+    }, headers
   );
 
   if (typeof(polygonIdResult.ids) !== 'undefined' && polygonIdResult.ids.length > 0)
   {
-    let polygonsGeoJson = await QueryUtil.getData(
+    let polygonsGeoJson = await QueryUtil.postData(
       apiUrl + 'geometry/polygons',
       {
         mapId:  mapUuid,
         timestamp: timestampEnd,
         polygonIds: polygonIdResult.ids
-      },
-      { headers }
+      }, headers
     );
 
     polygonsGeoJson.name = layerName;

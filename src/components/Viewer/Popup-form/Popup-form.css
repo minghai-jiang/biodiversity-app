@@ -1,0 +1,44 @@
+#formDiv
+{
+	text-align: right;
+}
+
+#formDiv textarea
+{
+	width: 100%;
+	margin: auto;
+	font-family: inherit;
+}
+
+#formDiv a
+{
+	padding: 5px;
+}
+
+#formDiv form
+{
+	text-align: left;
+}
+
+#formDiv h3, #formDiv h4
+{
+	margin: 0.5em 0;
+}
+
+#formDiv input[type='submit']
+{
+	margin-top: 0.5em;
+}
+
+#formDiv .notification
+{
+	text-align: left;
+	background-color: lightgreen;
+	padding: 1em;
+	color: white;
+	margin-top: 1em;
+}
+
+div.slide-pane__content {
+	padding: 0.5em 1.5em;
+}

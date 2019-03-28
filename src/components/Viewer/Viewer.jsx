@@ -6,6 +6,7 @@ import "./Viewer.css";
 import MapSelector from './MapSelector/MapSelector';
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 import ViewerMap from './ViewerMap/ViewerMap';
+import InfoPane from './ViewerMap/Helpers/InfoPane';
 
 class Viewer extends PureComponent {
   constructor(props, context) {
@@ -14,7 +15,8 @@ class Viewer extends PureComponent {
     this.state = {
       timestampRange: { start: 0, end: 0 },
       map: null,
-      shape: null
+      shape: null,
+      infoContent: null,
     };
   }
 
@@ -40,12 +42,16 @@ class Viewer extends PureComponent {
     });
   }
 
-  downloadShape = async () => {
+  getContent = (content) => {
+    this.setState({infoContent: content})
+  }
+
+/*  downloadShape = async () => {
     let headers = {
       "Content-Type": "application/json"
     };
     if (this.props.user) {
-      headers["Authorization"] = "BEARER " + this.props.user.token;
+      headers["Authorization"] = "Bearer " + this.props.user.token;
     }
 
     let timestamp = this.state.map.timestamps[this.state.timestampRange.end];
@@ -73,7 +79,7 @@ class Viewer extends PureComponent {
       .catch(error =>{
         alert("Failed to download shape");
       })
-  }
+  }*/
 
   render() {
     return (
@@ -97,7 +103,13 @@ class Viewer extends PureComponent {
           map={this.state.map}
           timestampRange={this.state.timestampRange}
           onShapeDrawn={this.onShapeDrawn}
+          infoContent={this.getContent}
           user={this.props.user}
+        />
+        <InfoPane
+          map={this.state.map}
+          infoContent={this.state.infoContent}
+          key={this.state.infoContent ? this.state.infoContent.id : null}
         />
 {/*        <QueryPane
           apiUrl={this.props.apiUrl}

@@ -1,4 +1,4 @@
-import React from 'react';
+//import React from 'react';
 
 import L from "leaflet";
 
@@ -63,7 +63,7 @@ function onShapeDrawnClosure(event, drawnItems, callback) {
   //   let headers = [];
   //   if (this.props.user)
   //   {
-  //     headers["Authorization"] = "BEARER " + this.props.user.token;
+  //     headers["Authorization"] = "Bearer " + this.props.user.token;
   //   }
 
   //   this.setState({popupProps: {
