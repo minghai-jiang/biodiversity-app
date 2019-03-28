@@ -79,17 +79,17 @@ export class MainMenu extends Component {
               {this.props.localization['AboutUs']}
             </NavLink>
           </li>
-          {/* <li style={{float: "right"}}>              
+          <li style={{float: "right"}}>              
             <a class="main-menu-item dropdown">
               <button class="dropbtn">
-                Language 
+                {this.props.localization['Language']}
               </button>
               <div class="dropdown-content">
                 <a href="#" onClick={() => this.changeLanguage('english')}>English</a>
-                <a href="#" onClick={() => this.changeLanguage('spanish')}>Spanish</a>
+                <a href="#" onClick={() => this.changeLanguage('spanish')}>Español</a>
               </div>
             </a> 
-          </li> */}
+          </li>
           <li style={{display: this.props.user ? 'none' : 'block', float: "right"}}>
             <NavLink to="/login" className="main-menu-item">
               {this.props.localization['Login']}

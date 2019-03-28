@@ -30,7 +30,7 @@ export class InfoPane extends PureComponent {
             className='query-pane'
             overlayClassName='modal-overlay'
             isOpen={this.state.openQueryPane}
-            title='Query Data'
+            title='GeoMessage'
             width={'75%'}
             onRequestClose={() => { this.toggleQueryPane(false); }}
           >

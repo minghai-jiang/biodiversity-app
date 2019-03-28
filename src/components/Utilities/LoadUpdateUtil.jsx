@@ -17,8 +17,9 @@ class LoadUpdateUtil extends Component
   }
 
   componentWillReceiveProps(nextProps) {
-    this.getContent(nextProps);
-    
+    if (this.props.contentUrl !== nextProps.contentUrl) {
+      this.getContent(nextProps);    
+    }
   }
 
   getContent(props) {

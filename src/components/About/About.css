@@ -28,10 +28,12 @@ div.about-accented-block {
 .profile-name {
     color: #026464;
     font-weight: bold;
+    font-size: 18px;
 }
 
 .profile-title {
     font-weight: bold;
+    font-size: 14px;
 }
 
 .profile-text {

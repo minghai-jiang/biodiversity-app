@@ -75,7 +75,8 @@ const PolygonLayersControl = {
   },
 
   clear: () => {
-    polygonLayersControl_controlOverlays = [];    
+    polygonLayersControl_controlOverlays = [];
+    polygonLayersControl_polygonCounts = 0;
   },
 
   onOverlayAdd: (e) => {
@@ -143,7 +144,7 @@ async function getPolygonsJson(props, bounds) {
 async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, layerName, layerColor) {
   let headers = {};
   if (user) {
-    headers["Authorization"] = "BEARER " + user.token;
+    headers["Authorization"] = "Bearer " + user.token;
   }
 
   let polygonIdResult = await QueryUtil.postData(
@@ -157,8 +158,7 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
       yMin: bounds.yMin,
       yMax: bounds.yMax,
       limit: polygonLayersControl_maxPolygon
-    },
-    { headers }
+    }, headers
   );
 
   if (typeof(polygonIdResult.ids) !== 'undefined' && polygonIdResult.ids.length > 0)
@@ -169,8 +169,7 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
         mapId:  mapUuid,
         timestamp: timestampEnd,
         polygonIds: polygonIdResult.ids
-      },
-      { headers }
+      }, headers
     );
 
     polygonsGeoJson.name = layerName;

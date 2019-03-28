@@ -7,6 +7,8 @@
   "AboutUs": "Sobre nosotros",
   "Login": "Iniciar",
 
+  "Language": "Lengua",
+
   "ChoosePrompt": "Please choose",
 
   "SelectSector": "Select sector",
@@ -16,5 +18,8 @@
   "Ngo": "NGO",
 
   "ApiTutorial": "API Tutorial",
-"Northern Paraguay deforestation": "Paraguay deforestation"
+  "Documentation": "Documentation",
+  "Northern Paraguay deforestation": "Paraguay deforestation",
+  "Flora management in the Netherlands": "Flora management in the Netherlands",
+  "Appendix": "Appendix"
 }

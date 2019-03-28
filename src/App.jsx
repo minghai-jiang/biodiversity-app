@@ -9,7 +9,7 @@ import MainMenu from "./components/MainMenu/MainMenu";
 
 import Viewer from './components/Viewer/Viewer';
 import Home from "./components/Home/Home";
-import About from "./components/about/about";
+import About from "./components/About/About";
 import Contact from "./components/contact/contact";
 import Products from "./components/Products/Products";
 import Login from './components/Login/Login';
@@ -64,7 +64,7 @@ class App extends Component {
         {
           method: 'GET',
           headers: {
-            "Authorization": "BEARER " + user.token
+            "Authorization": "Bearer " + user.token
           }
         }
       )
@@ -92,6 +92,7 @@ class App extends Component {
   }
 
   setLanguage = (language) => {
+    debugger;
     fetch('/localization/' + language + '.json')
       .then(response => {
         if (response.ok) {
@@ -101,9 +102,9 @@ class App extends Component {
       .then(json => {
         localStorage.setItem('language', language);
         this.setState({ 
-          init: true, 
           language: language, 
-          localization: json 
+          localization: json,
+          init: true
         });
       })
       .catch(err => {
@@ -124,13 +125,14 @@ class App extends Component {
   }
 
   onLanguageChange = (language) => {
-    debugger;
     if (language !== this.state.language) {
       this.setLanguage(language);
     }
   }
 
   render() {
+    console.log(this.state.language);
+    debugger;
     if (this.state.init) {
       return (
         <div className="App" onClick={this.closeMenu}>
@@ -183,7 +185,16 @@ class App extends Component {
                 />
               }
             />
-            <Route path="/about" component={About}/>
+            <Route 
+              path="/about" 
+              render={() => 
+                <About 
+                  publicFilesUrl={publicFilesUrl}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+            }
+            />
             <Route path="/contact" component={Contact} />
             <Route 
               path="/login" 

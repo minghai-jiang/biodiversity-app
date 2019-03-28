@@ -121,7 +121,7 @@ plt.imshow(img)
 
 
 
-    <matplotlib.image.AxesImage at 0x7f09329905f8>
+    <matplotlib.image.AxesImage at 0x7fb0a4ee0780>
 
 
 
@@ -498,7 +498,7 @@ plt.imshow(img)
 
 
 
-    <matplotlib.image.AxesImage at 0x7f09365faeb8>
+    <matplotlib.image.AxesImage at 0x7fb0a4fe43c8>
 
 
 
@@ -506,7 +506,7 @@ plt.imshow(img)
 ![png](output_26_1.png)
 
 
-### Brining it to the next level
+### Bringing it to the next level
 Now let's take advantage of the full power of the API and analyse the entire Netherlands in one go. We repeat the procedure around Esloo for each and every square kilometer of the Netherlands. Of each square kilometer we analye the percentage of mowed fields with respect to the total number of fields.
 
 Places in which this percentage is too high are flagged as these are places that insects might be dealing with a food shortage.
@@ -709,10 +709,52 @@ plt.imshow(img)
 
 
 
-    <matplotlib.image.AxesImage at 0x7f09364c4128>
+    <matplotlib.image.AxesImage at 0x7fb0a4db85c0>
 
 
 
 
 ![png](output_49_1.png)
 
+
+
+```python
+from shapely.geometry import Polygon
+from rasterio.features import rasterize
+
+def plotPolys(polys, xmin,xmax,ymin,ymax, alpha = None, im = None, colors = [(0,0,1)] , column= None):
+    polys.crs = {'init': 'epsg:4326'}
+    polys = polys.to_crs({'init': 'epsg:3395'})
+    
+    bbox = gpd.GeoDataFrame( {'geometry': [Polygon([(xmin,ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])]} )
+    bbox.crs = {'init': 'epsg:4326'}
+    bbox = bbox.to_crs({'init': 'epsg:3395'})
+
+    if str(type(im)) == "<class 'NoneType'>":
+        im = np.zeros((1024,1024,4))
+    if column == None:
+        column = 'extra'
+        polys[column] = 0
+    
+    transform = rasterio.transform.from_bounds(bbox.bounds['minx'], bbox.bounds['miny'], bbox.bounds['maxx'], bbox.bounds['maxy'], im.shape[0], im.shape[1])
+    rasters = np.zeros(im.shape)
+    for i in np.arange(len(colors)):
+        sub_polys = polys.loc[polys[column] == i]
+        raster = rasterio.features.rasterize( shapes = [ (sub_polys['geometry'].values[m], 1) for m in np.arange(sub_polys.shape[0]) ] , fill = 0, transform = transform, out_shape = (im.shape[0], im.shape[1]), all_touched = True )
+        raster = np.stack([raster * colors[i][0], raster*colors[i][1],raster*colors[i][2], raster ], axis = 2)
+        rasters = np.add(rasters, raster)
+     
+    rasters = np.clip(rasters, 0,1)
+    if alpha == None:
+        image = rasters
+        image[image[:,:,3] == 0, :] = im [image[:,:,3] == 0, :]
+    else:
+        image = im * (1 - alpha) + rasters*alpha 
+    return(image)
+ 
+```
+
+
+```python
+
+```

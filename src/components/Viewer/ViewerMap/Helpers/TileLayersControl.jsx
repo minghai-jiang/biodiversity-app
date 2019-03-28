@@ -119,6 +119,10 @@ const TileLayersControl = {
     if (index > -1) {
       tileLayersControl_checkedLayers.splice(index, 1);
     }
+  },
+
+  clear: (e) => {
+    tileLayersControl_controlOverlays = [];
   }
 }
 

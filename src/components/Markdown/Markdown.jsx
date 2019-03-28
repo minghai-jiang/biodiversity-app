@@ -51,7 +51,15 @@ class Markdown extends Component
   }
 
   componentDidMount() {
-    fetch(this.props.contentUrl)
+    this.getContent(this.props);
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.getContent(nextProps);
+  }
+
+  getContent = (props) => {
+    fetch(props.contentUrl)
       .then(response => {
         if (response.ok) {
           return response.text();
@@ -98,7 +106,6 @@ class Markdown extends Component
         alert(error);
       })
   }
-
 
   render()
   {

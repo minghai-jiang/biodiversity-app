@@ -75,7 +75,7 @@ constructor(props) {
           </label>
           <label>
             <h4>Give a small description of the mistake</h4>
-            <textarea name="text" value={this.state.text} onChange={this.handleChange} placeholder='A small description of the mistake.' maxLength='3000'/>
+            <textarea name="text" value={this.state.text} onChange={this.handleChange} placeholder='GeoMessage' maxLength='3000'/>
           </label><br/>
           <input type="submit" value="Submit" className="button"/>
         </form>

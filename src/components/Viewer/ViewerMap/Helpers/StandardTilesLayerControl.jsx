@@ -1,18 +1,11 @@
-//import React, { PureComponent, createRef } from 'react';
 import React from 'react';
 
 import {
-  //Map,
-  //TileLayer,
   GeoJSON,
   LayersControl,
   LayerGroup,
-  //FeatureGroup,
   Popup,
-  //Polygon,
-  //Marker
 } from "react-leaflet";
-//import L from "leaflet";
 
 import QueryUtil from '../../../Utilities/QueryUtil';
 
@@ -79,11 +72,13 @@ const StandardTilesLayer = {
 
     StandardTiles_map = props.map;
 
-    //console.log(StandardTiles_polygonCounts);
   },
 
   clear: () => {
-    StandardTiles_controlOverlays = [];    
+    StandardTiles_controlOverlays = [];
+    StandardTiles_PopupContent = [];
+    StandardTiles_polygonCounts = 0;
+    StandardTiles_map = null;
   },
 
   onOverlayAdd: (e) => {
@@ -102,7 +97,6 @@ const StandardTilesLayer = {
   onFeatureClick: (props, contentFunction) => {
     if (StandardTiles_PopupContent && StandardTiles_PopupContent.id)
     {
-      console.log(StandardTiles_PopupContent, props, contentFunction);
       let popup = StandardTiles_PopupContent;
       let id = popup.id + '.' + popup.properties.tileX + "." + popup.properties.tileY + '.' +  popup.properties.zoom;
       let content = [];
@@ -120,7 +114,7 @@ const StandardTilesLayer = {
         properties.apiUrl = props.apiUrl;
         if (props.user)
         {
-          properties.headers = {Authorization: "BEARER " + props.user.token}
+          properties.headers = {Authorization: "Bearer " + props.user.token}
         }
         else
         {
@@ -134,7 +128,7 @@ const StandardTilesLayer = {
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>Report error in this tile</a>
+        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>Send GeoMessage</a>
       }
 
       return (
@@ -161,7 +155,7 @@ async function getTilesJson(props, bounds) {
     return;
   }
 
-
+  let polygonCounts = [];
   let geoJsonPromise = getTilesJsonAux(
     props.apiUrl,
     props.user, 
@@ -170,10 +164,13 @@ async function getTilesJson(props, bounds) {
     bounds);
 
   let layerGeoJson = await geoJsonPromise;
-  let polygonCounts ={
-    name: layerGeoJson.standardTiles.name,
-    count: layerGeoJson.standardTiles.originalCount,
-  };
+  if (layerGeoJson && layerGeoJson.standardTiles)
+  {
+    polygonCounts.push({
+      name: layerGeoJson.standardTiles.name,
+      count: layerGeoJson.standardTiles.originalCount,
+    });
+  }
 
   return {
     layerGeoJsons: layerGeoJson.standardTiles,
@@ -185,7 +182,7 @@ async function getTilesJson(props, bounds) {
 async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds) {
   let headers = {};
   if (user) {
-    headers["Authorization"] = "BEARER " + user.token;
+    headers["Authorization"] = "Bearer " + user.token;
   }
 
   let tilesIdResult = await QueryUtil.postData(
@@ -198,10 +195,8 @@ async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds) {
       yMin: bounds.yMin,
       yMax: bounds.yMax,
       limit: StandardTilesControl_maxPolygon
-    },
-    { headers }
+    }, headers 
   );
-
 
   if (typeof(tilesIdResult.ids) !== 'undefined' && tilesIdResult.ids.length > 0)
   {
@@ -211,61 +206,65 @@ async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds) {
         mapId:  mapUuid,
         timestamp: timestampEnd,
         tileIds: tilesIdResult.ids
-      },
-      { headers }
+      }, headers
     );
-
-    let filteredTiles = {};
-
-    if (tilesGeoJson && user)
+    
+    if(tilesGeoJson)
     {
-      let filteredTilesFeatures = [];
-      let filteredTilesResult = await QueryUtil.postData(
-        apiUrl + 'feedback/error/get',
-        {
-          mapId:  mapUuid,
-          timestamp: timestampEnd
-        },
-        {
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MzYxNDQ2MSwiZXhwIjoxNTUzNzAwODYxfQ.3rxpY3a3gOFqXGyxXDUEsYzU-EVkh13LD-Ua9WR-RSE'
-        }
-      );
+      let filteredTiles = {};
 
-      for (let i = 0; i < tilesGeoJson.features.length; i++)
+      if (user)
       {
-        let tileProperties = tilesGeoJson.features[i].properties;
-
-        for (let j = 0; j < filteredTilesResult.length; j++)
-        {
-          if (tileProperties.tileX === filteredTilesResult[j].tileX && tileProperties.tileY === filteredTilesResult[j].tileY && tileProperties.zoom === filteredTilesResult[j].zoom)
+        let filteredTilesFeatures = [];
+        let filteredTilesResult = await QueryUtil.postData(
+          apiUrl + 'feedback/error/get',
           {
-            tilesGeoJson.features[i].feedback = filteredTilesResult[j].feedback;
-            filteredTilesFeatures.push(tilesGeoJson.features[i]);
+            mapId:  mapUuid,
+            timestamp: timestampEnd
+          }, headers
+        );
+
+        if (filteredTilesResult)
+        {      
+          for (let i = 0; i < tilesGeoJson.features.length; i++)
+          {
+            let tileProperties = tilesGeoJson.features[i].properties;
+
+            for (let j = 0; j < filteredTilesResult.length; j++)
+            {
+              if (tileProperties.tileX === filteredTilesResult[j].tileX && tileProperties.tileY === filteredTilesResult[j].tileY && tileProperties.zoom === filteredTilesResult[j].zoom)
+              {
+                tilesGeoJson.features[i].feedback = filteredTilesResult[j].feedback;
+                filteredTilesFeatures.push(tilesGeoJson.features[i]);
+              }
+            }
           }
+        
+          let ids = [...new Set(filteredTilesFeatures.map(item => item.id))];
+          tilesGeoJson.features = tilesGeoJson.features.filter(item => !ids.includes(item.id));
+          
+          filteredTiles.type = "FeatureCollection";
+          filteredTiles.count = filteredTilesFeatures.length;
+          filteredTiles.features = filteredTilesFeatures;
+          filteredTiles.name = 'Standard Tiles Error';
         }
       }
 
-      let ids = [...new Set(filteredTilesFeatures.map(item => item.id))];
-      tilesGeoJson.features = tilesGeoJson.features.filter(item => !ids.includes(item.id));
-      
-      filteredTiles.type = "FeatureCollection";
-      filteredTiles.count = filteredTilesFeatures.length;
-      filteredTiles.features = filteredTilesFeatures;
-      filteredTiles.name = 'Standard Tiles Error';
+      tilesGeoJson.name = 'Standard Tiles';
+      //tilesGeoJson.color = layerColor;
+      tilesGeoJson.count = tilesGeoJson.features.length
+      tilesGeoJson.originalCount = tilesIdResult.count
+
+      return {standardTiles: tilesGeoJson, errorTiles: filteredTiles};
     }
-
-    tilesGeoJson.name = 'Standard Tiles';
-    //tilesGeoJson.color = layerColor;
-    tilesGeoJson.count = tilesGeoJson.features.length
-    tilesGeoJson.originalCount = tilesIdResult.count
-
-    return {standardTiles: tilesGeoJson, errorTiles: filteredTiles};
   }
   else {
     return {
-      name: 'Standard Tiles',
-      //color: layerColor,
-      count: tilesIdResult.count
+      standardTiles: {
+        name: 'Standard Tiles',
+        //color: layerColor,
+        originalCount: tilesIdResult.count
+      }
     };
   }
 }
@@ -282,53 +281,57 @@ function createGeojsonLayerControl(props) {
   let filteredTiles = StandardTiles_filteredTiles;
   let geoJson = [];
 
-  if (layerGeoJson.count <= StandardTilesControl_maxPolygon)
+  if(layerGeoJson)
   {
-    geoJson.push( 
-      <GeoJSON
-        data={layerGeoJson}
-        onEachFeature={onEachFeature}
-        style={{color: 'cornflowerblue', weight: 1, opacity: 0.5}}
-        key={StandardTiles_randomKey}
-        zIndex={1000}
-      />);
-
-      if (filteredTiles.count > 0)
-      {
-        geoJson.push(<GeoJSON
-          data={filteredTiles}
+    if (layerGeoJson.count <= StandardTilesControl_maxPolygon)
+    {
+      geoJson.push( 
+        <GeoJSON
+          data={layerGeoJson}
           onEachFeature={onEachFeature}
-          style={{color: 'red', weight: 1}}
-          key={StandardTiles_randomKey + 'error'}
+          style={{color: 'cornflowerblue', weight: 1, opacity: 0.5}}
+          key={StandardTiles_randomKey}
           zIndex={1000}
         />);
-      }
-  }
 
-  let checked = StandardTiles_checkedLayers.includes(layerGeoJson.name);
+        if (filteredTiles.count > 0)
+        {
+          geoJson.push(<GeoJSON
+            data={filteredTiles}
+            onEachFeature={onEachFeature}
+            style={{color: 'red', weight: 1}}
+            key={StandardTiles_randomKey + 'error'}
+            zIndex={1000}
+          />);
+        }
+    }
 
-  let r = Math.random();
-  let layer = (
-    <LayersControl.Overlay
-      key={r}
-      name={layerGeoJson.name}
-      checked={checked}
-    >
-      <LayerGroup name={layerGeoJson.name} key='Standard Tiles Layer'>
-        {geoJson}
-      </LayerGroup>
-    </LayersControl.Overlay> 
-  ); 
+    let checked;
+    checked = StandardTiles_checkedLayers.includes(layerGeoJson.name)
 
-  layers.push(layer);
+    let r = Math.random();
+    let layer = (
+      <LayersControl.Overlay
+        key={r}
+        name={layerGeoJson.name}
+        checked={checked}
+      >
+        <LayerGroup name={layerGeoJson.name} key='Standard Tiles Layer'>
+          {geoJson}
+        </LayerGroup>
+      </LayersControl.Overlay> 
+    ); 
 
-  if (layers.length > 0)
-  {
-    return layers;
-  }
-  else
-  {
-    return null;
+    layers.push(layer);
+
+    if (layers.length > 0)
+    {
+      return layers;
+    }
+    else
+    {
+      return null;
+    }
   }
 }
 

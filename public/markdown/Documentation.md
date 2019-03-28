@@ -522,21 +522,21 @@ message: A custom message describing the error.<br/>
 **Returns**<br/>
 Status 200 if the submission was successful.
 
-#### Post /error/remove
+#### Post /error/retract
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/feedback/error/remove'
+url = 'https://api.ellipsis-earth.com/feedback/error/retract'
 ```
 
-Removes all errors for a specific tile.<br/>
+Retracts all reported errors for the given tile.<br/>
 **Parameters**<br/>
 mapId: The id of the map..<br/>
 timestamp: The number of the timestamp.<br/>
 tileX: The x of the tile in web mercator projection.<br/>
 tileY: The y of the tile in web mercator projection.<br/>
 zoom: The zoom level of the tile.<br/>
-isMask: Deletes all mask errors if true, otherwise, deletes all classification errors.<br/>
+isMask: Retracts all mask errors if true, otherwise, retracts all classification errors.<br/>
 message: A custom message describing the error.<br/>
 **Returns**<br/>
 Status 200 if the removeal was successful.
