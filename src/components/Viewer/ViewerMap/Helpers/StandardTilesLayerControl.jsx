@@ -125,7 +125,7 @@ const StandardTilesLayer = {
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>Report error in this tile</a>
+        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>Send GeoMessage</a>
       }
 
       return (
