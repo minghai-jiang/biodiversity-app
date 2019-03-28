@@ -1,5 +1,5 @@
 
-In the gallery notbooks we are using a few utility functions that are defined and explained in this appendix. The functions are not defined in the notebooks themselves as they would distract from the core message.
+In the gallery notebooks we are using a few utility functions that are defined and explained in this appendix. The functions are not defined in the notebooks themselves as they would distract from the core message.
 
 ## Drawing polygons
 In order to draw polygons in the webmercator projection on an image we use the polys_on_image function. The function takes as it's arguments a geopandas dataframe with polygons that need to be plotted and boundingbox coordinates in wgs84 to define the bounds in which to plot. Optionally you can pass an image as a numpy array with shape (w,h,4) to use as canvas and an alpha to define how the polygons should be blended with the background canvas. The argument column and colors allow you te define different colors for polygons depending on a column name in the geopandas dataframe.
