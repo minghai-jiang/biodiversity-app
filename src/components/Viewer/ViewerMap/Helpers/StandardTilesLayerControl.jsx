@@ -75,7 +75,10 @@ const StandardTilesLayer = {
   },
 
   clear: () => {
-    StandardTiles_controlOverlays = [];    
+    StandardTiles_controlOverlays = [];
+    StandardTiles_PopupContent = [];
+    StandardTiles_polygonCounts = 0;
+    StandardTiles_map = null;
   },
 
   onOverlayAdd: (e) => {

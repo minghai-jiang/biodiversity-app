@@ -10,13 +10,13 @@ let legendControl_maxStandardTiles = 1000;
 
 let legendControl_checkedLayers = [];
 
-let legendControl_legendElement = null;
+let legendControl_legendElement = [];
 
 let legendControl_map = null;
 
 const LegendControl = {
   getElement: () => {
-    if (!legendControl_legendElement) {
+    if (!legendControl_legendElement || legendControl_legendElement.length === 0) {
       return null;
     }
 
@@ -51,7 +51,7 @@ const LegendControl = {
   },
 
   clear: () => {
-    legendControl_legendElement = null;
+    legendControl_legendElement = [];
   },
 
   onOverlayAdd: (e) => {

@@ -67,6 +67,13 @@ export class ViewerMap extends PureComponent {
     DrawingControl.initialize(map, this.onShapeDrawn);
   }
 
+  componentWillUnmount = () => {
+    PolygonLayersControl.clear();
+    TileLayersControl.clear();
+    StandardTilesLayerControl.clear();
+    LegendControl.clear();
+  }
+
   componentWillReceiveProps = async (nextProps) => {
     let differentMap = nextProps.map !== this.props.map;
     
