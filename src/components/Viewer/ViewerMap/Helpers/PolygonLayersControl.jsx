@@ -75,7 +75,8 @@ const PolygonLayersControl = {
   },
 
   clear: () => {
-    polygonLayersControl_controlOverlays = [];    
+    polygonLayersControl_controlOverlays = [];
+    polygonLayersControl_polygonCounts = 0;
   },
 
   onOverlayAdd: (e) => {
