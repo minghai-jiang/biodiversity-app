@@ -118,7 +118,7 @@ export class QueryPane extends PureComponent {
       };
 
       if (this.props.user) {
-        headers["Authorization"] = "BEARER " + this.props.user.token
+        headers["Authorization"] = "Bearer " + this.props.user.token
       }
 
       this.setState({ executingQuery: true });

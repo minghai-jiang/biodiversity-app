@@ -64,7 +64,7 @@ class App extends Component {
         {
           method: 'GET',
           headers: {
-            "Authorization": "BEARER " + user.token
+            "Authorization": "Bearer " + user.token
           }
         }
       )

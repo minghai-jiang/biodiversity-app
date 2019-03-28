@@ -51,7 +51,7 @@ class Viewer extends PureComponent {
       "Content-Type": "application/json"
     };
     if (this.props.user) {
-      headers["Authorization"] = "BEARER " + this.props.user.token;
+      headers["Authorization"] = "Bearer " + this.props.user.token;
     }
 
     let timestamp = this.state.map.timestamps[this.state.timestampRange.end];

@@ -4,7 +4,6 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import {
   Map,
-  //Popup,
   LayersControl,
 } from "react-leaflet";
 import L from "leaflet";
@@ -13,8 +12,6 @@ import "leaflet-draw";
 
 import "./ViewerMap.css";
 
-// import PopupForm from '../../Popup-form/Popup-form';
-
 import TileLayersControl from './Helpers/TileLayersControl';
 import PolygonLayersControl from './Helpers/PolygonLayersControl';
 import StandardTilesLayerControl from './Helpers/StandardTilesLayerControl';
@@ -22,8 +19,8 @@ import LegendControl from './Helpers/LegendControl';
 import DrawingControl from './Helpers/DrawingControl';
 
 const getPolygonJsonWaitTime = 1000;
-const maxPolygons = 1;
-const maxStandardTiles = 5000;
+const maxPolygons = 1500;
+const maxStandardTiles = 3000;
 
 export class ViewerMap extends PureComponent {
   mapRef = createRef();
@@ -63,10 +60,9 @@ export class ViewerMap extends PureComponent {
 
     TileLayersControl.initialize(this.props);
     await PolygonLayersControl.initialize(this.props, bounds, maxPolygons);
-    await StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles);
+    StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles);
 
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
-    console.log('LegendControl.initialize', this.props, maxPolygons, maxStandardTiles);
     
     DrawingControl.initialize(map, this.onShapeDrawn);
   }
@@ -164,8 +160,7 @@ export class ViewerMap extends PureComponent {
     PolygonLayersControl.onOverlayAdd(e);
     StandardTilesLayerControl.onOverlayAdd(e);
     LegendControl.onOverlayAdd(e);
-    LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts);
-    LegendControl.update(this.props, StandardTilesLayerControl.getElement().polygonCounts);
+    LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts, StandardTilesLayerControl.getElement().polygonCounts);
 
     // this.setState({checkedLayers: checkedLayers});
 
@@ -188,8 +183,7 @@ export class ViewerMap extends PureComponent {
     PolygonLayersControl.onOverlayRemove(e);
     StandardTilesLayerControl.onOverlayRemove(e);
     LegendControl.onOverlayRemove(e);
-    LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts);
-    LegendControl.update(this.props, StandardTilesLayerControl.getElement().polygonCounts);
+    LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts, StandardTilesLayerControl.getElement().polygonCounts);
 
     this.forceUpdate();
   }
