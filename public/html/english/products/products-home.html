@@ -4,7 +4,7 @@
 
     <p>
       Ellipsis' main product is an easy to use API that allows you to query and visualize the vast amount of geographic information in our database. 
-      On top of this we offer an open-source interactive viewer to easily engage people on your projects.
+      On top of this we offer an open-source interactive viewer and a Geomessage service to easily engage people on your projects.
     </p>
   </div>                    
 </div>      
@@ -16,8 +16,8 @@
     </h3>
 
     <p className="product-end-paragraph">
-      Ellipsis provides a REST API that allows you to query our aggregated data directly.
-      It also offers attractive and interactive visualizations that can be easily imported in your favorite framework,
+      Ellipsis provides a public REST API that allows you to query our aggregated data directly.
+      It also renders attractive visualizations that can be easily imported in your favorite framework,
       such as arcGIS or Leaflet.
     </p>
 
@@ -35,7 +35,7 @@
     </h3>
 
     <p className="product-end-paragraph">
-        The API and viewer allow user to give georeferenced remarks and feedback in the Ellipsis database. This feedback is used to correct models and inform other users.
+        Geomessage allows users to sent georeferenced remarks and feedback to the the Ellipsis database. This feedback is used to correct models and inform other users. Geomessage is integrated in both the Viewer and public API.
     </p>
 
     <a href="/products/documentation" className="button button-accented main-block-double-button product-double-button">
@@ -58,8 +58,8 @@
     </h2>
 
     <p>
-      Ellipsis data is acquired and processed on a resolution of 10 by 10 meters. 
-      We currently provide three types of data:
+      Ellipsis data is acquired and processed on the same resolution as the original satellite datasource. 
+      We currently provide three types of information:
     </p>
 
     <ul>
@@ -75,12 +75,14 @@
     </ul>
 
     <p>
-      We aggregate data to both standard OpenStreetMap tiles as well as to custom polygons that are map specific.
-    </p>
-
-    <p>
         On top of automatically generated data we can store georeferenced human messages.
     </p>
+
+
+    <p>
+      We aggregate this information to both standard webMercator tiles as well as to custom polygons that are map specific.
+    </p>
+
 
 
     <h2>

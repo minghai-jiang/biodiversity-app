@@ -154,7 +154,7 @@ The ellipsis API returns data in JSON, CSV and PNG. We can interpret these as Py
 ```
 
 <a id='login'></a>
-# Acces
+# Access
 
 ## Loging in
 
@@ -171,7 +171,7 @@ r =requests.post(url + '/account/login',
 print(r.text)
 ```
 
-    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MzA3OTYzMiwiZXhwIjoxNTUzMTY2MDMyfQ.NG-RyEnnmsj_4qZjRIc40VrVlldG3qVdLcMJipnu_fs"}
+    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1Mzk4NjA5MywiZXhwIjoxNTU0MDcyNDkzfQ.f3tYmKEdd7-omZ5MpdrQQpOzCmRBWO6MRBE-XKz3Q_A"}
 
 
 Our token is quite long, so let's save the token to a variable that we can send with our other requests.
@@ -190,7 +190,7 @@ token = 'Bearer ' + token
 print(token)
 ```
 
-    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1MzA3OTYzMiwiZXhwIjoxNTUzMTY2MDMyfQ.NG-RyEnnmsj_4qZjRIc40VrVlldG3qVdLcMJipnu_fs
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1Mzk4NjA5MywiZXhwIjoxNTU0MDcyNDkzfQ.f3tYmKEdd7-omZ5MpdrQQpOzCmRBWO6MRBE-XKz3Q_A
 
 
 To test whether our token is working, we send a get request with this token to the following authentication testing URL.
@@ -224,7 +224,7 @@ Let's request a JSON and print all keys.
 r = requests.get(url + '/account/myMaps')
 
 r = r.json()
-r
+
 map_names = [map['name'] for map in r]
 map_names
 ```
@@ -232,13 +232,13 @@ map_names
 
 
 
-    ['Netherlands Fields',
-     'Suriname',
+    ['Suriname',
      'Belgium Clouds',
      'Chaco Demo',
      'Gran Chaco',
-     'Amazon Santarem',
-     'Yucatan Coast']
+     'Santarem Sentinel2',
+     'Yucatan Coast',
+     'Netherlands plots']
 
 
 
@@ -393,6 +393,8 @@ r[1:3]
 
 We get all polygon layers per timestamp. Overall these layers should not change to much over time so it might be sensible to just take the layers of the first timestamp and print them.
 
+In case the processed property of a polygon layer is marked as True, it means that data in the database has been aggregated to these polygons and that we can use the polygon queries to request information. If it is marked as false we must obtain data about these polygon using the customPolygon requests.
+
 
 ```python
 [ layer['name'] for layer in r[0]['layers']]
@@ -518,11 +520,12 @@ As mentioned we can obtain data for the classes based on custom polygons, predef
 <a id='data/class/custom'></a>
 ### For a custom polygon
 
-We can define an arbitrary polygon by specifying a sequence of coordinate tuples as follows:
+We can define an arbitrary polygon using a geoJSON as follows:
 
 
 ```python
-coords = [[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]
+coords = {'type': 'FeatureCollection' , 'features':[{ 'properties':{}, 'geometry': {'type': 'Polygon',
+    'coordinates': [[[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]]} }]}
 ```
 
 If we are interested in information about the surface area of landcover classes on this polygon, we have two queries at our disposal.
@@ -1232,7 +1235,7 @@ There are two requests we can make for standard tiles. First off we can request 
 
 ```python
 r = requests.post(url + '/data/class/tile/tileIds',
-                 json = {"mapId":  mapId, 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959},{'tileX':5691,'tileY':7960},{'tileX':5692,'tileY':7959}]})
+                 json = {"mapId":  mapId, 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959},{'tileX':5691,'tileY':7960, 'zoom':14},{'tileX':5692,'tileY':7959, 'zoom':14}]})
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -1312,7 +1315,7 @@ Secondly we can request all timestamps for a specific tile
 
 ```python
 r = requests.post(url + '/data/class/tile/timestamps',
-                 json = {"mapId":  mapId, 'tileX':5658, 'tileY': 7970})
+                 json = {"mapId":  mapId, 'tileX':5658, 'tileY': 7970, 'zoom':14})
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -1481,7 +1484,8 @@ We start out with specifying some polygon that we might be interested in.
 
 
 ```python
-coords = [ [-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]
+coords = {'type': 'FeatureCollection' , 'features':[{ 'properties':{}, 'geometry': {'type': 'Polygon',
+    'coordinates': [[[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]]} }]}
 ```
 
 Now let's request the mean of all spectral indices of the standard tiles intersecting our polygon.
@@ -2091,7 +2095,7 @@ There are two queries available to retrieve data about these tiles. First off we
 
 ```python
 r = requests.post(url + '/data/spectral/tile/tileIds',
-                 json = {"mapId":  mapId,  'class': 'disturbance', 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959},{'tileX':5691,'tileY':7960},{'tileX':5692,'tileY':7959}]})
+                 json = {"mapId":  mapId,  'class': 'disturbance', 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959},{'tileX':5691,'tileY':7960, 'zoom':14},{'tileX':5692,'tileY':7959, 'zoom':14}]})
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -2166,7 +2170,7 @@ Of course we can also request all timestamps for a specific tile.
 
 ```python
 r = requests.post(url + '/data/spectral/tile/timestamps',
-                 json = {"mapId":  mapId, 'tileX': 5659, 'tileY':7974, 'class': 'disturbance' })
+                 json = {"mapId":  mapId, 'tileX': 5659, 'tileY':7974, 'zoom':14, 'class': 'disturbance' })
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -2264,7 +2268,7 @@ We can request the geometries and features of predefined polygons as follows.
 ```python
 r = requests.post(url + '/geometry/polygons',
                  json = {"mapId":  mapId, 'polygonIds':[1,2]})
-
+r.json()
 r  = gpd.GeoDataFrame.from_features(r.json()['features'])
 r.plot()
 r.head(5)
@@ -2300,14 +2304,14 @@ r.head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>POLYGON Z ((-54.65552 4.889224 0, -54.6505432 ...</td>
+      <td>POLYGON Z ((-54.6555203 4.889224 0, -54.650542...</td>
       <td>1</td>
       <td>Mine</td>
       <td>Mine1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>POLYGON Z ((-54.82143 5.1544714 0, -54.81791 5...</td>
+      <td>POLYGON Z ((-54.8214295 5.1544714 0, -54.81791...</td>
       <td>2</td>
       <td>Mine</td>
       <td>Mine2</td>
@@ -2328,7 +2332,7 @@ We can request standard tiles by specifying their tileX and tileY coordinates.
 
 ```python
 r = requests.post(url + '/geometry/tiles',
-                 json = {"mapId":  mapId, 'tileIds':[{'tileX':5704,'tileY':7971}, {'tileX':5705,'tileY':7973}]})
+                 json = {"mapId":  mapId, 'tileIds':[{'tileX':5704,'tileY':7971, 'zoom':14}, {'tileX':5705,'tileY':7973, 'zoom':14}]})
 
 r  = gpd.GeoDataFrame.from_features(r.json()['features'])
 r.plot()
@@ -2337,7 +2341,7 @@ r.plot()
 
 
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f4228ebb1d0>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7ff852b821d0>
 
 
 
@@ -2366,7 +2370,7 @@ plt.imshow(img)
 
 
 
-    <matplotlib.image.AxesImage at 0x7fddd3875240>
+    <matplotlib.image.AxesImage at 0x7ff8564448d0>
 
 
 

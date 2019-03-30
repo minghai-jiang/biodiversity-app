@@ -16,7 +16,7 @@ This brief documentation outlines all post and get requests that can be sent to 
       3.2.3 <a href='#data_index'>/data/spectral/tile</a> <br/>
 4. <a href='#geometry'>**/geometry**</a><br/>
 5. <a href='#visual'>**/visual**</a>
-6. <a href='#tileLayer'>**/tileLayer**</a>
+6. <a href='#tileService'>**/tileService**</a>
 7. <a href='#Feedback'>**/Feedback**</a>
 8. <a href='#download'>**/download**</a>
 
@@ -184,7 +184,7 @@ url = 'https://api.ellipsis-earth.com/data/class/customPolygon/timestamps'
 Request to obtain the surface area of each class for each timestamp for a certain custom polygon.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-coords: A list of coordinates describing the polygon.<br/>
+coords: A geojson describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns timestamp, [columns of area per class], total area, date from and date to.
 
@@ -199,9 +199,9 @@ Request to obtain the surface area of each class for each standard tile covering
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
-coords: A list of coordinates describing the polygon.<br/>
+coords: A geoJson describing the polygon.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of area per class], total area, date from and date to.
+CSV with columns tileX, tileY, zoom, [columns of area per class], total area, date from and date to.
 
 <a id='data_class_polygon'></a>
 ### /data/class/polygon
@@ -247,7 +247,7 @@ mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 polygonId: An integer identifying the polygon.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of area per class] and total area.
+CSV with columns tileX, tileY, zoom, [columns of area per class] and total area.
 
 <a id='data_class_tile'></a>
 ### data/class/tile
@@ -264,7 +264,7 @@ Request to obtain the surface area of each class for each tile for a certain tim
 mapId: The uuid of the particular map.<br/>
 tileIds: a list of key value pairs with keys tileX, tileY and optionally zoom, cannot be longer than 3000.<br/>
 **Returns**<br/>
-CSV with columns polygon, [columns of area per class], total area date from and date to.
+CSV with columns tileX, tileY, zoom, [columns of area per class], total area date from and date to.
 
 #### Post timestamps
 
@@ -276,9 +276,11 @@ url = 'https://api.ellipsis-earth.com/data/class/tile/timestamps'
 Request to obtain the surface area of each class for a standard tile for all timestamps.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-timestamp: An integer identifying the timestamp.<br/>
+tileX: An integer identifying the x-location of the tile<br/>
+tileY: An integer identifying the y-location of the tile<br/>
+zoom: AN integer indicating the zoomlevel of the tile <br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of area per class] and total area.
+CSV with columns tileX, tileY, zoom, [columns of area per class] and total area.
 
 <a id='data_index'></a>
 ## /data/spectral
@@ -295,7 +297,7 @@ Request to obtain the mean indices of each index over a certain class for each t
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
-coords: A list of coordinates describing the polygon.<br/>
+coords: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns timestamp, [columns of mean per index], total area, date from and date to.
 
@@ -311,9 +313,9 @@ Request to obtain the mean indices of each index over a certain class for a cert
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
-coords: A list of coordinates describing the polygon.<br/>
+coords: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of mean per index] and total area.
+CSV with columns tileX, tileY, zoom, [columns of mean per index] and total area.
 
 ### data/spectral/polygon
 <a id='data_index_polygon'></a>
@@ -362,7 +364,7 @@ timestamp: An integer identifying the timestamp.<br/>
 polygonId: An integer identifying the polygon.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of mean per index] and total area.
+CSV with columns tileX, tileY, zoom, [columns of mean per index] and total area.
 
 ### data/spectral/tile
 <a id='data_index_tile'></a>
@@ -392,8 +394,9 @@ Request to obtain the mean indices of each index over a certain class for a stan
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
-tileX: The x position of the tile..<br/>
-tileY: The y position of the tile.<br/>
+tileX: An integer identifying the x-location of the tile<br/>
+tileY: An integer identifying the y-location of the tile<br/>
+zoom: An integer indicating the zoomlevel of the tile <br/>
 **Returns**<br/>
 CSV with columns tileX, tileY, [columns of mean per index], total area, date from and date to.
 
@@ -449,8 +452,8 @@ layerName: Name of the layer that you wish to visualise<br/>
 **Returns**<br/>
 A Web Mercator projected PNG image of no more than 2048 by 2048 pixels.
 
-<a id='tileLayer'></a>
-# /tileLayer
+<a id='tileService'></a>
+# /tileService
 
 
 ```python
@@ -537,7 +540,6 @@ tileX: The x of the tile in web mercator projection.<br/>
 tileY: The y of the tile in web mercator projection.<br/>
 zoom: The zoom level of the tile.<br/>
 isMask: Retracts all mask errors if true, otherwise, retracts all classification errors.<br/>
-message: A custom message describing the error.<br/>
 **Returns**<br/>
 Status 200 if the removeal was successful.
 
@@ -549,7 +551,7 @@ url = 'https://api.ellipsis-earth.com/feedback/error/get'
 ```
 
 Gets all errors of a certain map and a timestamp.<br/>
-**Parameters**
+**Parameters**<br/>
 mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 isMask: Gets all mask errors if true, otherwise, get all classification errors.<br/>
