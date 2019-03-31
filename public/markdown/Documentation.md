@@ -184,7 +184,7 @@ url = 'https://api.ellipsis-earth.com/data/class/customPolygon/timestamps'
 Request to obtain the surface area of each class for each timestamp for a certain custom polygon.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-coords: A geojson describing the polygon.<br/>
+geometry: A geojson describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns timestamp, [columns of area per class], total area, date from and date to.
 
@@ -199,7 +199,7 @@ Request to obtain the surface area of each class for each standard tile covering
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
-coords: A geoJson describing the polygon.<br/>
+geometry: A geoJson describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns tileX, tileY, zoom, [columns of area per class], total area, date from and date to.
 
@@ -297,7 +297,7 @@ Request to obtain the mean indices of each index over a certain class for each t
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
-coords: A geoJSON describing the polygon.<br/>
+geometry: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns timestamp, [columns of mean per index], total area, date from and date to.
 
@@ -313,7 +313,7 @@ Request to obtain the mean indices of each index over a certain class for a cert
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
-coords: A geoJSON describing the polygon.<br/>
+geometry: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns tileX, tileY, zoom, [columns of mean per index] and total area.
 

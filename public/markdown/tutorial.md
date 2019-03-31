@@ -524,7 +524,7 @@ We can define an arbitrary polygon using a geoJSON as follows:
 
 
 ```python
-coords = {'type': 'FeatureCollection' , 'features':[{ 'properties':{}, 'geometry': {'type': 'Polygon',
+geometry = {'type': 'FeatureCollection' , 'features':[{ 'properties':{}, 'geometry': {'type': 'Polygon',
     'coordinates': [[[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]]} }]}
 ```
 
@@ -536,7 +536,7 @@ First off we can obtain the aggregated surface area of each class for this polyg
 
 ```python
 r = requests.post(url + '/data/class/customPolygon/timestamps',
-                 json = {"mapId":  mapId, 'coords': coords })
+                 json = {"mapId":  mapId, 'geometry': geometry })
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -698,7 +698,7 @@ Secondly, we can get these surface areas per land cover class for each tile cove
 
 ```python
 r = requests.post(url + '/data/class/customPolygon/tiles',
-                 json = {"mapId":  mapId, 'timestamp':0, 'coords':coords })
+                 json = {"mapId":  mapId, 'timestamp':0, 'geometry':geometry })
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -1484,7 +1484,7 @@ We start out with specifying some polygon that we might be interested in.
 
 
 ```python
-coords = {'type': 'FeatureCollection' , 'features':[{ 'properties':{}, 'geometry': {'type': 'Polygon',
+geometry = {'type': 'FeatureCollection' , 'features':[{ 'properties':{}, 'geometry': {'type': 'Polygon',
     'coordinates': [[[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]]} }]}
 ```
 
@@ -1495,7 +1495,7 @@ Now let's request the mean of all spectral indices of the standard tiles interse
 
 ```python
 r = requests.post(url + '/data/spectral/customPolygon/timestamps',
-                 json = {"mapId":  mapId, 'class': 'disturbance', 'coords': coords })
+                 json = {"mapId":  mapId, 'class': 'disturbance', 'geometry': geometry })
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -1645,7 +1645,7 @@ Next we request the spectral indices for all tiles intersecting with our polygon
 
 ```python
 r = requests.post(url + '/data/spectral/customPolygon/tiles',
-                 json = {"mapId":  mapId, 'timestamp': 1, 'class': 'disturbance', 'coords': coords })
+                 json = {"mapId":  mapId, 'timestamp': 1, 'class': 'disturbance', 'geometry': geometry })
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
