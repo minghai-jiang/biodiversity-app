@@ -1,0 +1,41 @@
+div.slide-pane__header
+{
+	background-color: #026464;
+}
+
+div.slide-pane__header h2, div.slide-pane__header .slide-pane__close
+{
+	color: white;
+}
+
+div.slide-pane__content
+{
+	background-color: #e6e6e6;
+}
+
+.LineChart
+{
+	min-height: 350px;
+}
+
+div.slide-pane__content h1, div.slide-pane__content h2
+{
+	margin: 0;
+}
+
+div.slide-pane__content h2
+{
+	font-size: 1em;
+}
+
+div.slide-pane__content p
+{
+	margin: 0;
+	padding-top: 1em;
+}
+
+div.slide-pane__content .rc-slider
+{
+	margin: 0.5em;
+	width: calc(100% - 1em);
+}

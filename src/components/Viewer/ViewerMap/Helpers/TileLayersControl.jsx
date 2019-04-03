@@ -169,7 +169,7 @@ function tileLayersControl_prepareLayers (props) {
       }
 
       mapTileLayerType.timestamps.forEach(timestampNumber => {
-        let url = `${props.apiUrl}tileLayer/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
+        let url = `${props.apiUrl}tileService/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
 
         tileLayersOfType.timestampElements.push({
           timestampNumber: timestampNumber,

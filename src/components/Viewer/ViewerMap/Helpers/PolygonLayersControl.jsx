@@ -8,7 +8,7 @@ import {
   LayersControl,
   LayerGroup,
   //FeatureGroup,
-  //Popup,
+  Popup,
   //Polygon,
   //Marker
 } from "react-leaflet";
@@ -27,6 +27,8 @@ let polygonLayersControl_maxPolygon = 500;
 let polygonLayersControl_randomKey = '1';
 
 let polygonLayersControl_map = null;
+
+let polygonLayersControl_PopupContent = {}
 
 const PolygonLayersControl = {
   getElement: () => {
@@ -77,6 +79,8 @@ const PolygonLayersControl = {
   clear: () => {
     polygonLayersControl_controlOverlays = [];
     polygonLayersControl_polygonCounts = 0;
+    polygonLayersControl_PopupContent = {}
+    polygonLayersControl_map = null;
   },
 
   onOverlayAdd: (e) => {
@@ -89,6 +93,77 @@ const PolygonLayersControl = {
     let index = polygonLayersControl_checkedLayers.indexOf(e.name);
     if (index > -1) {
       polygonLayersControl_checkedLayers.splice(index, 1);
+    }
+  },
+
+  onFeatureClick: (props, contentFunction) => {
+    if (polygonLayersControl_PopupContent && polygonLayersControl_PopupContent.id)
+    {
+      let popup = polygonLayersControl_PopupContent;
+      let id = popup.id;
+      let content = [];
+      let properties = Object.create(popup.properties);
+
+      for (let key in popup.properties)
+      {
+        content.push(<p key={id + '.' + key}><span>{key}:</span> {popup.properties[key]}</p>)
+      }
+
+      let classes; let spectral;
+      for (let i = 0; i < props.map.classes.length; i++)
+      {
+        if (props.map.classes[i].timestampNumber === props.timestampRange.end)
+        {
+          classes = props.map.classes[i].classes;
+          spectral = props.map.spectral[i].indices;
+          break;
+        }
+      }
+
+      if(popup.properties && props.map && props.timestampRange && props.apiUrl && polygonLayersControl_PopupContent.data)
+      {
+        properties.class = classes;
+        properties.spectral = spectral;
+        properties.layerName = polygonLayersControl_PopupContent.data.layerName;
+        properties.hasAggregatedData = polygonLayersControl_PopupContent.data.hasAggregatedData;
+        properties.uuid = props.map.uuid;
+        properties.timestamp = props.timestampRange.end;
+        properties.apiUrl = props.apiUrl;
+        properties.type = polygonLayersControl_PopupContent.geometry.type;
+        properties.coordinates = polygonLayersControl_PopupContent.geometry.coordinates;
+
+        if (props.user)
+        {
+          properties.headers = {Authorization: "Bearer " + props.user.token}
+        }
+        else
+        {
+          properties.headers = []
+        }
+      }
+
+      let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, properties)} }>Analyse</a>
+
+      let report;
+
+      if (props.user)
+      {
+        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>GeoMessage</a>
+      }
+
+      return (
+        <Popup position={popup.e.latlng} key={id}>
+          <div key={id + '.content'}>
+            {content}
+          </div>
+          {analyse}
+          {/*report*/}
+        </Popup>
+      );
+    }
+    else
+    {
+      return null;
     }
   }
 }
@@ -114,7 +189,8 @@ async function getPolygonsJson(props, bounds) {
           props.timestampRange.end, 
           bounds, 
           map.polygonLayers[i].layers[j].name,
-          map.polygonLayers[i].layers[j].color);
+          map.polygonLayers[i].layers[j].color,
+          map.polygonLayers[i].layers[j].hasAggregatedData);
 
         geoJsonPromises.push(geoJsonPromise);          
       }
@@ -141,7 +217,7 @@ async function getPolygonsJson(props, bounds) {
   };
 }
 
-async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, layerName, layerColor) {
+async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, layerName, layerColor, hasAggregatedData) {
   let headers = {};
   if (user) {
     headers["Authorization"] = "Bearer " + user.token;
@@ -160,7 +236,6 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
       limit: polygonLayersControl_maxPolygon
     }, headers
   );
-
   if (typeof(polygonIdResult.ids) !== 'undefined' && polygonIdResult.ids.length > 0)
   {
     let polygonsGeoJson = await QueryUtil.postData(
@@ -175,6 +250,7 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
     polygonsGeoJson.name = layerName;
     polygonsGeoJson.color = layerColor;
     polygonsGeoJson.count = polygonIdResult.count
+    polygonsGeoJson.hasAggregatedData = hasAggregatedData
 
     return polygonsGeoJson;
   }
@@ -241,16 +317,28 @@ function createGeojsonLayerControl(props) {
 }
 
 function onEachFeature(feature, layer) {
-  if (feature.properties) {
-    let popupContent = '';
-
-    for (let property in feature.properties) {
-      if (feature.properties.hasOwnProperty(property)) {      
-        popupContent += `<span><strong>${property}</strong>: ${feature.properties[property]}<br/></span>`
+  layer.on({
+    click: function(e){
+      feature.e = e;
+      feature.data = 
+      {
+        color: layer.options.data.color,
+        layerName: layer.options.data.name,
+        hasAggregatedData: layer.options.data.hasAggregatedData,
       }
+      polygonLayersControl_PopupContent = feature;
     }
-    layer.bindPopup(popupContent);
-  }
+  });
+}
+
+function handleTile(type, contentFunction, id, properties)
+{
+  contentFunction({
+    id: id,
+    openPane: true,
+    type: type,
+    properties: properties,
+  });
 }
 
 export default PolygonLayersControl;

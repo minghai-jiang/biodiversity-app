@@ -92,7 +92,6 @@ class App extends Component {
   }
 
   setLanguage = (language) => {
-    debugger;
     fetch('/localization/' + language + '.json')
       .then(response => {
         if (response.ok) {
@@ -131,8 +130,6 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state.language);
-    debugger;
     if (this.state.init) {
       return (
         <div className="App" onClick={this.closeMenu}>

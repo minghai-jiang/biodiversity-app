@@ -3,7 +3,7 @@ import Slider from 'rc-slider';
 import Moment from 'moment';
 
 import 'rc-slider/assets/index.css';
-import 'rc-tooltip/assets/bootstrap.css'; //<--- Nodig?
+import 'rc-tooltip/assets/bootstrap.css';
 import './TimestampSelector.css';
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
