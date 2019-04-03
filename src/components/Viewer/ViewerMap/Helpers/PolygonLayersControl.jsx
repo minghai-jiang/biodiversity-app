@@ -97,6 +97,7 @@ const PolygonLayersControl = {
   },
 
   onFeatureClick: (props, contentFunction) => {
+    console.log(polygonLayersControl_PopupContent, polygonLayersControl_PopupContent.id);
     if (polygonLayersControl_PopupContent && polygonLayersControl_PopupContent.id)
     {
       let popup = polygonLayersControl_PopupContent;
@@ -152,8 +153,8 @@ const PolygonLayersControl = {
       }
 
       return (
-        <Popup position={popup.e.latlng} key={id}>
-          <div key={id + '.content'}>
+        <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()}>
+          <div key={id + '.content' + Math.random() + Math.random() + Math.random()}>
             {content}
           </div>
           {analyse}

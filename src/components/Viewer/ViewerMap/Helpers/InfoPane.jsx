@@ -33,7 +33,7 @@ export class InfoPane extends PureComponent {
   };
 
   componentWillReceiveProps(nextProp){  
-    if(nextProp && nextProp.infoContent && nextProp.infoContent.openPane)
+    if(nextProp && nextProp.infoContent && nextProp.infoContent.openPane && this.props.infoContent.openPane !== nextProp.infoContent.openPane)
     {
       this.toggleQueryPane(true);
     }
