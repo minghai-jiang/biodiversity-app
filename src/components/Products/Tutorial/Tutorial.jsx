@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "./Tutorial.css";
 
-import L_U_HTML from '../../Utilities/LoadUpdateUtil';
+import LoadUpdateUtil from '../../Utilities/LoadUpdateUtil';
 
 
 export class ProductsTutorial extends Component {
@@ -15,7 +15,7 @@ export class ProductsTutorial extends Component {
                     </h1>
                     <div className="main-block-content main-block-content-left">
                         {/* <Markdown publicFilesUrl={this.props.publicFilesUrl} file="tutorial"></Markdown> */}
-                        <L_U_HTML 
+                        <LoadUpdateUtil 
                           contentUrl={'/markdown/tutorial.md'}
                           isMarkdown={true}
                         />

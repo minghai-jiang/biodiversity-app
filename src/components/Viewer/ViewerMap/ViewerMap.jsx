@@ -12,15 +12,15 @@ import "leaflet-draw";
 
 import "./ViewerMap.css";
 
-// import PopupForm from '../../Popup-form/Popup-form';
-
 import TileLayersControl from './Helpers/TileLayersControl';
 import PolygonLayersControl from './Helpers/PolygonLayersControl';
+import StandardTilesLayerControl from './Helpers/StandardTilesLayerControl';
 import LegendControl from './Helpers/LegendControl';
 import DrawingControl from './Helpers/DrawingControl';
 
 const getPolygonJsonWaitTime = 1000;
-const maxPolygons = 500;
+const maxPolygons = 1500;
+const maxStandardTiles = 3000;
 
 export class ViewerMap extends PureComponent {
   mapRef = createRef();
@@ -47,6 +47,7 @@ export class ViewerMap extends PureComponent {
     map.on('moveend', this.onMapMoveEnd);
     map.on('overlayadd', this.onOverlayAdd);
     map.on('overlayremove', this.onOverlayRemove);
+    map.on('click', this.onClick);
 
     let screenBounds = map.getBounds();
     let bounds = 
@@ -59,9 +60,18 @@ export class ViewerMap extends PureComponent {
 
     TileLayersControl.initialize(this.props);
     await PolygonLayersControl.initialize(this.props, bounds, maxPolygons);
-    LegendControl.initialize(this.props, maxPolygons);
+    StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles);
+
+    LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
     
     DrawingControl.initialize(map, this.onShapeDrawn);
+  }
+
+  componentWillUnmount = () => {
+    PolygonLayersControl.clear();
+    TileLayersControl.clear();
+    StandardTilesLayerControl.clear();
+    LegendControl.clear();
   }
 
   componentWillReceiveProps = async (nextProps) => {
@@ -74,6 +84,7 @@ export class ViewerMap extends PureComponent {
 
       if (differentMap) {
         PolygonLayersControl.clear();
+        StandardTilesLayerControl.clear();
 
         let bounds = L.latLngBounds(L.latLng(nextProps.map.yMin, nextProps.map.xMin), L.latLng(nextProps.map.yMax, nextProps.map.xMax));
       
@@ -107,6 +118,8 @@ export class ViewerMap extends PureComponent {
       LegendControl.update(nextProps, []);
 
       await PolygonLayersControl.update(nextProps, bounds);
+      await StandardTilesLayerControl.update(nextProps, bounds);
+
     }
   }
 
@@ -122,10 +135,14 @@ export class ViewerMap extends PureComponent {
       yMax: screenBounds.getNorth()
     }
 
-    await PolygonLayersControl.update(props, bounds);
 
+    await PolygonLayersControl.update(props, bounds);
     let polygonsInfo = PolygonLayersControl.getElement();
-    LegendControl.update(this.props, polygonsInfo.polygonCounts);
+
+    await StandardTilesLayerControl.update(props, bounds);
+    let standardTilesInfo = StandardTilesLayerControl.getElement();
+
+    LegendControl.update(this.props, polygonsInfo.polygonCounts, standardTilesInfo.polygonCounts);
 
     this.forceUpdate();
   }
@@ -148,11 +165,16 @@ export class ViewerMap extends PureComponent {
 
     TileLayersControl.onOverlayAdd(e);
     PolygonLayersControl.onOverlayAdd(e);
+    StandardTilesLayerControl.onOverlayAdd(e);
     LegendControl.onOverlayAdd(e);
-    LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts);
+    LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts, StandardTilesLayerControl.getElement().polygonCounts);
 
     // this.setState({checkedLayers: checkedLayers});
 
+    this.forceUpdate();
+  }
+
+  onClick = (e) => {
     this.forceUpdate();
   }
 
@@ -166,19 +188,21 @@ export class ViewerMap extends PureComponent {
 
     TileLayersControl.onOverlayRemove(e);
     PolygonLayersControl.onOverlayRemove(e);
+    StandardTilesLayerControl.onOverlayRemove(e);
     LegendControl.onOverlayRemove(e);
-    LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts);
+    LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts, StandardTilesLayerControl.getElement().polygonCounts);
 
-    // this.setState({checkedLayers: checkedLayers});
     this.forceUpdate();
+  }
+
+  getPopupContent = (content) => {
+    this.props.infoContent(content);
   }
 
   onShapeDrawn = (shapeCoords) => {
     // Do something useful.
     console.log(shapeCoords);
   }
-
-  
 
   render() {
     return (
@@ -200,8 +224,16 @@ export class ViewerMap extends PureComponent {
               null
           }
 
-          { LegendControl.getElement() }
+          {
+            StandardTilesLayerControl.getElement().polygonControlOverlays ?
+              <LayersControl position="topright">
+                { StandardTilesLayerControl.getElement().polygonControlOverlays }
+              </LayersControl> :
+              null
+          }
 
+          { LegendControl.getElement() }
+          { StandardTilesLayerControl.onFeatureClick(this.props, this.getPopupContent) }
         </Map>
         {/* <PopupForm props={this.state.popupProps} /> */}
       </div>

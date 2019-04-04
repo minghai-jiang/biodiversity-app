@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
+//import { NavLink } from "react-router-dom";
 
-import L_U_HTML from '../Utilities/LoadUpdateUtil';
+import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 import { Footer } from "../footer/footer";
 
 import "./Home.css";
@@ -15,7 +15,7 @@ export class Home extends Component {
             <img id="banner-logo" src="/images/logo-white-subtitle.png" alt="Ellipsis Earth Intelligence"/>                    
           </div>
 
-          <L_U_HTML 
+          <LoadUpdateUtil 
             contentUrl={'/html/' + this.props.language + '/home/home.html'}
           />
         </div>

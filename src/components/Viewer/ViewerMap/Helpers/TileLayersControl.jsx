@@ -1,15 +1,16 @@
-import React, { PureComponent, createRef } from 'react';
+//import React, { PureComponent, createRef } from 'react';
+import React from 'react';
 
 import {
-  Map,
+  //Map,
   TileLayer,
-  GeoJSON,
+  //GeoJSON,
   LayersControl,
   LayerGroup,
-  FeatureGroup,
-  Popup,
-  Polygon,
-  Marker
+  //FeatureGroup,
+  //Popup,
+  //Polygon,
+  //Marker
 } from "react-leaflet";
 import L from "leaflet";
 
@@ -54,7 +55,7 @@ const mapParams = {
 };
 
 const baseSatelliteOverlay = (
-  <LayersControl.Overlay checked name="Base satellite">
+  <LayersControl.Overlay checked name="Base satellite" key="Base streets-satellite">
     <TileLayer
       url="https://api.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWhqaWFuZyIsImEiOiJjamhkNXU3azcwZW1oMzZvNjRrb214cDVsIn0.QZWgmabi2gRJAWr1Vr3h7w"
       attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href = "https://www.mapbox.com/" > Mapbox</a >'
@@ -118,6 +119,10 @@ const TileLayersControl = {
     if (index > -1) {
       tileLayersControl_checkedLayers.splice(index, 1);
     }
+  },
+
+  clear: (e) => {
+    tileLayersControl_controlOverlays = [];
   }
 }
 
@@ -164,7 +169,7 @@ function tileLayersControl_prepareLayers (props) {
       }
 
       mapTileLayerType.timestamps.forEach(timestampNumber => {
-        let url = `${props.apiUrl}tileLayer/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
+        let url = `${props.apiUrl}tileService/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
 
         tileLayersOfType.timestampElements.push({
           timestampNumber: timestampNumber,

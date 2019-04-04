@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import L_U_HTML from '../../Utilities/LoadUpdateUtil';
+import LoadUpdateUtil from '../../Utilities/LoadUpdateUtil';
 
 import './Documentation.css';
 
@@ -14,7 +14,7 @@ export class ProductsDocumentation extends Component {
           </div>
           <div className='main-block-content main-block-content-left documentation-block'>
             {/* <Markdown publicFilesUrl={this.props.publicFilesUrl} file="documentation"></Markdown> */}
-            <L_U_HTML 
+            <LoadUpdateUtil 
               contentUrl={'/markdown/Documentation.md'}
               isMarkdown={true}
             />

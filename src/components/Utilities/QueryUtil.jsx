@@ -2,12 +2,12 @@ const createReactClass = require('create-react-class');
 
 const QueryUtil = createReactClass({
   statics: {
-    getData: async (url, body, header = { "Content-Type": "application/json" }) => {
+    postData: async (url, body, header = { "Content-Type": "application/json" }) => {
       if(url)
       {      
         try
         {
-          var response;
+          let response;
           if(body)
           {
             if (!header['Content-Type'])
@@ -15,11 +15,11 @@ const QueryUtil = createReactClass({
               header['Content-Type'] = "application/json";
             }
             response = await fetch(url, 
-              {
-                method:   'POST',
-                headers:  header,
-                body:     JSON.stringify(body),
-              });
+            {
+              method:   'POST',
+              headers:  header,
+              body:     JSON.stringify(body),
+            });
           }
           else
           {
@@ -27,10 +27,47 @@ const QueryUtil = createReactClass({
           }
 
           let responseJson = await response.text();
-          if (!~responseJson.indexOf('Error'))
+          if (response.status === 200)
           {
-            responseJson = JSON.parse(responseJson);
-            return (responseJson);
+            try
+            {
+              responseJson = JSON.parse(responseJson);
+            }
+            catch (e){}
+            return responseJson
+          }
+        }
+        catch(error)
+        {
+          throw new Error(error);
+        }
+      }
+      else
+      {
+        throw new Error('Invalid Query URL');
+      }
+    },
+    getData: async (url, header) => {
+      if(url)
+      {
+        try
+        {
+          let response;
+          response = await fetch(url, 
+          {
+            method:   'GET',
+            headers:  header,
+          });
+
+          let responseJson = await response.text();
+          if (response.status === 200)
+          {
+            try
+            {
+              responseJson = JSON.parse(responseJson);
+            }
+            catch (e){}
+            return responseJson
           }
         }
         catch(error)
