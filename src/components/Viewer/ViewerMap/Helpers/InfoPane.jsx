@@ -3,6 +3,9 @@ import SlidingPane from 'react-sliding-pane';
 import PopupForm from '../../Popup-form/Popup-form';
 import LineChart from './DV/LineChart';
 import Slider from 'rc-slider';
+import QueryUtil from '../../../Utilities/QueryUtil';
+import Papa from 'papaparse';
+import Table from './DV/Table';
 
 import 'rc-slider/assets/index.css';
 import 'rc-tooltip/assets/bootstrap.css';
@@ -20,6 +23,7 @@ export class InfoPane extends PureComponent {
       inputClass: '',
       sliderValue: 1,
       slider: [],
+      data: {},
     }
 
     if (this.props && this.props.infoContent)
@@ -39,25 +43,12 @@ export class InfoPane extends PureComponent {
     }
   };
 
-  getClasses = () =>
+  getOptions = () =>
   {
-    let content = [];
-    let classes = [];
-    content.push(<h1 key='Classes'>Classes</h1>);
-    content.push(<LineChart key ='classesTimestamps' props={this.props} type='class'/>);
-    classes.push(<div key='containerClasses' className='LineChart'>{content}</div>);
-    return classes;
-  };
-
-  getIndeces = (itemValue, filter = 1) =>
-  {
-    let content = [];
-    let indeces = [];
     let options = [
       <option key='default' value="default" disabled hidden>Choose a class</option>,
       <option key='allClasses' value='all classes'>all classes</option>,
     ];
-    content.push(<h1 key='Indices'>Indices</h1>);
 
     for (let i = 0; i < this.props.map.classes.length; i++)
     {
@@ -74,14 +65,54 @@ export class InfoPane extends PureComponent {
       }
     }
 
-    if (itemValue)
+    return options;
+  }
+
+  getClasses = async() =>
+  {
+    let content = [];
+    let classes = [];
+    let data = await this.getData('class');
+    console.log('Get Classes ', data)
+
+    content.push(<h1 key='Classes'>Classes</h1>);
+    if (data)
     {
-      content.push(<select key='classSelector' defaultValue={itemValue} onChange={this.onClassChange}>{options}</select>);
-      content.push(<LineChart key={'indicesTimestamps' + itemValue} props={this.props} type='spectral' inputClass={itemValue} className='LineChart' filter={filter}/>)
+      content.push(<LineChart key ='classesTimestamps' props={this.props} type='class' data={data.graphData} filter={1}/>);
+      content.push(<Table key='classTable' type={'class'} data={data.tableData}/>)
     }
     else
     {
-      content.push(<select key='classSelector' defaultValue={'default'} onChange={this.onClassChange}>{options}</select>);
+      content.push(<p key='noClassData'>No Class Data</p>);
+    }
+
+    classes.push(<div key='containerClasses' className='LineChart'>{content}</div>);
+    return classes;
+  };
+
+  getIndeces = async(itemValue, filter = 1) =>
+  {
+    let content = [];
+    let indeces = [];
+    let currentValue = itemValue ? itemValue : 'all classes';
+    let defaultValue = itemValue ? itemValue : 'default';
+    let data = await this.getData('spectral', currentValue);
+
+    let options = this.getOptions();
+
+    content.push(<h1 key='Indices'>Indices</h1>);
+    content.push(<select key='classSelector' defaultValue={defaultValue} onChange={this.onClassChange}>{options}</select>);
+    if (itemValue)
+    {
+      if(data)
+      {
+        content.push(<LineChart key={'indicesTimestamps' + itemValue + filter} props={this.props} type='spectral' inputClass={currentValue} className='LineChart' filter={filter} data={data.graphData}/>)
+        content.push(<Table key={'indecesTable' + itemValue} type={itemValue} data={data.tableData}/>)
+      }
+      else
+      {
+        content.push(<p key={'noDataFor' + itemValue}>No data for {currentValue}</p>);
+      }
     }
 
     indeces.push(<div key={'containerIndices'} className='LineChart'>{content}</div>);
@@ -89,8 +120,9 @@ export class InfoPane extends PureComponent {
     return indeces;
   };
 
-  handleChange = (value) => {
-    this.setState({sliderValue: value, indeces: this.getIndeces(this.state.inputClass, value)});
+  handleChange = async(value) => {
+    let indeces = await this.getIndeces(this.state.inputClass, value);
+    this.setState({sliderValue: value, indeces: indeces});
   };
 
   getSlider = () =>
@@ -114,52 +146,175 @@ export class InfoPane extends PureComponent {
     return slider;
   };
 
-  componentDidMount()
+  getData = async(type, spectralClass) =>
   {
-    let name;
+    if (this.state.data[type])
+    {
+      if (type === 'class')
+      {
+        return(this.state.data[type]);
+      }
+      else if (type === 'spectral')
+      {
+        if (this.state.data[type][spectralClass])
+        {
+          return(this.state.data[type][spectralClass]);
+          console.log('from state', this.state.data[type][spectralClass])
+        }
+        else
+        {
+          let data = this.state.data;
+          data[type][spectralClass] = await this.getDataFromServer(type, spectralClass);
+          this.setState({data: data});
+          console.log('from DB', data[type][spectralClass])
+          return data[type][spectralClass];
+        }
+      }
+    }
+    else
+    {
+      if (type === 'class')
+      {       
+        let data = this.state.data;
+        data[type] = await this.getDataFromServer(type);
+        this.setState({data: data});
+        return data[type];
+      }
+      else if (type === 'spectral')
+      {
+        let data = this.state.data;
+        data[type] = {};
+        data[type][spectralClass] = await this.getDataFromServer(type, spectralClass);
+        this.setState({data: data});
+        console.log('from DB', data[type][spectralClass])
+        return data[type][spectralClass];
+      }
+    }
+  };
+
+  getDataFromServer = async(type, spectralClass) =>
+  {
+    let rawGraphDataPromise;
+
+    let body = {
+      mapId:  this.props.map.uuid,
+    };
+
+    if(type === 'spectral')
+    {
+      body.class = spectralClass;
+    }
+
+    if (!this.props.infoContent.properties.hasAggregatedData)
+    {
+      let geometry = {
+        'type': 'FeatureCollection',
+        'features':[{
+          properties:
+          {},
+          geometry:{
+            type: this.props.infoContent.properties.type,
+            coordinates:this.props.infoContent.properties.coordinates,
+            }
+          }]
+        }
+
+      body.geometry = geometry;
+      rawGraphDataPromise = await QueryUtil.postData(
+        this.props.infoContent.properties.apiUrl + 'data/' + type + '/customPolygon/timestamps',
+        body,
+        this.headers 
+      );
+    }
+    else
+    {
+      body.polygonId = this.props.infoContent.id;      
+      rawGraphDataPromise = await QueryUtil.postData(
+        this.props.infoContent.properties.apiUrl + 'data/' + type + '/polygon/timestamps',
+        body,
+        this.headers 
+      );
+    }
+  
+    let rawGraphData = await rawGraphDataPromise;
+
+    return (this.prepareData(rawGraphData));
+  }
+
+  prepareData = async(rawGraphData) =>
+  {
+    rawGraphData = await rawGraphData;
+    if (rawGraphData && !rawGraphData.includes('no data'))
+    {
+      let tableData = Papa.parse(rawGraphData, {dynamicTyping: true, skipEmptyLines: true});
+      let graphData = Papa.parse(rawGraphData, {dynamicTyping: true, skipEmptyLines: true, header: true});
+
+      return ({tableData: tableData, graphData: graphData});
+    }
+  };
+
+  componentWillMount = () => {
     if(this.props.infoContent && this.props.infoContent.type === 'analyse')
     {
-      name = 'Analysis of ' + this.props.infoContent.properties.type + ' ' + this.props.infoContent.properties.id;
-
-      let classes = this.getClasses();
-      let indeces = this.getIndeces();
-      let slider = this.getSlider();
-
-      this.setState({classes: classes, indeces: indeces, slider: slider})
+      this.paneName = 'Analysis of ' + this.props.infoContent.properties.type + ' ' + this.props.infoContent.properties.id;
     }
     else if(this.props.infoContent && this.props.infoContent.type === 'report')
     {
-      name = 'GeoMessage';
+      this.paneName = 'GeoMessage';
+    }
+  };
+
+  componentDidMount = async() =>
+  {
+    if(this.props.infoContent && this.props.infoContent.type === 'analyse')
+    {
+      let classes = await this.getClasses();
+      let indeces = await this.getIndeces();
+      let slider = this.getSlider();
+
+      await this.setState({classes: classes, indeces: indeces, slider: slider})
+    }
+    else if(this.props.infoContent && this.props.infoContent.type === 'report')
+    {
       this.setState({GeoMessage: <PopupForm props={this.props.infoContent.properties} />})
     }
-
-    this.paneName = name;
   }
 
-  onClassChange = e =>
+  onClassChange = async(e) =>
   {
     let itemValue = e.target.value;
-    let indeces = this.getIndeces(itemValue);
+    let indeces = await this.getIndeces(itemValue);
+
     this.setState({inputClass: itemValue, indeces: indeces})
   }
 
   render() {
     if (this.props.map && this.props.infoContent)
-    {     
+    {
+      let content = [];
+
+      if (this.props.map.timestamps.length > 1)
+      {
+        content.push(this.state.classes);
+        content.push(this.state.indeces);
+        this.state.indeces.length > 0 && this.state.inputClass !== '' && this.state.indeces[0].props.children[2] && this.state.indeces[0].props.children[2].type !== 'p' ? content.push(this.state.slider) : content.push(null);
+      }
+      else
+      {
+        content.push(<p key='notEnoughData'>Not enough timestamps available for analysis.</p>);
+      }
+
       return (
           <SlidingPane
             className='query-pane'
             overlayClassName='modal-overlay'
             isOpen={this.state.openQueryPane}
             title={this.paneName}
-            width={'75%'}
+            width={'50%'}
             onRequestClose={() => { this.toggleQueryPane(false); }}
           >
-            {this.state.classes}
-            {this.state.indeces}
-            {this.state.indeces.length > 0 ? this.state.slider : null}
+            {content[0].length !== 0 ? content : <p key='loadingData'>Loading Data <br/><img src='/images/spinner.png' alt='spinner'/></p>}
             {this.state.GeoMessage}
-
           </SlidingPane>
       );
     }

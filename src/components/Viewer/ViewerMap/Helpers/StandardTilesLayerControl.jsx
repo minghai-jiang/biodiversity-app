@@ -132,7 +132,7 @@ const StandardTilesLayer = {
       }
 
       return (
-        <Popup position={popup.e.latlng} key={id}>
+        <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()} autoPan={false} keepInView={false}>
           <div key={id + '.content'}>
             {content}
           </div>

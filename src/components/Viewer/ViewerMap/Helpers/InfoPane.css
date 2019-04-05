@@ -39,3 +39,93 @@ div.slide-pane__content .rc-slider
 	margin: 0.5em;
 	width: calc(100% - 1em);
 }
+
+div.slide-pane__content table
+{
+	max-height: 400px;
+	background: none;
+}
+
+div.slide-pane__content button
+{
+  margin-top: 5em;
+}
+
+div.slide-pane__content .tableContainer
+{
+  margin-top: 1em;
+  max-height: 100vh;
+  overflow: hidden;
+  -webkit-transition: max-height 0.5s; /* Safari */
+  transition: max-height 0.5s ;
+}
+
+div.slide-pane__content .tableContainer.hidden
+{
+  height: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+
+
+div.slide-pane__content table::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+  background: none;
+}
+ 
+div.slide-pane__content table::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #8c8c8c; 
+}
+
+div.slide-pane__content table::-webkit-scrollbar-thumb:hover {
+  background: #999999; 
+}
+
+div.slide-pane__content img
+{
+  height: 24px;
+  width: 24px;
+
+    -webkit-animation-name: spin;
+    -webkit-animation-duration: 1000ms;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: spin;
+    -moz-animation-duration: 1000ms;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -ms-animation-name: spin;
+    -ms-animation-duration: 1000ms;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: linear;
+    
+    animation-name: spin;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+
+    opacity: 0.75;
+}
+
+@-ms-keyframes spin {
+    from { -ms-transform: rotate(360deg); }
+    to { -ms-transform: rotate(0deg); }
+}
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(360deg); }
+    to { -moz-transform: rotate(0deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(360deg); }
+    to { -webkit-transform: rotate(0deg); }
+}
+@keyframes spin {
+  from {
+      transform:rotate(360deg);
+  }
+  to {
+      transform:rotate(0deg);
+  }
+}
