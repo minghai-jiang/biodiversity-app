@@ -86,7 +86,6 @@ export class LineChart extends PureComponent {
       }
     }
 
-    console.log(this.props.filter);
     for (let i = 0; i < data.data.length; i++)
     {
       let row = data.data[i];
@@ -145,7 +144,7 @@ export class LineChart extends PureComponent {
       line: {stroke: '#808080'},
       ticks: {stroke: '#808080'},
       text: {stroke: 'none', fill: '#545454', fontWeight: 600}};
-      console.log(this.state.meta)
+      
       if (this.state.lines.length > 0 && this.state.lines[0].type !== 'p')
       {
         return(

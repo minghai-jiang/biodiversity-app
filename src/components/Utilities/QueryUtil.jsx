@@ -27,7 +27,6 @@ const QueryUtil = createReactClass({
           }
 
           let responseJson = await response.text();
-          //console.log(responseJson);
           if (response.status === 200)
           {
             try

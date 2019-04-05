@@ -19,7 +19,7 @@ import LegendControl from './Helpers/LegendControl';
 import DrawingControl from './Helpers/DrawingControl';
 
 const getPolygonJsonWaitTime = 1000;
-const maxPolygons = 1500;
+const maxPolygons = 3000;
 const maxStandardTiles = 3000;
 
 export class ViewerMap extends PureComponent {
@@ -59,8 +59,8 @@ export class ViewerMap extends PureComponent {
     }
 
     TileLayersControl.initialize(this.props);
-    await PolygonLayersControl.initialize(this.props, bounds, maxPolygons);
-    StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles);
+    await PolygonLayersControl.initialize(this.props, bounds, maxPolygons, map);
+    StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles, map);
 
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
     
