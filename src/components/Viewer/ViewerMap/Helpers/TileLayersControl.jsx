@@ -49,7 +49,7 @@ const tileLayerTypes = [
 const mapParams = {
   tileSize: 256,
   attribution: 'Ellipsis Earth Intelligence',
-  maxZoom: 14,
+  maxZoom: 16,
   noWrap: true,
   format: 'image/png'
 };
