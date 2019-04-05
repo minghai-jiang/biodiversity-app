@@ -171,7 +171,7 @@ r =requests.post(url + '/account/login',
 print(r.text)
 ```
 
-    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1Mzk4NjA5MywiZXhwIjoxNTU0MDcyNDkzfQ.f3tYmKEdd7-omZ5MpdrQQpOzCmRBWO6MRBE-XKz3Q_A"}
+    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1NDM4ODk5NiwiZXhwIjoxNTU0NDc1Mzk2fQ.wc-vRBHiawc39jQBRjb_wNnksH8zB_kiLNd-HZLRjj0"}
 
 
 Our token is quite long, so let's save the token to a variable that we can send with our other requests.
@@ -190,7 +190,7 @@ token = 'Bearer ' + token
 print(token)
 ```
 
-    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1Mzk4NjA5MywiZXhwIjoxNTU0MDcyNDkzfQ.f3tYmKEdd7-omZ5MpdrQQpOzCmRBWO6MRBE-XKz3Q_A
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1NDM4ODk5NiwiZXhwIjoxNTU0NDc1Mzk2fQ.wc-vRBHiawc39jQBRjb_wNnksH8zB_kiLNd-HZLRjj0
 
 
 To test whether our token is working, we send a get request with this token to the following authentication testing URL.
@@ -232,13 +232,17 @@ map_names
 
 
 
-    ['Suriname',
+    ['PBL KPL farm',
      'Belgium Clouds',
+     'Cartagena',
+     'Netherlands plots',
+     'Suriname',
      'Chaco Demo',
+     'PBL forest Tanzania',
      'Gran Chaco',
-     'Santarem Sentinel2',
      'Yucatan Coast',
-     'Netherlands plots']
+     'Medellin',
+     'Santarem Sentinel2']
 
 
 
@@ -283,13 +287,16 @@ r[1:4]
 
     [{'timestampNumber': 1,
       'dateFrom': '2018-02-01T00:00:00.000Z',
-      'dateTo': '2018-02-15T00:00:00.000Z'},
+      'dateTo': '2018-02-15T00:00:00.000Z',
+      'dataSourceId': 1},
      {'timestampNumber': 2,
       'dateFrom': '2018-03-01T00:00:00.000Z',
-      'dateTo': '2018-03-15T00:00:00.000Z'},
+      'dateTo': '2018-03-15T00:00:00.000Z',
+      'dataSourceId': 1},
      {'timestampNumber': 3,
       'dateFrom': '2018-04-01T00:00:00.000Z',
-      'dateTo': '2018-04-15T00:00:00.000Z'}]
+      'dateTo': '2018-04-15T00:00:00.000Z',
+      'dataSourceId': 1}]
 
 
 
@@ -310,18 +317,18 @@ r1[1:3]
 
 
 
-    [{'timestampNumber': 1,
+    [{'timestampNumber': 10,
       'modelVersion': 1,
-      'classes': [{'name': 'disturbance', 'color': 'ff0000ff'},
+      'classes': [{'name': 'blanc', 'color': '00000000'},
        {'name': 'no class', 'color': '00000000'},
-       {'name': 'mask', 'color': '00000000'},
-       {'name': 'blanc', 'color': '00000000'}]},
-     {'timestampNumber': 2,
+       {'name': 'disturbance', 'color': 'ff0000ff'},
+       {'name': 'mask', 'color': 'ffffffff'}]},
+     {'timestampNumber': 9,
       'modelVersion': 1,
-      'classes': [{'name': 'disturbance', 'color': 'ff0000ff'},
+      'classes': [{'name': 'blanc', 'color': '00000000'},
        {'name': 'no class', 'color': '00000000'},
-       {'name': 'mask', 'color': '00000000'},
-       {'name': 'blanc', 'color': '00000000'}]}]
+       {'name': 'disturbance', 'color': 'ff0000ff'},
+       {'name': 'mask', 'color': 'ffffffff'}]}]
 
 
 
@@ -358,7 +365,7 @@ print([ cl['name'] for cl in r1[0]['classes']])
 print([ index['name'] for index in r2[0]['indices']])
 ```
 
-    ['disturbance', 'no class', 'mask', 'blanc']
+    ['blanc', 'no class', 'disturbance', 'mask']
     ['NDVI', 'NDWI']
 
 
@@ -380,20 +387,26 @@ r[1:3]
 
     [{'timestampNumber': 1,
       'polygonVersion': 0,
-      'layers': [{'name': 'Reserve', 'color': 'ff0000ff'},
-       {'name': 'Mine', 'color': 'ff0000ff'},
-       {'name': 'polygon', 'color': 'ff0000ff'}]},
+      'layers': [{'name': 'province',
+        'color': 'ffff00ff',
+        'hasAggregatedData': False},
+       {'name': 'polygon', 'color': 'ffff00ff', 'hasAggregatedData': True},
+       {'name': 'Reserve', 'color': 'ffff00ff', 'hasAggregatedData': True},
+       {'name': 'Mine', 'color': 'ffff00ff', 'hasAggregatedData': True}]},
      {'timestampNumber': 2,
       'polygonVersion': 0,
-      'layers': [{'name': 'Reserve', 'color': 'ff0000ff'},
-       {'name': 'Mine', 'color': 'ff0000ff'},
-       {'name': 'polygon', 'color': 'ff0000ff'}]}]
+      'layers': [{'name': 'province',
+        'color': 'ffff00ff',
+        'hasAggregatedData': False},
+       {'name': 'polygon', 'color': 'ffff00ff', 'hasAggregatedData': True},
+       {'name': 'Reserve', 'color': 'ffff00ff', 'hasAggregatedData': True},
+       {'name': 'Mine', 'color': 'ffff00ff', 'hasAggregatedData': True}]}]
 
 
 
 We get all polygon layers per timestamp. Overall these layers should not change to much over time so it might be sensible to just take the layers of the first timestamp and print them.
 
-In case the processed property of a polygon layer is marked as True, it means that data in the database has been aggregated to these polygons and that we can use the polygon queries to request information. If it is marked as false we must obtain data about these polygon using the customPolygon requests.
+In case the hasAggregatedData property of a polygon layer is marked as True, it means that data in the database has been aggregated to these polygons and that we can use the polygon queries to request information. If it is marked as false we must obtain data about these polygon using the customPolygon requests.
 
 
 ```python
@@ -403,7 +416,7 @@ In case the processed property of a polygon layer is marked as True, it means th
 
 
 
-    ['Reserve', 'Mine', 'polygon']
+    ['province', 'polygon', 'Reserve', 'Mine']
 
 
 
@@ -422,7 +435,7 @@ r
 
 
 
-    {'count': 7, 'ids': [1, 2, 3, 4, 5, 6, 7]}
+    {'count': 7, 'ids': [4, 2, 1, 3, 5, 6, 7]}
 
 
 
@@ -440,7 +453,7 @@ r
 
 
 
-    {'count': 2, 'ids': [1, 4]}
+    {'count': 2, 'ids': [4, 1]}
 
 
 
@@ -577,10 +590,10 @@ r.head(10)
     <tr>
       <th>0</th>
       <td>0</td>
-      <td>124.488598</td>
-      <td>10.598003</td>
-      <td>1190.759627</td>
-      <td>216.817771</td>
+      <td>124.489</td>
+      <td>10.598</td>
+      <td>1190.760</td>
+      <td>216.818</td>
       <td>1542.664</td>
       <td>2018-01-01</td>
       <td>2018-01-15</td>
@@ -588,10 +601,10 @@ r.head(10)
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>124.488598</td>
-      <td>25.381730</td>
-      <td>784.431065</td>
-      <td>608.362607</td>
+      <td>124.489</td>
+      <td>25.382</td>
+      <td>784.431</td>
+      <td>608.363</td>
       <td>1542.664</td>
       <td>2018-02-01</td>
       <td>2018-02-15</td>
@@ -599,10 +612,10 @@ r.head(10)
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>124.488598</td>
-      <td>27.846718</td>
-      <td>689.946937</td>
-      <td>700.381747</td>
+      <td>124.489</td>
+      <td>27.847</td>
+      <td>689.947</td>
+      <td>700.382</td>
       <td>1542.664</td>
       <td>2018-03-01</td>
       <td>2018-03-15</td>
@@ -610,10 +623,10 @@ r.head(10)
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>124.488598</td>
-      <td>27.846718</td>
-      <td>685.075506</td>
-      <td>705.253178</td>
+      <td>124.489</td>
+      <td>27.847</td>
+      <td>685.076</td>
+      <td>705.253</td>
       <td>1542.664</td>
       <td>2018-04-01</td>
       <td>2018-04-15</td>
@@ -621,10 +634,10 @@ r.head(10)
     <tr>
       <th>4</th>
       <td>4</td>
-      <td>124.488598</td>
-      <td>28.363239</td>
-      <td>634.804199</td>
-      <td>755.007964</td>
+      <td>124.489</td>
+      <td>28.363</td>
+      <td>634.804</td>
+      <td>755.008</td>
       <td>1542.664</td>
       <td>2018-05-01</td>
       <td>2018-05-15</td>
@@ -632,10 +645,10 @@ r.head(10)
     <tr>
       <th>5</th>
       <td>5</td>
-      <td>124.488598</td>
-      <td>30.364747</td>
-      <td>537.709792</td>
-      <td>850.100863</td>
+      <td>124.489</td>
+      <td>30.365</td>
+      <td>537.710</td>
+      <td>850.101</td>
       <td>1542.664</td>
       <td>2018-06-01</td>
       <td>2018-06-15</td>
@@ -643,10 +656,10 @@ r.head(10)
     <tr>
       <th>6</th>
       <td>6</td>
-      <td>124.488598</td>
-      <td>44.976240</td>
-      <td>175.924769</td>
-      <td>1197.274393</td>
+      <td>124.489</td>
+      <td>44.976</td>
+      <td>175.925</td>
+      <td>1197.274</td>
       <td>1542.664</td>
       <td>2018-07-01</td>
       <td>2018-07-15</td>
@@ -654,10 +667,10 @@ r.head(10)
     <tr>
       <th>7</th>
       <td>7</td>
-      <td>124.488598</td>
-      <td>49.115222</td>
-      <td>64.710806</td>
-      <td>1304.349374</td>
+      <td>124.489</td>
+      <td>49.115</td>
+      <td>64.711</td>
+      <td>1304.349</td>
       <td>1542.664</td>
       <td>2018-08-01</td>
       <td>2018-08-15</td>
@@ -665,10 +678,10 @@ r.head(10)
     <tr>
       <th>8</th>
       <td>8</td>
-      <td>124.488598</td>
-      <td>52.222326</td>
-      <td>15.179718</td>
-      <td>1350.773358</td>
+      <td>124.489</td>
+      <td>52.222</td>
+      <td>15.180</td>
+      <td>1350.773</td>
       <td>1542.664</td>
       <td>2018-09-01</td>
       <td>2018-09-15</td>
@@ -676,10 +689,10 @@ r.head(10)
     <tr>
       <th>9</th>
       <td>9</td>
-      <td>124.488598</td>
-      <td>57.116250</td>
-      <td>0.372243</td>
-      <td>1360.686909</td>
+      <td>124.489</td>
+      <td>57.116</td>
+      <td>0.372</td>
+      <td>1360.687</td>
       <td>1542.664</td>
       <td>2018-10-01</td>
       <td>2018-10-15</td>
@@ -725,8 +738,9 @@ r.head(10)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>x</th>
-      <th>y</th>
+      <th>tileX</th>
+      <th>tileY</th>
+      <th>zoom</th>
       <th>blanc</th>
       <th>disturbance</th>
       <th>mask</th>
@@ -739,100 +753,110 @@ r.head(10)
       <th>0</th>
       <td>5666</td>
       <td>8000</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>5.318601</td>
-      <td>0.592399</td>
+      <td>0.000</td>
+      <td>5.319</td>
+      <td>0.592</td>
       <td>5.911</td>
     </tr>
     <tr>
       <th>1</th>
       <td>5667</td>
       <td>8000</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.016506</td>
-      <td>5.270618</td>
-      <td>0.623877</td>
+      <td>0.017</td>
+      <td>5.271</td>
+      <td>0.624</td>
       <td>5.911</td>
     </tr>
     <tr>
       <th>2</th>
       <td>5667</td>
       <td>8001</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.155702</td>
-      <td>3.118198</td>
-      <td>2.638100</td>
+      <td>0.156</td>
+      <td>3.118</td>
+      <td>2.638</td>
       <td>5.912</td>
     </tr>
     <tr>
       <th>3</th>
       <td>5668</td>
       <td>8000</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.157660</td>
-      <td>5.192419</td>
-      <td>0.560921</td>
+      <td>0.158</td>
+      <td>5.192</td>
+      <td>0.561</td>
       <td>5.911</td>
     </tr>
     <tr>
       <th>4</th>
       <td>5668</td>
       <td>8001</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.051329</td>
-      <td>4.907602</td>
-      <td>0.953068</td>
+      <td>0.051</td>
+      <td>4.908</td>
+      <td>0.953</td>
       <td>5.912</td>
     </tr>
     <tr>
       <th>5</th>
       <td>5669</td>
       <td>8000</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.344544</td>
-      <td>3.046957</td>
-      <td>2.519499</td>
+      <td>0.345</td>
+      <td>3.047</td>
+      <td>2.519</td>
       <td>5.911</td>
     </tr>
     <tr>
       <th>6</th>
       <td>5669</td>
       <td>8001</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.021560</td>
-      <td>4.652489</td>
-      <td>1.237951</td>
+      <td>0.022</td>
+      <td>4.652</td>
+      <td>1.238</td>
       <td>5.912</td>
     </tr>
     <tr>
       <th>7</th>
       <td>5670</td>
       <td>8000</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.019572</td>
-      <td>4.782213</td>
-      <td>1.109214</td>
+      <td>0.020</td>
+      <td>4.782</td>
+      <td>1.109</td>
       <td>5.911</td>
     </tr>
     <tr>
       <th>8</th>
       <td>5670</td>
       <td>8001</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>5.495230</td>
-      <td>0.416770</td>
+      <td>0.000</td>
+      <td>5.495</td>
+      <td>0.417</td>
       <td>5.912</td>
     </tr>
     <tr>
       <th>9</th>
       <td>5671</td>
       <td>8000</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>5.387871</td>
-      <td>0.523129</td>
+      <td>0.000</td>
+      <td>5.388</td>
+      <td>0.523</td>
       <td>5.911</td>
     </tr>
   </tbody>
@@ -896,27 +920,27 @@ r
       <th>0</th>
       <td>1</td>
       <td>0.0</td>
-      <td>3.581839</td>
-      <td>19.940976</td>
-      <td>15.135185</td>
+      <td>3.582</td>
+      <td>19.941</td>
+      <td>15.135</td>
       <td>38.658</td>
     </tr>
     <tr>
       <th>1</th>
       <td>4</td>
       <td>0.0</td>
-      <td>3.657095</td>
-      <td>20.714430</td>
-      <td>14.863475</td>
+      <td>3.657</td>
+      <td>20.714</td>
+      <td>14.863</td>
       <td>39.235</td>
     </tr>
     <tr>
       <th>2</th>
       <td>5</td>
       <td>0.0</td>
-      <td>0.330621</td>
-      <td>0.093677</td>
-      <td>0.353702</td>
+      <td>0.331</td>
+      <td>0.094</td>
+      <td>0.354</td>
       <td>0.778</td>
     </tr>
   </tbody>
@@ -975,9 +999,9 @@ r
       <th>0</th>
       <td>0</td>
       <td>0.0</td>
-      <td>1.449953</td>
-      <td>35.478269</td>
-      <td>2.306778</td>
+      <td>1.450</td>
+      <td>35.478</td>
+      <td>2.307</td>
       <td>39.235</td>
       <td>2018-01-01</td>
       <td>2018-01-15</td>
@@ -986,9 +1010,9 @@ r
       <th>1</th>
       <td>1</td>
       <td>0.0</td>
-      <td>3.657095</td>
-      <td>20.714430</td>
-      <td>14.863475</td>
+      <td>3.657</td>
+      <td>20.714</td>
+      <td>14.863</td>
       <td>39.235</td>
       <td>2018-02-01</td>
       <td>2018-02-15</td>
@@ -997,9 +1021,9 @@ r
       <th>2</th>
       <td>2</td>
       <td>0.0</td>
-      <td>3.657095</td>
-      <td>20.573790</td>
-      <td>15.004115</td>
+      <td>3.657</td>
+      <td>20.574</td>
+      <td>15.004</td>
       <td>39.235</td>
       <td>2018-03-01</td>
       <td>2018-03-15</td>
@@ -1008,9 +1032,9 @@ r
       <th>3</th>
       <td>3</td>
       <td>0.0</td>
-      <td>3.657095</td>
-      <td>20.573790</td>
-      <td>15.004115</td>
+      <td>3.657</td>
+      <td>20.574</td>
+      <td>15.004</td>
       <td>39.235</td>
       <td>2018-04-01</td>
       <td>2018-04-15</td>
@@ -1019,9 +1043,9 @@ r
       <th>4</th>
       <td>4</td>
       <td>0.0</td>
-      <td>3.657095</td>
-      <td>20.573790</td>
-      <td>15.004115</td>
+      <td>3.657</td>
+      <td>20.574</td>
+      <td>15.004</td>
       <td>39.235</td>
       <td>2018-05-01</td>
       <td>2018-05-15</td>
@@ -1030,9 +1054,9 @@ r
       <th>5</th>
       <td>5</td>
       <td>0.0</td>
-      <td>4.014701</td>
-      <td>15.391037</td>
-      <td>19.829262</td>
+      <td>4.015</td>
+      <td>15.391</td>
+      <td>19.829</td>
       <td>39.235</td>
       <td>2018-06-01</td>
       <td>2018-06-15</td>
@@ -1041,9 +1065,9 @@ r
       <th>6</th>
       <td>6</td>
       <td>0.0</td>
-      <td>5.568670</td>
-      <td>1.303989</td>
-      <td>32.362341</td>
+      <td>5.569</td>
+      <td>1.304</td>
+      <td>32.362</td>
       <td>39.235</td>
       <td>2018-07-01</td>
       <td>2018-07-15</td>
@@ -1052,9 +1076,9 @@ r
       <th>7</th>
       <td>7</td>
       <td>0.0</td>
-      <td>5.624018</td>
-      <td>0.041097</td>
-      <td>33.569885</td>
+      <td>5.624</td>
+      <td>0.041</td>
+      <td>33.570</td>
       <td>39.235</td>
       <td>2018-08-01</td>
       <td>2018-08-15</td>
@@ -1063,9 +1087,9 @@ r
       <th>8</th>
       <td>8</td>
       <td>0.0</td>
-      <td>5.758523</td>
-      <td>0.000000</td>
-      <td>33.476477</td>
+      <td>5.759</td>
+      <td>0.000</td>
+      <td>33.476</td>
       <td>39.235</td>
       <td>2018-09-01</td>
       <td>2018-09-15</td>
@@ -1074,9 +1098,9 @@ r
       <th>9</th>
       <td>9</td>
       <td>0.0</td>
-      <td>6.076213</td>
-      <td>0.000000</td>
-      <td>33.158787</td>
+      <td>6.076</td>
+      <td>0.000</td>
+      <td>33.159</td>
       <td>39.235</td>
       <td>2018-10-01</td>
       <td>2018-10-15</td>
@@ -1085,9 +1109,9 @@ r
       <th>10</th>
       <td>10</td>
       <td>0.0</td>
-      <td>6.297776</td>
-      <td>0.000000</td>
-      <td>32.937224</td>
+      <td>6.298</td>
+      <td>0.000</td>
+      <td>32.937</td>
       <td>39.235</td>
       <td>2018-11-01</td>
       <td>2018-11-15</td>
@@ -1096,9 +1120,9 @@ r
       <th>11</th>
       <td>11</td>
       <td>0.0</td>
-      <td>6.219074</td>
-      <td>0.000000</td>
-      <td>33.015926</td>
+      <td>6.219</td>
+      <td>0.000</td>
+      <td>33.016</td>
       <td>39.235</td>
       <td>2018-12-01</td>
       <td>2018-12-15</td>
@@ -1146,6 +1170,7 @@ r
       <th></th>
       <th>tileX</th>
       <th>tileY</th>
+      <th>zoom</th>
       <th>blanc</th>
       <th>disturbance</th>
       <th>mask</th>
@@ -1158,60 +1183,66 @@ r
       <th>0</th>
       <td>5691</td>
       <td>7959</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.058146</td>
-      <td>0.525839</td>
-      <td>0.135015</td>
+      <td>0.058</td>
+      <td>0.526</td>
+      <td>0.135</td>
       <td>0.719</td>
     </tr>
     <tr>
       <th>1</th>
       <td>5691</td>
       <td>7960</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.481033</td>
-      <td>0.135625</td>
-      <td>0.495342</td>
+      <td>0.481</td>
+      <td>0.136</td>
+      <td>0.495</td>
       <td>1.112</td>
     </tr>
     <tr>
       <th>2</th>
       <td>5692</td>
       <td>7959</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.063063</td>
-      <td>1.079176</td>
-      <td>0.393761</td>
+      <td>0.063</td>
+      <td>1.079</td>
+      <td>0.394</td>
       <td>1.536</td>
     </tr>
     <tr>
       <th>3</th>
       <td>5692</td>
       <td>7960</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>2.385504</td>
-      <td>0.131453</td>
-      <td>2.710043</td>
+      <td>2.386</td>
+      <td>0.131</td>
+      <td>2.710</td>
       <td>5.227</td>
     </tr>
     <tr>
       <th>4</th>
       <td>5692</td>
       <td>7961</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.083273</td>
-      <td>0.000000</td>
-      <td>0.212727</td>
+      <td>0.083</td>
+      <td>0.000</td>
+      <td>0.213</td>
       <td>0.296</td>
     </tr>
     <tr>
       <th>5</th>
       <td>5693</td>
       <td>7960</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.295953</td>
-      <td>0.007021</td>
-      <td>0.762026</td>
+      <td>0.296</td>
+      <td>0.007</td>
+      <td>0.762</td>
       <td>1.065</td>
     </tr>
   </tbody>
@@ -1264,6 +1295,7 @@ r.head(10)
       <th></th>
       <th>tileX</th>
       <th>tileY</th>
+      <th>zoom</th>
       <th>blanc</th>
       <th>disturbance</th>
       <th>mask</th>
@@ -1276,30 +1308,33 @@ r.head(10)
       <th>0</th>
       <td>5691</td>
       <td>7959</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.096370</td>
-      <td>5.255255</td>
-      <td>0.545375</td>
+      <td>0.096</td>
+      <td>5.255</td>
+      <td>0.545</td>
       <td>5.897</td>
     </tr>
     <tr>
       <th>1</th>
       <td>5691</td>
       <td>7960</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.587756</td>
-      <td>1.956099</td>
-      <td>3.353145</td>
+      <td>0.588</td>
+      <td>1.956</td>
+      <td>3.353</td>
       <td>5.897</td>
     </tr>
     <tr>
       <th>2</th>
       <td>5692</td>
       <td>7959</td>
+      <td>14</td>
       <td>0.0</td>
-      <td>0.136861</td>
-      <td>3.903199</td>
-      <td>1.856940</td>
+      <td>0.137</td>
+      <td>3.903</td>
+      <td>1.857</td>
       <td>5.897</td>
     </tr>
   </tbody>
@@ -1356,10 +1391,10 @@ r.head(10)
     <tr>
       <th>0</th>
       <td>0</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.374125</td>
-      <td>0.162706</td>
+      <td>0.374</td>
+      <td>0.163</td>
       <td>5.901</td>
       <td>2018-01-15</td>
       <td>2018-01-01</td>
@@ -1367,10 +1402,10 @@ r.head(10)
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.273008</td>
-      <td>0.263823</td>
+      <td>0.273</td>
+      <td>0.264</td>
       <td>5.901</td>
       <td>2018-02-15</td>
       <td>2018-02-01</td>
@@ -1378,10 +1413,10 @@ r.head(10)
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.273008</td>
-      <td>0.263823</td>
+      <td>0.273</td>
+      <td>0.264</td>
       <td>5.901</td>
       <td>2018-03-15</td>
       <td>2018-03-01</td>
@@ -1389,10 +1424,10 @@ r.head(10)
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.273008</td>
-      <td>0.263823</td>
+      <td>0.273</td>
+      <td>0.264</td>
       <td>5.901</td>
       <td>2018-04-15</td>
       <td>2018-04-01</td>
@@ -1400,10 +1435,10 @@ r.head(10)
     <tr>
       <th>4</th>
       <td>4</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.273008</td>
-      <td>0.263823</td>
+      <td>0.273</td>
+      <td>0.264</td>
       <td>5.901</td>
       <td>2018-05-15</td>
       <td>2018-05-01</td>
@@ -1411,10 +1446,10 @@ r.head(10)
     <tr>
       <th>5</th>
       <td>5</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.273008</td>
-      <td>0.263823</td>
+      <td>0.273</td>
+      <td>0.264</td>
       <td>5.901</td>
       <td>2018-06-15</td>
       <td>2018-06-01</td>
@@ -1422,10 +1457,10 @@ r.head(10)
     <tr>
       <th>6</th>
       <td>6</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.536831</td>
+      <td>0.000</td>
+      <td>0.537</td>
       <td>5.901</td>
       <td>2018-07-15</td>
       <td>2018-07-01</td>
@@ -1433,10 +1468,10 @@ r.head(10)
     <tr>
       <th>7</th>
       <td>7</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.536831</td>
+      <td>0.000</td>
+      <td>0.537</td>
       <td>5.901</td>
       <td>2018-08-15</td>
       <td>2018-08-01</td>
@@ -1444,10 +1479,10 @@ r.head(10)
     <tr>
       <th>8</th>
       <td>8</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.536831</td>
+      <td>0.000</td>
+      <td>0.537</td>
       <td>5.901</td>
       <td>2018-09-15</td>
       <td>2018-09-01</td>
@@ -1455,10 +1490,10 @@ r.head(10)
     <tr>
       <th>9</th>
       <td>9</td>
-      <td>5.364169</td>
+      <td>5.364</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.536831</td>
+      <td>0.000</td>
+      <td>0.537</td>
       <td>5.901</td>
       <td>2018-10-15</td>
       <td>2018-10-01</td>
@@ -1484,8 +1519,8 @@ We start out with specifying some polygon that we might be interested in.
 
 
 ```python
-geometry = {'type': 'FeatureCollection' , 'features':[{ 'properties':{}, 'geometry': {'type': 'Polygon',
-    'coordinates': [[[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]]} }]}
+geometry = {"type": "FeatureCollection", "features":[{ "properties":{"id":0}, "geometry": {"type": "Polygon",
+    "coordinates": [[[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]]} }]}
 ```
 
 Now let's request the mean of all spectral indices of the standard tiles intersecting our polygon.
@@ -1535,9 +1570,9 @@ r.head(10)
     <tr>
       <th>0</th>
       <td>0</td>
-      <td>0.993101</td>
-      <td>0.478672</td>
-      <td>0.852675</td>
+      <td>0.993</td>
+      <td>0.479</td>
+      <td>0.853</td>
       <td>1542.664</td>
       <td>2018-01-01</td>
       <td>2018-01-15</td>
@@ -1545,9 +1580,9 @@ r.head(10)
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>0.962001</td>
-      <td>0.469612</td>
-      <td>0.683103</td>
+      <td>0.962</td>
+      <td>0.470</td>
+      <td>0.683</td>
       <td>1542.664</td>
       <td>2018-02-01</td>
       <td>2018-02-15</td>
@@ -1555,9 +1590,9 @@ r.head(10)
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>0.476266</td>
-      <td>0.218599</td>
-      <td>0.898113</td>
+      <td>0.476</td>
+      <td>0.219</td>
+      <td>0.898</td>
       <td>1542.664</td>
       <td>2018-03-01</td>
       <td>2018-03-15</td>
@@ -1565,9 +1600,9 @@ r.head(10)
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>0.020386</td>
-      <td>-0.007053</td>
-      <td>0.992451</td>
+      <td>0.020</td>
+      <td>-0.007</td>
+      <td>0.992</td>
       <td>1542.664</td>
       <td>2018-04-01</td>
       <td>2018-04-15</td>
@@ -1575,9 +1610,9 @@ r.head(10)
     <tr>
       <th>4</th>
       <td>4</td>
-      <td>0.337877</td>
-      <td>0.092783</td>
-      <td>0.936130</td>
+      <td>0.338</td>
+      <td>0.093</td>
+      <td>0.936</td>
       <td>1542.664</td>
       <td>2018-05-01</td>
       <td>2018-05-15</td>
@@ -1585,9 +1620,9 @@ r.head(10)
     <tr>
       <th>5</th>
       <td>5</td>
-      <td>0.527262</td>
-      <td>0.177563</td>
-      <td>0.877889</td>
+      <td>0.527</td>
+      <td>0.178</td>
+      <td>0.878</td>
       <td>1542.664</td>
       <td>2018-06-01</td>
       <td>2018-06-15</td>
@@ -1595,9 +1630,9 @@ r.head(10)
     <tr>
       <th>6</th>
       <td>6</td>
-      <td>0.971997</td>
-      <td>0.413940</td>
-      <td>0.403466</td>
+      <td>0.972</td>
+      <td>0.414</td>
+      <td>0.403</td>
       <td>1542.664</td>
       <td>2018-07-01</td>
       <td>2018-07-15</td>
@@ -1605,9 +1640,9 @@ r.head(10)
     <tr>
       <th>7</th>
       <td>7</td>
-      <td>0.989275</td>
-      <td>0.388528</td>
-      <td>0.387444</td>
+      <td>0.989</td>
+      <td>0.389</td>
+      <td>0.387</td>
       <td>1542.664</td>
       <td>2018-08-01</td>
       <td>2018-08-15</td>
@@ -1615,9 +1650,9 @@ r.head(10)
     <tr>
       <th>8</th>
       <td>8</td>
-      <td>0.997145</td>
-      <td>0.437617</td>
-      <td>0.219172</td>
+      <td>0.997</td>
+      <td>0.438</td>
+      <td>0.219</td>
       <td>1542.664</td>
       <td>2018-09-01</td>
       <td>2018-09-15</td>
@@ -1625,9 +1660,9 @@ r.head(10)
     <tr>
       <th>9</th>
       <td>9</td>
-      <td>0.996576</td>
-      <td>0.372065</td>
-      <td>0.130757</td>
+      <td>0.997</td>
+      <td>0.372</td>
+      <td>0.131</td>
       <td>1542.664</td>
       <td>2018-10-01</td>
       <td>2018-10-15</td>
@@ -1674,6 +1709,7 @@ r.head(10)
       <th></th>
       <th>tileX</th>
       <th>tileY</th>
+      <th>zoom</th>
       <th>NDVI</th>
       <th>NDWI</th>
       <th>cloud_cover</th>
@@ -1685,6 +1721,7 @@ r.head(10)
       <th>0</th>
       <td>5666</td>
       <td>8000</td>
+      <td>14</td>
       <td>1.000</td>
       <td>0.759</td>
       <td>0.77</td>
@@ -1694,6 +1731,7 @@ r.head(10)
       <th>1</th>
       <td>5667</td>
       <td>8000</td>
+      <td>14</td>
       <td>1.000</td>
       <td>0.654</td>
       <td>0.71</td>
@@ -1703,6 +1741,7 @@ r.head(10)
       <th>2</th>
       <td>5667</td>
       <td>8001</td>
+      <td>14</td>
       <td>0.616</td>
       <td>0.449</td>
       <td>0.93</td>
@@ -1712,6 +1751,7 @@ r.head(10)
       <th>3</th>
       <td>5668</td>
       <td>8000</td>
+      <td>14</td>
       <td>1.000</td>
       <td>0.696</td>
       <td>0.65</td>
@@ -1721,6 +1761,7 @@ r.head(10)
       <th>4</th>
       <td>5668</td>
       <td>8001</td>
+      <td>14</td>
       <td>0.997</td>
       <td>0.768</td>
       <td>0.67</td>
@@ -1730,6 +1771,7 @@ r.head(10)
       <th>5</th>
       <td>5669</td>
       <td>8000</td>
+      <td>14</td>
       <td>0.998</td>
       <td>0.596</td>
       <td>0.64</td>
@@ -1739,6 +1781,7 @@ r.head(10)
       <th>6</th>
       <td>5669</td>
       <td>8001</td>
+      <td>14</td>
       <td>0.976</td>
       <td>0.708</td>
       <td>0.34</td>
@@ -1748,6 +1791,7 @@ r.head(10)
       <th>7</th>
       <td>5670</td>
       <td>8000</td>
+      <td>14</td>
       <td>1.000</td>
       <td>0.730</td>
       <td>0.27</td>
@@ -1757,6 +1801,7 @@ r.head(10)
       <th>8</th>
       <td>5670</td>
       <td>8001</td>
+      <td>14</td>
       <td>1.000</td>
       <td>0.692</td>
       <td>0.87</td>
@@ -1766,6 +1811,7 @@ r.head(10)
       <th>9</th>
       <td>5687</td>
       <td>7997</td>
+      <td>14</td>
       <td>1.000</td>
       <td>0.609</td>
       <td>0.79</td>
@@ -1827,25 +1873,25 @@ r
     <tr>
       <th>0</th>
       <td>1</td>
-      <td>0.989887</td>
-      <td>0.505977</td>
-      <td>0.529641</td>
+      <td>0.990</td>
+      <td>0.506</td>
+      <td>0.530</td>
       <td>38.658</td>
     </tr>
     <tr>
       <th>1</th>
       <td>4</td>
-      <td>0.995728</td>
-      <td>0.468509</td>
-      <td>0.593817</td>
+      <td>0.996</td>
+      <td>0.469</td>
+      <td>0.594</td>
       <td>39.235</td>
     </tr>
     <tr>
       <th>2</th>
       <td>5</td>
-      <td>1.000000</td>
-      <td>0.632000</td>
-      <td>0.120000</td>
+      <td>1.000</td>
+      <td>0.632</td>
+      <td>0.120</td>
       <td>0.778</td>
     </tr>
   </tbody>
@@ -1901,9 +1947,9 @@ r.head(10)
     <tr>
       <th>0</th>
       <td>0</td>
-      <td>0.970152</td>
-      <td>0.330398</td>
-      <td>0.905335</td>
+      <td>0.970</td>
+      <td>0.330</td>
+      <td>0.905</td>
       <td>39.235</td>
       <td>2018-01-01</td>
       <td>2018-01-15</td>
@@ -1911,9 +1957,9 @@ r.head(10)
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>0.995728</td>
-      <td>0.468509</td>
-      <td>0.593817</td>
+      <td>0.996</td>
+      <td>0.469</td>
+      <td>0.594</td>
       <td>39.235</td>
       <td>2018-02-01</td>
       <td>2018-02-15</td>
@@ -1921,9 +1967,9 @@ r.head(10)
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
-      <td>0.996004</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.996</td>
       <td>39.235</td>
       <td>2018-03-01</td>
       <td>2018-03-15</td>
@@ -1931,9 +1977,9 @@ r.head(10)
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
-      <td>1.000000</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>1.000</td>
       <td>39.235</td>
       <td>2018-04-01</td>
       <td>2018-04-15</td>
@@ -1941,9 +1987,9 @@ r.head(10)
     <tr>
       <th>4</th>
       <td>4</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
-      <td>1.000000</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>1.000</td>
       <td>39.235</td>
       <td>2018-05-01</td>
       <td>2018-05-15</td>
@@ -1951,9 +1997,9 @@ r.head(10)
     <tr>
       <th>5</th>
       <td>5</td>
-      <td>0.795593</td>
-      <td>0.231363</td>
-      <td>0.660828</td>
+      <td>0.796</td>
+      <td>0.231</td>
+      <td>0.661</td>
       <td>39.235</td>
       <td>2018-06-01</td>
       <td>2018-06-15</td>
@@ -1961,9 +2007,9 @@ r.head(10)
     <tr>
       <th>6</th>
       <td>6</td>
-      <td>0.997588</td>
-      <td>0.403357</td>
-      <td>0.053883</td>
+      <td>0.998</td>
+      <td>0.403</td>
+      <td>0.054</td>
       <td>39.235</td>
       <td>2018-07-01</td>
       <td>2018-07-15</td>
@@ -1971,9 +2017,9 @@ r.head(10)
     <tr>
       <th>7</th>
       <td>7</td>
-      <td>1.000000</td>
-      <td>0.363662</td>
-      <td>0.038336</td>
+      <td>1.000</td>
+      <td>0.364</td>
+      <td>0.038</td>
       <td>39.235</td>
       <td>2018-08-01</td>
       <td>2018-08-15</td>
@@ -1981,9 +2027,9 @@ r.head(10)
     <tr>
       <th>8</th>
       <td>8</td>
-      <td>1.000000</td>
-      <td>0.408166</td>
-      <td>0.003560</td>
+      <td>1.000</td>
+      <td>0.408</td>
+      <td>0.004</td>
       <td>39.235</td>
       <td>2018-09-01</td>
       <td>2018-09-15</td>
@@ -1991,9 +2037,9 @@ r.head(10)
     <tr>
       <th>9</th>
       <td>9</td>
-      <td>0.999556</td>
-      <td>0.339575</td>
-      <td>0.039668</td>
+      <td>1.000</td>
+      <td>0.340</td>
+      <td>0.040</td>
       <td>39.235</td>
       <td>2018-10-01</td>
       <td>2018-10-15</td>
@@ -2041,6 +2087,7 @@ r.head(10)
       <th></th>
       <th>tileX</th>
       <th>tileY</th>
+      <th>zoom</th>
       <th>NDVI</th>
       <th>NDWI</th>
       <th>cloud_cover</th>
@@ -2052,6 +2099,7 @@ r.head(10)
       <th>0</th>
       <td>5704</td>
       <td>7971</td>
+      <td>14</td>
       <td>1.0</td>
       <td>0.387</td>
       <td>0.70</td>
@@ -2061,6 +2109,7 @@ r.head(10)
       <th>1</th>
       <td>5705</td>
       <td>7971</td>
+      <td>14</td>
       <td>1.0</td>
       <td>0.386</td>
       <td>0.42</td>
@@ -2070,6 +2119,7 @@ r.head(10)
       <th>2</th>
       <td>5706</td>
       <td>7970</td>
+      <td>14</td>
       <td>1.0</td>
       <td>0.659</td>
       <td>0.95</td>
@@ -2124,6 +2174,7 @@ r.head(10)
       <th></th>
       <th>tileX</th>
       <th>tileY</th>
+      <th>zoom</th>
       <th>NDVI</th>
       <th>NDWI</th>
       <th>cloud_cover</th>
@@ -2135,6 +2186,7 @@ r.head(10)
       <th>0</th>
       <td>5691</td>
       <td>7959</td>
+      <td>14</td>
       <td>0.828</td>
       <td>0.455</td>
       <td>0.98</td>
@@ -2144,6 +2196,7 @@ r.head(10)
       <th>1</th>
       <td>5691</td>
       <td>7960</td>
+      <td>14</td>
       <td>1.000</td>
       <td>0.364</td>
       <td>0.97</td>
@@ -2153,6 +2206,7 @@ r.head(10)
       <th>2</th>
       <td>5692</td>
       <td>7959</td>
+      <td>14</td>
       <td>1.000</td>
       <td>0.648</td>
       <td>0.92</td>
@@ -2341,7 +2395,7 @@ r.plot()
 
 
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7ff852b821d0>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f4c1261a3c8>
 
 
 
@@ -2370,7 +2424,7 @@ plt.imshow(img)
 
 
 
-    <matplotlib.image.AxesImage at 0x7ff8564448d0>
+    <matplotlib.image.AxesImage at 0x7f4c15ea8a20>
 
 
 

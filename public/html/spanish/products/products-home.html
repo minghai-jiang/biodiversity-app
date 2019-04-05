@@ -3,8 +3,7 @@
     <img className="products-top-image" src="/images/logo-black-subtitle.png" alt="Ellipsis Earth Intelligence logo black"/>
 
     <p>
-        El producto principal de Ellipsis es una API fácil de usar que le permite consultar y visualizar la gran cantidad de información geográfica en nuestra base de datos.
-        Además de esto, ofrecemos un visor interactivo de código abierto para involucrar fácilmente a las personas en sus proyectos.
+      El producto principal de Ellipsis es una API fácil de usar que le permite consultar y visualizar la gran cantidad de información geográfica de nuestra base de datos. Además, ofrecemos un visor interactivo de código abierto y un servicio de Geomensaje para involucrar fácilmente a la gente en sus proyectos.
     </p>
   </div>                    
 </div>      
@@ -16,29 +15,33 @@
     </h3>
 
     <p className="product-end-paragraph">
-      Ellipsis provides a REST API that allows you to query our aggregated data directly.
-      It also offers attractive and interactive visualizations that can be easily imported in your favorite framework,
-      such as arcGIS or Leaflet.
+      Ellipsis proporciona una API pública de REST que le permite consultar nuestros datos agregados directamente. También ofrece visualizaciones atractivas que se pueden importar fácilmente en su marco de trabajo favorito, como arcGIS o Leaflet.
     </p>
 
-    <a href="/products/documentation" className="button button-accented main-block-double-button product-double-button">
-      Documentation
-    </a>
-    <a href="/products/tutorial" className="button button-accented main-block-double-button product-double-button">
-      Tutorial
-    </a>
-
     <h3>
-      Viewer
+      Visor
     </h3>
 
     <p className="product-end-paragraph">              
-      The Ellipsis viewer offers low threshold access to all your Ellipsis data.
-      Explore our interactive maps and/or export data to be processed in your application of choice.
+      El visor de Ellipsis ofrece un bajo umbral de acceso a todos los datos de Ellipsis. Explore nuestros mapas interactivos y/o datos de exportación para ser procesados en la aplicación de su elección.
     </p>
 
+    <h3>
+      GeoMensaje
+    </h3>
+
+    <p className="product-end-paragraph">
+        Geomensaje permite a los usuarios enviar observaciones y comentarios georeferenciados a la base de datos de Ellipsis. Esta retroalimentación se utiliza para corregir modelos e informar a otros usuarios. Geomensaje está integrado tanto en el Visor como en la API pública.
+    </p>
+
+    <a href="/products/documentation" className="button button-accented main-block-double-button product-double-button">
+      API documentacion
+    </a>
+    <a href="/products/tutorial" className="button button-accented main-block-double-button product-double-button">
+      API tutorial
+    </a>
     <a href="/viewer" className="button button-accented main-block-double-button product-double-button">
-      Viewer
+      Visor
     </a>
 
   </div>
@@ -47,38 +50,42 @@
 <div className="main-block">
   <div className="main-block-content main-block-content-left">
     <h2>
-      About the data
+      Acerca de los datos
     </h2>
 
     <p>
-      Ellipsis data is acquired and processed on a resolution of 10 by 10 meters. 
-      We currently provide three types of data:
+      Los datos de Ellipsis se adquieren y procesan con la misma resolución que la fuente de datos original del satélite. Actualmente ofrecemos tres tipos de información:
     </p>
 
     <ul>
       <li>
-        Spectral indices, to assess the condition of a region.
+        Índices espectrales, para evaluar la condición de una región.
       </li>
       <li>
-        Classification, to assess the land cover type of a region.
+        Clasificación, para evaluar el tipo de cubierta vegetal de una región.
       </li>
       <li>
-        Sudden change, to assess whether an abrupt event has occurred in a region.
+        Cambio repentino, para evaluar si ha ocurrido un evento repentino en una región.
       </li>
     </ul>
 
     <p>
-      We aggregate data to both standard OpenStreetMap tiles as well as to custom polygons that are map specific.
+        Además de los datos generados automáticamente, podemos almacenar mensajes humanos georeferenciados.
     </p>
 
+
+    <p>
+      Agregamos esta información tanto a los mosaicos webMercator estándar como a los polígonos personalizados que son específicos del mapa.
+    </p>
+
+
+
     <h2>
-        Accessibility
+        Accesibilidad
     </h2>
 
     <p>
-      Ellipsis maintains various monitoring services for a broad range of customers.
-      Some of these maps are public and can be viewed and used by anyone, 
-      others are private and can only be accessed if you have the required login credentials.
+      Ellipsis mantiene varios servicios de monitoreo para una amplia gama de clientes. Algunos de estos mapas son públicos y pueden ser vistos y utilizados por cualquier persona, otros son privados y sólo se puede acceder a ellos si se dispone de las credenciales de acceso necesarias.
     </p>
   </div>                    
 </div>     
