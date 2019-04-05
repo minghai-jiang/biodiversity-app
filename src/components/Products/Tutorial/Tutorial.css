@@ -33,9 +33,11 @@ pre
 
 table
 {
+	overflow: auto;
 	width: 100%;
 	font-size: 13px;
 	border: none;
+	display: block;
 }
 
 th,td

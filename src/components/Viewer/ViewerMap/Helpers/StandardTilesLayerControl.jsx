@@ -76,8 +76,8 @@ const StandardTilesLayer = {
 
   clear: () => {
     StandardTiles_controlOverlays = [];
-    StandardTiles_PopupContent = [];
     StandardTiles_polygonCounts = 0;
+    StandardTiles_PopupContent = {};
     StandardTiles_map = null;
   },
 
@@ -132,7 +132,7 @@ const StandardTilesLayer = {
       }
 
       return (
-        <Popup position={popup.e.latlng} key={id}>
+        <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()} autoPan={false} keepInView={false}>
           <div key={id + '.content'}>
             {content}
           </div>

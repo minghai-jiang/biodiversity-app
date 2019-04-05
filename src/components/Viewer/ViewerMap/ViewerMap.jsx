@@ -125,6 +125,10 @@ export class ViewerMap extends PureComponent {
 
   getPolygonsJson = async (props) =>
   {
+    if(!this.mapRef)
+    {
+      return null;
+    }
     let map = this.mapRef.current.leafletElement;
     let screenBounds = map.getBounds();
     let bounds = 
@@ -233,6 +237,7 @@ export class ViewerMap extends PureComponent {
           }
 
           { LegendControl.getElement() }
+          { PolygonLayersControl.onFeatureClick(this.props, this.getPopupContent) }
           { StandardTilesLayerControl.onFeatureClick(this.props, this.getPopupContent) }
         </Map>
         {/* <PopupForm props={this.state.popupProps} /> */}
