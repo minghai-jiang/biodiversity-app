@@ -302,7 +302,6 @@ export class InfoPane extends PureComponent {
           content.push(<p key='notEnoughData'>Not enough timestamps available for analysis.</p>);
         }
 
-        console.log(content, content[0])
         if(content[0].length === 0)
         {
           content.push(<p key='loadingData'>Loading Data <br/><img src='/images/spinner.png' alt='spinner'/></p>);
