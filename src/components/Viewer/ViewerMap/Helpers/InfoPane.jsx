@@ -73,7 +73,6 @@ export class InfoPane extends PureComponent {
     let content = [];
     let classes = [];
     let data = await this.getData('class');
-    console.log('Get Classes ', data)
 
     content.push(<h1 key='Classes'>Classes</h1>);
     if (data)
@@ -159,14 +158,12 @@ export class InfoPane extends PureComponent {
         if (this.state.data[type][spectralClass])
         {
           return(this.state.data[type][spectralClass]);
-          console.log('from state', this.state.data[type][spectralClass])
         }
         else
         {
           let data = this.state.data;
           data[type][spectralClass] = await this.getDataFromServer(type, spectralClass);
           this.setState({data: data});
-          console.log('from DB', data[type][spectralClass])
           return data[type][spectralClass];
         }
       }
@@ -186,7 +183,6 @@ export class InfoPane extends PureComponent {
         data[type] = {};
         data[type][spectralClass] = await this.getDataFromServer(type, spectralClass);
         this.setState({data: data});
-        console.log('from DB', data[type][spectralClass])
         return data[type][spectralClass];
       }
     }
@@ -293,15 +289,24 @@ export class InfoPane extends PureComponent {
     {
       let content = [];
 
-      if (this.props.map.timestamps.length > 1)
+      if(this.props.infoContent.type !== 'report')
       {
-        content.push(this.state.classes);
-        content.push(this.state.indeces);
-        this.state.indeces.length > 0 && this.state.inputClass !== '' && this.state.indeces[0].props.children[2] && this.state.indeces[0].props.children[2].type !== 'p' ? content.push(this.state.slider) : content.push(null);
-      }
-      else
-      {
-        content.push(<p key='notEnoughData'>Not enough timestamps available for analysis.</p>);
+        if (this.props.map.timestamps.length > 1)
+        {
+          content.push(this.state.classes);
+          content.push(this.state.indeces);
+          this.state.indeces.length > 0 && this.state.inputClass !== '' && this.state.indeces[0].props.children[2] && this.state.indeces[0].props.children[2].type !== 'p' ? content.push(this.state.slider) : content.push(null);
+        }
+        else
+        {
+          content.push(<p key='notEnoughData'>Not enough timestamps available for analysis.</p>);
+        }
+
+        console.log(content, content[0])
+        if(content[0].length === 0)
+        {
+          content.push(<p key='loadingData'>Loading Data <br/><img src='/images/spinner.png' alt='spinner'/></p>);
+        }
       }
 
       return (
@@ -313,7 +318,7 @@ export class InfoPane extends PureComponent {
             width={'50%'}
             onRequestClose={() => { this.toggleQueryPane(false); }}
           >
-            {content[0].length !== 0 ? content : <p key='loadingData'>Loading Data <br/><img src='/images/spinner.png' alt='spinner'/></p>}
+            {content}
             {this.state.GeoMessage}
           </SlidingPane>
       );

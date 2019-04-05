@@ -21,6 +21,7 @@ let StandardTilesControl_maxPolygon = 1000;
 let StandardTiles_randomKey = '1';
 
 let StandardTiles_map = null;
+let StandardTiles_mapRef = {};
 
 let StandardTiles_PopupContent = {};
 
@@ -32,7 +33,7 @@ const StandardTilesLayer = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons) => {
+  initialize: async (props, bounds, maxPolygons, map) => {
     StandardTilesControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -49,6 +50,7 @@ const StandardTilesLayer = {
     }
 
     StandardTiles_map = props.map;
+    StandardTiles_mapRef = map;
   },
 
   update: async (props, bounds) => {
@@ -92,6 +94,9 @@ const StandardTilesLayer = {
     if (index > -1) {
       StandardTiles_checkedLayers.splice(index, 1);
     }
+    
+    StandardTiles_PopupContent = {};
+    StandardTiles_mapRef.closePopup();
   },
 
   onFeatureClick: (props, contentFunction) => {

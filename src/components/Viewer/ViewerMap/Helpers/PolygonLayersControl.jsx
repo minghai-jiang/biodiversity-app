@@ -27,8 +27,9 @@ let polygonLayersControl_maxPolygon = 500;
 let polygonLayersControl_randomKey = '1';
 
 let polygonLayersControl_map = null;
+let polygonLayersControl_mapRef = {};
 
-let polygonLayersControl_PopupContent = {}
+let polygonLayersControl_PopupContent = {};
 
 const PolygonLayersControl = {
   getElement: () => {
@@ -38,7 +39,7 @@ const PolygonLayersControl = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons) => {
+  initialize: async (props, bounds, maxPolygons, map) => {
     polygonLayersControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -53,6 +54,7 @@ const PolygonLayersControl = {
     }
 
     polygonLayersControl_map = props.map;
+    polygonLayersControl_mapRef = map;
   },
 
   update: async (props, bounds) => {
@@ -94,6 +96,9 @@ const PolygonLayersControl = {
     if (index > -1) {
       polygonLayersControl_checkedLayers.splice(index, 1);
     }
+
+    polygonLayersControl_PopupContent = {};
+    polygonLayersControl_mapRef.closePopup();
   },
 
   onFeatureClick: (props, contentFunction) => {
