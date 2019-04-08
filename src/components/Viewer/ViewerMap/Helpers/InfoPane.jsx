@@ -21,8 +21,10 @@ export class InfoPane extends PureComponent {
       indeces: [],
       GeoMessage: [],
       inputClass: '',
-      sliderValue: 1,
-      slider: [],
+      classSliderValue: 1,
+      spectralSliderValue: 1,
+      classesSlider: [],
+      indecesSlider: [],
       data: {},
     }
 
@@ -36,8 +38,8 @@ export class InfoPane extends PureComponent {
     this.setState({ openQueryPane: open });
   };
 
-  componentWillReceiveProps(nextProp){  
-    if(nextProp && nextProp.infoContent && nextProp.infoContent.openPane && this.props.infoContent.openPane !== nextProp.infoContent.openPane)
+  componentWillReceiveProps(nextProp){
+    if(nextProp && nextProp.infoContent && nextProp.infoContent.openPane && this.props.infoContent.random !== nextProp.infoContent.random)
     {
       this.toggleQueryPane(true);
     }
@@ -68,7 +70,7 @@ export class InfoPane extends PureComponent {
     return options;
   }
 
-  getClasses = async() =>
+  getClasses = async(filter = 1) =>
   {
     let content = [];
     let classes = [];
@@ -77,7 +79,7 @@ export class InfoPane extends PureComponent {
     content.push(<h1 key='Classes'>Classes</h1>);
     if (data)
     {
-      content.push(<LineChart key ='classesTimestamps' props={this.props} type='class' data={data.graphData} filter={1}/>);
+      content.push(<LineChart key ={'classesTimestamps' + filter} props={this.props} type='class' data={data.graphData} filter={filter}/>);
       content.push(<Table key='classTable' type={'class'} data={data.tableData}/>)
     }
     else
@@ -119,26 +121,35 @@ export class InfoPane extends PureComponent {
     return indeces;
   };
 
-  handleChange = async(value) => {
-    let indeces = await this.getIndeces(this.state.inputClass, value);
-    this.setState({sliderValue: value, indeces: indeces});
+  handleChange = async(value, type) => {
+    let stateName = type + 'SliderValue';
+    if(type === 'spectral')
+    {
+      let indeces = await this.getIndeces(this.state.inputClass, value);
+      this.setState({spectralSliderValue: value, indeces: indeces});
+    }
+    else
+    {
+      let classes = await this.getClasses(value);
+      this.setState({classSliderValue: value, classes: classes});
+    }
   };
 
-  getSlider = () =>
+  getSlider = (type) =>
   {
     let slider = [];
     const createSliderWithTooltip = Slider.createSliderWithTooltip;
     const SliderWithTooltip = createSliderWithTooltip(Slider);
-    slider.push(<h2 key='CloudFilter Header'>Maximum cloud cover</h2>);
+    slider.push(<h2 key={type + 'CloudFilter Header'}>Maximum cloud cover</h2>);
     slider.push(
       <SliderWithTooltip
         key='Slider'
         dots={false}
         step={0.01}
-        defaultValue={this.state.sliderValue}
+        defaultValue={this.state[type + 'SliderValue']}
         min={0}
         max={1}
-        onChange={this.handleChange}
+        onChange={(value) => this.handleChange(value, type)}
         tipFormatter={v => Math.round(v*100) + '%'}
         marks={{0:'0%', 1: '100%'}}
       />);
@@ -265,10 +276,11 @@ export class InfoPane extends PureComponent {
     if(this.props.infoContent && this.props.infoContent.type === 'analyse')
     {
       let classes = await this.getClasses();
+      let classesSlider = this.getSlider('class');
       let indeces = await this.getIndeces();
-      let slider = this.getSlider();
+      let indecesSlider = this.getSlider('spectral');
 
-      await this.setState({classes: classes, indeces: indeces, slider: slider})
+      await this.setState({classes: classes, indeces: indeces, classesSlider: classesSlider, indecesSlider: indecesSlider})
     }
     else if(this.props.infoContent && this.props.infoContent.type === 'report')
     {
@@ -294,8 +306,10 @@ export class InfoPane extends PureComponent {
         if (this.props.map.timestamps.length > 1)
         {
           content.push(this.state.classes);
+          this.state.classes.length > 0 && this.state.classes[0].props.children[2] && this.state.classes[0].props.children[2].type !== 'p' ? content.push(this.state.classesSlider) : content.push(null);
+
           content.push(this.state.indeces);
-          this.state.indeces.length > 0 && this.state.inputClass !== '' && this.state.indeces[0].props.children[2] && this.state.indeces[0].props.children[2].type !== 'p' ? content.push(this.state.slider) : content.push(null);
+          this.state.indeces.length > 0 && this.state.inputClass !== '' && this.state.indeces[0].props.children[2] && this.state.indeces[0].props.children[2].type !== 'p' ? content.push(this.state.indecesSlider) : content.push(null);
         }
         else
         {

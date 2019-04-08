@@ -147,13 +147,13 @@ const PolygonLayersControl = {
         }
       }
 
-      let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, properties)} }>Analyse</a>
+      let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
 
       let report;
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>GeoMessage</a>
+        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties)} }>GeoMessage</a>
       }
 
       return (
@@ -336,13 +336,14 @@ function onEachFeature(feature, layer) {
   });
 }
 
-function handleTile(type, contentFunction, id, properties)
+function handlePolygon(type, contentFunction, id, properties, random)
 {
   contentFunction({
     id: id,
     openPane: true,
     type: type,
     properties: properties,
+    random: random,
   });
 }
 

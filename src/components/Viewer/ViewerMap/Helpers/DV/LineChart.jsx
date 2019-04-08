@@ -12,17 +12,11 @@ export class LineChart extends PureComponent {
       data: [],
       lines: [],
       meta: [],
-      /*crosshairValues: [],
-      filterArray: [],
-      cloud_cover: [],*/
     }
 
     this.map = this.props.props.map;
     this.props.props.infoContent &&  this.props.props.infoContent.headers ? this.headers = this.props.props.infoContent.headers : this.headers = {};
     this.infoContent = this.props.props.infoContent;
-    //this.data = null;
-    //this.ticksX = [];
-    //this.ymax = [0,0];
   };
 
   _onMouseLeave = () => {
@@ -30,24 +24,7 @@ export class LineChart extends PureComponent {
   };
 
   _onNearestX = (value, {index}) => {
-    this.setState({crosshairValues: this.data.data.map(d => d.data[index])});
-  };
-
-  componentWillReceiveProps = (nextProps) =>
-  {
-    /*if (nextProps.filter !== this.props.filter && this.state.cloud_cover.length > 0)
-    {
-      let filterArray = [];
-      for (let i = 0; i < this.state.cloud_cover.length; i++)
-      {
-        if (this.state.cloud_cover[i] > nextProps.filter)
-        {
-          filterArray.push(i);
-        }
-      }
-      this.setState({filterArray: filterArray});
-      this.renderLines(filterArray);
-    }*/
+    this.setState({crosshairValues: this.state.data.map(d => d[index])});
   };
 
   componentWillMount = () => {
@@ -64,19 +41,19 @@ export class LineChart extends PureComponent {
     graphData.meta.ticksX = [];
     graphData.meta.max = data.data[0].area;
 
-    let excludes = ['no class', 'date_to', 'date_from', 'blanc', 'cloud_cover', 'timestamp', 'area'];
+    let excludes = ['no class', 'date_to', 'date_from', 'blanc', 'timestamp', 'area'];
 
     for (let i = 0; i < data.meta.fields.length; i++)
     {
       if (!excludes.includes(data.meta.fields[i]))
       {
         let classes = this.infoContent.properties[this.props.type];
-        let color = '';
+        let color = 'fff';
         for (let j = 0; j < classes.length; j++)
         {
           if(classes[j].name === data.meta.fields[i])
           {
-            color = classes[j].color;
+            if(classes[j].color){color = classes[j].color};
             break;
           }
         }
@@ -90,9 +67,22 @@ export class LineChart extends PureComponent {
     {
       let row = data.data[i];
 
-      let cloud_cover = row.cloud_cover ? row.cloud_cover : this.props.filter;
+      let mask;
+      let filter;
 
-      if (typeof(this.props.filter) === 'number' && cloud_cover <= this.props.filter)
+      if (this.props.type === 'class')
+      {
+        filter = this.props.filter * row.area;
+        mask = row.mask ? row.mask : filter;
+      }
+      else
+      {
+        filter = this.props.filter;
+        mask = row.cloud_cover ? row.cloud_cover : filter;
+      }
+
+
+      if (typeof(this.props.filter) === 'number' && mask <= filter)
       {
         for(let key in row)
         {
@@ -106,20 +96,23 @@ export class LineChart extends PureComponent {
       }
     }
 
+    let stateData = [];
     let lines = [];
     for(let key in graphData)
     {
       if (key !== 'meta' && graphData[key].data.length > 1)
       {
-        let color = '000';
+        let color = 'fff';
         lines.push(<LineSeries
           key={key + this.props.filter}
           curve={'curveMonotoneX'}
           data={graphData[key].data}
           color={'#' + graphData[key].color}
-          //onNearestX={i === 0 ? this._onNearestX : null}
+          onNearestX={this._onNearestX}
           name={key}
+          style={{transform: 'translate(50px, 10px)'}}
         />);
+        stateData.push(graphData[key].data);
       }
       else if(key !== 'meta')
       {
@@ -127,23 +120,42 @@ export class LineChart extends PureComponent {
       }
     }
     
-    if (this.props.type === 'class')
-    {
-      graphData.meta['yMax'] = [0,graphData.meta.max];
-    }
-    else
+    if (this.props.type === 'spectral')
     {
       graphData.meta['yMax']= [-1, 1];
     }
 
-    this.setState({lines: lines, meta: graphData.meta});
+    this.setState({lines: lines, meta: graphData.meta, data: stateData});
   }
+
+  crossHairData = (d) =>
+  {
+    let merged = [];
+    let legendCopy = JSON.parse(JSON.stringify(this.state.meta.legend))
+    for (let i = 0; i < legendCopy.length; i++)
+    {
+      let legendItem = legendCopy[i];
+      delete legendItem.color;
+      let crossHairItem = d[i];
+      legendItem.value = d[i].y;
+      merged.push(legendItem);
+    }
+
+    return (merged);
+  };
+
+  crossHairTitle = (d) =>
+  {
+    let title = {title: 'date', value: Moment(d[0].x).format('DD-MM-YY')}
+    return title;
+  };
 
   render(){
     let axixStyle = {
       line: {stroke: '#808080'},
       ticks: {stroke: '#808080'},
-      text: {stroke: 'none', fill: '#545454', fontWeight: 600}};
+      text: {stroke: 'none', fill: '#545454', fontWeight: 200, fontSize: '10px'},
+    };
       
       if (this.state.lines.length > 0 && this.state.lines[0].type !== 'p')
       {
@@ -153,6 +165,7 @@ export class LineChart extends PureComponent {
             height={200}
             yDomain={this.state.meta.yMax}
             ref={this.props.type + 'Chart'}
+            style={{marginRight: 10}}
           >
             <XAxis
               key={'XAxis' + this.props.type + this.props.filter}
@@ -163,6 +176,8 @@ export class LineChart extends PureComponent {
               tickLabelAngle = {-35}
               style={axixStyle}
               tickValues={this.state.meta.ticksX}
+              left={50}
+              tickSizeOuter={3}
             />
             <YAxis
               key={'YAxis' + this.props.type + this.props.filter}
@@ -170,17 +185,22 @@ export class LineChart extends PureComponent {
               attrAxis="x"
               orientation="left"
               style={axixStyle}
+              left={10}
+              tickSizeOuter={3}
             />
             {this.state.lines}
             <Crosshair
               key={'crossHair' + this.props.type + this.props.filter}
               values={this.state.crosshairValues}
               className={'test-class-name'}
+              itemsFormat={(d) => this.crossHairData(d)}
+              titleFormat={(d) => this.crossHairTitle(d)}
             />
             <DiscreteColorLegend
               key={'DiscreteColorLegend' + this.props.type + this.props.filter}
               orientation='horizontal'
-              items={this.state.meta.legend} />
+              items={this.state.meta.legend}
+            />
           </FlexibleXYPlot>
         );
       }
