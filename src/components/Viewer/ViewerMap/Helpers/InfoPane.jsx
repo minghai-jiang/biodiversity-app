@@ -328,7 +328,7 @@ export class InfoPane extends PureComponent {
             overlayClassName='modal-overlay'
             isOpen={this.state.openQueryPane}
             title={this.paneName}
-            width={'50%'}
+            width={'0'}
             onRequestClose={() => { this.toggleQueryPane(false); }}
           >
             {content}
