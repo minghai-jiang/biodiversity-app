@@ -16,9 +16,8 @@ This brief documentation outlines all post and get requests that can be sent to 
       3.2.3 <a href='#data_index'>/data/spectral/tile</a> <br/>
 4. <a href='#geometry'>**/geometry**</a><br/>
 5. <a href='#visual'>**/visual**</a>
-6. <a href='#tileLayer'>**/tileLayer**</a>
-7. <a href='#Feedback'>**/Feedback**</a>
-8. <a href='#download'>**/download**</a>
+6. <a href='#tileService'>**/tileService**</a>
+7. <a href='#geoMessage'>**/geoMessage**</a>
 
 <a id='account'></a>
 # /account
@@ -133,7 +132,7 @@ JSON with all polygon layers of all timestamps of a given map.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/polygonsBounds'
+url = 'https://api.ellipsis-earth.com/metadata/polygons'
 ```
 
 Request to obtain the id's of predefined polygons.<br/>
@@ -184,7 +183,7 @@ url = 'https://api.ellipsis-earth.com/data/class/customPolygon/timestamps'
 Request to obtain the surface area of each class for each timestamp for a certain custom polygon.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-coords: A list of coordinates describing the polygon.<br/>
+geometry: A geojson describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns timestamp, [columns of area per class], total area, date from and date to.
 
@@ -199,9 +198,9 @@ Request to obtain the surface area of each class for each standard tile covering
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
-coords: A list of coordinates describing the polygon.<br/>
+geometry: A geoJson describing the polygon.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of area per class], total area, date from and date to.
+CSV with columns tileX, tileY, zoom, [columns of area per class], total area, date from and date to.
 
 <a id='data_class_polygon'></a>
 ### /data/class/polygon
@@ -224,7 +223,7 @@ CSV with columns polygon ids, [columns of area per class] and total area.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/polygon/timestamps'
+url = 'https://api.ellipsis-earth.com/data/class/polygon/timestamps'
 ```
 
 Request to obtain the surface area of each classes for each timestamps for a certain polygon.<br/>
@@ -247,7 +246,7 @@ mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 polygonId: An integer identifying the polygon.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of area per class] and total area.
+CSV with columns tileX, tileY, zoom, [columns of area per class] and total area.
 
 <a id='data_class_tile'></a>
 ### data/class/tile
@@ -264,7 +263,7 @@ Request to obtain the surface area of each class for each tile for a certain tim
 mapId: The uuid of the particular map.<br/>
 tileIds: a list of key value pairs with keys tileX, tileY and optionally zoom, cannot be longer than 3000.<br/>
 **Returns**<br/>
-CSV with columns polygon, [columns of area per class], total area date from and date to.
+CSV with columns tileX, tileY, zoom, [columns of area per class], total area date from and date to.
 
 #### Post timestamps
 
@@ -276,9 +275,11 @@ url = 'https://api.ellipsis-earth.com/data/class/tile/timestamps'
 Request to obtain the surface area of each class for a standard tile for all timestamps.<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
-timestamp: An integer identifying the timestamp.<br/>
+tileX: An integer identifying the x-location of the tile<br/>
+tileY: An integer identifying the y-location of the tile<br/>
+zoom: AN integer indicating the zoomlevel of the tile <br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of area per class] and total area.
+CSV with columns tileX, tileY, zoom, [columns of area per class] and total area.
 
 <a id='data_index'></a>
 ## /data/spectral
@@ -295,7 +296,7 @@ Request to obtain the mean indices of each index over a certain class for each t
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
-coords: A list of coordinates describing the polygon.<br/>
+geometry: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns timestamp, [columns of mean per index], total area, date from and date to.
 
@@ -311,9 +312,9 @@ Request to obtain the mean indices of each index over a certain class for a cert
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
-coords: A list of coordinates describing the polygon.<br/>
+geometry: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of mean per index] and total area.
+CSV with columns tileX, tileY, zoom, [columns of mean per index] and total area.
 
 ### data/spectral/polygon
 <a id='data_index_polygon'></a>
@@ -337,7 +338,7 @@ CSV with columns polygon ids, [columns of mean per index] and total area.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/polygons/timestamps'
+url = 'https://api.ellipsis-earth.com/data/spectral/polygon/timestamps'
 ```
 
 Request to obtain the mean indices of each index over a certain classs for each timestamp for a certain polygon.<br/>
@@ -362,7 +363,7 @@ timestamp: An integer identifying the timestamp.<br/>
 polygonId: An integer identifying the polygon.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of mean per index] and total area.
+CSV with columns tileX, tileY, zoom, [columns of mean per index] and total area.
 
 ### data/spectral/tile
 <a id='data_index_tile'></a>
@@ -392,8 +393,9 @@ Request to obtain the mean indices of each index over a certain class for a stan
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
-tileX: The x position of the tile..<br/>
-tileY: The y position of the tile.<br/>
+tileX: An integer identifying the x-location of the tile<br/>
+tileY: An integer identifying the y-location of the tile<br/>
+zoom: An integer indicating the zoomlevel of the tile <br/>
 **Returns**<br/>
 CSV with columns tileX, tileY, [columns of mean per index], total area, date from and date to.
 
@@ -449,12 +451,12 @@ layerName: Name of the layer that you wish to visualise<br/>
 **Returns**<br/>
 A Web Mercator projected PNG image of no more than 2048 by 2048 pixels.
 
-<a id='tileLayer'></a>
-# /tileLayer
+<a id='tileService'></a>
+# /tileService
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/tileLayer/[mapUuid]/[timestamp]/[layerName]/[tileZoom]/[tileX]/[tileY]'
+url = 'https://api.ellipsis-earth.com/tileService/[mapUuid]/[timestamp]/[layerName]/[tileZoom]/[tileX]/[tileY]'
 ```
 
 Request to obtain a png image of tile layer [layerName] of standard tile [tileX], [tileY] at zoom level [tileZoom] for a certain timestamp [timestamp].<br/>
@@ -472,86 +474,241 @@ Ellipsis-Earth tiles work in the same way as Open Street Map tiles. That is to s
 
 As this is a standard way of working, you can quickly visualise the tile layer as an interactive map in a framework such as Leaflet or arcGIS once you supplied it with the correct base URL.
 
-<a id='download'></a>
-# /download
-#### Post /shape/token
+<a id='geoMessage'></a>
+# /geoMessage
+## /geoMessage/tile
+#### Post /addMessage
 
 
 ```python
-url =  'https://api.ellipsis-earth.com/download/shape/token'
+url = 'https://api.ellipsis-earth.com/geoMessage/tile/addMessage'
 ```
 
-Request to obtain a dowload token.<br/>
-**Parameters**<br/>
-mapId: The uuid of the particular map. <br/>
-timestamp: An integer identifying the timestamp.<br/>
-**Returns**<br/>
-JSON with a token for downloading the shape file.
-
-#### Get /shape/get
-
-
-```python
-url = 'https://api.ellipsis-earth.com/download/shape/get/{token}'
-```
-
-Request to download the shapefile. <br/>
-**Parameters**<br/>
-token: The download token that was obtained via the post download token request.<br/>
-**Returns**<br/>
-Starts the download of the shape.
-
-<a id='Feedback'></a>
-# /feedback
-#### Post /error/add
-
-
-```python
-url = 'https://api.ellipsis-earth.com/feedback/error/add'
-```
-
-Submits feedback to the system, notifying it of classification errors in the given area.<br/>
+Submits a report for a certain standard tile.<br/>
 **Parameters**<br/>
 mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 tileX: The x of the tile in web mercator projection.<br/>
 tileY: The y of the tile in web mercator projection<br/>
 zoom: The zoom level of the tile.<br/>
-isMask: If true, indicates that the error is a mask related error, otherwise it's a classification error.<br/>
-message: A custom message describing the error.<br/>
+errorMask: If true, indicates that the error is a mask related error.<br/>
+errorClass: If true, indicates that the error is a classification related error.<br/>
+message: A custom message.<br/>
 **Returns**<br/>
 Status 200 if the submission was successful.
 
-#### Post /error/retract
+#### Post /deletetMessage
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/feedback/error/retract'
+url = 'https://api.ellipsis-earth.com/geoMessage/tile/deleteMessage'
 ```
 
-Retracts all reported errors for the given tile.<br/>
+Deletes a report of a tile.<br/>
 **Parameters**<br/>
-mapId: The id of the map..<br/>
-timestamp: The number of the timestamp.<br/>
-tileX: The x of the tile in web mercator projection.<br/>
-tileY: The y of the tile in web mercator projection.<br/>
-zoom: The zoom level of the tile.<br/>
-isMask: Retracts all mask errors if true, otherwise, retracts all classification errors.<br/>
-message: A custom message describing the error.<br/>
+messageId: id of the message to be retracted.<br/>
 **Returns**<br/>
 Status 200 if the removeal was successful.
 
-#### Post /error/get
+#### Post /ids
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/feedback/error/get'
+url = 'https://api.ellipsis-earth.com/geoMessage/tile/ids'
 ```
 
-Gets all errors of a certain map and a timestamp.<br/>
-**Parameters**
+Gets tile ids for which there are reports.<br/>
+**Parameters**<br/>
+mapId: The id of the map.<br/>
+xMin: Minimum x coordinate wgs84 (optional). <br />
+xMax: Maximum x coordinate wgs84 (optional). <br />
+yMin: Minimum y coordinate wgs84 (optional). <br />
+yMax: Maximum y coordinate wgs84 (optional). <br />
+limit: maximum number of ids to return (default is infinity). <br />
+**Returns**<br/>
+Json with a count and list of ids. In case the number of ids exceeds the limit, only a count is returned.
+
+#### Post /getMessages
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/tile/getMessages'
+```
+
+Gets all reports of the tiles with the given ids.<br/>
+**Parameters**<br/>
+mapId: The id of the map.<br/>
+tileIds: list of triples tileX, tileY and zoom. <br/>
+**Returns**<br/>
+Json with all reports.
+
+## /geoMessage/polygon
+#### Post /addMessage
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/polygon/addMessage'
+```
+
+Submits a report for a certain polygon.<br/>
+**Parameters**<br/>
 mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
-isMask: Gets all mask errors if true, otherwise, get all classification errors.<br/>
+polygonId: Id of the polygon.<br/>
+errorMask: If true, indicates that the error is a mask related error.<br/>
+errorClass: If true, indicates that the error is a classification related error.<br/>
+message: A custom message.<br/>
 **Returns**<br/>
-Json with all the errors.
+Status 200 if the submission was successful.
+
+#### Post /deleteMessage
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/polygon/deleteMessage'
+```
+
+Deletes a report of a polygon.<br/>
+**Parameters**<br/>
+messageId: Id of the messge to be retracted.<br/>
+**Returns**<br/>
+Status 200 if the removeal was successful.
+
+#### Post /ids
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/polygon/ids'
+```
+
+Gets polygon ids for which there are reports.<br/>
+**Parameters**<br/>
+mapId: The id of the map.<br/>
+xMin: Minimum x coordinate wgs84 (optional). <br />
+xMax: Maximum x coordinate wgs84 (optional). <br />
+yMin: Minimum y coordinate wgs84 (optional). <br />
+yMax: Maximum y coordinate wgs84 (optional). <br />
+limit: maximum number of ids to return (default is infinity). <br />
+**Returns**<br/>
+Json with a count and list of ids. In case the number of ids exceeds the limit, only a count is returned.
+
+#### Post /getMessages
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/polygon/getMessages'
+```
+
+Gets all reports of the polygons with the given ids.<br/>
+**Parameters**<br/>
+mapId: The id of the map.<br/>
+timestamp: The number of the timestamp.<br/>
+polygonIds: list of ids. <br/>
+**Returns**<br/>
+Json with all reports.
+
+## /geoMessage/customPolygon
+#### Post /layers
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/layers'
+```
+
+Requests the customPolygon layers of a certai map.<br/>
+**Parameters**<br/>
+mapId: The id of the map.<br/>
+**Returns**<br/>
+JSON with layer names and colors.
+
+#### Post /addPolygon
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/addPolygon'
+```
+
+Submits a certain customly defined polygon.<br/>
+**Parameters**<br/>
+mapId: The id of the map.<br/>
+timestamp: The number of the timestamp.<br/>
+geometry: GeoJSON.<br/>
+features: A JSON with features.<br/>
+layer: the name of the layer to which to add.<br/>
+**Returns**<br/>
+Status 200 if the submission was successful.
+
+#### Post /addMessage
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/addMessage'
+```
+
+Submits a report for a certain polygon.<br/>
+**Parameters**<br/>
+customPolygonId: The id of the customPolygon.<br/>
+timestamp: The number of the timestamp.<br/>
+errorMask: If true, indicates that the error is a mask related error.<br/>
+errorClass: If true, indicates that the error is a classification related error.<br/>
+message: A custom message.<br/>
+**Returns**<br/>
+Status 200 if the submission was successful.
+
+#### Post /deleteMessage
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/deleteMessage'
+```
+
+Deletes a customPolygon.<br/>
+**Parameters**<br/>
+messageId: Id of the messge to be retracted.<br/>
+**Returns**<br/>
+Status 200 if the removeal was successful.
+
+#### Post /deletePolygon
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/deletePolygon'
+```
+
+Deletes a customPolygon.<br/>
+**Parameters**<br/>
+customPolygonId: Id of the customPolygon to be retracted.<br/>
+**Returns**<br/>
+Status 200 if the removeal was successful.
+
+#### Post /ids
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/ids'
+```
+
+Gets customPolygon ids for which there are reports.<br/>
+**Parameters**<br/>
+mapId: The id of the map.<br/>
+xMin: Minimum x coordinate wgs84 (optional). <br />
+xMax: Maximum x coordinate wgs84 (optional). <br />
+yMin: Minimum y coordinate wgs84 (optional). <br />
+yMax: Maximum y coordinate wgs84 (optional). <br />
+limit: maximum number of ids to return (default is infinity). <br />
+layer: The name of the layer of which to retrieve the id's. <br />
+**Returns**<br/>
+Json with a count and list of ids. In case the number of ids exceeds the limit, only a count is returned.
+
+#### Post /getMessages
+
+
+```python
+url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/getMessages'
+```
+
+Gets all reports of the customPolygons with the given ids.<br/>
+**Parameters**<br/>
+customPolygonIds: list of ids. <br/>
+**Returns**<br/>
+Json with all reports.
