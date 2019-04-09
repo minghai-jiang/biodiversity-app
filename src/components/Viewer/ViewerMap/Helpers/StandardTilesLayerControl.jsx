@@ -103,9 +103,10 @@ const StandardTilesLayer = {
     if (StandardTiles_PopupContent && StandardTiles_PopupContent.id)
     {
       let popup = StandardTiles_PopupContent;
-      let id = popup.id + '.' + popup.properties.tileX + "." + popup.properties.tileY + '.' +  popup.properties.zoom;
+      let id = popup.properties.tileX + "." + popup.properties.tileY + '.' +  popup.properties.zoom;
       let content = [];
       let properties = Object.create(popup.properties);
+      let merged;
 
       for (let key in popup.properties)
       {
@@ -117,6 +118,7 @@ const StandardTilesLayer = {
         properties.uuid = props.map.uuid;
         properties.timestamp = props.timestampRange.end;
         properties.apiUrl = props.apiUrl;
+
         if (props.user)
         {
           properties.headers = {Authorization: "Bearer " + props.user.token}
@@ -125,15 +127,17 @@ const StandardTilesLayer = {
         {
           properties.headers = []
         }
+
+        merged = {...properties, ...StandardTiles_PopupContent.properties};
       }
 
-      let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, properties)} }>Analyse this tile</a>
+      let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
 
       let report;
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>Send GeoMessage</a>
+        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
       }
 
       return (
@@ -166,7 +170,8 @@ async function getTilesJson(props, bounds) {
     props.user, 
     map.uuid, 
     props.timestampRange.end, 
-    bounds);
+    bounds,
+    map.zoom);
 
   let layerGeoJson = await geoJsonPromise;
   if (layerGeoJson && layerGeoJson.standardTiles)
@@ -184,7 +189,7 @@ async function getTilesJson(props, bounds) {
   };
 }
 
-async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds) {
+async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, zoom) {
   let headers = {};
   if (user) {
     headers["Authorization"] = "Bearer " + user.token;
@@ -222,24 +227,28 @@ async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds) {
       {
         let filteredTilesFeatures = [];
         let filteredTilesResult = await QueryUtil.postData(
-          apiUrl + 'feedback/error/get',
+          apiUrl + 'geoMessage/tile/ids',
           {
             mapId:  mapUuid,
-            timestamp: timestampEnd
+            timestamp: timestampEnd,
+            xMin: bounds.xMin,
+            xMax: bounds.xMax,
+            yMin: bounds.yMin,
+            yMax: bounds.yMax,
+            zoom: zoom
           }, headers
         );
 
         if (filteredTilesResult)
-        {      
+        {
           for (let i = 0; i < tilesGeoJson.features.length; i++)
           {
             let tileProperties = tilesGeoJson.features[i].properties;
 
-            for (let j = 0; j < filteredTilesResult.length; j++)
+            for (let j = 0; j < filteredTilesResult.tileIds.length; j++)
             {
-              if (tileProperties.tileX === filteredTilesResult[j].tileX && tileProperties.tileY === filteredTilesResult[j].tileY && tileProperties.zoom === filteredTilesResult[j].zoom)
+              if (tileProperties.tileX === filteredTilesResult.tileIds[j].tileX && tileProperties.tileY === filteredTilesResult.tileIds[j].tileY && tileProperties.zoom === filteredTilesResult.tileIds[j].zoom)
               {
-                tilesGeoJson.features[i].feedback = filteredTilesResult[j].feedback;
                 filteredTilesFeatures.push(tilesGeoJson.features[i]);
               }
             }
@@ -350,13 +359,14 @@ function onEachFeature(feature, layer)
   });
 }
 
-function handleTile(type, contentFunction, id, properties)
+function handleTile(type, contentFunction, id, properties, random)
 {
   contentFunction({
     id: id,
     openPane: true,
     type: type,
     properties: properties,
+    random: random,
   });
 }
 

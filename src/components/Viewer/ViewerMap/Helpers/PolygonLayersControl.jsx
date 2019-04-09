@@ -153,7 +153,7 @@ const PolygonLayersControl = {
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties)} }>GeoMessage</a>
+        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>
       }
 
       return (

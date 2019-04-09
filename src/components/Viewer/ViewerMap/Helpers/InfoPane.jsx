@@ -1,11 +1,11 @@
 import React, { PureComponent} from 'react';
 import SlidingPane from 'react-sliding-pane';
-import PopupForm from '../../Popup-form/Popup-form';
 import LineChart from './DV/LineChart';
 import Slider from 'rc-slider';
 import QueryUtil from '../../../Utilities/QueryUtil';
 import Papa from 'papaparse';
 import Table from './DV/Table';
+import GeoMessage from './GeoMessage';
 
 import 'rc-slider/assets/index.css';
 import 'rc-tooltip/assets/bootstrap.css';
@@ -267,7 +267,7 @@ export class InfoPane extends PureComponent {
     }
     else if(this.props.infoContent && this.props.infoContent.type === 'report')
     {
-      this.paneName = 'GeoMessage';
+      this.paneName = 'GeoMessage for ' + this.props.infoContent.id;
     }
   };
 
@@ -284,7 +284,7 @@ export class InfoPane extends PureComponent {
     }
     else if(this.props.infoContent && this.props.infoContent.type === 'report')
     {
-      this.setState({GeoMessage: <PopupForm props={this.props.infoContent.properties} />})
+      this.setState({GeoMessage: <GeoMessage properties={this.props.infoContent.properties} user={this.props.user}/>})
     }
   }
 

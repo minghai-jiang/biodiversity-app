@@ -1,5 +1,4 @@
 import React, { PureComponent} from 'react';
-//import Papa from 'papaparse';
 import Moment from 'moment';
 
 import {FlexibleXYPlot, XAxis, YAxis, LineSeries, DiscreteColorLegend, Crosshair} from 'react-vis';

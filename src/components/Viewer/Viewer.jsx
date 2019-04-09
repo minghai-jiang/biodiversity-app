@@ -110,6 +110,7 @@ class Viewer extends PureComponent {
           map={this.state.map}
           infoContent={this.state.infoContent}
           key={this.state.infoContent ? this.state.infoContent.id : null}
+          user={this.props.user}
         />
 {/*        <QueryPane
           apiUrl={this.props.apiUrl}
