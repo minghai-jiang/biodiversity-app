@@ -17,10 +17,13 @@ export default class GeoMessage extends PureComponent {
 
   scrollToBottom()
   {
-    const scrollHeight = this.messageList.scrollHeight;
-    const height = this.messageList.clientHeight;
-    const maxScrollTop = scrollHeight - height;
-    this.messageList.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+    if (this.messageList)
+    {
+      const scrollHeight = this.messageList.scrollHeight;
+      const height = this.messageList.clientHeight;
+      const maxScrollTop = scrollHeight - height;
+      this.messageList.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+    }
   };
 
   componentDidUpdate()
@@ -30,19 +33,38 @@ export default class GeoMessage extends PureComponent {
 
   getMessages = async() =>
   {
+    console.log('getMessages', this.props)
     let messages = [];
-    let messagesPromise = await QueryUtil.postData(
-      this.props.properties.apiUrl + 'geoMessage/tile/getMessages',
-      {
-        mapId: this.props.properties.uuid,
-        tileIds: [{
-          tileX: this.props.properties.tileX,
-          tileY: this.props.properties.tileY,
-          zoom: this.props.properties.zoom,
-        }],
-      },
-      this.props.properties.headers 
-    );
+    let messagesPromise;
+
+    if (this.props.properties.type && this.props.properties.type === 'Polygon')
+    {
+      messagesPromise = await QueryUtil.postData(
+        this.props.properties.apiUrl + 'geoMessage/polygon/getMessages',
+        {
+          mapId: this.props.properties.uuid,
+          timestamp: this.props.properties.timestamp,
+          polygonIds: [this.props.properties.id],
+        },
+        this.props.properties.headers 
+      );
+    }
+    else
+    {
+      messagesPromise = await QueryUtil.postData(
+        this.props.properties.apiUrl + 'geoMessage/tile/getMessages',
+        {
+          mapId: this.props.properties.uuid,
+          tileIds: [{
+            tileX: this.props.properties.tileX,
+            tileY: this.props.properties.tileY,
+            zoom: this.props.properties.zoom,
+          }],
+        },
+        this.props.properties.headers 
+      );
+    }
+
 
     let allMessagesInfo = await messagesPromise;
     if (allMessagesInfo)
@@ -60,7 +82,7 @@ export default class GeoMessage extends PureComponent {
         }
       }
     }
-    
+
     return(messages)
   };
 
@@ -78,8 +100,10 @@ export default class GeoMessage extends PureComponent {
 
   render = () => 
   {
-    return(
-      <div>
+    let geoMessages = [];
+    if (this.state.messages.length > 0)
+    {
+      geoMessages.push(
         <div
           className='GeoMessageContainer'
           key='GeoMessageContainer'
@@ -87,6 +111,12 @@ export default class GeoMessage extends PureComponent {
         >
           {this.state.messages}
         </div>
+      )
+    }
+
+    return(
+      <div>
+        {geoMessages}
         <PopupForm properties={this.props.properties} messageTrigger={this.messageTrigger}/>
       </div>
     );

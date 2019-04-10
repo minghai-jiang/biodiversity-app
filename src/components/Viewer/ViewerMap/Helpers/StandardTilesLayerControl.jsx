@@ -11,7 +11,7 @@ import QueryUtil from '../../../Utilities/QueryUtil';
 
 let StandardTiles_checkedLayers = [];
 let StandardTiles_layerGeoJsons = [];
-let StandardTiles_filteredTiles = []
+let StandardTiles_filteredTiles = [];
 let StandardTiles_polygonCounts = 0;
 
 let StandardTiles_controlOverlays = [];
@@ -42,7 +42,6 @@ const StandardTilesLayer = {
     else {
       let layerInfo = await getTilesJson(props, bounds);
       StandardTiles_layerGeoJsons = layerInfo.layerGeoJsons;
-      StandardTiles_filteredTiles = layerInfo.errorTiles;
       StandardTiles_polygonCounts = layerInfo.polygonCounts;
       layerInfo.errorTiles ? StandardTiles_filteredTiles = layerInfo.errorTiles : StandardTiles_filteredTiles = [];
 
@@ -66,7 +65,6 @@ const StandardTilesLayer = {
       
       StandardTiles_layerGeoJsons = layerInfo.layerGeoJsons;
       StandardTiles_polygonCounts = layerInfo.polygonCounts;
-      StandardTiles_filteredTiles = layerInfo.errorTiles;
       layerInfo.errorGeoJsons ? StandardTiles_filteredTiles = layerInfo.errorGeoJsons : StandardTiles_filteredTiles = [];
 
       StandardTiles_controlOverlays = createGeojsonLayerControl(props);
@@ -81,6 +79,11 @@ const StandardTilesLayer = {
     StandardTiles_polygonCounts = 0;
     StandardTiles_PopupContent = {};
     StandardTiles_map = null;
+
+    StandardTiles_checkedLayers = [];
+    StandardTiles_layerGeoJsons = [];
+    StandardTiles_controlOverlays = [];
+
   },
 
   onOverlayAdd: (e) => {
@@ -230,7 +233,6 @@ async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, zoom
           apiUrl + 'geoMessage/tile/ids',
           {
             mapId:  mapUuid,
-            timestamp: timestampEnd,
             xMin: bounds.xMin,
             xMax: bounds.xMax,
             yMin: bounds.yMin,

@@ -115,7 +115,7 @@ export class ViewerMap extends PureComponent {
         yMax: screenBounds.getNorth()
       }
 
-      LegendControl.update(nextProps, []);
+      LegendControl.update(nextProps, [], []);
 
       await PolygonLayersControl.update(nextProps, bounds);
       await StandardTilesLayerControl.update(nextProps, bounds);

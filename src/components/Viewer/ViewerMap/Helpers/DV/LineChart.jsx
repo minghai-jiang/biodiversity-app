@@ -118,11 +118,6 @@ export class LineChart extends PureComponent {
         lines.push(<p key='notEnoughData'>Not enough data for a graph</p>)
       }
     }
-    
-    if (this.props.type === 'spectral')
-    {
-      graphData.meta['yMax']= [-1, 1];
-    }
 
     this.setState({lines: lines, meta: graphData.meta, data: stateData});
   }
@@ -162,7 +157,6 @@ export class LineChart extends PureComponent {
           <FlexibleXYPlot
             key={'FlexibleXYPlot' + this.props.type + this.props.filter}
             height={200}
-            yDomain={this.state.meta.yMax}
             ref={this.props.type + 'Chart'}
             style={{marginRight: 10}}
           >

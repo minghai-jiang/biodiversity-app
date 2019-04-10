@@ -275,6 +275,15 @@ export class InfoPane extends PureComponent {
   {
     if(this.props.infoContent && this.props.infoContent.type === 'analyse')
     {
+      this.paneName = 'Analysis of ' + this.props.infoContent.properties.type + ' ' + this.props.infoContent.properties.id;
+    }
+    else if(this.props.infoContent && this.props.infoContent.type === 'report')
+    {
+      this.paneName = 'GeoMessage for ' + this.props.infoContent.id;
+    }
+
+    if(this.props.infoContent && this.props.infoContent.type === 'analyse')
+    {
       let classes = await this.getClasses();
       let classesSlider = this.getSlider('class');
       let indeces = await this.getIndeces();
@@ -297,6 +306,8 @@ export class InfoPane extends PureComponent {
   }
 
   render() {
+    let graph = [];
+    console.log(this.props);
     if (this.props.map && this.props.infoContent)
     {
       let content = [];
@@ -320,10 +331,16 @@ export class InfoPane extends PureComponent {
         {
           content.push(<p key='loadingData'>Loading Data <br/><img src='/images/spinner.png' alt='spinner'/></p>);
         }
+
+        if (content.length > 1)
+        {
+          graph = <div className='graphContainer' key={'graph' + this.props.infoContent.type + this.props.infoContent.id + this.props.infoContent.properties.id}>{content}</div>
+        }
       }
 
       return (
           <SlidingPane
+            key={this.props.infoContent.type + this.props.infoContent.id + this.props.infoContent.properties.id}
             className='query-pane'
             overlayClassName='modal-overlay'
             isOpen={this.state.openQueryPane}
@@ -331,7 +348,7 @@ export class InfoPane extends PureComponent {
             width={'0'}
             onRequestClose={() => { this.toggleQueryPane(false); }}
           >
-            {content}
+            {graph}
             {this.state.GeoMessage}
           </SlidingPane>
       );

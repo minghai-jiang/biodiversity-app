@@ -36,20 +36,38 @@ constructor(props) {
   async handleSubmit(event) {
     event.preventDefault();
     let props = this.props.properties;
+    let feedbackResult;
 
-    let feedbackResult = await QueryUtil.postData(
-    props.apiUrl + 'geoMessage/tile/addMessage',
+    if(props.type === 'Polygon')
     {
-      mapId:  props.uuid,
-      timestamp: props.timestamp,
-      tileX: props.tileX,
-      tileY: props.tileY,
-      zoom: props.zoom,
-      isMask: this.state.clouds,
-      isClassification: this.state.classification,
-      message: this.state.text,
-    }, props.headers
-  );
+      feedbackResult = await QueryUtil.postData(
+        props.apiUrl + 'geoMessage/polygon/addMessage',
+        {
+          mapId:  props.uuid,
+          timestamp: props.timestamp,
+          polygonId: props.id,
+          isMask: this.state.clouds,
+          isClassification: this.state.classification,
+          message: this.state.text,
+        }, props.headers
+      );
+    }
+    else
+    {
+      feedbackResult = await QueryUtil.postData(
+        props.apiUrl + 'geoMessage/tile/addMessage',
+        {
+          mapId:  props.uuid,
+          timestamp: props.timestamp,
+          tileX: props.tileX,
+          tileY: props.tileY,
+          zoom: props.zoom,
+          isMask: this.state.clouds,
+          isClassification: this.state.classification,
+          message: this.state.text,
+        }, props.headers
+      );
+    }
 
     let notification; let type;
     if(feedbackResult === 'OK')

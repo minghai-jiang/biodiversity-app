@@ -119,6 +119,11 @@ div.query-pane
   width: 50% !important;
 }
 
+div.graphContainer
+{
+  padding: 1em;
+}
+
 @media only screen and (max-device-width : 860px)
 {
   div.query-pane
