@@ -116,11 +116,25 @@ const StandardTilesLayer = {
         content.push(<p key={id + '.' + key + '.' + popup.properties[key]}><span>{key}:</span> {popup.properties[key]}</p>)
       }
 
+      let classes; let spectral;
+      for (let i = 0; i < props.map.classes.length; i++)
+      {
+        if (props.map.classes[i].timestampNumber === props.timestampRange.end)
+        {
+          classes = props.map.classes[i].classes;
+          spectral = props.map.spectral[i].indices;
+          break;
+        }
+      }
+
       if(popup.properties && props.map && props.timestampRange && props.apiUrl)
       {
+        properties.class = classes;
+        properties.spectral = spectral;
         properties.uuid = props.map.uuid;
         properties.timestamp = props.timestampRange.end;
         properties.apiUrl = props.apiUrl;
+        properties.kind = 'tile';
 
         if (props.user)
         {
@@ -148,7 +162,7 @@ const StandardTilesLayer = {
           <div key={id + '.content'}>
             {content}
           </div>
-          {/*analyse*/}
+          {analyse}
           {report}
         </Popup>
       );

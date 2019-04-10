@@ -105,7 +105,7 @@ export class InfoPane extends PureComponent {
     content.push(<select key='classSelector' defaultValue={defaultValue} onChange={this.onClassChange}>{options}</select>);
     if (itemValue)
     {
-      if(data)
+      if(data && data.tableData && data.tableData.data && data.tableData.data.length > 1)
       {
         content.push(<LineChart key={'indicesTimestamps' + itemValue + filter} props={this.props} type='spectral' inputClass={currentValue} className='LineChart' filter={filter} data={data.graphData}/>)
         content.push(<Table key={'indecesTable' + itemValue} type={itemValue} data={data.tableData}/>)
@@ -212,7 +212,7 @@ export class InfoPane extends PureComponent {
       body.class = spectralClass;
     }
 
-    if (!this.props.infoContent.properties.hasAggregatedData)
+    if (this.props.infoContent.properties.hasAggregatedData === false)
     {
       let geometry = {
         'type': 'FeatureCollection',
@@ -235,9 +235,20 @@ export class InfoPane extends PureComponent {
     }
     else
     {
-      body.polygonId = this.props.infoContent.id;      
+      let kind = this.props.infoContent.properties.kind;
+      if (kind === 'polygon')
+      {
+        body.polygonId = this.props.infoContent.id;
+      }
+      else
+      {
+        body.tileX = this.props.infoContent.properties.tileX;
+        body.tileY = this.props.infoContent.properties.tileY;
+        body.zoom = this.props.infoContent.properties.zoom;
+      }
+
       rawGraphDataPromise = await QueryUtil.postData(
-        this.props.infoContent.properties.apiUrl + 'data/' + type + '/polygon/timestamps',
+        this.props.infoContent.properties.apiUrl + 'data/' + type + '/' + kind + '/timestamps',
         body,
         this.headers 
       );
@@ -263,7 +274,7 @@ export class InfoPane extends PureComponent {
   componentWillMount = () => {
     if(this.props.infoContent && this.props.infoContent.type === 'analyse')
     {
-      this.paneName = 'Analysis of ' + this.props.infoContent.properties.type + ' ' + this.props.infoContent.properties.id;
+      this.paneName = 'Analysis of ' + this.props.infoContent.id;
     }
     else if(this.props.infoContent && this.props.infoContent.type === 'report')
     {
@@ -275,7 +286,7 @@ export class InfoPane extends PureComponent {
   {
     if(this.props.infoContent && this.props.infoContent.type === 'analyse')
     {
-      this.paneName = 'Analysis of ' + this.props.infoContent.properties.type + ' ' + this.props.infoContent.properties.id;
+      this.paneName = 'Analysis of ' + this.props.infoContent.id
     }
     else if(this.props.infoContent && this.props.infoContent.type === 'report')
     {
@@ -307,7 +318,6 @@ export class InfoPane extends PureComponent {
 
   render() {
     let graph = [];
-    console.log(this.props);
     if (this.props.map && this.props.infoContent)
     {
       let content = [];

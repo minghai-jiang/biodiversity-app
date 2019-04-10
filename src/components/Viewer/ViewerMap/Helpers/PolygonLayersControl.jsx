@@ -141,6 +141,7 @@ const PolygonLayersControl = {
         properties.apiUrl = props.apiUrl;
         properties.type = polygonLayersControl_PopupContent.geometry.type;
         properties.coordinates = polygonLayersControl_PopupContent.geometry.coordinates;
+        properties.kind = 'polygon';
 
         if (props.user)
         {
