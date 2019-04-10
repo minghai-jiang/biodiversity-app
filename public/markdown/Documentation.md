@@ -16,8 +16,12 @@ This brief documentation outlines all post and get requests that can be sent to 
       3.2.3 <a href='#data_index'>/data/spectral/tile</a> <br/>
 4. <a href='#geometry'>**/geometry**</a><br/>
 5. <a href='#visual'>**/visual**</a>
-6. <a href='#tileService'>**/tileService**</a>
-7. <a href='#geoMessage'>**/geoMessage**</a>
+6. <a href='#tileService'>**/tileService**</a> 
+7. <a href='#geoMessage'>**/geoMessage**</a> <br/>
+     7.1 <a href='#message_tile'>*/geoMessage/tile*</a> <br/>
+     7.2 <a href='#message_polygon'>*/geoMessage/polygon*</a> <br/>
+     7.3 <a href='#message_customPolygon'>*/geoMessage/customPolygon*</a> <br/>
+          
 
 <a id='account'></a>
 # /account
@@ -46,7 +50,7 @@ Request to obtain all maps that a user has access to.<br/>
 **Parameters**<br/>
 None<br/>
 **Returns**<br/>
-JSON with an array of maps. Each element has a map uuid, a map name, a bounding box of the map and whether the map is public or not.<br/>
+JSON with all to the user available maps and metadata of these maps.
 
 #### Get validate
 
@@ -476,6 +480,7 @@ As this is a standard way of working, you can quickly visualise the tile layer a
 
 <a id='geoMessage'></a>
 # /geoMessage
+<a id='message_tile'></a>
 ## /geoMessage/tile
 #### Post /addMessage
 
@@ -484,31 +489,32 @@ As this is a standard way of working, you can quickly visualise the tile layer a
 url = 'https://api.ellipsis-earth.com/geoMessage/tile/addMessage'
 ```
 
-Submits a report for a certain standard tile.<br/>
+Adds a message for a certain standard tile.<br/>
 **Parameters**<br/>
 mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 tileX: The x of the tile in web mercator projection.<br/>
 tileY: The y of the tile in web mercator projection<br/>
 zoom: The zoom level of the tile.<br/>
-errorMask: If true, indicates that the error is a mask related error.<br/>
-errorClass: If true, indicates that the error is a classification related error.<br/>
+isMask: If true, indicates that the message mask related.<br/>
+isClassification: If true, indicates that the error is classification related.<br/>
 message: A custom message.<br/>
 **Returns**<br/>
 Status 200 if the submission was successful.
 
-#### Post /deletetMessage
+#### Post /deleteMessage
 
 
 ```python
 url = 'https://api.ellipsis-earth.com/geoMessage/tile/deleteMessage'
 ```
 
-Deletes a report of a tile.<br/>
+Deletes a specific tile message.<br/>
 **Parameters**<br/>
+mapId: The id of the map.<br/>
 messageId: id of the message to be retracted.<br/>
 **Returns**<br/>
-Status 200 if the removeal was successful.
+Status 200 if the removal was successful.
 
 #### Post /ids
 
@@ -517,16 +523,20 @@ Status 200 if the removeal was successful.
 url = 'https://api.ellipsis-earth.com/geoMessage/tile/ids'
 ```
 
-Gets tile ids for which there are reports.<br/>
+Gets tile ids for which there are messages.<br/>
 **Parameters**<br/>
 mapId: The id of the map.<br/>
 xMin: Minimum x coordinate wgs84 (optional). <br />
 xMax: Maximum x coordinate wgs84 (optional). <br />
 yMin: Minimum y coordinate wgs84 (optional). <br />
 yMax: Maximum y coordinate wgs84 (optional). <br />
-limit: maximum number of ids to return (default is infinity). <br />
+zoom: The zoom level of the tile. (optional)<br/>
+limit: maximum number of ids to return (optional, default is infinity). <br />
+
+NOTE: Except for limit, all other optional arguments are used together. If you define one of them, you also need to define the others.<br/>
+
 **Returns**<br/>
-Json with a count and list of ids. In case the number of ids exceeds the limit, only a count is returned.
+Json with a count and list of tile ids. In case the number of ids exceeds the limit, only a count is returned.
 
 #### Post /getMessages
 
@@ -535,13 +545,14 @@ Json with a count and list of ids. In case the number of ids exceeds the limit, 
 url = 'https://api.ellipsis-earth.com/geoMessage/tile/getMessages'
 ```
 
-Gets all reports of the tiles with the given ids.<br/>
+Gets the tile messages with the given ids.<br/>
 **Parameters**<br/>
 mapId: The id of the map.<br/>
-tileIds: list of triples tileX, tileY and zoom. <br/>
+tileIds: Array of triples with keys 'tileX', 'tileY' and 'zoom'. <br/>
 **Returns**<br/>
-Json with all reports.
+Json with all the messages.
 
+<a id='message_polygon'></a>
 ## /geoMessage/polygon
 #### Post /addMessage
 
@@ -550,13 +561,13 @@ Json with all reports.
 url = 'https://api.ellipsis-earth.com/geoMessage/polygon/addMessage'
 ```
 
-Submits a report for a certain polygon.<br/>
+Adds a message for a certain polygon.<br/>
 **Parameters**<br/>
 mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 polygonId: Id of the polygon.<br/>
-errorMask: If true, indicates that the error is a mask related error.<br/>
-errorClass: If true, indicates that the error is a classification related error.<br/>
+isMask: If true, indicates that the message mask related.<br/>
+isClassification: If true, indicates that the error is classification related.<br/>
 message: A custom message.<br/>
 **Returns**<br/>
 Status 200 if the submission was successful.
@@ -568,11 +579,12 @@ Status 200 if the submission was successful.
 url = 'https://api.ellipsis-earth.com/geoMessage/polygon/deleteMessage'
 ```
 
-Deletes a report of a polygon.<br/>
+Deletes a message of a polygon.<br/>
 **Parameters**<br/>
-messageId: Id of the messge to be retracted.<br/>
+mapId: The id of the map.
+messageId: Id of the messge to be deleted.<br/>
 **Returns**<br/>
-Status 200 if the removeal was successful.
+Status 200 if the removal was successful.
 
 #### Post /ids
 
@@ -581,7 +593,7 @@ Status 200 if the removeal was successful.
 url = 'https://api.ellipsis-earth.com/geoMessage/polygon/ids'
 ```
 
-Gets polygon ids for which there are reports.<br/>
+Gets the polygon ids for which there are messages .<br/>
 **Parameters**<br/>
 mapId: The id of the map.<br/>
 xMin: Minimum x coordinate wgs84 (optional). <br />
@@ -589,8 +601,10 @@ xMax: Maximum x coordinate wgs84 (optional). <br />
 yMin: Minimum y coordinate wgs84 (optional). <br />
 yMax: Maximum y coordinate wgs84 (optional). <br />
 limit: maximum number of ids to return (default is infinity). <br />
+
+NOTE: Except for limit, all other optional arguments are used together. If you define one of them, you also need to define the others.<br/><br/>
 **Returns**<br/>
-Json with a count and list of ids. In case the number of ids exceeds the limit, only a count is returned.
+Json with a count and list of polygon ids. In case the number of ids exceeds the limit, only a count is returned.
 
 #### Post /getMessages
 
@@ -599,7 +613,7 @@ Json with a count and list of ids. In case the number of ids exceeds the limit, 
 url = 'https://api.ellipsis-earth.com/geoMessage/polygon/getMessages'
 ```
 
-Gets all reports of the polygons with the given ids.<br/>
+Gets all messages of the polygons with the given ids.<br/>
 **Parameters**<br/>
 mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
@@ -607,6 +621,7 @@ polygonIds: list of ids. <br/>
 **Returns**<br/>
 Json with all reports.
 
+<a id='message_customPolygon'></a>
 ## /geoMessage/customPolygon
 #### Post /layers
 
@@ -647,6 +662,7 @@ url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/addMessage'
 
 Submits a report for a certain polygon.<br/>
 **Parameters**<br/>
+mapId: The id of the map.<br/>
 customPolygonId: The id of the customPolygon.<br/>
 timestamp: The number of the timestamp.<br/>
 errorMask: If true, indicates that the error is a mask related error.<br/>
@@ -664,6 +680,7 @@ url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/deleteMessage'
 
 Deletes a customPolygon.<br/>
 **Parameters**<br/>
+mapId: The id of the map.<br/>
 messageId: Id of the messge to be retracted.<br/>
 **Returns**<br/>
 Status 200 if the removeal was successful.
@@ -677,6 +694,7 @@ url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/deletePolygon'
 
 Deletes a customPolygon.<br/>
 **Parameters**<br/>
+mapId: The id of the map.<br/>
 customPolygonId: Id of the customPolygon to be retracted.<br/>
 **Returns**<br/>
 Status 200 if the removeal was successful.
@@ -709,6 +727,7 @@ url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/getMessages'
 
 Gets all reports of the customPolygons with the given ids.<br/>
 **Parameters**<br/>
+mapId: The id of the map.<br/>
 customPolygonIds: list of ids. <br/>
 **Returns**<br/>
 Json with all reports.
