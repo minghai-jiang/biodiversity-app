@@ -23,7 +23,7 @@ const LegendControl = {
     return ( 
       <Portal key="legendPortal" position="bottomright">
         <div 
-          key={'legendContainer'}
+          key='legendContainer'
           className='leaflet-control-layers leaflet-control-layers-toggle legend active'
           onClick={addActive}
         >

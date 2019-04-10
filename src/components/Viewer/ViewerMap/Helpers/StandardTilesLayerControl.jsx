@@ -11,7 +11,7 @@ import QueryUtil from '../../../Utilities/QueryUtil';
 
 let StandardTiles_checkedLayers = [];
 let StandardTiles_layerGeoJsons = [];
-let StandardTiles_filteredTiles = []
+let StandardTiles_filteredTiles = [];
 let StandardTiles_polygonCounts = 0;
 
 let StandardTiles_controlOverlays = [];
@@ -42,7 +42,6 @@ const StandardTilesLayer = {
     else {
       let layerInfo = await getTilesJson(props, bounds);
       StandardTiles_layerGeoJsons = layerInfo.layerGeoJsons;
-      StandardTiles_filteredTiles = layerInfo.errorTiles;
       StandardTiles_polygonCounts = layerInfo.polygonCounts;
       layerInfo.errorTiles ? StandardTiles_filteredTiles = layerInfo.errorTiles : StandardTiles_filteredTiles = [];
 
@@ -66,7 +65,6 @@ const StandardTilesLayer = {
       
       StandardTiles_layerGeoJsons = layerInfo.layerGeoJsons;
       StandardTiles_polygonCounts = layerInfo.polygonCounts;
-      StandardTiles_filteredTiles = layerInfo.errorTiles;
       layerInfo.errorGeoJsons ? StandardTiles_filteredTiles = layerInfo.errorGeoJsons : StandardTiles_filteredTiles = [];
 
       StandardTiles_controlOverlays = createGeojsonLayerControl(props);
@@ -81,6 +79,11 @@ const StandardTilesLayer = {
     StandardTiles_polygonCounts = 0;
     StandardTiles_PopupContent = {};
     StandardTiles_map = null;
+
+    StandardTiles_checkedLayers = [];
+    StandardTiles_layerGeoJsons = [];
+    StandardTiles_controlOverlays = [];
+
   },
 
   onOverlayAdd: (e) => {
@@ -103,20 +106,36 @@ const StandardTilesLayer = {
     if (StandardTiles_PopupContent && StandardTiles_PopupContent.id)
     {
       let popup = StandardTiles_PopupContent;
-      let id = popup.id + '.' + popup.properties.tileX + "." + popup.properties.tileY + '.' +  popup.properties.zoom;
+      let id = popup.properties.tileX + "." + popup.properties.tileY + '.' +  popup.properties.zoom;
       let content = [];
       let properties = Object.create(popup.properties);
+      let merged;
 
       for (let key in popup.properties)
       {
         content.push(<p key={id + '.' + key + '.' + popup.properties[key]}><span>{key}:</span> {popup.properties[key]}</p>)
       }
 
+      let classes; let spectral;
+      for (let i = 0; i < props.map.classes.length; i++)
+      {
+        if (props.map.classes[i].timestampNumber === props.timestampRange.end)
+        {
+          classes = props.map.classes[i].classes;
+          spectral = props.map.spectral[i].indices;
+          break;
+        }
+      }
+
       if(popup.properties && props.map && props.timestampRange && props.apiUrl)
       {
+        properties.class = classes;
+        properties.spectral = spectral;
         properties.uuid = props.map.uuid;
         properties.timestamp = props.timestampRange.end;
         properties.apiUrl = props.apiUrl;
+        properties.kind = 'tile';
+
         if (props.user)
         {
           properties.headers = {Authorization: "Bearer " + props.user.token}
@@ -125,15 +144,17 @@ const StandardTilesLayer = {
         {
           properties.headers = []
         }
+
+        merged = {...properties, ...StandardTiles_PopupContent.properties};
       }
 
-      let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, properties)} }>Analyse this tile</a>
+      let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
 
       let report;
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>Send GeoMessage</a>
+        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
       }
 
       return (
@@ -141,7 +162,7 @@ const StandardTilesLayer = {
           <div key={id + '.content'}>
             {content}
           </div>
-          {/*analyse*/}
+          {analyse}
           {report}
         </Popup>
       );
@@ -166,7 +187,8 @@ async function getTilesJson(props, bounds) {
     props.user, 
     map.uuid, 
     props.timestampRange.end, 
-    bounds);
+    bounds,
+    map.zoom);
 
   let layerGeoJson = await geoJsonPromise;
   if (layerGeoJson && layerGeoJson.standardTiles)
@@ -184,7 +206,7 @@ async function getTilesJson(props, bounds) {
   };
 }
 
-async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds) {
+async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, zoom) {
   let headers = {};
   if (user) {
     headers["Authorization"] = "Bearer " + user.token;
@@ -222,24 +244,27 @@ async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds) {
       {
         let filteredTilesFeatures = [];
         let filteredTilesResult = await QueryUtil.postData(
-          apiUrl + 'feedback/error/get',
+          apiUrl + 'geoMessage/tile/ids',
           {
             mapId:  mapUuid,
-            timestamp: timestampEnd
+            xMin: bounds.xMin,
+            xMax: bounds.xMax,
+            yMin: bounds.yMin,
+            yMax: bounds.yMax,
+            zoom: zoom
           }, headers
         );
 
         if (filteredTilesResult)
-        {      
+        {
           for (let i = 0; i < tilesGeoJson.features.length; i++)
           {
             let tileProperties = tilesGeoJson.features[i].properties;
 
-            for (let j = 0; j < filteredTilesResult.length; j++)
+            for (let j = 0; j < filteredTilesResult.tileIds.length; j++)
             {
-              if (tileProperties.tileX === filteredTilesResult[j].tileX && tileProperties.tileY === filteredTilesResult[j].tileY && tileProperties.zoom === filteredTilesResult[j].zoom)
+              if (tileProperties.tileX === filteredTilesResult.tileIds[j].tileX && tileProperties.tileY === filteredTilesResult.tileIds[j].tileY && tileProperties.zoom === filteredTilesResult.tileIds[j].zoom)
               {
-                tilesGeoJson.features[i].feedback = filteredTilesResult[j].feedback;
                 filteredTilesFeatures.push(tilesGeoJson.features[i]);
               }
             }
@@ -350,13 +375,14 @@ function onEachFeature(feature, layer)
   });
 }
 
-function handleTile(type, contentFunction, id, properties)
+function handleTile(type, contentFunction, id, properties, random)
 {
   contentFunction({
     id: id,
     openPane: true,
     type: type,
     properties: properties,
+    random: random,
   });
 }
 

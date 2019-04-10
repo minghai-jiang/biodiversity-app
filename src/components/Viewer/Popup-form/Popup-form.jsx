@@ -10,6 +10,7 @@ constructor(props) {
     this.state = {
       text: '',
       clouds: false,
+      classification: false,
       notification: {
         type: 'hidden',
         text: '',
@@ -34,20 +35,39 @@ constructor(props) {
 
   async handleSubmit(event) {
     event.preventDefault();
-    let props = this.props.props;
+    let props = this.props.properties;
+    let feedbackResult;
 
-    let feedbackResult = await QueryUtil.postData(
-    props.apiUrl + 'feedback/error/add',
+    if(props.type === 'Polygon')
     {
-      mapId:  props.uuid,
-      timestamp: props.timestamp,
-      tileX: props.tileX,
-      tileY: props.tileY,
-      zoom: props.zoom,
-      isMask: this.state.clouds,
-      message: this.state.text,
-    }, props.headers
-  );
+      feedbackResult = await QueryUtil.postData(
+        props.apiUrl + 'geoMessage/polygon/addMessage',
+        {
+          mapId:  props.uuid,
+          timestamp: props.timestamp,
+          polygonId: props.id,
+          isMask: this.state.clouds,
+          isClassification: this.state.classification,
+          message: this.state.text,
+        }, props.headers
+      );
+    }
+    else
+    {
+      feedbackResult = await QueryUtil.postData(
+        props.apiUrl + 'geoMessage/tile/addMessage',
+        {
+          mapId:  props.uuid,
+          timestamp: props.timestamp,
+          tileX: props.tileX,
+          tileY: props.tileY,
+          zoom: props.zoom,
+          isMask: this.state.clouds,
+          isClassification: this.state.classification,
+          message: this.state.text,
+        }, props.headers
+      );
+    }
 
     let notification; let type;
     if(feedbackResult === 'OK')
@@ -56,30 +76,37 @@ constructor(props) {
       notification = 'Thanks for submitting this error';
     }
 
-    this.setState({text: '', clouds: false, notification: {type: type, text: notification}});
-    this.forceUpdate();
+    this.setState({text: '', clouds: false, classification: false, notification: {type: type, text: notification}});
+
+    this.props.messageTrigger();
   }
 
   render() {
-    let props = this.props.props;
+    let props = this.props.properties;
     const id = props.tileX + '.' + props.tileY + '.' + props.zoom;
     
     return (
       <div id='formDiv'>
         <form key={id} id='popupForm' onSubmit={this.handleSubmit}>
-          <h3>What's wrong with this square?</h3>
+          <label>
+            <h3>Type a GeoMessage</h3>
+            <textarea name="text" value={this.state.text} onChange={this.handleChange} placeholder='GeoMessage' maxLength='3000'/>
+          </label><br/>
+          <h4>Is there something wrong?</h4>
+          <p>There is a problem with:</p>
           <label>
             <input type="checkbox" name="clouds" checked={this.state.clouds} onChange={this.handleChange}/>
-            This is a problem with clouds
+              Clouds
             <br/>
           </label>
           <label>
-            <h4>Give a small description of the mistake</h4>
-            <textarea name="text" value={this.state.text} onChange={this.handleChange} placeholder='GeoMessage' maxLength='3000'/>
-          </label><br/>
+            <input type="checkbox" name="classification" checked={this.state.classification} onChange={this.handleChange}/>
+              Classification
+            <br/>
+          </label>
           <input type="submit" value="Submit" className="button"/>
         </form>
-        <div className={this.state.notification.type}>{this.state.notification.text}</div>
+        <div key={id + 'notification' + this.state.notification.text} className={this.state.notification.type}>{this.state.notification.text}</div>
       </div>
     );
   }

@@ -70,7 +70,7 @@ const PolygonLayersControl = {
       polygonLayersControl_layerGeoJsons = layerInfo.layerGeoJsons;
       polygonLayersControl_polygonCounts = layerInfo.polygonCounts;
 
-      polygonLayersControl_controlOverlays = createGeojsonLayerControl(props); 
+      polygonLayersControl_controlOverlays = createGeojsonLayerControl(props);
     }
 
 
@@ -83,6 +83,10 @@ const PolygonLayersControl = {
     polygonLayersControl_polygonCounts = 0;
     polygonLayersControl_PopupContent = {}
     polygonLayersControl_map = null;
+
+    polygonLayersControl_checkedLayers = [];
+    polygonLayersControl_layerGeoJsons = [];
+    polygonLayersControl_controlOverlays = [];
   },
 
   onOverlayAdd: (e) => {
@@ -127,6 +131,7 @@ const PolygonLayersControl = {
 
       if(popup.properties && props.map && props.timestampRange && props.apiUrl && polygonLayersControl_PopupContent.data)
       {
+        properties.id = polygonLayersControl_PopupContent.id;
         properties.class = classes;
         properties.spectral = spectral;
         properties.layerName = polygonLayersControl_PopupContent.data.layerName;
@@ -136,6 +141,7 @@ const PolygonLayersControl = {
         properties.apiUrl = props.apiUrl;
         properties.type = polygonLayersControl_PopupContent.geometry.type;
         properties.coordinates = polygonLayersControl_PopupContent.geometry.coordinates;
+        properties.kind = 'polygon';
 
         if (props.user)
         {
@@ -147,13 +153,13 @@ const PolygonLayersControl = {
         }
       }
 
-      let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, properties)} }>Analyse</a>
+      let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
 
       let report;
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, properties)} }>GeoMessage</a>
+        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>
       }
 
       return (
@@ -162,7 +168,7 @@ const PolygonLayersControl = {
             {content}
           </div>
           {analyse}
-          {/*report*/}
+          {report}
         </Popup>
       );
     }
@@ -205,13 +211,27 @@ async function getPolygonsJson(props, bounds) {
   let layerGeoJsons = [];
   let polygonCounts = [];
 
-  for (let i = 0; i < geoJsonPromises.length; i++) {
+  for (let i = 0; i < geoJsonPromises.length; i++)
+  {
     let layerGeoJson = await geoJsonPromises[i];
-    layerGeoJsons.push(layerGeoJson);
-    polygonCounts.push({
-      name: layerGeoJson.name,
-      count: layerGeoJson.count,
-    });
+    if (layerGeoJson)
+    {    
+      layerGeoJsons.push(layerGeoJson);
+      if (layerGeoJson.polygonLayer)
+      {
+        polygonCounts.push({
+          name: layerGeoJson.polygonLayer.name,
+          count: layerGeoJson.polygonLayer.count,
+        });
+      }
+      else
+      {
+        polygonCounts.push({
+          name: layerGeoJson.name,
+          count: layerGeoJson.count,
+        });
+      }
+    }
   }
 
   polygonLayersControl_randomKey = Math.random();
@@ -220,6 +240,7 @@ async function getPolygonsJson(props, bounds) {
     layerGeoJsons: layerGeoJsons,
     polygonCounts: polygonCounts
   };
+
 }
 
 async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, layerName, layerColor, hasAggregatedData) {
@@ -252,12 +273,56 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
       }, headers
     );
 
+    let filteredPolygons = {};
+    
+    if (polygonsGeoJson)
+    {
+      if (user)
+      {
+        let filteredPolygonFeatures = [];
+        let filteredPolygonResult = await QueryUtil.postData(
+          apiUrl + 'geoMessage/polygon/ids',
+          {
+            mapId:  mapUuid,
+            xMin: bounds.xMin,
+            xMax: bounds.xMax,
+            yMin: bounds.yMin,
+            yMax: bounds.yMax,
+          }, headers
+        );
+
+        if (filteredPolygonResult)
+        {
+          for (let i = 0; i < polygonsGeoJson.features.length; i++)
+          {
+            let polygonProperties = polygonsGeoJson.features[i].properties;
+
+            for (let j = 0; j < filteredPolygonResult.ids.length; j++)
+            {
+              if (polygonProperties.id === filteredPolygonResult.ids[j])
+              {
+                filteredPolygonFeatures.push(polygonsGeoJson.features[i]);
+              }
+            }
+          }
+        
+          let ids = [...new Set(filteredPolygonFeatures.map(item => item.id))];
+          polygonsGeoJson.features = polygonsGeoJson.features.filter(item => !ids.includes(item.id));
+          
+          filteredPolygons.type = "FeatureCollection";
+          filteredPolygons.count = filteredPolygonFeatures.length;
+          filteredPolygons.features = filteredPolygonFeatures;
+          filteredPolygons.name = 'Polygon Error';
+        }
+      }
+    }
+
     polygonsGeoJson.name = layerName;
     polygonsGeoJson.color = layerColor;
     polygonsGeoJson.count = polygonIdResult.count
     polygonsGeoJson.hasAggregatedData = hasAggregatedData
 
-    return polygonsGeoJson;
+    return {polygonLayer: polygonsGeoJson, errorPolygons: filteredPolygons};
   }
   else {
     return {
@@ -278,38 +343,53 @@ function createGeojsonLayerControl(props) {
 
   let layerGeoJsons = polygonLayersControl_layerGeoJsons;
 
-  for (let i = 0; i < layerGeoJsons.length; i++)
+  if (layerGeoJsons)
   {
-    let geoJson;
-    if (layerGeoJsons[i].count <= polygonLayersControl_maxPolygon && layerGeoJsons[i].type)
+    for (let i = 0; i < layerGeoJsons.length; i++)
     {
-      geoJson = 
-        <GeoJSON
-          data={layerGeoJsons[i]}
-          onEachFeature={onEachFeature}
-          style={{color: '#' + layerGeoJsons[i].color, weight: 1}}
-          key={polygonLayersControl_randomKey}
-          zIndex={1000}
-        />
+      let geoJson = [];
+      if (layerGeoJsons[i].polygonLayer && layerGeoJsons[i].polygonLayer.count <= polygonLayersControl_maxPolygon && layerGeoJsons[i].polygonLayer.type)
+      {
+        geoJson.push( 
+          <GeoJSON
+            data={layerGeoJsons[i].polygonLayer}
+            onEachFeature={onEachFeature}
+            style={{color: '#' + layerGeoJsons[i].polygonLayer.color, weight: 1}}
+            key={polygonLayersControl_randomKey}
+            zIndex={1000}
+          />);
+
+          if (layerGeoJsons[i].errorPolygons.count > 0)
+          {
+            geoJson.push(<GeoJSON
+              data={layerGeoJsons[i].errorPolygons}
+              onEachFeature={onEachFeature}
+              style={{color: 'red', weight: 1}}
+              key={polygonLayersControl_randomKey + 'error'}
+              zIndex={1000}
+            />);
+          }
+      }
+
+      let checked = polygonLayersControl_checkedLayers.includes(layerGeoJsons[i].name);
+
+      let r = Math.random();
+      let layer = (
+        <LayersControl.Overlay
+          key={r}
+          name={layerGeoJsons[i].polygonLayer ? layerGeoJsons[i].polygonLayer.name : layerGeoJsons[i].name}
+          checked={checked}
+        >
+          <LayerGroup name={layerGeoJsons[i].polygonLayer ? layerGeoJsons[i].polygonLayer.name : layerGeoJsons[i].name} key={i}>
+            {geoJson}
+          </LayerGroup>
+        </LayersControl.Overlay> 
+      ); 
+
+      layers.push(layer);
     }
-
-    let checked = polygonLayersControl_checkedLayers.includes(layerGeoJsons[i].name);
-
-    let r = Math.random();
-    let layer = (
-      <LayersControl.Overlay
-        key={r}
-        name={layerGeoJsons[i].name}
-        checked={checked}
-      >
-        <LayerGroup name={layerGeoJsons[i].name} key={i}>
-          {geoJson}
-        </LayerGroup>
-      </LayersControl.Overlay> 
-    ); 
-
-    layers.push(layer);
   }
+
 
   if (layers.length > 0)
   {
@@ -336,13 +416,14 @@ function onEachFeature(feature, layer) {
   });
 }
 
-function handleTile(type, contentFunction, id, properties)
+function handlePolygon(type, contentFunction, id, properties, random)
 {
   contentFunction({
     id: id,
     openPane: true,
     type: type,
     properties: properties,
+    random: random,
   });
 }
 
