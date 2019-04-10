@@ -9,13 +9,13 @@
 
   "Language": "Lengua",
 
-  "ChoosePrompt": "Please choose",
+  "ChoosePrompt": "por favor seleccione",
 
-  "SelectSector": "Select sector",
-  "Forestry": "Forestry",
-  "ConsultancyEngineering": "Consultancy or Engineering",
-  "Government": "Government",
-  "Ngo": "NGO",
+  "SelectSector": "seleccione sector",
+  "Forestry": "Forestal",
+  "ConsultancyEngineering": "Consultoría e Ingeniería",
+  "Government": "Agencias de Gobierno",
+  "Ngo": "ONG",
 
   "ApiTutorial": "API Tutorial",
   "Documentation": "Documentation",
