@@ -237,6 +237,7 @@ export class LineChart extends PureComponent {
             height={200}
             ref={this.props.type + 'Chart'}
             style={{marginRight: 10}}
+            onMouseLeave={this._onMouseLeave}
           >
             {plot}
           </FlexibleXYPlot>
@@ -248,7 +249,6 @@ export class LineChart extends PureComponent {
       }
       else
       {
-        console.log(this.state.lines);
         return(<p>Loading Graph Data <img src='/images/spinner.png' alt='spinner'/></p>);
       }
   }

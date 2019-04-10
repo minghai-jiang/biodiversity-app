@@ -33,7 +33,6 @@ export default class GeoMessage extends PureComponent {
 
   getMessages = async() =>
   {
-    console.log('getMessages', this.props)
     let messages = [];
     let messagesPromise;
 
