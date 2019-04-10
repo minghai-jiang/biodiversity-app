@@ -109,7 +109,8 @@ class Viewer extends PureComponent {
         <InfoPane
           map={this.state.map}
           infoContent={this.state.infoContent}
-          key={this.state.infoContent ? this.state.infoContent.id : null}
+          key={this.state.infoContent ? this.state.infoContent.type + this.state.infoContent.id + this.state.infoContent.properties.id : null}
+          user={this.props.user}
         />
 {/*        <QueryPane
           apiUrl={this.props.apiUrl}
