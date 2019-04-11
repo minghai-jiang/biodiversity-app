@@ -371,16 +371,17 @@ function createGeojsonLayerControl(props) {
           }
       }
 
-      let checked = polygonLayersControl_checkedLayers.includes(layerGeoJsons[i].name);
+      let name = layerGeoJsons[i].polygonLayer ? layerGeoJsons[i].polygonLayer.name : layerGeoJsons[i].name;
+      let checked = polygonLayersControl_checkedLayers.includes(name);
 
       let r = Math.random();
       let layer = (
         <LayersControl.Overlay
           key={r}
-          name={layerGeoJsons[i].polygonLayer ? layerGeoJsons[i].polygonLayer.name : layerGeoJsons[i].name}
+          name={name}
           checked={checked}
         >
-          <LayerGroup name={layerGeoJsons[i].polygonLayer ? layerGeoJsons[i].polygonLayer.name : layerGeoJsons[i].name} key={i}>
+          <LayerGroup name={name} key={i}>
             {geoJson}
           </LayerGroup>
         </LayersControl.Overlay> 
