@@ -51,10 +51,16 @@ export class Table extends PureComponent {
   render() {
     if(this.props.data)
     {
+      let className = 'tableContainer hidden';
+      if(this.state.table.props.children[1].props.children.length === 1)
+      {
+        className = 'tableContainer';
+      }
+
       return(
         <div>
           <button className='button' onClick={this.buttonHandle}>Display raw data</button>
-          <div className='tableContainer hidden'>
+          <div className={className}>
             {this.state.table}
           </div>
         </div>

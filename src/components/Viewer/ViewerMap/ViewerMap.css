@@ -29,7 +29,7 @@
   z-index: 1001;
 }
 
-.legend
+.legend, .flyTo
 {
   background: #ffffff;
   z-index: 800;
@@ -44,9 +44,10 @@
   transition: max-width 0.5s, max-height 0.5s ;
 }
 
-.legend.active
+.legend.active, .flyTo.active
 {
   padding: 1em;
+  padding-top: 0;
   max-height: 75vh;
   max-width: 100vw;
   min-height: 48px;
@@ -59,7 +60,7 @@
   overflow: auto;
 }
 
-.legend i
+.legend i, .flyTo i
 {
   height: 18px;
   width: 18px;
@@ -68,19 +69,19 @@
   margin-right: 0.5em;
 }
 
-.legend h1
+.legend h1, .flyTo h1
 {
   font-size: 14pt;
   margin: 0;
 }
 
-.legend h2
+.legend h2, .flyTo h2
 {
   font-size: 12pt;
   margin: 0;
 }
 
-.legend p
+.legend p, .flyTo p
 {
   font-size: 12pt;
   margin: 0.2em ;
@@ -115,7 +116,7 @@
   margin-bottom: 0;
 }
 
-.legend.active .closeButton
+.legend.active .closeButton, .flyTo.active .closeButton
 {
   color: #00a3a3;
   border: none;
@@ -126,13 +127,37 @@
   border: 1px solid #00a3a3;
   -webkit-transition: background-color 0.25s; /* Safari */
   transition: background-color 0.25s;
-  position: fixed;
-  right: 30px;
+  position: relative;
+  margin-right: 0;
+  margin-left: auto;
+  top: 25px;
 }
 
-.legend .closeButton:hover
+.legend .closeButton:hover, .flyTo .closeButton:hover
 {
   background-color: #00a3a340;
+}
+
+.flyTo select, .flyTo input
+{
+  margin-top: 0.5em;
+}
+
+.flyTo input[type='submit']
+{
+  margin-top: 1.5em;
+  width: 100%;
+}
+
+.flyTo div
+{
+  height: auto;
+  overflow: hidden;
+}
+
+.flyTo .hidden
+{
+  height: 0;
 }
 
 .leaflet-control

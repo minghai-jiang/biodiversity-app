@@ -31,6 +31,10 @@ let polygonLayersControl_mapRef = {};
 
 let polygonLayersControl_PopupContent = {};
 
+let polygonLayersControl_highlight = -1;
+let polygonLayersControl_highlightCenter = [];
+let polygonLayersControl_refresh = () => {};
+
 const PolygonLayersControl = {
   getElement: () => {
     return { 
@@ -87,11 +91,22 @@ const PolygonLayersControl = {
     polygonLayersControl_checkedLayers = [];
     polygonLayersControl_layerGeoJsons = [];
     polygonLayersControl_controlOverlays = [];
+
+    polygonLayersControl_highlight = -1;
+    polygonLayersControl_highlightCenter = [];
+    polygonLayersControl_refresh = () => {};
   },
 
-  onOverlayAdd: (e) => {
+  onOverlayAdd: (e, refresh) => {
     if (!polygonLayersControl_checkedLayers.includes(e.name)) {
       polygonLayersControl_checkedLayers.push(e.name);
+    }
+
+    if (e.id)
+    {
+      polygonLayersControl_highlight = e.id;
+      polygonLayersControl_highlightCenter = e.center;
+      polygonLayersControl_refresh = refresh;
     }
   },
 
@@ -402,19 +417,34 @@ function createGeojsonLayerControl(props) {
   }
 }
 
+function addFeatureData(feature, layer)
+{
+  feature.data = 
+  {
+    color: layer.options.data.color,
+    layerName: layer.options.data.name,
+    hasAggregatedData: layer.options.data.hasAggregatedData,
+  }
+
+  polygonLayersControl_PopupContent = feature;
+}
+
 function onEachFeature(feature, layer) {
+  if (polygonLayersControl_highlight !== -1 && polygonLayersControl_highlight[0] == feature.id)
+  {
+    feature.e = {};
+    feature.e.latlng = polygonLayersControl_highlightCenter;
+    addFeatureData(feature, layer);
+    polygonLayersControl_refresh();
+  }
+
   layer.on({
     click: function(e){
       feature.e = e;
-      feature.data = 
-      {
-        color: layer.options.data.color,
-        layerName: layer.options.data.name,
-        hasAggregatedData: layer.options.data.hasAggregatedData,
-      }
-      polygonLayersControl_PopupContent = feature;
+      addFeatureData(feature, layer);
     }
   });
+
 }
 
 function handlePolygon(type, contentFunction, id, properties, random)

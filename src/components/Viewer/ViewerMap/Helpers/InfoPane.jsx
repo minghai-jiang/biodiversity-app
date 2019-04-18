@@ -322,27 +322,33 @@ export class InfoPane extends PureComponent {
     {
       let content = [];
 
-      if(this.props.infoContent.type !== 'report')
+      if(this.props.infoContent.type === 'analyse')
       {
-        if (this.props.map.timestamps.length > 1)
+        if (this.props.map.timestamps.length >= 1)
         {
           content.push(this.state.classes);
-          this.state.classes.length > 0 && this.state.classes[0].props.children[2] && this.state.classes[0].props.children[2].type !== 'p' ? content.push(this.state.classesSlider) : content.push(null);
+          if (this.state.classes && this.state.classes.length > 0 && this.state.classes[0].props.children[1].props.data && this.state.classes[0].props.children[1].props.data.data.length > 1)
+          {
+            content.push(this.state.classesSlider);
+          }
 
           content.push(this.state.indeces);
-          this.state.indeces.length > 0 && this.state.inputClass !== '' && this.state.indeces[0].props.children[2] && this.state.indeces[0].props.children[2].type !== 'p' ? content.push(this.state.indecesSlider) : content.push(null);
+          if (this.state.indeces && this.state.inputClass !== '' && this.state.indeces.length > 0 && this.state.indeces[0].props.children[2].props.data && this.state.indeces[0].props.children[2].props.data.data.length > 1)
+          {
+            content.push(this.state.indecesSlider);
+          }
         }
         else
         {
           content.push(<p key='notEnoughData'>Not enough timestamps available for analysis.</p>);
         }
 
-        if(content[0].length === 0)
+        if(content.length === 0 || content[0].length === 0)
         {
           content.push(<p key='loadingData'>Loading Data <br/><img src='/images/spinner.png' alt='spinner'/></p>);
         }
 
-        if (content.length > 1)
+        if (content.length >= 1)
         {
           graph = <div className='graphContainer' key={'graph' + this.props.infoContent.type + this.props.infoContent.id + this.props.infoContent.properties.id}>{content}</div>
         }

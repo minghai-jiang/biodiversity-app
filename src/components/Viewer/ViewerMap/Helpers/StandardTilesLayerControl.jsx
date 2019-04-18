@@ -25,6 +25,10 @@ let StandardTiles_mapRef = {};
 
 let StandardTiles_PopupContent = {};
 
+let StandardTiles_highlight = {};
+let StandardTiles_highlightCenter = [];
+let StandardTiles_refresh = () => {};
+
 const StandardTilesLayer = {
   getElement: () => {
     return { 
@@ -84,11 +88,21 @@ const StandardTilesLayer = {
     StandardTiles_layerGeoJsons = [];
     StandardTiles_controlOverlays = [];
 
+    StandardTiles_highlight = -1;
+    StandardTiles_highlightCenter = [];
+    StandardTiles_refresh = () => {};
   },
 
-  onOverlayAdd: (e) => {
+  onOverlayAdd: (e, refresh) => {
     if (!StandardTiles_checkedLayers.includes(e.name)) {
       StandardTiles_checkedLayers.push(e.name);
+    }
+
+    if (e.id)
+    {
+      StandardTiles_highlight = e.id;
+      StandardTiles_highlightCenter = e.center;
+      StandardTiles_refresh = refresh;
     }
   },
 
@@ -121,8 +135,14 @@ const StandardTilesLayer = {
       {
         if (props.map.classes[i].timestampNumber === props.timestampRange.end)
         {
-          classes = props.map.classes[i].classes;
-          spectral = props.map.spectral[i].indices;
+          if (props.map.classes[i])
+          {
+            classes = props.map.classes[i].classes;
+          }
+          if (props.map.spectral[i])
+          {
+            spectral = props.map.spectral[i].indices;
+          }
           break;
         }
       }
@@ -221,6 +241,7 @@ async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, zoom
       xMax: bounds.xMax,
       yMin: bounds.yMin,
       yMax: bounds.yMax,
+      zoom: zoom,
       limit: StandardTilesControl_maxPolygon
     }, headers 
   );
@@ -367,6 +388,16 @@ function createGeojsonLayerControl(props) {
 
 function onEachFeature(feature, layer)
 {
+  if (StandardTiles_highlight[0] && StandardTiles_highlight[0].tileX && StandardTiles_highlight[0].tileX == feature.properties.tileX && StandardTiles_highlight[0].tileY == feature.properties.tileY && StandardTiles_highlight[0].zoom == feature.properties.zoom)
+  {
+    feature.e = {};
+    feature.e.latlng = StandardTiles_highlightCenter;
+
+    StandardTiles_PopupContent = feature;
+
+    StandardTiles_refresh();
+  }
+
   layer.on({
     click: function(e){
       feature.e = e; 

@@ -16,6 +16,7 @@ import TileLayersControl from './Helpers/TileLayersControl';
 import PolygonLayersControl from './Helpers/PolygonLayersControl';
 import StandardTilesLayerControl from './Helpers/StandardTilesLayerControl';
 import LegendControl from './Helpers/LegendControl';
+import FlyToControl from './Helpers/FlyToControl';
 import DrawingControl from './Helpers/DrawingControl';
 
 const getPolygonJsonWaitTime = 1000;
@@ -64,6 +65,8 @@ export class ViewerMap extends PureComponent {
 
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
     
+    FlyToControl.initialize(this.props, map, this.flyToChecked);
+    
     DrawingControl.initialize(map, this.onShapeDrawn);
   }
 
@@ -72,6 +75,7 @@ export class ViewerMap extends PureComponent {
     TileLayersControl.clear();
     StandardTilesLayerControl.clear();
     LegendControl.clear();
+    FlyToControl.clear();
   }
 
   componentWillReceiveProps = async (nextProps) => {
@@ -82,11 +86,17 @@ export class ViewerMap extends PureComponent {
         nextProps.timestampRange.start !== this.props.timestampRange.start || 
         nextProps.timestampRange.end !== this.props.timestampRange.end) {
 
+      let boundsFlyTo;
+
       if (differentMap) {
         PolygonLayersControl.clear();
+        TileLayersControl.clear();
         StandardTilesLayerControl.clear();
+        LegendControl.clear();
+        FlyToControl.clear();
 
         let bounds = L.latLngBounds(L.latLng(nextProps.map.yMin, nextProps.map.xMin), L.latLng(nextProps.map.yMax, nextProps.map.xMax));
+        boundsFlyTo = bounds;
       
         if (this.props.map === null)
         {
@@ -116,6 +126,7 @@ export class ViewerMap extends PureComponent {
       }
 
       LegendControl.update(nextProps, [], []);
+      FlyToControl.update(nextProps, map, boundsFlyTo.getCenter(), this.flyToChecked);
 
       await PolygonLayersControl.update(nextProps, bounds);
       await StandardTilesLayerControl.update(nextProps, bounds);
@@ -208,6 +219,17 @@ export class ViewerMap extends PureComponent {
     console.log(shapeCoords);
   }
 
+  flyToChecked = (value) => {
+    if (value.type === 'polygons')
+    {
+      PolygonLayersControl.onOverlayAdd(value, this.onClick);
+    }
+    else
+    {
+      StandardTilesLayerControl.onOverlayAdd(value, this.onClick);
+    }
+  }
+
   render() {
     return (
       <div className='mapContainer'>
@@ -215,6 +237,7 @@ export class ViewerMap extends PureComponent {
           center={[this.state.lat, this.state.lon]}
           zoom={this.state.zoom}
           ref={this.mapRef}
+          maxZoom={18}
         >
           <LayersControl position="topright">
             { TileLayersControl.getElement() }
@@ -237,6 +260,7 @@ export class ViewerMap extends PureComponent {
           }
 
           { LegendControl.getElement() }
+          { FlyToControl.getElement() }
           { PolygonLayersControl.onFeatureClick(this.props, this.getPopupContent) }
           { StandardTilesLayerControl.onFeatureClick(this.props, this.getPopupContent) }
         </Map>
