@@ -111,6 +111,11 @@ export class ViewerMap extends PureComponent {
             this.mapRef.current.leafletElement.flyToBounds(bounds);
           }
         }
+      }
+      else
+      {
+        let bounds = L.latLngBounds(L.latLng(this.props.map.yMin, this.props.map.xMin), L.latLng(this.props.map.yMax, this.props.map.xMax));
+        boundsFlyTo = bounds;
       } 
       
       TileLayersControl.update(nextProps);
