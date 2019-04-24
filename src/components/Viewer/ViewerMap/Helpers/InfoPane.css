@@ -124,6 +124,21 @@ div.graphContainer
   padding: 1em;
 }
 
+.saveFormContainer
+{
+  padding: 1em;
+}
+
+.saveFormContainer .hidden
+{
+  display: none;
+}
+
+.saveFormContainer input[type='submit']
+{
+  margin-top: 1em;
+}
+
 @media only screen and (max-device-width : 860px)
 {
   div.query-pane

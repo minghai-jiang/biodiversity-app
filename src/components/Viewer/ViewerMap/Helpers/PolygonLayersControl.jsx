@@ -299,14 +299,16 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
           apiUrl + 'geoMessage/polygon/ids',
           {
             mapId:  mapUuid,
+            timestamp: timestampEnd,
             xMin: bounds.xMin,
             xMax: bounds.xMax,
             yMin: bounds.yMin,
             yMax: bounds.yMax,
+            limit: polygonLayersControl_maxPolygon,
           }, headers
         );
 
-        if (filteredPolygonResult)
+        if (filteredPolygonResult && filteredPolygonResult.ids)
         {
           for (let i = 0; i < polygonsGeoJson.features.length; i++)
           {

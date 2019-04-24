@@ -38,7 +38,21 @@ constructor(props) {
     let props = this.props.properties;
     let feedbackResult;
 
-    if(props.type === 'Polygon')
+    if (props.custom === true)
+    {
+      feedbackResult = await QueryUtil.postData(
+        props.apiUrl + 'geoMessage/customPolygon/addMessage',
+        {
+          mapId:  props.uuid,
+          timestamp: props.timestamp,
+          customPolygonId: props.id,
+          isMask: this.state.clouds,
+          isClassification: this.state.classification,
+          message: this.state.text,
+        }, props.headers
+      );
+    }
+    else if(props.type === 'Polygon')
     {
       feedbackResult = await QueryUtil.postData(
         props.apiUrl + 'geoMessage/polygon/addMessage',

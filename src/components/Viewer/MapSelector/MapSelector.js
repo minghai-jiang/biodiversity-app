@@ -10,6 +10,25 @@ export class MapSelector extends PureComponent {
     this.state = {
       maps: []
     };
+
+    if(this.props.user)
+    {
+      this.header = {Authorization: "Bearer " + this.props.user.token};
+    }
+    else
+    {
+      this.header = {};
+    }
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    if (this.props !== nextProps && this.props.user !== nextProps.user)
+    {
+      if (nextProps.user)
+      {
+        this.header['Authorization'] = "Bearer " + nextProps.user.token;
+      }
+    }
   }
 
   componentDidMount = () => {
@@ -22,7 +41,7 @@ export class MapSelector extends PureComponent {
   getMaps = async () => {
     try
     {
-      let responseJson = await QueryUtil.getData(this.props.apiUrl + 'account/myMaps');
+      let responseJson = await QueryUtil.getData(this.props.apiUrl + 'account/myMaps', this.header);
       this.setState({ maps: responseJson });
     }
     catch(error)
@@ -54,16 +73,19 @@ export class MapSelector extends PureComponent {
     }
   };
 
+
   getMapTimestamps = async (map) => {
-    let responseJson = await QueryUtil.postData(this.props.apiUrl + 'metadata/timestamps', {"mapId":  map.uuid });
+    let responseJson = await QueryUtil.postData(this.props.apiUrl + 'metadata/timestamps', {"mapId":  map.uuid }, this.header);
     map.timestamps = responseJson;
   };
 
   getMapLayers = async (map) => {
-    let tileLayersPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/tileLayers', {"mapId":  map.uuid });
-    let polygonLayersPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/polygonLayers', {"mapId":  map.uuid });
-    let classPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/classes', {"mapId":  map.uuid });
-    let spectralPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/spectral', {"mapId":  map.uuid });
+    let tileLayersPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/tileLayers', {"mapId":  map.uuid }, this.header);
+    let polygonLayersPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/polygonLayers', {"mapId":  map.uuid }, this.header);
+    let classPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/classes', {"mapId":  map.uuid }, this.header);
+    let spectralPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/spectral', {"mapId":  map.uuid }, this.header);
+    let crowdLayersPromise;
+    this.header.Authorization ? crowdLayersPromise = QueryUtil.postData(this.props.apiUrl + 'geoMessage/customPolygon/layers', {"mapId":  map.uuid }, this.header) : crowdLayersPromise = null;
 
     let responseJsonTileLayers = await tileLayersPromise;
 
@@ -95,11 +117,17 @@ export class MapSelector extends PureComponent {
     let responseJsonPolygonLayers = await polygonLayersPromise;
     let responseClasses = await classPromise;
     let responseSpectral = await spectralPromise;
+    let responseJsonCrowdLayers = await crowdLayersPromise;
 
     map.tileLayers = tileLayers;
     map.polygonLayers = responseJsonPolygonLayers;
     map.classes = responseClasses;
     map.spectral = responseSpectral;
+
+    if(responseJsonCrowdLayers)
+    {
+      map.crowdLayers = responseJsonCrowdLayers;
+    }
   };
 
   renderMapOptions = () => {

@@ -36,7 +36,18 @@ export default class GeoMessage extends PureComponent {
     let messages = [];
     let messagesPromise;
 
-    if (this.props.properties.type && this.props.properties.type === 'Polygon')
+    if(this.props.properties.custom && this.props.properties.custom === true)
+    {
+      messagesPromise = await QueryUtil.postData(
+        this.props.properties.apiUrl + 'geoMessage/customPolygon/getMessages',
+        {
+          mapId: this.props.properties.uuid,
+          customPolygonIds: [this.props.properties.id]
+        },
+        this.props.properties.headers 
+      );
+    }
+    else if (this.props.properties.type && this.props.properties.type === 'Polygon')
     {
       messagesPromise = await QueryUtil.postData(
         this.props.properties.apiUrl + 'geoMessage/polygon/getMessages',
@@ -126,10 +137,7 @@ class Message extends Component {
   constructor(props, context)
   {
     super(props, context)
-    this.state =
-    {
-
-    }
+    this.state = {}
   };
 
   render = () => 

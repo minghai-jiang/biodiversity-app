@@ -26,12 +26,18 @@ export class InfoPane extends PureComponent {
       classesSlider: [],
       indecesSlider: [],
       data: {},
+      save: [],
+      selectedCrowdLayer: 'default',
+      crowdProperties: {},
     }
 
     if (this.props && this.props.infoContent)
     {
       this.timestamp = this.props.infoContent.properties.timestamp;
     }
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.onPropertyChange = this.onPropertyChange.bind(this);
   }
 
   toggleQueryPane = (open) => {
@@ -51,6 +57,7 @@ export class InfoPane extends PureComponent {
       <option key='default' value="default" disabled hidden>Choose a class</option>,
       <option key='allClasses' value='all classes'>all classes</option>,
     ];
+
 
     for (let i = 0; i < this.props.map.classes.length; i++)
     {
@@ -212,11 +219,12 @@ export class InfoPane extends PureComponent {
       body.class = spectralClass;
     }
 
-    if (this.props.infoContent.properties.hasAggregatedData === false)
+    if (this.props.infoContent.properties.hasAggregatedData === false  || this.props.infoContent.properties.custom)
     {
       let geometry = {
         'type': 'FeatureCollection',
         'features':[{
+          type: 'Feature',
           properties:
           {},
           geometry:{
@@ -257,7 +265,7 @@ export class InfoPane extends PureComponent {
     let rawGraphData = await rawGraphDataPromise;
 
     return (this.prepareData(rawGraphData));
-  }
+  };
 
   prepareData = async(rawGraphData) =>
   {
@@ -274,24 +282,42 @@ export class InfoPane extends PureComponent {
   componentWillMount = () => {
     if(this.props.infoContent && this.props.infoContent.type === 'analyse')
     {
-      this.paneName = 'Analysis of ' + this.props.infoContent.id;
+      if (this.props.infoContent.properties.custom)
+      {
+        this.paneName = 'Analysis of Custom Polygon';
+      }
+      else
+      {
+        this.paneName = 'Analysis of ' + this.props.infoContent.id;
+      }
     }
     else if(this.props.infoContent && this.props.infoContent.type === 'report')
     {
-      this.paneName = 'GeoMessage for ' + this.props.infoContent.id;
+      if (this.props.infoContent.properties.custom)
+      {
+        this.paneName = 'GeoMessage for Custom Polygon';
+      }
+      else
+      {
+        this.paneName = 'GeoMessage for ' + this.props.infoContent.id;
+      }
+    }
+    else if(this.props.infoContent && this.props.infoContent.type === 'save')
+    {
+      this.paneName = 'Save Custom Polygon';
     }
   };
 
   componentDidMount = async() =>
   {
-    if(this.props.infoContent && this.props.infoContent.type === 'analyse')
+/*    if(this.props.infoContent && this.props.infoContent.type === 'analyse')
     {
       this.paneName = 'Analysis of ' + this.props.infoContent.id
     }
     else if(this.props.infoContent && this.props.infoContent.type === 'report')
     {
       this.paneName = 'GeoMessage for ' + this.props.infoContent.id;
-    }
+    }*/
 
     if(this.props.infoContent && this.props.infoContent.type === 'analyse')
     {
@@ -306,6 +332,109 @@ export class InfoPane extends PureComponent {
     {
       this.setState({GeoMessage: <GeoMessage properties={this.props.infoContent.properties} user={this.props.user}/>})
     }
+    else if(this.props.infoContent && this.props.infoContent.type === 'save')
+    {
+      let options = [<option key='default' value="default" disabled hidden>Choose a layer</option>];
+      let properties = [];
+      for (let i = 0; i < this.props.infoContent.properties.crowdLayers.length; i++)
+      {
+        let crowdLayer = this.props.infoContent.properties.crowdLayers[i];
+        options.push(<option key={crowdLayer.name} value={crowdLayer.name}>{crowdLayer.name}</option>);
+        let layerProps = [];
+        for (let j = 0; j < crowdLayer.properties.length; j++)
+        {
+          layerProps.push(
+            <label key={crowdLayer.properties[j] + 'Label'}>{crowdLayer.properties[j]}
+              <br/>
+              <input type='text' name={crowdLayer.name + ';' + crowdLayer.properties[j]} key={crowdLayer.properties[j]} onChange={this.onPropertyChange}/>
+              <br/>
+            </label>);
+        }
+        properties.push(<div key={crowdLayer.name + 'propertyContainer'} id={crowdLayer.name} className='hidden'>{layerProps}</div>)
+      }
+
+      let select = <select key='classSelector' defaultValue='default' onChange={this.onCrowdLayerChange}>{options}</select>;
+      let form = (
+        <div className='saveFormContainer'>
+          <form key={'form'} onSubmit={this.handleSubmit}>
+            {select}
+            {properties}
+            <input type="submit" value="Submit" className="button hidden"/>
+          </form>
+        </div>);
+      this.setState({save: form});
+    }
+  };
+
+  async handleSubmit(event) {
+    event.preventDefault();
+    let properties = {};
+    this.state.crowdProperties[this.state.selectedCrowdLayer] ? properties = this.state.crowdProperties[this.state.selectedCrowdLayer] : properties = {};
+
+    let geometry = {
+      'type': 'FeatureCollection',
+      'features':[{
+        type: 'Feature',
+        properties: properties,
+        geometry:{
+          type: 'MultiPolygon',
+          coordinates:[this.props.infoContent.properties.coordinates],
+          }
+        }]
+      }
+
+    let addResult = await QueryUtil.postData(
+      this.props.infoContent.properties.apiUrl + 'geoMessage/customPolygon/addPolygon',
+      {
+        mapId:  this.props.map.uuid,
+        timestamp: this.props.infoContent.properties.timestamp,
+        geometry: geometry,
+        features: {},
+        layer: this.state.selectedCrowdLayer,
+      }, this.headers
+    );
+
+    if(await addResult === 'OK')
+    {
+      this.toggleQueryPane(false);
+    }
+  };
+
+  onCrowdLayerChange = (event) =>
+  {
+    const value = event.target.value;
+    let container = document.getElementsByClassName('saveFormContainer')[0].children[0].children;
+    for (let i = 0; i < container.length; i++)
+    {
+      if (container[i].type === 'submit' || container[i].id === event.target.value)
+      {
+        container[i].classList.remove("hidden");
+      }
+      else if (container[i].tagName !== 'SELECT')
+      {
+        container[i].classList.add("hidden");
+      }
+    }
+    this.setState({selectedCrowdLayer: value});
+  };
+
+  onPropertyChange = (event) =>
+  {
+    const value = event.target.value;
+    let name = event.target.name.split(';');
+    let crowdProperties = this.state.crowdProperties;
+    
+    try
+    {
+      crowdProperties[name[0]][name[1]] = value;
+    }
+    catch
+    {
+      crowdProperties[name[0]] = {};
+      crowdProperties[name[0]][name[1]] = value;
+    }
+
+    this.setState({crowdProperties: crowdProperties});
   }
 
   onClassChange = async(e) =>
@@ -366,6 +495,7 @@ export class InfoPane extends PureComponent {
           >
             {graph}
             {this.state.GeoMessage}
+            {this.state.save}
           </SlidingPane>
       );
     }

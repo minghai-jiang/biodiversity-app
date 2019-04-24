@@ -51,7 +51,7 @@ export class LineChart extends PureComponent {
           let classes = this.infoContent.properties[this.props.type];
           let color = 'fff';
           if (classes)
-          {        
+          {  
             for (let j = 0; j < classes.length; j++)
             {
               if(classes[j].name === data.meta.fields[i])

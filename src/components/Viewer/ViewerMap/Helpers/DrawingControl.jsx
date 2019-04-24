@@ -1,10 +1,32 @@
-//import React from 'react';
+import React from 'react';
 
 import L from "leaflet";
 
-const LegendControl = {
-  initialize: (map, callback) => {
+import {
+  Popup,
+} from "react-leaflet";
+
+let DrawingControl_user;
+let DrawingControl_contentFunction;
+let DrawingControl_Popup;
+let DrawingControl_Props;
+
+const DrawingControl = {
+  initialize: (map, callback, user, contentFunction, props) => {
+    DrawingControl_user = user;
+    DrawingControl_contentFunction = contentFunction;
+    DrawingControl_Props = props;
+
     createDrawButton(map, {polygon: {allowIntersection: false }}, callback);
+  },
+  update:(user, props) =>
+  {
+    DrawingControl_user = user;
+    DrawingControl_Props = props;
+  },
+  onFeatureClick: () =>
+  {
+    return(DrawingControl_Popup);
   }
 }
 
@@ -54,6 +76,7 @@ function onShapeDrawnClosure(event, drawnItems, callback) {
     shapeCoords.push(coord);
   }
 
+  layer.on('click', (e) => onClickCustomPolygon(e, shapeCoords))
   callback(shapeCoords);
 
   // let map = this.props.map;
@@ -80,5 +103,83 @@ function onShapeDrawnClosure(event, drawnItems, callback) {
   // this.props.onShapeDrawn(shapeCoords);
 }
 
+function onClickCustomPolygon(e, shapeCoords)
+{
+  let id = JSON.stringify(shapeCoords);
+  
+  let coordinates = [];
+  for (let i = 0; i < shapeCoords.length; i++)
+  {
+    coordinates.push([shapeCoords[i].x, shapeCoords[i].y]);
+  }
+  coordinates.push([shapeCoords[0].x, shapeCoords[0].y])
 
-export default LegendControl;
+  if (DrawingControl_Props && DrawingControl_Props.map)
+  {
+    let classes; let spectral; let custom;
+    for (let i = 0; i < DrawingControl_Props.map.classes.length; i++)
+    {
+      if (DrawingControl_Props.map.classes[i].timestampNumber === DrawingControl_Props.timestampRange.end)
+      {
+        if (DrawingControl_Props.map.classes[i])
+        {
+          classes = DrawingControl_Props.map.classes[i].classes;
+        }
+        if (DrawingControl_Props.map.spectral[i])
+        {
+          spectral = DrawingControl_Props.map.spectral[i].indices;
+        }
+
+        break;
+      }
+    }
+
+    let content = [];
+    let properties = {
+      coordinates: [coordinates],
+      custom: true,
+      type: 'Polygon',
+      apiUrl: DrawingControl_Props.apiUrl,
+      class: classes,
+      spectral: spectral,
+      timestamp: DrawingControl_Props.timestampRange.end,
+      crowdLayers: DrawingControl_Props.map.crowdLayers,
+    }
+
+    let analyse = <a className="noselect" onClick={() => {handleCustomPolygon('analyse', DrawingControl_contentFunction, id, properties, Math.random())} }>Analyse</a>
+    let report;
+
+    if (DrawingControl_user)
+    {
+      report =  <a className="noselect" onClick={() => {handleCustomPolygon('save', DrawingControl_contentFunction, id, properties, Math.random())} }>Save Polygon</a>
+    }
+
+    for (let i = 0; i < shapeCoords.length; i++)
+    {
+      content.push(<p key={id + '.Point.' + i}><span>{'Point ' + (i+1)}:</span><br/> x: {shapeCoords[i].x.toFixed(3)}<br/> y: {shapeCoords[i].y.toFixed(3)}</p>);
+    }
+    
+    DrawingControl_Popup = (<Popup position={e.latlng} key={id + Math.random() + Math.random() + Math.random()} autoPan={false} keepInView={false}>
+        <div key={id + '.content'}>
+          {content}
+        </div>
+        {analyse}
+        {report}
+      </Popup>
+    );
+  }
+}
+
+function handleCustomPolygon(type, contentFunction, id, properties, random)
+{
+  contentFunction({
+    id: id,
+    openPane: true,
+    type: type,
+    properties: properties,
+    random: random,
+  });
+}
+
+
+export default DrawingControl;

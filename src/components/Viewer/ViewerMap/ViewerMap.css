@@ -175,9 +175,30 @@
   margin: 0;
 }
 
+.leaflet-popup-content span
+{
+  font-weight: 800;
+}
+
 .leaflet-popup-content div
 {
   margin-bottom: 1em;
+  max-height: 15vh;
+  overflow: auto;
+}
+
+.leaflet-popup-content div::-webkit-scrollbar {
+  height: auto;
+  width: 4px;
+}
+ 
+.leaflet-popup-content div::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #8c8c8c; 
+}
+
+.leaflet-popup-content div::-webkit-scrollbar-thumb:hover {
+  background: #999999; 
 }
 
 .leaflet-popup-content a

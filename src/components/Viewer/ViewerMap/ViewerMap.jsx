@@ -15,6 +15,7 @@ import "./ViewerMap.css";
 import TileLayersControl from './Helpers/TileLayersControl';
 import PolygonLayersControl from './Helpers/PolygonLayersControl';
 import StandardTilesLayerControl from './Helpers/StandardTilesLayerControl';
+import CrowdLayersControl from './Helpers/CrowdLayersControl';
 import LegendControl from './Helpers/LegendControl';
 import FlyToControl from './Helpers/FlyToControl';
 import DrawingControl from './Helpers/DrawingControl';
@@ -60,20 +61,23 @@ export class ViewerMap extends PureComponent {
     }
 
     TileLayersControl.initialize(this.props);
-    await PolygonLayersControl.initialize(this.props, bounds, maxPolygons, map);
+    PolygonLayersControl.initialize(this.props, bounds, maxPolygons, map);
     StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles, map);
+    CrowdLayersControl.initialize(this.props, bounds, maxPolygons, map);
+
 
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
     
     FlyToControl.initialize(this.props, map, this.flyToChecked);
     
-    DrawingControl.initialize(map, this.onShapeDrawn);
+    DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props);
   }
 
   componentWillUnmount = () => {
-    PolygonLayersControl.clear();
     TileLayersControl.clear();
+    PolygonLayersControl.clear();
     StandardTilesLayerControl.clear();
+    CrowdLayersControl.clear();
     LegendControl.clear();
     FlyToControl.clear();
   }
@@ -89,9 +93,10 @@ export class ViewerMap extends PureComponent {
       let boundsFlyTo;
 
       if (differentMap) {
-        PolygonLayersControl.clear();
         TileLayersControl.clear();
+        PolygonLayersControl.clear();
         StandardTilesLayerControl.clear();
+        CrowdLayersControl.clear();
         LegendControl.clear();
         FlyToControl.clear();
 
@@ -132,16 +137,17 @@ export class ViewerMap extends PureComponent {
 
       LegendControl.update(nextProps, [], []);
       FlyToControl.update(nextProps, map, boundsFlyTo.getCenter(), this.flyToChecked);
+      DrawingControl.update(this.props.user, this.props);
 
       await PolygonLayersControl.update(nextProps, bounds);
       await StandardTilesLayerControl.update(nextProps, bounds);
-
+      await CrowdLayersControl.update(nextProps, bounds);
     }
   }
 
   getPolygonsJson = async (props) =>
   {
-    if(!this.mapRef)
+    if(!this.mapRef || !this.mapRef.current)
     {
       return null;
     }
@@ -162,7 +168,11 @@ export class ViewerMap extends PureComponent {
     await StandardTilesLayerControl.update(props, bounds);
     let standardTilesInfo = StandardTilesLayerControl.getElement();
 
+    await CrowdLayersControl.update(props, bounds);
+    let crowdInfo = CrowdLayersControl.getElement();
+
     LegendControl.update(this.props, polygonsInfo.polygonCounts, standardTilesInfo.polygonCounts);
+    DrawingControl.update(this.props.user, this.props);
 
     this.forceUpdate();
   }
@@ -186,8 +196,10 @@ export class ViewerMap extends PureComponent {
     TileLayersControl.onOverlayAdd(e);
     PolygonLayersControl.onOverlayAdd(e);
     StandardTilesLayerControl.onOverlayAdd(e);
+    CrowdLayersControl.onOverlayAdd(e);
     LegendControl.onOverlayAdd(e);
     LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts, StandardTilesLayerControl.getElement().polygonCounts);
+    DrawingControl.update(this.props.user, this.props);
 
     // this.setState({checkedLayers: checkedLayers});
 
@@ -209,6 +221,7 @@ export class ViewerMap extends PureComponent {
     TileLayersControl.onOverlayRemove(e);
     PolygonLayersControl.onOverlayRemove(e);
     StandardTilesLayerControl.onOverlayRemove(e);
+    CrowdLayersControl.onOverlayRemove(e);
     LegendControl.onOverlayRemove(e);
     LegendControl.update(this.props, PolygonLayersControl.getElement().polygonCounts, StandardTilesLayerControl.getElement().polygonCounts);
 
@@ -221,7 +234,7 @@ export class ViewerMap extends PureComponent {
 
   onShapeDrawn = (shapeCoords) => {
     // Do something useful.
-    console.log(shapeCoords);
+    //console.log(shapeCoords);
   }
 
   flyToChecked = (value) => {
@@ -264,10 +277,20 @@ export class ViewerMap extends PureComponent {
               null
           }
 
+          {
+            CrowdLayersControl.getElement().polygonControlOverlays ? 
+              <LayersControl position="topright">
+                { CrowdLayersControl.getElement().polygonControlOverlays }
+              </LayersControl> :
+              null
+          }
+
           { LegendControl.getElement() }
           { FlyToControl.getElement() }
           { PolygonLayersControl.onFeatureClick(this.props, this.getPopupContent) }
           { StandardTilesLayerControl.onFeatureClick(this.props, this.getPopupContent) }
+          { CrowdLayersControl.onFeatureClick(this.props, this.getPopupContent) }
+          { DrawingControl.onFeatureClick() }
         </Map>
         {/* <PopupForm props={this.state.popupProps} /> */}
       </div>
