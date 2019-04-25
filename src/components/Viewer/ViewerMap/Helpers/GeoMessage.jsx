@@ -13,6 +13,15 @@ export default class GeoMessage extends PureComponent {
     {
       messages: [],
     }
+    this.type = '';
+    if(this.props.properties.custom)
+    {
+      this.type = 'customPolygon';
+    }
+    else
+    {
+      this.type = this.props.properties.kind;
+    }
   };
 
   scrollToBottom()
@@ -87,7 +96,15 @@ export default class GeoMessage extends PureComponent {
           for (let j = 0; j < messageInfo.messages.length; j++)
           {
             let message = messageInfo.messages[j];
-            messages.push(<Message key={message.id} info={message} user={this.props.user}/>);
+            console.log(message);
+            if (typeof(message.deleteDate) !== 'string')
+            {            
+              message.kind = this.type;
+              message.uuid = this.props.properties.uuid;
+              message.headers = this.props.properties.headers;
+              message.apiUrl = this.props.properties.apiUrl;
+              messages.push(<Message key={message.id} info={message} user={this.props.user} trigger={this.messageTrigger}/>);
+            }
           }
         }
       }
@@ -140,6 +157,22 @@ class Message extends Component {
     this.state = {}
   };
 
+  deleteMessage = async(e, info, trigger) =>
+  {
+    let messagesDeletePromise = await QueryUtil.postData(
+      info.apiUrl + 'geoMessage/' + info.kind + '/deleteMessage',
+      {
+        mapId: info.uuid,
+        id: info.id
+      },
+      info.headers 
+    );
+    if (await messagesDeletePromise === 'OK')
+    {
+      trigger();
+    }
+  }
+
   render = () => 
   {
     let propsList = [];
@@ -176,6 +209,7 @@ class Message extends Component {
             {propsList}
           </ul>
           <li className='GeoDate' key={this.props.info.id + 'date'}>{Moment(this.props.info.date).format('DD-MM-YYYY HH:mm')}</li>
+          <li><button key={this.props.info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, this.props.info, this.props.trigger)}>delete</button></li>
         </ul>
       </div>
     );

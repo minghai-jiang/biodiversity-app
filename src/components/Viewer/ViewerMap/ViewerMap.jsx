@@ -70,7 +70,7 @@ export class ViewerMap extends PureComponent {
     
     FlyToControl.initialize(this.props, map, this.flyToChecked);
     
-    DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props);
+    DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap);
   }
 
   componentWillUnmount = () => {
@@ -141,11 +141,11 @@ export class ViewerMap extends PureComponent {
 
       await PolygonLayersControl.update(nextProps, bounds);
       await StandardTilesLayerControl.update(nextProps, bounds);
-      await CrowdLayersControl.update(nextProps, bounds);
+      await CrowdLayersControl.update(nextProps, bounds, this.refreshMap);
     }
   }
 
-  getPolygonsJson = async (props) =>
+  getPolygonsJson = async (props, type = 'all') =>
   {
     if(!this.mapRef || !this.mapRef.current)
     {
@@ -161,18 +161,27 @@ export class ViewerMap extends PureComponent {
       yMax: screenBounds.getNorth()
     }
 
+    if (type === 'all')
+    {
+      await PolygonLayersControl.update(props, bounds);
+      let polygonsInfo = PolygonLayersControl.getElement();
 
-    await PolygonLayersControl.update(props, bounds);
-    let polygonsInfo = PolygonLayersControl.getElement();
+      await StandardTilesLayerControl.update(props, bounds);
+      let standardTilesInfo = StandardTilesLayerControl.getElement();
 
-    await StandardTilesLayerControl.update(props, bounds);
-    let standardTilesInfo = StandardTilesLayerControl.getElement();
+      await CrowdLayersControl.update(props, bounds, this.refreshMap);
+      let crowdInfo = CrowdLayersControl.getElement();
+      
+      LegendControl.update(this.props, polygonsInfo.polygonCounts, standardTilesInfo.polygonCounts);
+      DrawingControl.update(this.props.user, this.props);
+    }
 
-    await CrowdLayersControl.update(props, bounds);
-    let crowdInfo = CrowdLayersControl.getElement();
+    if (type = 'customPolygon')
+    {
+      await CrowdLayersControl.update(props, bounds, this.refreshMap);
+      let crowdInfo = CrowdLayersControl.getElement();
+    }
 
-    LegendControl.update(this.props, polygonsInfo.polygonCounts, standardTilesInfo.polygonCounts);
-    DrawingControl.update(this.props.user, this.props);
 
     this.forceUpdate();
   }
@@ -206,6 +215,11 @@ export class ViewerMap extends PureComponent {
     this.forceUpdate();
   }
 
+  refreshMap = (type) => {
+    this.forceUpdate();
+    this.getPolygonsJson(this.props, type);
+  }
+
   onClick = (e) => {
     this.forceUpdate();
   }
@@ -228,7 +242,13 @@ export class ViewerMap extends PureComponent {
     this.forceUpdate();
   }
 
+  checkLayer = (layer) => 
+  {
+    CrowdLayersControl.onOverlayAdd({name: layer});
+  }
+
   getPopupContent = (content) => {
+    content.checkLayer = this.checkLayer;
     this.props.infoContent(content);
   }
 
@@ -240,11 +260,11 @@ export class ViewerMap extends PureComponent {
   flyToChecked = (value) => {
     if (value.type === 'polygons')
     {
-      PolygonLayersControl.onOverlayAdd(value, this.onClick);
+      PolygonLayersControl.onOverlayAdd(value, this.refreshMap);
     }
     else
     {
-      StandardTilesLayerControl.onOverlayAdd(value, this.onClick);
+      StandardTilesLayerControl.onOverlayAdd(value, this.refreshMap);
     }
   }
 

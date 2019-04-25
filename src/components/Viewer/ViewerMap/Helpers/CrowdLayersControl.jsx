@@ -22,11 +22,15 @@ let CrowdLayersControl_randomKey = '1';
 let CrowdLayersControl_map = null;
 let CrowdLayersControl_mapRef = {};
 
+let CrowdLayersControl_props = {};
+
 let CrowdLayersControl_PopupContent = {};
 
 let CrowdLayersControl_highlight = -1;
 let CrowdLayersControl_highlightCenter = [];
 let CrowdLayersControl_refresh = () => {};
+
+let CrowdLayersControl_deleted = -1;
 
 const CrowdLayersControl = {
   getElement: () => {
@@ -36,7 +40,7 @@ const CrowdLayersControl = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons, map) => {
+  initialize: async (props, bounds, maxPolygons, map, refresh) => {
     CrowdLayersControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -52,9 +56,13 @@ const CrowdLayersControl = {
 
     CrowdLayersControl_map = props.map;
     CrowdLayersControl_mapRef = map;
+
+    CrowdLayersControl_props = props;
+
+    CrowdLayersControl_refresh = refresh;
   },
 
-  update: async (props, bounds) => {
+  update: async (props, bounds, refresh) => {
     if (CrowdLayersControl_map !== props.map) {
       CrowdLayersControl_checkedLayers = [];
     }
@@ -63,10 +71,13 @@ const CrowdLayersControl = {
       CrowdLayersControl_controlOverlays = [];
     }
     else {
+      CrowdLayersControl_props = props;
+
       let layerInfo = await getPolygonsJson(props, bounds);
       CrowdLayersControl_layerGeoJsons = layerInfo.layerGeoJsons;
       CrowdLayersControl_polygonCounts = layerInfo.polygonCounts;
 
+      CrowdLayersControl_refresh = refresh;
       CrowdLayersControl_controlOverlays = createGeojsonLayerControl(props);
     }
 
@@ -88,6 +99,8 @@ const CrowdLayersControl = {
     CrowdLayersControl_highlight = -1;
     CrowdLayersControl_highlightCenter = [];
     CrowdLayersControl_refresh = () => {};
+
+    CrowdLayersControl_props = {};
   },
 
   onOverlayAdd: (e, refresh) => {
@@ -99,7 +112,6 @@ const CrowdLayersControl = {
     {
       CrowdLayersControl_highlight = e.id;
       CrowdLayersControl_highlightCenter = e.center;
-      CrowdLayersControl_refresh = refresh;
     }
   },
 
@@ -166,21 +178,29 @@ const CrowdLayersControl = {
       let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
 
       let report;
+      let deleteButton;
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>
+        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+        deleteButton =  <a className="noselect" onClick={() => {deletePolygon(properties)} }>Delete</a>;
       }
 
-      return (
-        <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()}  autoPan={false} keepInView={false}>
-          <div key={id + '.content'}>
-            {content}
-          </div>
-          {analyse}
-          {report}
-        </Popup>
-      );
+      let popupContent;
+      if (id !== CrowdLayersControl_deleted)
+      {
+        popupContent = (
+          <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()}  autoPan={false} keepInView={false}>
+            <div key={id + '.content'}>
+              {content}
+            </div>
+            {analyse}
+            {report}
+            {deleteButton}
+          </Popup>);
+      }
+
+      return (popupContent);
     }
     else
     {
@@ -393,6 +413,29 @@ function handlePolygon(type, contentFunction, id, properties, random)
     properties: properties,
     random: random,
   });
+}
+
+async function deletePolygon(properties)
+{
+  let headers = {};
+  if (CrowdLayersControl_props.user) {
+    headers["Authorization"] = "Bearer " + CrowdLayersControl_props.user.token;
+  }
+
+  let polygonDelete = await QueryUtil.postData(
+    CrowdLayersControl_props.apiUrl + 'geoMessage/customPolygon/deletePolygon',
+    {
+      mapId: CrowdLayersControl_props.map.uuid,
+      customPolygonId: properties.id,
+    }, headers
+  );
+
+  if (await polygonDelete === 'OK')
+  {
+    CrowdLayersControl_mapRef.closePopup();
+    CrowdLayersControl_deleted = properties.id;
+    CrowdLayersControl_refresh();
+  }
 }
 
 export default CrowdLayersControl;

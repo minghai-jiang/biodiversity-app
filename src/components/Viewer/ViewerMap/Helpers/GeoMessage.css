@@ -61,6 +61,12 @@ div.slide-pane__content div.messageContainer .GeoPropsList li
   font-weight: 600;
 }
 
+div.slide-pane__content div.messageContainer button
+{
+  margin: 0;
+  margin-right: auto;
+}
+
 div.slide-pane__content
 {
   padding: 0;

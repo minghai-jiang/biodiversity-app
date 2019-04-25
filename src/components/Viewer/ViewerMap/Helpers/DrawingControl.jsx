@@ -10,12 +10,18 @@ let DrawingControl_user;
 let DrawingControl_contentFunction;
 let DrawingControl_Popup;
 let DrawingControl_Props;
+let DrawingControl_refresh;
+let DrawingControl_mapRef;
+let DrawingControl_drawnItems;
 
 const DrawingControl = {
-  initialize: (map, callback, user, contentFunction, props) => {
+  initialize: (map, callback, user, contentFunction, props, mapRef, refresh) => {
     DrawingControl_user = user;
     DrawingControl_contentFunction = contentFunction;
     DrawingControl_Props = props;
+
+    DrawingControl_refresh = refresh;
+    DrawingControl_mapRef = mapRef;
 
     createDrawButton(map, {polygon: {allowIntersection: false }}, callback);
   },
@@ -32,6 +38,7 @@ const DrawingControl = {
 
 function createDrawButton (map, type, callback) {
   var drawnItems = new L.featureGroup();
+  DrawingControl_drawnItems = drawnItems;
   map.addLayer(drawnItems);
   
   let draw = {
@@ -151,7 +158,7 @@ function onClickCustomPolygon(e, shapeCoords)
 
     if (DrawingControl_user)
     {
-      report =  <a className="noselect" onClick={() => {handleCustomPolygon('save', DrawingControl_contentFunction, id, properties, Math.random())} }>Save Polygon</a>
+      report =  <a className="noselect" onClick={() => {handleCustomPolygon('save', DrawingControl_contentFunction, id, properties, Math.random(), e)} }>Save Polygon</a>
     }
 
     for (let i = 0; i < shapeCoords.length; i++)
@@ -170,7 +177,7 @@ function onClickCustomPolygon(e, shapeCoords)
   }
 }
 
-function handleCustomPolygon(type, contentFunction, id, properties, random)
+function handleCustomPolygon(type, contentFunction, id, properties, random, e)
 {
   contentFunction({
     id: id,
@@ -178,6 +185,10 @@ function handleCustomPolygon(type, contentFunction, id, properties, random)
     type: type,
     properties: properties,
     random: random,
+    refresh: DrawingControl_refresh,
+    mapRef: DrawingControl_mapRef,
+    clear: DrawingControl_drawnItems.clearLayers,
+    e: e,
   });
 }
 

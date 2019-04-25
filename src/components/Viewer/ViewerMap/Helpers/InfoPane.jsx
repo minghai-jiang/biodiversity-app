@@ -396,6 +396,10 @@ export class InfoPane extends PureComponent {
 
     if(await addResult === 'OK')
     {
+      this.props.infoContent.mapRef.closePopup();
+      this.props.infoContent.refresh('customPolygon');
+      this.props.infoContent.checkLayer(this.state.selectedCrowdLayer);
+      //this.props.infoContent.clearLayers(this.props.infoContent.e.layer);
       this.toggleQueryPane(false);
     }
   };
