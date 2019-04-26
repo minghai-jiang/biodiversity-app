@@ -87,7 +87,7 @@ constructor(props) {
     if(feedbackResult === 'OK')
     {
       type = 'notification';
-      notification = 'Thanks for submitting this error';
+      notification = 'Thanks for submitting this message';
     }
 
     this.setState({text: '', clouds: false, classification: false, notification: {type: type, text: notification}});
