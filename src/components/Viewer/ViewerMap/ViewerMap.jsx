@@ -42,6 +42,8 @@ export class ViewerMap extends PureComponent {
       polygonCounts: {},
       legend: [],
     };
+
+    this.maxZoom = 14;
   }
 
   componentDidMount = async () => {
@@ -85,6 +87,8 @@ export class ViewerMap extends PureComponent {
   componentWillReceiveProps = async (nextProps) => {
     let differentMap = nextProps.map !== this.props.map;
     
+    this.mapRef.current.leafletElement.setMaxZoom(nextProps.map.zoom);
+
     if (differentMap ||
         nextProps.timestampRange !== this.props.timestampRange ||
         nextProps.timestampRange.start !== this.props.timestampRange.start || 
@@ -275,7 +279,7 @@ export class ViewerMap extends PureComponent {
           center={[this.state.lat, this.state.lon]}
           zoom={this.state.zoom}
           ref={this.mapRef}
-          maxZoom={18}
+          maxZoom={this.maxZoom}
         >
           <LayersControl position="topright">
             { TileLayersControl.getElement() }
