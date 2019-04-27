@@ -1,4 +1,7 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent } from 'react';
+import { NavLink } from 'react-router-dom';
+
+import { Footer } from "../footer/footer";
 
 import "./Login.css";
 
@@ -9,10 +12,6 @@ class Login extends PureComponent {
     this.state = {
 
     };
-  }
-
-  toggleQueryPane = (open) => {
-    this.setState({ openQueryPane: open });
   }
 
   login = () => {
@@ -69,33 +68,46 @@ class Login extends PureComponent {
 
   render() {
     return (
-      <div className="login-block">
-        <h1>
-          Login
-        </h1>
-        <form>
-          <div className='login-input-label-div'>
-            <div>
-              Username
+      <div>
+        <div className='main-content'>
+          <h1>
+            Login
+          </h1>
+          <form>
+            <div className='login-input-label-div'>
+              <div>
+                Username
+              </div>
+              <div>
+                <input className='login-input' tabIndex={0} ref='usernameInput'></input>
+              </div>
             </div>
-            <div>
-              <input className='login-input' tabIndex={0} ref='usernameInput'></input>
+            <div className='login-input-label-div'>
+              <div>
+                Password
+              </div>
+              <div>
+                <input className='login-input' tabIndex={0} type='password' ref='passwordInput' onKeyUp={this.onEnter.bind(this)}></input>
+              </div>
             </div>
+            <div className='login-input-label-div' onClick={this.login.bind(this)} onKeyUp={this.onEnter.bind(this)}>
+              <div className="button main-block-single-button" tabIndex={0}>
+                Login                                               
+              </div>
+            </div>
+          </form>
+          <div>
+            <NavLink to='/account/register' style={{fontSize: '12pt'}}>
+              Sign up
+            </NavLink>          
           </div>
-          <div className='login-input-label-div'>
-            <div>
-              Password
-            </div>
-            <div>
-              <input className='login-input' tabIndex={0} type='password' ref='passwordInput' onKeyUp={this.onEnter.bind(this)}></input>
-            </div>
+          <div>
+            <NavLink to='/account/resetPassword' style={{fontSize: '12pt'}}>
+              Forgot your password?
+            </NavLink>          
           </div>
-          <div className='login-input-label-div' style={{marginTop: '2em'}} onClick={this.login.bind(this)} onKeyUp={this.onEnter.bind(this)}>
-            <div className="button main-block-single-button" tabIndex={0}>
-              Login                                               
-            </div>
-          </div>
-        </form>
+        </div>
+        <Footer></Footer>
       </div>
     );
   }

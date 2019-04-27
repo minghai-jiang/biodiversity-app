@@ -14,7 +14,8 @@ import Contact from "./components/contact/contact";
 import Products from "./components/Products/Products";
 import Login from './components/Login/Login';
 import Sector from './components/Sectors/Sectors';
-import Gallery from './components/Gallery/Gallery'
+import Gallery from './components/Gallery/Gallery';
+import Account from './components/Account/Account';
 
 import "./App.css";
 
@@ -198,6 +199,17 @@ class App extends Component {
               render={() => 
                 <Login apiUrl={apiUrl} onLogin={this.onLogin}/> 
               }
+            />
+            <Route 
+              path="/account" 
+              render={() => 
+                <Account 
+                  apiUrl={apiUrl}
+                  user={this.state.user} 
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              } 
             />
           </div>               
         </div>   

@@ -99,9 +99,10 @@ export class MainMenu extends Component {
           <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>              
             <a className='main-menu-item' style={{cursor: 'pointer'}} onClick={this.logout.bind(this)}>Logout</a>
           </li>
-          <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>              
-            <a className='main-menu-item no-hover'>{this.props.user ? this.props.user.username : ''}</a>
-            {/* {this.props.user.username} */}
+          <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>   
+            <NavLink to="/account/dashboard" className="main-menu-item">
+              {this.props.user ? this.props.user.username : ''}  
+            </NavLink>
           </li>
         </ul> 
         <a href={void(0)} className="icon" onClick={this.toggleMenu}>
