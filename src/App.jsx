@@ -61,7 +61,7 @@ class App extends Component {
       user = JSON.parse(userJson);
 
       fetch(
-        `${apiUrl}account/validate`,
+        `${apiUrl}account/validateLogin`,
         {
           method: 'GET',
           headers: {
