@@ -149,7 +149,7 @@ const CrowdLayersControl = {
         }
       }
 
-      if(popup.properties && props.map && props.timestampRange && props.apiUrl && CrowdLayersControl_PopupContent.data)
+      if(popup.properties && props.map && props.timestampRange && props.apiUrl && CrowdLayersControl_PopupContent.data && CrowdLayersControl_PopupContent.data.click)
       {
         properties.id = CrowdLayersControl_PopupContent.id;
         properties.class = classes;
@@ -189,6 +189,7 @@ const CrowdLayersControl = {
       let popupContent;
       if (id !== CrowdLayersControl_deleted)
       {
+        CrowdLayersControl_PopupContent.data.click = false;
         popupContent = (
           <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()}  autoPan={false} keepInView={false}>
             <div key={id + '.content'}>
@@ -381,6 +382,7 @@ function addFeatureData(feature, layer)
     color: layer.options.data.color,
     layerName: layer.options.data.name,
     hasAggregatedData: layer.options.data.hasAggregatedData,
+    click: true,
   }
 
   CrowdLayersControl_PopupContent = feature;
@@ -392,13 +394,14 @@ function onEachFeature(feature, layer) {
     feature.e = {};
     feature.e.latlng = CrowdLayersControl_highlightCenter;
     addFeatureData(feature, layer);
-    CrowdLayersControl_refresh();
   }
 
   layer.on({
     click: function(e){
+      CrowdLayersControl_mapRef.closePopup();
       feature.e = e;
       addFeatureData(feature, layer);
+      //CrowdLayersControl_refresh();
     }
   });
 

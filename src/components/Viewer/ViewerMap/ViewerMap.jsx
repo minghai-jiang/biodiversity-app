@@ -174,16 +174,16 @@ export class ViewerMap extends PureComponent {
       let standardTilesInfo = StandardTilesLayerControl.getElement();
 
       await CrowdLayersControl.update(props, bounds, this.refreshMap);
-      let crowdInfo = CrowdLayersControl.getElement();
+      //let crowdInfo = CrowdLayersControl.getElement();
       
       LegendControl.update(this.props, polygonsInfo.polygonCounts, standardTilesInfo.polygonCounts);
       DrawingControl.update(this.props.user, this.props);
     }
 
-    if (type = 'customPolygon')
+    if (type === 'customPolygon')
     {
       await CrowdLayersControl.update(props, bounds, this.refreshMap);
-      let crowdInfo = CrowdLayersControl.getElement();
+      //let crowdInfo = CrowdLayersControl.getElement();
     }
 
 
@@ -206,6 +206,7 @@ export class ViewerMap extends PureComponent {
       checkedLayers.push(e.name);
     }
 
+    this.mapRef.current.leafletElement.closePopup();
     TileLayersControl.onOverlayAdd(e);
     PolygonLayersControl.onOverlayAdd(e);
     StandardTilesLayerControl.onOverlayAdd(e);
@@ -220,7 +221,7 @@ export class ViewerMap extends PureComponent {
   }
 
   refreshMap = (type) => {
-    this.forceUpdate();
+    //this.forceUpdate();
     this.getPolygonsJson(this.props, type);
   }
 

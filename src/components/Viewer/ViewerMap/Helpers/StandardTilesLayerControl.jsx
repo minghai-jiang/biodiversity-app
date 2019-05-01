@@ -147,7 +147,7 @@ const StandardTilesLayer = {
         }
       }
 
-      if(popup.properties && props.map && props.timestampRange && props.apiUrl)
+      if(popup.properties && props.map && props.timestampRange && props.apiUrl && StandardTiles_PopupContent.click)
       {
         properties.class = classes;
         properties.spectral = spectral;
@@ -166,26 +166,27 @@ const StandardTilesLayer = {
         }
 
         merged = {...properties, ...StandardTiles_PopupContent.properties};
+
+        let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
+
+        let report;
+
+        if (props.user)
+        {
+          report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
+        }
+
+        StandardTiles_PopupContent.click = false;
+        return (
+          <Popup position={popup.e.latlng} key={id + Math.random()} autoPan={false} keepInView={false}>
+            <div key={id + '.content'}>
+              {content}
+            </div>
+            {analyse}
+            {report}
+          </Popup>
+        );
       }
-
-      let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
-
-      let report;
-
-      if (props.user)
-      {
-        report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
-      }
-
-      return (
-        <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()} autoPan={false} keepInView={false}>
-          <div key={id + '.content'}>
-            {content}
-          </div>
-          {analyse}
-          {report}
-        </Popup>
-      );
     }
     else
     {
@@ -392,16 +393,18 @@ function onEachFeature(feature, layer)
   {
     feature.e = {};
     feature.e.latlng = StandardTiles_highlightCenter;
+    feature.click = true;
 
     StandardTiles_PopupContent = feature;
-
-    StandardTiles_refresh();
   }
 
   layer.on({
     click: function(e){
-      feature.e = e; 
+      StandardTiles_mapRef.closePopup();
+      feature.e = e;
+      feature.click = true;
       StandardTiles_PopupContent = feature;
+      //StandardTiles_refresh();
     }
   });
 }
