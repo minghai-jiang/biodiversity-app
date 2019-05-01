@@ -11,14 +11,14 @@ class ResetPassword extends PureComponent {
   }
 
   resetPassword = () => {
-    let username = this.refs.usernameInput.value;
+    let email = this.refs.emailInput.value;
 
-    if (username === '') {
+    if (email === '') {
       return;
     }
 
     let bodyJson = JSON.stringify({
-      username: username
+      email: email
     });
 
     fetch(
@@ -78,10 +78,10 @@ class ResetPassword extends PureComponent {
           <form>
             <div className='login-input-label-div'>
               <div>
-                Username
+                Email
               </div>
               <div>
-                <input className='login-input' tabIndex={0} ref='usernameInput'></input>
+                <input className='login-input' type='email' tabIndex={0} ref='emailInput'></input>
               </div>
             </div>
             <div className='login-input-label-div' onClick={this.resetPassword.bind(this)} onKeyUp={this.onEnter.bind(this)}>
