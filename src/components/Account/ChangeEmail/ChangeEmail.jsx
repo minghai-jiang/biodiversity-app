@@ -63,18 +63,18 @@ class ChangeEmail extends PureComponent {
     return (
       <div className="login-block">
         <h1 className='account-title'>
-          Change email
+          {this.props.localization["ChangeEmail"]}
         </h1>
         {
           this.state.success ?
           <div className='main-content'>
-            <h2>Success</h2>
+            <h2>{this.props.localization["Success"]}</h2>
             <p>
-              We have sent you an e-mail to validate your e-mail address. Please follow the procedures in the mail.
+              {this.props.localization["ChangeEmailSuccessMessage"]}
             </p>
             <div>
-              <NavLink to='/account/dashboard' style={{fontSize: '12pt'}}>
-                Dashboard
+              <NavLink to='/account/management' style={{fontSize: '12pt'}}>
+                {this.props.localization["AccountManagement"]}
               </NavLink>          
             </div>
           </div>
@@ -82,7 +82,7 @@ class ChangeEmail extends PureComponent {
           <form>
             <div className='login-input-label-div'>
               <div>
-                New email
+                {this.props.localization['NewEmail']}
               </div>
               <div>
                 <input className='login-input' type='email' tabIndex={0} ref='newEmailInput'></input>
@@ -91,7 +91,7 @@ class ChangeEmail extends PureComponent {
 
             <div className='login-input-label-div' onClick={this.changeEmail.bind(this)} onKeyUp={this.onEnter.bind(this)}>
               <div className="button main-block-single-button" tabIndex={0}>
-                Change email                                               
+                {this.props.localization["ChangeEmail"]}                                               
               </div>
             </div>
           </form>

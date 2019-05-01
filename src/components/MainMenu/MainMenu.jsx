@@ -101,7 +101,7 @@ export class MainMenu extends Component {
           </li> */}
 
           <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>   
-            <NavLink to="/account/dashboard" className="main-menu-item">
+            <NavLink to="/account/management" className="main-menu-item">
               {this.props.user ? this.props.user.username : ''}  
             </NavLink>
           </li>

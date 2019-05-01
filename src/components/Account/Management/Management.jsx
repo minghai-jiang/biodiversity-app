@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { NavLink, Redirect } from 'react-router-dom';
 
-class AccountDashboard extends PureComponent {
+class AccountManagement extends PureComponent {
   constructor(props, context) {
     super(props, context);
   }
@@ -20,13 +20,13 @@ class AccountDashboard extends PureComponent {
     return (
       <div className="login-block">
         <h1 className='account-title'>
-          Account Management
+          {this.props.localization['AccountManagement']}
         </h1>
 
         <div className='login-input-label-div'>
           <NavLink to='/account/changePassword' className="button-a">
             <div className="button button-accented main-block-single-button">
-              Change password
+              {this.props.localization['ChangePassword']}
             </div>
           </NavLink>    
         </div>
@@ -34,7 +34,7 @@ class AccountDashboard extends PureComponent {
         <div className='login-input-label-div'>
           <NavLink to='/account/changeEmail' className="button-a">
             <div className="button button-accented main-block-single-button">
-              Change email
+              {this.props.localization['ChangeEmail']}
             </div>
           </NavLink>    
         </div>
@@ -44,7 +44,7 @@ class AccountDashboard extends PureComponent {
         <div className='login-input-label-div'>
           <div className="button-a" onClick={this.logout.bind(this)}>
             <div className="button button-accented main-block-single-button">
-              Logout
+              {this.props.localization['Logout']}
             </div>
           </div>    
         </div>
@@ -53,4 +53,4 @@ class AccountDashboard extends PureComponent {
   }
 }
 
-export default AccountDashboard;
+export default AccountManagement;

@@ -3,7 +3,7 @@ import {
     Route
 } from "react-router-dom";
 
-import Dashboard from './Dashboard/Dashboard';
+import AccountManagement from './Management/Management';
 import ChangePassword from './ChangePassword/ChangePassword';
 import ChangeEmail from './ChangeEmail/ChangeEmail';
 import ResetPassword from './ResetPassword/ResetPassword';
@@ -22,14 +22,14 @@ export class Account extends Component {
             path="/account" 
             render={() => 
               <div>
-                Account dashboard
+                {this.props.localization['AccountManagement']}
               </div>
             } 
           />
           <Route 
-            path="/account/dashboard" 
+            path="/account/management" 
             render={() => 
-              <Dashboard 
+              <AccountManagement 
                 apiUrl={this.props.apiUrl} 
                 language={this.props.language} 
                 localization={this.props.localization}

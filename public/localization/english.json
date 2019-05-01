@@ -6,6 +6,7 @@
   "Gallery": "Gallery",
   "AboutUs": "About Us",
   "Login": "Login",
+  "Logout": "Logout",
 
   "Language": "Language",
 
@@ -21,5 +22,34 @@
   "Documentation": "Documentation",
   "Northern Paraguay deforestation": "Paraguay deforestation",
   "Flora management in the Netherlands": "Flora management in the Netherlands",
-  "Appendix": "Appendix"
+  "Appendix": "Appendix",
+
+  "Username": "Username",
+  "Password": "Password",
+  "PasswordRepeat": "Repeat password",
+  "Email": "Email",
+
+  "NewEmail": "New email",
+  "NewPassword": "New password",
+  "NewPasswordRepeat": "New password repeat",
+
+  "SignUp": "Sign up",
+  "Register": "Register",
+  "ForgotPasswordQuestion": "Forgot your password?",
+  "ResetPassword": "Reset password",
+
+  "AccountManagement": "Account management",
+  "ChangePassword": "Change password",
+  "ChangeEmail": "Change email",
+
+  "Success": "Success",
+  "RegisterSuccessMessage1": "We have sent you an email to validate your email address. Please follow the procedures in the mail.",
+  "RegisterSuccessMessage2": "You can now login using the your credentials.",
+  "ChangeEmailSuccessMessage": "We have sent you an email to validate your email address. Please follow the procedures in the mail.",
+  "ChangePasswordSuccessMessage": "We have sent you an email to validate your email address. Please follow the procedures in the mail.",
+  "ResetPasswordSuccessMessage1": "We have sent an email to the given email address.",
+  "ResetPasswordSuccessMessage2": "Por favor siga el procedimiento en el correo electrónico para continuar."
+
+
+
 }

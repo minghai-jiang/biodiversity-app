@@ -196,7 +196,12 @@ class App extends Component {
             <Route 
               path="/login" 
               render={() => 
-                <Login apiUrl={apiUrl} onLogin={this.onLogin}/> 
+                <Login 
+                  apiUrl={apiUrl} 
+                  onLogin={this.onLogin}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                /> 
               }
             />
             <Route 

@@ -69,18 +69,18 @@ class ChangePassword extends PureComponent {
     return (
       <div className="login-block">
         <h1 className='account-title'>
-          Change password
+          {this.props.localization["ChangePassword"]}
         </h1>
         {
           this.state.success ?
           <div className='main-content'>
-            <h2>Success</h2>
+            <h2>{this.props.localization["Success"]}</h2>
             <p>
-              Your password has been successfully changed.
+              {this.props.localization["ChangePasswordSuccessMessage"]}
             </p>
             <div>
-              <NavLink to='/account/dashboard' style={{fontSize: '12pt'}}>
-                Dashboard
+              <NavLink to='/account/management' style={{fontSize: '12pt'}}>
+                {this.props.localization["AccountManagement"]}
               </NavLink>          
             </div>
           </div>
@@ -88,7 +88,7 @@ class ChangePassword extends PureComponent {
           <form>
             <div className='login-input-label-div'>
               <div>
-                New password
+                {this.props.localization["NewPassword"]}
               </div>
               <div>
                 <input className='login-input' type='password' tabIndex={0} ref='newPasswordInput'></input>
@@ -97,7 +97,7 @@ class ChangePassword extends PureComponent {
 
             <div className='login-input-label-div'>
               <div>
-                New password repeat
+                {this.props.localization["NewPasswordRepeat"]}
               </div>
               <div>
                 <input className='login-input' type='password' tabIndex={0} ref='newPasswordRepeatInput'></input>
@@ -106,7 +106,7 @@ class ChangePassword extends PureComponent {
 
             <div className='login-input-label-div' onClick={this.changePassword.bind(this)} onKeyUp={this.onEnter.bind(this)}>
               <div className="button main-block-single-button" tabIndex={0}>
-                Change password                                               
+                {this.props.localization["ChangePassword"]}                                               
               </div>
             </div>
           </form>

@@ -56,21 +56,21 @@ class ResetPassword extends PureComponent {
     return (
       <div className="login-block">
         <h1 className='account-title'>
-          Reset password
+          {this.props.localization["ResetPassword"]}
         </h1>
         {
           this.state.success ?
           <div className='main-content'>
-            <h2>Success</h2>
+            <h2>{this.props.localization["Success"]}</h2>
             <p>
-              We have sent an e-mail to the address registered under the given username.
+              {this.props.localization["ResetPasswordSuccessMessage1"]}
             </p>
             <p>
-              Please follow the procedure in the e-mail to continue.
+              {this.props.localization["ResetPasswordSuccessMessage2"]}
             </p>
             <div>
-              <NavLink to='/' style={{fontSize: '12pt'}}>
-                Home
+              <NavLink to='/login' style={{fontSize: '12pt'}}>
+                {this.props.localization["Login"]}
               </NavLink>          
             </div>
           </div>
@@ -78,7 +78,7 @@ class ResetPassword extends PureComponent {
           <form>
             <div className='login-input-label-div'>
               <div>
-                Email
+                {this.props.localization["Email"]}
               </div>
               <div>
                 <input className='login-input' type='email' tabIndex={0} ref='emailInput'></input>
@@ -86,7 +86,7 @@ class ResetPassword extends PureComponent {
             </div>
             <div className='login-input-label-div' onClick={this.resetPassword.bind(this)} onKeyUp={this.onEnter.bind(this)}>
               <div className="button main-block-single-button" tabIndex={0}>
-                Reset password                                               
+                {this.props.localization["ResetPassword"]}                                              
               </div>
             </div>
           </form>

@@ -66,21 +66,21 @@ class Register extends PureComponent {
     return (
       <div className="login-block">
         <h1 className='account-title'>
-          Register
+          {this.props.localization["Register"]}
         </h1>
         {
           this.state.success ?
             <div className='main-content'>
-              <h2>Registration success</h2>
+              <h2>{this.props.localization["Success"]}</h2>
               <p>
-                We have sent you an e-mail to validate your e-mail address. Please follow the procedures in the mail.
+                {this.props.localization["RegisterSuccessMessage1"]}
               </p>
               <p>
-                You can now login using the your credentials.
+                {this.props.localization["RegisterSuccessMessage2"]}
               </p>
               <div>
                 <NavLink to='/login' style={{fontSize: '12pt'}}>
-                  Login
+                  {this.props.localization["Login"]}
                 </NavLink>          
               </div>
             </div>
@@ -88,7 +88,7 @@ class Register extends PureComponent {
             <form>
               <div className='login-input-label-div'>
                 <div>
-                  Username
+                  {this.props.localization["Username"]}
                 </div>
                 <div>
                   <input className='login-input' tabIndex={0} ref='usernameInput'></input>
@@ -96,7 +96,7 @@ class Register extends PureComponent {
               </div>
               <div className='login-input-label-div'>
                 <div>
-                  Password
+                  {this.props.localization["Password"]}
                 </div>
                 <div>
                   <input className='login-input' tabIndex={0} type='password' ref='passwordInput'></input>
@@ -105,7 +105,7 @@ class Register extends PureComponent {
 
               <div className='login-input-label-div'>
                 <div>
-                  Repeat password
+                  {this.props.localization["PasswordRepeat"]}
                 </div>
                 <div>
                   <input className='login-input' tabIndex={0} type='password' ref='repeatPasswordInput' onKeyUp={this.onEnter.bind(this)}></input>
@@ -114,7 +114,7 @@ class Register extends PureComponent {
 
               <div className='login-input-label-div'>
                 <div>
-                  E-mail
+                  {this.props.localization["Email"]}
                 </div>
                 <div>
                   <input className='login-input' tabIndex={0} type='email' ref='emailInput' onKeyUp={this.onEnter.bind(this)}></input>
@@ -122,7 +122,7 @@ class Register extends PureComponent {
               </div>
               <div className='login-input-label-div' onClick={this.register.bind(this)} onKeyUp={this.onEnter.bind(this)}>
                 <div className="button main-block-single-button" tabIndex={0}>
-                  Register                                               
+                  {this.props.localization["Register"]}                                               
                 </div>
               </div>
             </form>
