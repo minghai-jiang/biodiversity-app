@@ -62,7 +62,6 @@ export default class GeoMessage extends PureComponent {
         this.props.properties.apiUrl + 'geoMessage/polygon/getMessages',
         {
           mapId: this.props.properties.uuid,
-          timestamp: this.props.properties.timestamp,
           polygonIds: [this.props.properties.id],
         },
         this.props.properties.headers 
@@ -197,6 +196,10 @@ class Message extends Component {
     if (this.props.user.username === this.props.info.user)
     {
       className += ' own';
+    }
+    else
+    {
+      className += ' other';
     }
 
     return(

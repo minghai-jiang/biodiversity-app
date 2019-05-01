@@ -17,6 +17,18 @@ div.slide-pane__content div.messageContainer.own
   margin-left: 0;
 }
 
+div.slide-pane__content div.messageContainer.other button
+{
+  background-color: #737373;
+  border: 3px solid #808080;
+  color: #cccccc;
+}
+
+div.slide-pane__content div.messageContainer.other button:hover
+{
+  background-color: #4d4d4d;
+}
+
 div.slide-pane__content div.messageContainer ul
 {
   margin: 0;

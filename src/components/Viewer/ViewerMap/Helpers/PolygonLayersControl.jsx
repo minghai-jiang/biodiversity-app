@@ -121,7 +121,7 @@ const PolygonLayersControl = {
   },
 
   onFeatureClick: (props, contentFunction) => {
-    if (polygonLayersControl_PopupContent && polygonLayersControl_PopupContent.id)
+    if (polygonLayersControl_PopupContent && polygonLayersControl_PopupContent.id && polygonLayersControl_PopupContent.data.click)
     {
       let popup = polygonLayersControl_PopupContent;
       let id = popup.id;
@@ -177,8 +177,9 @@ const PolygonLayersControl = {
         report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>
       }
 
+      polygonLayersControl_PopupContent.data.click = false;
       return (
-        <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()}  autoPan={false} keepInView={false}>
+        <Popup position={popup.e.latlng} key={id + Math.random()}  autoPan={false} keepInView={false}>
           <div key={id + '.content'}>
             {content}
           </div>
@@ -299,7 +300,6 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
           apiUrl + 'geoMessage/polygon/ids',
           {
             mapId:  mapUuid,
-            timestamp: timestampEnd,
             xMin: bounds.xMin,
             xMax: bounds.xMax,
             yMin: bounds.yMin,
@@ -426,6 +426,7 @@ function addFeatureData(feature, layer)
     color: layer.options.data.color,
     layerName: layer.options.data.name,
     hasAggregatedData: layer.options.data.hasAggregatedData,
+    click: true,
   }
 
   polygonLayersControl_PopupContent = feature;
@@ -437,13 +438,14 @@ function onEachFeature(feature, layer) {
     feature.e = {};
     feature.e.latlng = polygonLayersControl_highlightCenter;
     addFeatureData(feature, layer);
-    polygonLayersControl_refresh();
   }
 
   layer.on({
     click: function(e){
+      polygonLayersControl_mapRef.closePopup();
       feature.e = e;
       addFeatureData(feature, layer);
+      //polygonLayersControl_refresh();
     }
   });
 
