@@ -46,7 +46,7 @@
   "RegisterSuccessMessage1": "Le hemos enviado un correo electrónico para validar su dirección de correo electrónico. Por favor siga los procedimientos en el correo.",
   "RegisterSuccessMessage2": "Ahora puede iniciar sesión usando sus credenciales.",
   "ChangeEmailSuccessMessage": "Le hemos enviado un correo electrónico para validar su dirección de correo electrónico. Por favor siga los procedimientos en el correo.",
-  "ChangePasswordSuccessMessage": "Le hemos enviado un correo electrónico para validar su dirección de correo electrónico. Por favor siga los procedimientos en el correo.",
+  "ChangePasswordSuccessMessage": "Ahora puede iniciar sesión con su nueva contraseña.",
   "ResetPasswordSuccessMessage1": "Hemos enviado un correo electrónico a la dirección de correo electrónico dada.",
   "ResetPasswordSuccessMessage2": "Please follow the procedure in the email to continue."
 }
