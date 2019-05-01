@@ -27,9 +27,9 @@ export class MainMenu extends Component {
     event.stopPropagation();
   }
 
-  logout = () => {
-    this.props.onLogout();
-  }
+  // logout = () => {
+  //   this.props.onLogout();
+  // }
 
   changeLanguage = (language) => {
     if (this.props.onLanguageChange) {
@@ -96,9 +96,10 @@ export class MainMenu extends Component {
             </NavLink>
           </li>
 
-          <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>              
+          {/* <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>              
             <a className='main-menu-item' style={{cursor: 'pointer'}} onClick={this.logout.bind(this)}>Logout</a>
-          </li>
+          </li> */}
+
           <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>   
             <NavLink to="/account/dashboard" className="main-menu-item">
               {this.props.user ? this.props.user.username : ''}  

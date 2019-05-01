@@ -27,7 +27,7 @@ const publicFilesUrl = "https://public.ellipsis-earth.com/";
 //const apiUrl = "https://dev.api.ellipsis-earth.com/";
 // const publicFilesUrl = "https://dev.public.ellipsis-earth.com/";
 
-//const apiUrl = "http://localhost:7552/";
+// const apiUrl = "http://localhost:7552/";
 // const publicFilesUrl = "http://localhost:3000/";
 
 class App extends Component {
@@ -138,7 +138,6 @@ class App extends Component {
             user={this.state.user}
             language={this.state.language}
             localization={this.state.localization}
-            onLogout={this.onLogout}
             onLanguageChange={this.onLanguageChange}
           />
           <div className="content" ref={ref => this.el = ref}>
@@ -208,6 +207,7 @@ class App extends Component {
                   user={this.state.user} 
                   language={this.state.language}
                   localization={this.state.localization}
+                  onLogout={this.onLogout}
                 />
               } 
             />

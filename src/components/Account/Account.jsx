@@ -34,6 +34,7 @@ export class Account extends Component {
                 language={this.props.language} 
                 localization={this.props.localization}
                 user={this.props.user}
+                onLogout={this.props.onLogout}
               />
             } 
           />

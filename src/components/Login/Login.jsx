@@ -70,7 +70,7 @@ class Login extends PureComponent {
     return (
       <div>
         <div className='main-content'>
-          <h1>
+          <h1 className='account-title'>
             Login
           </h1>
           <form>

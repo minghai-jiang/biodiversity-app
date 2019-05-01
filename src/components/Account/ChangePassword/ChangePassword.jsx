@@ -68,7 +68,7 @@ class ChangePassword extends PureComponent {
 
     return (
       <div className="login-block">
-        <h1>
+        <h1 className='account-title'>
           Change password
         </h1>
         {

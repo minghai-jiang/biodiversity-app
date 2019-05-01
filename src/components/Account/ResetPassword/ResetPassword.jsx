@@ -55,7 +55,7 @@ class ResetPassword extends PureComponent {
   render() {
     return (
       <div className="login-block">
-        <h1>
+        <h1 className='account-title'>
           Reset password
         </h1>
         {

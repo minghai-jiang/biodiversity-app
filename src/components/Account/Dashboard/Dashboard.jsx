@@ -6,6 +6,10 @@ class AccountDashboard extends PureComponent {
     super(props, context);
   }
 
+  logout = () => {
+    this.props.onLogout();
+  }
+
   render() {
     if (!this.props.user) {
       return (
@@ -15,8 +19,8 @@ class AccountDashboard extends PureComponent {
 
     return (
       <div className="login-block">
-        <h1>
-          Dashboard
+        <h1 className='account-title'>
+          Account Management
         </h1>
 
         <div className='login-input-label-div'>
@@ -33,6 +37,16 @@ class AccountDashboard extends PureComponent {
               Change email
             </div>
           </NavLink>    
+        </div>
+
+        <br/>
+
+        <div className='login-input-label-div'>
+          <div className="button-a" onClick={this.logout.bind(this)}>
+            <div className="button button-accented main-block-single-button">
+              Logout
+            </div>
+          </div>    
         </div>
       </div>
     );
