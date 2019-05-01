@@ -87,7 +87,9 @@ export class ViewerMap extends PureComponent {
   componentWillReceiveProps = async (nextProps) => {
     let differentMap = nextProps.map !== this.props.map;
     
-    this.mapRef.current.leafletElement.setMaxZoom(nextProps.map.zoom);
+    nextProps.map ? this.maxZoom = nextProps.map.zoom : this.maxZoom = 14;
+
+    this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
 
     if (differentMap ||
         nextProps.timestampRange !== this.props.timestampRange ||

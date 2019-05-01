@@ -126,7 +126,7 @@ const CrowdLayersControl = {
   },
 
   onFeatureClick: (props, contentFunction) => {
-    if (CrowdLayersControl_PopupContent && CrowdLayersControl_PopupContent.id)
+    if (CrowdLayersControl_PopupContent && CrowdLayersControl_PopupContent.id && CrowdLayersControl_PopupContent.data.click && CrowdLayersControl_PopupContent.e)
     {
       let popup = CrowdLayersControl_PopupContent;
       let id = popup.id;
@@ -149,7 +149,7 @@ const CrowdLayersControl = {
         }
       }
 
-      if(popup.properties && props.map && props.timestampRange && props.apiUrl && CrowdLayersControl_PopupContent.data && CrowdLayersControl_PopupContent.data.click)
+      if(popup.properties && props.map && props.timestampRange && props.apiUrl && CrowdLayersControl_PopupContent.data)
       {
         properties.id = CrowdLayersControl_PopupContent.id;
         properties.class = classes;
@@ -191,7 +191,7 @@ const CrowdLayersControl = {
       {
         CrowdLayersControl_PopupContent.data.click = false;
         popupContent = (
-          <Popup position={popup.e.latlng} key={id + Math.random() + Math.random() + Math.random()}  autoPan={false} keepInView={false}>
+          <Popup position={popup.e.latlng} key={id + Math.random()}  autoPan={false} keepInView={false}>
             <div key={id + '.content'}>
               {content}
             </div>
@@ -199,6 +199,8 @@ const CrowdLayersControl = {
             {report}
             {deleteButton}
           </Popup>);
+        delete CrowdLayersControl_PopupContent.e;
+        delete popup.e;
       }
 
       return (popupContent);
