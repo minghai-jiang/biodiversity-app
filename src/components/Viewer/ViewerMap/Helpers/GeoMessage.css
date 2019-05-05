@@ -91,6 +91,16 @@ div.slide-pane__content .GeoMessageContainer
   padding: 1em;
 }
 
+div.slide-pane__content .GeoMessageContainer.feed
+{
+  max-height: initial;
+}
+
+div.slide-pane__content .GeoMessageContainer.feed>button
+{
+  margin-top: 2em;
+}
+
 div.slide-pane__content #formDiv
 {
   max-height: calc(50vh - 2.25em - 32px);

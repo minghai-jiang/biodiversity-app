@@ -17,6 +17,7 @@ class Viewer extends PureComponent {
       map: null,
       shape: null,
       infoContent: null,
+      feed: [],
     };
   }
 
@@ -45,6 +46,7 @@ class Viewer extends PureComponent {
   getContent = (content) => {
     this.setState({infoContent: content})
   }
+
 
 /*  downloadShape = async () => {
     let headers = {
@@ -82,6 +84,7 @@ class Viewer extends PureComponent {
   }*/
 
   render() {
+    let keyPart = this.state.infoContent && this.state.infoContent.properties ? this.state.infoContent.properties.id : '';
     return (
       <div className="map">
         <div className="map-selector-div">
@@ -109,7 +112,8 @@ class Viewer extends PureComponent {
         <InfoPane
           map={this.state.map}
           infoContent={this.state.infoContent}
-          key={this.state.infoContent ? this.state.infoContent.type + this.state.infoContent.id + this.state.infoContent.properties.id : null}
+          feed={this.state.feed}
+          key={this.state.infoContent ? this.state.infoContent.type + this.state.infoContent.id + keyPart : null}
           user={this.props.user}
         />
 {/*        <QueryPane

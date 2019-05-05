@@ -455,7 +455,7 @@ function handlePolygon(type, contentFunction, id, properties, random)
 {
   contentFunction({
     id: id,
-    openPane: true,
+    openpane: true,
     type: type,
     properties: properties,
     random: random,

@@ -95,7 +95,7 @@ export default class GeoMessage extends PureComponent {
           for (let j = 0; j < messageInfo.messages.length; j++)
           {
             let message = messageInfo.messages[j];
-            console.log(message);
+
             if (typeof(message.deleteDate) !== 'string')
             {            
               message.kind = this.type;
@@ -149,7 +149,7 @@ export default class GeoMessage extends PureComponent {
   };
 }
 
-class Message extends Component {
+export class Message extends Component {
   constructor(props, context)
   {
     super(props, context)
@@ -187,13 +187,16 @@ class Message extends Component {
     }
 
     let userGroups = '';
-    for (var i = 0; i < this.props.info.userGroups.length; i++)
-    {
-      userGroups += this.props.info.userGroups[i];
+    if (this.props.info.userGroups)
+    {    
+      for (var i = 0; i < this.props.info.userGroups.length; i++)
+      {
+        userGroups += this.props.info.userGroups[i];
+      }
     }
 
     let className = 'messageContainer';
-    if (this.props.user.username === this.props.info.user)
+    if (this.props.user && this.props.user.username === this.props.info.user)
     {
       className += ' own';
     }

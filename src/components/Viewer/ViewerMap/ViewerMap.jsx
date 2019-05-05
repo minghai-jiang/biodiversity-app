@@ -18,6 +18,7 @@ import StandardTilesLayerControl from './Helpers/StandardTilesLayerControl';
 import CrowdLayersControl from './Helpers/CrowdLayersControl';
 import LegendControl from './Helpers/LegendControl';
 import FlyToControl from './Helpers/FlyToControl';
+import GeoMessageFeed from './Helpers/GeoMessageFeed';
 import DrawingControl from './Helpers/DrawingControl';
 
 const getPolygonJsonWaitTime = 1000;
@@ -71,6 +72,8 @@ export class ViewerMap extends PureComponent {
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
     
     FlyToControl.initialize(this.props, map, this.flyToChecked);
+
+    GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);
     
     DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap);
   }
@@ -82,6 +85,7 @@ export class ViewerMap extends PureComponent {
     CrowdLayersControl.clear();
     LegendControl.clear();
     FlyToControl.clear();
+    GeoMessageFeed.clear();
   }
 
   componentWillReceiveProps = async (nextProps) => {
@@ -105,6 +109,7 @@ export class ViewerMap extends PureComponent {
         CrowdLayersControl.clear();
         LegendControl.clear();
         FlyToControl.clear();
+        GeoMessageFeed.clear();
 
         let bounds = L.latLngBounds(L.latLng(nextProps.map.yMin, nextProps.map.xMin), L.latLng(nextProps.map.yMax, nextProps.map.xMax));
         boundsFlyTo = bounds;
@@ -143,6 +148,8 @@ export class ViewerMap extends PureComponent {
 
       LegendControl.update(nextProps, [], []);
       FlyToControl.update(nextProps, map, boundsFlyTo.getCenter(), this.flyToChecked);
+      GeoMessageFeed.update(nextProps, map, this.flyToChecked, this.props.infoContent);
+
       DrawingControl.update(this.props.user, this.props);
 
       await PolygonLayersControl.update(nextProps, bounds);
@@ -166,6 +173,9 @@ export class ViewerMap extends PureComponent {
       yMin: screenBounds.getSouth(),
       yMax: screenBounds.getNorth()
     }
+
+    GeoMessageFeed.update(props, map, this.flyToChecked, this.props.infoContent);
+    GeoMessageFeed.getElement();
 
     if (type === 'all')
     {
@@ -283,6 +293,7 @@ export class ViewerMap extends PureComponent {
           zoom={this.state.zoom}
           ref={this.mapRef}
           maxZoom={this.maxZoom}
+          zoomSnap={0.25}
         >
           <LayersControl position="topright">
             { TileLayersControl.getElement() }
@@ -314,6 +325,7 @@ export class ViewerMap extends PureComponent {
 
           { LegendControl.getElement() }
           { FlyToControl.getElement() }
+          { GeoMessageFeed.getElement() }
           { PolygonLayersControl.onFeatureClick(this.props, this.getPopupContent) }
           { StandardTilesLayerControl.onFeatureClick(this.props, this.getPopupContent) }
           { CrowdLayersControl.onFeatureClick(this.props, this.getPopupContent) }
