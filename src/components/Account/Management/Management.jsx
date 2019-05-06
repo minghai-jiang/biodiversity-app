@@ -39,6 +39,14 @@ class AccountManagement extends PureComponent {
           </NavLink>    
         </div>
 
+        <div className='login-input-label-div'>
+          <NavLink to='/account/mapManagement' className="button-a">
+            <div className="button button-accented main-block-single-button">
+              Map Management
+            </div>
+          </NavLink>    
+        </div>
+
         <br/>
 
         <div className='login-input-label-div'>
@@ -48,6 +56,7 @@ class AccountManagement extends PureComponent {
             </div>
           </div>    
         </div>
+        
       </div>
     );
   }

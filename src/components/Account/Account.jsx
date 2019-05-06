@@ -8,6 +8,7 @@ import ChangePassword from './ChangePassword/ChangePassword';
 import ChangeEmail from './ChangeEmail/ChangeEmail';
 import ResetPassword from './ResetPassword/ResetPassword';
 import Register from './Register/Register';
+import MapManagement from './MapManagement/MapManagement';
 import { Footer } from '../footer/footer';
 
 import "./Account.css";
@@ -77,6 +78,18 @@ export class Account extends Component {
                 apiUrl={this.props.apiUrl} 
                 language={this.props.language} 
                 localization={this.props.localization}
+              />
+            } 
+          />
+          <Route 
+            path="/account/mapManagement" 
+            render={() => 
+              <MapManagement 
+                apiUrl={this.props.apiUrl} 
+                language={this.props.language} 
+                localization={this.props.localization}
+                user={this.props.user}
+                onLogout={this.props.onLogout}
               />
             } 
           />

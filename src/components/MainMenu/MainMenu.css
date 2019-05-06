@@ -53,7 +53,7 @@
   margin-left: 3vw;
 }
 
-#main-menu > ul > li a.main-menu-item {
+#main-menu > ul > li .main-menu-item {
   display: block;
   height: 100%;
   font-size: 0.9em;
