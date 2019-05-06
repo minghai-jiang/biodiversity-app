@@ -279,9 +279,13 @@ export class ViewerMap extends PureComponent {
     {
       PolygonLayersControl.onOverlayAdd(value, this.refreshMap);
     }
-    else
+    else if(value.type === 'tiles')
     {
       StandardTilesLayerControl.onOverlayAdd(value, this.refreshMap);
+    }
+    else
+    {
+      CrowdLayersControl.onOverlayAdd(value, this.refreshMap);
     }
   }
 

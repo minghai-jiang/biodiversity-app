@@ -1,8 +1,7 @@
 div.slide-pane__content div.messageContainer
 {
-  background-color: grey;
+  background-color: #b3b3b3;
   border-radius: 5px;
-  padding: 0.5em 1em;
   width: 75%;
   color: #e6e6e6;
   font-weight: 400;
@@ -17,11 +16,16 @@ div.slide-pane__content div.messageContainer.own
   margin-left: 0;
 }
 
+div.slide-pane__content div.messageContainer.other
+{
+  color: #fafafa;
+}
+
 div.slide-pane__content div.messageContainer.other button
 {
   background-color: #737373;
-  border: 3px solid #808080;
-  color: #cccccc;
+  border: 3px solid #666;
+  color: #f5f5f5;
 }
 
 div.slide-pane__content div.messageContainer.other button:hover
@@ -34,6 +38,7 @@ div.slide-pane__content div.messageContainer ul
   margin: 0;
   padding: 0;
   list-style: none;
+  padding: 0.5em 1em;
 }
 
 div.slide-pane__content div.messageContainer ul li
@@ -57,12 +62,31 @@ div.slide-pane__content div.messageContainer ul li.GeoUserGroup
   text-align: right;
 }
 
-div.slide-pane__content div.messageContainer ul li.GeoDate
+div.slide-pane__content div.messageContainer ul li.GeoLayer, div.slide-pane__content div.messageContainer ul li.GeoDate
 {
   text-align: right;
   font-size: 75%;
-  width: 100%;
+  width: 50%;
   font-weight: 200;
+}
+
+div.slide-pane__content div.messageContainer ul li.GeoLayer
+{
+  text-align: left;
+}
+
+div.slide-pane__content div.messageContainer div.GeoType
+{
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  background: #038787;
+  border-radius: 5px 5px 0 0;
+}
+
+div.slide-pane__content div.messageContainer div.GeoType:hover
+{
+  background: #026464
 }
 
 div.slide-pane__content div.messageContainer .GeoPropsList li
@@ -78,6 +102,32 @@ div.slide-pane__content div.messageContainer button
   margin: 0;
   margin-right: auto;
 }
+
+div.slide-pane__content div.messageContainer button.linkButton
+{
+  border: none;
+  color: white;
+  background: none;
+  width: 100%;
+}
+
+div.slide-pane__content div.messageContainer button.linkButton h1, div.slide-pane__content div.messageContainer button.linkButton span
+{
+  color: white;
+  margin: 0;
+}
+
+div.slide-pane__content div.messageContainer button.linkButton h1
+{
+  font-size: 150%;
+}
+
+div.slide-pane__content div.messageContainer button.linkButton:hover
+{
+  color: #026464;
+  text-decoration: underline;
+  color: white;
+}  
 
 div.slide-pane__content
 {

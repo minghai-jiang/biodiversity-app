@@ -163,7 +163,7 @@ function onClickCustomPolygon(e, shapeCoords)
 
     for (let i = 0; i < shapeCoords.length; i++)
     {
-      content.push(<p key={id + '.Point.' + i}><span>{'Point ' + (i+1)}:</span><br/> x: {shapeCoords[i].x.toFixed(3)}<br/> y: {shapeCoords[i].y.toFixed(3)}</p>);
+      content.push(<p key={id + '.Point.' + i}><span>{'Point ' + (i+1)}:</span><br/> x: {shapeCoords[i].x.toFixed(3)}    y: {shapeCoords[i].y.toFixed(3)}</p>);
     }
     
     DrawingControl_Popup = (<Popup position={e.latlng} key={id + Math.random() + Math.random() + Math.random()} autoPan={false} keepInView={false}>

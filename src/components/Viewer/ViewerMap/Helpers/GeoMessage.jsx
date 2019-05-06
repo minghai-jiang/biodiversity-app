@@ -2,6 +2,7 @@ import React, { Component, PureComponent } from 'react';
 import PopupForm from '../../Popup-form/Popup-form';
 import QueryUtil from '../../../Utilities/QueryUtil';
 import Moment from 'moment';
+import FlyToControl from './FlyToControl';
 
 import './GeoMessage.css';
 
@@ -158,14 +159,33 @@ export class Message extends Component {
 
   deleteMessage = async(e, info, trigger) =>
   {
-    let messagesDeletePromise = await QueryUtil.postData(
-      info.apiUrl + 'geoMessage/' + info.kind + '/deleteMessage',
+
+    let url = '';
+    let body = {}; 
+
+    if(info.kind)
+    {
+      url = info.apiUrl + 'geoMessage/' + info.kind + '/deleteMessage';
+      body = { mapId: info.uuid, id: info.id };
+    }
+    else
+    {
+      let type = info.type;
+      if(info.type === 'custom polygon')
       {
-        mapId: info.uuid,
-        id: info.id
-      },
+        type = 'customPolygon';
+      }
+
+      url = info.apiUrl + 'geoMessage/' + type + '/deleteMessage';
+      body = { mapId: info.mapId, id: info.uuid };
+    }
+
+    let messagesDeletePromise= await QueryUtil.postData(
+      url,
+      body,
       info.headers 
     );
+
     if (await messagesDeletePromise === 'OK')
     {
       trigger();
@@ -205,8 +225,27 @@ export class Message extends Component {
       className += ' other';
     }
 
+    let typeListItem = [];
+    if (this.props.info && this.props.info.type)
+    {
+      let showID = this.props.info.elementId;
+      if(this.props.info.type === 'tile')
+      {
+        showID = 'tileX:' + this.props.info.elementId.tileX + ' tileY: ' + this.props.info.elementId.tileY;
+      }
+
+      typeListItem.push(
+        <div className='GeoType' key={this.props.info.id + 'type'}>
+          <button className='button linkButton' onClick={() => FlyToControl.flyTo(this.props.info.type, this.props.info.elementId)}>
+            <h1>{this.props.info.type}</h1>
+            <span>{showID}</span>
+          </button>
+        </div>);
+    }
+
     return(
       <div className={className} key={this.props.info.id + 'container'}>
+        {typeListItem}
         <ul key={this.props.info.id + 'messageList'}>
           <li className='GeoName' key={this.props.info.id + 'name'}>{this.props.info.user}</li>
           <li className='GeoUserGroup' key={this.props.info.id + 'userGroup'}>{userGroups}</li>
@@ -214,6 +253,7 @@ export class Message extends Component {
           <ul className='GeoPropsList' key={this.props.info.id + 'propsList'}>
             {propsList}
           </ul>
+          <li className='GeoLayer' key={this.props.info.id + 'layer'}>{this.props.info.layer}</li>
           <li className='GeoDate' key={this.props.info.id + 'date'}>{Moment(this.props.info.date).format('DD-MM-YYYY HH:mm')}</li>
           <li><button key={this.props.info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, this.props.info, this.props.trigger)}>delete</button></li>
         </ul>

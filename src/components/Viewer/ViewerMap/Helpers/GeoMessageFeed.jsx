@@ -46,7 +46,7 @@ const GeoMessageFeed = {
         <div 
           key='GeoMessageFeedContainer'
           className='leaflet-control-layers leaflet-control-layers-toggle GeoMessageFeed'
-          onClick={makeFeed}
+          onClick={buttonClick}
         >
         </div>
       </Portal>
@@ -107,12 +107,23 @@ function scrollToBottom()
   }
 };
 
+function buttonClick()
+{
+  feedLoop('click');
+}
+
 async function feedLoop(page)
 {
-  if (GeoMessageFeedElements.length === 0)
+  if (GeoMessageFeedElements.length === 0 || page === 'click')
   {
+    GeoMessageFeedElements = [];
     GeoMessageFeedElements.push({type: 'button', pageNumber: 0, messages: <button key={'GeoMessageFeedButton'} onClick={loadMore} className='button'>Load more</button>});
     GeoMessageFeedElements.push(await getFeed(1));
+    if(page === 'click')
+    {
+      GeoMessageFeed_page = 1;
+      makeFeed();
+    }
   }
   else if (page > GeoMessageFeed_page)
   {
@@ -157,7 +168,11 @@ async function getFeed(page)
   {
     for (let j = 0; j < feed.length; j++)
     {
-      messages.push(<Message key={feed[j].uuid} info={feed[j]} user={GeoMessageFeed_props.user} trigger={this}/>);
+      feed[j].apiUrl = GeoMessageFeed_props.apiUrl;
+      feed[j].mapId = GeoMessageFeed_props.map.uuid;
+      feed[j].headers = headers;
+
+      messages.push(<Message key={feed[j].uuid} info={feed[j]} user={GeoMessageFeed_props.user} trigger={buttonClick}/>);
     }
 
     return({type:'page', pageNumber: page, messages: messages});
@@ -187,10 +202,10 @@ async function makeFeed()
 
   let feed = <div
       className='GeoMessageContainer feed'
-      key={'GeoMessageContainer' + GeoMessageFeedElements[0].key}
+      key={'GeoMessageContainer' + GeoMessageFeedElements[1].key}
       ref={(div) => {GeoMessageFeed_list = div;}}
       type= 'GeoMessageFeed'
-      id={GeoMessageFeedElements[0].key}
+      id={GeoMessageFeedElements[1].key}
       openpane='true'
       random={Math.random()}
     >

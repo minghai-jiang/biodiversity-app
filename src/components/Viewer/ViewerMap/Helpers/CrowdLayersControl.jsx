@@ -104,6 +104,9 @@ const CrowdLayersControl = {
   },
 
   onOverlayAdd: (e, refresh) => {
+    CrowdLayersControl_PopupContent = {};
+    CrowdLayersControl_mapRef.closePopup();
+
     if (!CrowdLayersControl_checkedLayers.includes(e.name)) {
       CrowdLayersControl_checkedLayers.push(e.name);
     }

@@ -98,6 +98,9 @@ const PolygonLayersControl = {
   },
 
   onOverlayAdd: (e, refresh) => {
+    polygonLayersControl_PopupContent = {};
+    polygonLayersControl_mapRef.closePopup();
+
     if (!polygonLayersControl_checkedLayers.includes(e.name)) {
       polygonLayersControl_checkedLayers.push(e.name);
     }

@@ -94,6 +94,9 @@ const StandardTilesLayer = {
   },
 
   onOverlayAdd: (e, refresh) => {
+    StandardTiles_PopupContent = {};
+    StandardTiles_mapRef.closePopup();
+
     if (!StandardTiles_checkedLayers.includes(e.name)) {
       StandardTiles_checkedLayers.push(e.name);
     }
