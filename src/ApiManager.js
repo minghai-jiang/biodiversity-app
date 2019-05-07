@@ -1,6 +1,6 @@
-const apiUrl = "https://api.ellipsis-earth.com";
+// const apiUrl = "https://api.ellipsis-earth.com";
 //const apiUrl = "https://dev.api.ellipsis-earth.com";
-// const apiUrl = "http://localhost:7552";
+const apiUrl = "http://localhost:7552";
 
 const ApiManager = {
   fetch: async (method, url, body, user) => {
@@ -18,6 +18,7 @@ const ApiManager = {
     }
 
     let gottenResponse = null;
+    let isText = false;
 
     let options = {
       method: method,
@@ -30,16 +31,32 @@ const ApiManager = {
 
     return await fetch(url, options)
       .then(response => {
-        gottenResponse = response;
+        gottenResponse = response;        
 
-        return response.json();
-      })
-      .then(jsonResult => {
-        if (gottenResponse.status === 200) {
-          return jsonResult
+        let contentType = response.headers.get('Content-Type');
+        isText = contentType.includes('text/plain');
+
+        if (!isText) {
+          return response.json();
         }
         else {
-          throw jsonResult;
+          return response.text();
+        }
+      })
+      .then(result => {
+        if (gottenResponse.status === 200) {
+          return result
+        }
+        else {  
+          if (!isText) {
+            throw result;
+          }        
+          else {
+            throw {
+              status: gottenResponse.status,
+              message: result
+            };
+          }
         }
       })
   }
