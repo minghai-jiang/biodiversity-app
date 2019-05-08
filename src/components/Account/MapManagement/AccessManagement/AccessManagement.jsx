@@ -13,11 +13,15 @@ class AccessManagement extends PureComponent {
 
     this.state = {
       mapAccess: null,
-      groupData: null
+      groupsData: null
     };
   }
 
   componentDidMount() {
+    this.update();
+  }
+
+  update = () => {
     if (!this.props.user) {
       return;
     }
@@ -26,7 +30,18 @@ class AccessManagement extends PureComponent {
   }
 
   componentWillUnmount() {
-    this.setState({ mapAccess: null, groupData: null });
+    this.setState({ mapAccess: null, groupsData: null });
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.map !== this.props.map) {
+      this.setState({
+        mapAccess: null,
+        groupsData: null
+      },
+      () => { this.update(); }
+      );
+    }
   }
 
   getMapAccess = (e) => {
@@ -114,7 +129,7 @@ class AccessManagement extends PureComponent {
         
         let groupsData = [...this.state.groupsData];
 
-        this.setState({ groupData: groupsData });
+        this.setState({ groupsData: groupsData });
       })
       .catch(err => {
         this.props.showError(err);
@@ -259,6 +274,7 @@ class AccessManagement extends PureComponent {
           >
           </input>
           <ReactTable
+            key={Math.random()}
             data={this.state.groupsData}
             columns={[
               {

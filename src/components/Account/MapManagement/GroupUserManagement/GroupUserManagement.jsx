@@ -17,6 +17,10 @@ class GroupUserManagement extends PureComponent {
   }
 
   componentDidMount() {
+    this.update();
+  }
+
+  update = () => {
     if (!this.props.user) {
       return;
     }
@@ -26,6 +30,16 @@ class GroupUserManagement extends PureComponent {
 
   componentWillUnmount() {
     this.setState({ groupUsers: null });
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.map !== this.props.map) {
+      this.setState({
+        groupUsers: null
+      },
+      () => { this.update(); }
+      );
+    }  
   }
 
   getGroupUsers = (e) => {
@@ -117,6 +131,8 @@ class GroupUserManagement extends PureComponent {
   }
 
   renderEditable = (cellInfo) => {
+    let disable = cellInfo.original.id !== 0;
+
     return (
       <div style={{ backgroundColor: "#fafafa" }}>
         <input
@@ -125,6 +141,7 @@ class GroupUserManagement extends PureComponent {
           onBlur={e => {
             this.state.groupUsers[cellInfo.index][cellInfo.column.id] = e.target.value;
           }}
+          disabled={disable}
         />
       </div>
     );
@@ -156,8 +173,8 @@ class GroupUserManagement extends PureComponent {
       return (
         <div>
           <ReactTable
+            key={Math.random()}
             data={this.state.groupUsers}
-            // resolveData={data => data.map(row => {debugger; return row})}
             columns={[
               {
                 Header: 'Username',

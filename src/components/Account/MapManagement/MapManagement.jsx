@@ -74,7 +74,12 @@ class MapManagement extends PureComponent {
           accessLevel: 500
         });
 
-        this.setState({ selectedMap: selectedMap, mapAccess: result, groupsData: groupsData });
+        let nextMode = this.state.mode;
+        if (this.state.mode === 1) {
+          nextMode = 0;
+        }
+
+        this.setState({ selectedMap: selectedMap, mapAccess: result, groupsData: groupsData, mode: nextMode });
       })
       .catch(err => {
         showError(err);

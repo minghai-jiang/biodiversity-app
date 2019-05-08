@@ -18,6 +18,10 @@ class CustomPolygonLayersManagement extends PureComponent {
   }
 
   componentDidMount() {
+    this.update();
+  }
+
+  update = () => {
     if (!this.props.user) {
       return;
     }
@@ -27,6 +31,17 @@ class CustomPolygonLayersManagement extends PureComponent {
 
   componentWillUnmount() {
     this.setState({ customPolygonLayers: null });
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.map !== this.props.map) {
+      this.setState({
+        customPolygonLayers: null,
+        customPolygonLayersData: null
+      },
+      () => { this.update(); }
+      );
+    }
   }
 
   getCustomPolygonLayers = (e) => {
@@ -165,15 +180,15 @@ class CustomPolygonLayersManagement extends PureComponent {
 
       ApiManager.fetch('POST', '/geoMessage/customPolygon/deleteLayer', body, this.props.user)
         .then(() => {
-          this.state.customPolygonLayers = this.state.customPolygonLayers.filter(group => {
-            return group.id !== originalRow.id;
+          let newCustomPolygonLayers = this.state.customPolygonLayers.filter(layer => {
+            return layer.id !== originalRow.id;
           });
 
-          let newCustomPolygonLayersData = this.state.customPolygonLayersData.filter(group => {
-            return group.id !== originalRow.id;
+          let newCustomPolygonLayersData = this.state.customPolygonLayersData.filter(layer => {
+            return layer.id !== originalRow.id;
           });
 
-          this.setState({ customPolygonLayersData: newCustomPolygonLayersData });
+          this.setState({ customPolygonLayers: newCustomPolygonLayers, customPolygonLayersData: newCustomPolygonLayersData });
         })
         .catch(err => {
           this.props.showError(err);
@@ -223,6 +238,7 @@ class CustomPolygonLayersManagement extends PureComponent {
       return (
         <div>
           <ReactTable
+            key={Math.random()}
             data={this.state.customPolygonLayersData}
             columns={[
               {
