@@ -5,15 +5,13 @@ import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import cloneDeep from 'lodash.clonedeep';
 
-import ApiManager from '../../../ApiManager';
+import ApiManager from '../../../../ApiManager';
 
-class MapManagement extends PureComponent {
+class AccessManagement extends PureComponent {
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      maps: null,
-      selectedMap: null,
       mapAccess: null,
       groupData: null
     };
@@ -24,29 +22,15 @@ class MapManagement extends PureComponent {
       return;
     }
 
-    this.getMaps();
+    this.getMapAccess();
   }
 
   componentWillUnmount() {
-    this.setState({ maps: null, selectedMap: null });
+    this.setState({ mapAccess: null, groupData: null });
   }
 
-  getMaps = async () => {
-    ApiManager.fetch('GET', '/account/myMaps', null, this.props.user)
-      .then(result => {
-        let relevantMaps = result.filter(map => map.accessLevel >= 800);
-
-        this.setState({ maps: relevantMaps });
-      })
-      .catch(err => {
-        showError(err);
-      });
-  }
-
-  onMapSelect = (e) => {
-    let selectedMap = this.state.maps.find(map => map.uuid === e.target.value);
-
-    ApiManager.fetch('POST', '/settings/mapAccess', { mapId: selectedMap.uuid }, this.props.user)
+  getMapAccess = (e) => {
+    ApiManager.fetch('POST', '/settings/mapAccess', { mapId: this.props.map.uuid }, this.props.user)
       .then(result => {
         for (let i = 1; i < result.groups.length + 1; i++) {
           result.groups[i - 1].id = i;
@@ -60,10 +44,10 @@ class MapManagement extends PureComponent {
           accessLevel: 500
         });
 
-        this.setState({ selectedMap: selectedMap, mapAccess: result, groupsData: groupsData });
+        this.setState({ mapAccess: result, groupsData: groupsData });
       })
       .catch(err => {
-        showError(err);
+        this.props.showError(err);
       });
   }
 
@@ -78,17 +62,17 @@ class MapManagement extends PureComponent {
     }
 
     let body = {
-      mapId: this.state.selectedMap.uuid,
+      mapId: this.props.map.uuid,
       newPublicAccessLevel: newPublicAccessLevel
     };
 
     ApiManager.fetch('POST', '/settings/updateMap', body, this.props.user)
-      .then(result => {
-        this.state.selectedMap.publicAccessLevel = newPublicAccessLevel;
+      .then(() => {
+        this.props.map.publicAccessLevel = newPublicAccessLevel;
       })
       .catch(err => {
         target.value = this.state.mapAccess.publicAccessLevel;
-        showError(err);
+        this.props.showError(err);
       });    
   }
 
@@ -106,13 +90,13 @@ class MapManagement extends PureComponent {
     }
 
     let body = {
-      mapId: this.state.selectedMap.uuid,
+      mapId: this.props.map.uuid,
       groupName: editedRow.name,
       accessLevel: editedRow.accessLevel
     };
 
     ApiManager.fetch('POST', '/settings/createGroup', body, this.props.user)
-      .then(result => {
+      .then(() => {
         let newGroup = {
           id: this.state.groupsData.length + 1,
           name: editedRow.name,
@@ -133,16 +117,16 @@ class MapManagement extends PureComponent {
         this.setState({ groupData: groupsData });
       })
       .catch(err => {
-        showError(err);
+        this.props.showError(err);
       });    
   }
 
-  saveGroup = (row) => {
-    let editedRow = row.original;
+  saveGroup = (cellInfo) => {
+    let editedRow = cellInfo.original;
     let originalRow = this.state.mapAccess.groups.find(group => group.id === editedRow.id);
 
     if (!originalRow) {
-      console.warn('Attempted to save a row that does not exist in the original data.');
+      console.warn('Attempted to save a group that does not exist in the original data.');
       return;
     }
 
@@ -154,7 +138,7 @@ class MapManagement extends PureComponent {
       }
 
       let body = {
-        mapId: this.state.selectedMap.uuid,
+        mapId: this.props.map.uuid,
         groupName: originalRow.name,
         newGroupName: editedRow.name,
         newAccessLevel: editedRow.accessLevel
@@ -166,25 +150,42 @@ class MapManagement extends PureComponent {
           originalRow.accessLevel = editedRow.accessLevel;
         })
         .catch(err => {
-          showError(err);
+          this.props.showError(err);
         });
     }
   }
 
-  deleteGroup = (row) => {
-    let editedRow = row.original;
+  onGroupEditUsers = (cellInfo) => {
+    let editedRow = cellInfo.original;
     let originalRow = this.state.mapAccess.groups.find(group => group.id === editedRow.id);
+
+    if (!originalRow) {
+      console.warn('Attempted to edit users of a group that does not exist in the original data.');
+      return;
+    }
+
+    this.props.onGroupUserManagement(originalRow);
+  }
+
+  deleteGroup = (cellInfo) => {
+    let editedRow = cellInfo.original;
+    let originalRow = this.state.mapAccess.groups.find(group => group.id === editedRow.id);
+
+    if (!originalRow) {
+      console.warn('Attempted to delete a group that does not exist in the original data.');
+      return;
+    }
 
     let confirmDelete = window.confirm(`Are you sure you want to delete the group: ${originalRow.name}?`);
 
     if (confirmDelete) {
       let body = {
-        mapId: this.state.selectedMap.uuid,
+        mapId: this.props.map.uuid,
         groupName: originalRow.name
       };
 
       ApiManager.fetch('POST', '/settings/deleteGroup', body, this.props.user)
-        .then(result => {
+        .then(() => {
           this.state.mapAccess.groups = this.state.mapAccess.groups.filter(group => {
             return group.id !== originalRow.id;
           });
@@ -196,42 +197,22 @@ class MapManagement extends PureComponent {
           this.setState({ groupsData: newGroupsData });
         })
         .catch(err => {
-          showError(err);
+          this.props.showError(err);
         });
     }
   }
 
-  renderMapOptions = () => {
-    let options = [];
-
-    let key = 0;
-
-    this.state.maps.forEach(map => {
-      if (map.accessLevel < 900) {
-        return;
-      }
-
-      options.push(
-        <option value={map.uuid} key={key++} >{map.name}</option>
-      );
-    });
-
-    return options;
-  }
-
   renderEditable = (cellInfo) => {
     return (
-      <div
-        style={{ backgroundColor: "#fafafa" }}
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={e => {
-          this.state.groupsData[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
-        }}
-        dangerouslySetInnerHTML={{
-          __html: this.state.groupsData[cellInfo.index][cellInfo.column.id]
-        }}
-      />
+      <div style={{ backgroundColor: "#fafafa" }}>
+        <input
+          type='text'
+          defaultValue={this.state.groupsData[cellInfo.index][cellInfo.column.id]}
+          onBlur={e => {
+            this.state.groupsData[cellInfo.index][cellInfo.column.id] = e.target.value;
+          }}
+        />
+      </div>
     );
   }
 
@@ -251,6 +232,7 @@ class MapManagement extends PureComponent {
           style={{ backgroundColor: "#fafafa" }}
         >
           <button onClick={() => this.saveGroup(cellInfo)}>Save</button>
+          <button onClick={() => this.onGroupEditUsers(cellInfo)}>Edit users</button>
           <button onClick={() => this.deleteGroup(cellInfo)}>Delete</button>
         </div>
       );
@@ -259,100 +241,54 @@ class MapManagement extends PureComponent {
   }
 
   render() {
-    if (!this.props.user) {
+    if (this.state.mapAccess) {
+      let disable = this.props.accessLevel < 1000;
+
       return (
-        <Redirect to='/login'></Redirect>
-      );
-    }
-
-    let settingsArea = (<div></div>);
-
-    if (this.state.maps) {
-      let mapAccessArea = (
-        <div></div>
-      )
-
-      if (this.state.mapAccess) {
-        let disable = this.state.selectedMap.accessLevel < 1000;
-
-        mapAccessArea = (
-          <div>
-            <div>
-              <button onClick={() => { }}>Map access</button>
-              <button onClick={() => { }}>Custom polygons</button>
-            </div>
-            <div className='login-input-label-div'>
-              Public access level
-            </div>
-            <input 
-              className='login-input' 
-              type='text'
-              ref='publicAccessLevelInput'
-              defaultValue={this.state.mapAccess.publicAccessLevel}
-              onBlur={this.updatePublicAccessLevel.bind(this)}
-              disabled={disable}
-            >
-            </input>
-            <ReactTable
-              data={this.state.groupsData}
-              columns={[
-                {
-                  Header: 'Group name',
-                  accessor: 'name',
-                  Cell: this.renderEditable
-                },
-                {
-                  Header: 'Access level',
-                  accessor: 'accessLevel',
-                  Cell: this.renderEditable
-                },
-                {
-                  Header: 'Actions',
-                  accessor: 'actions',
-                  Cell: this.renderActionButtons
-                }
-              ]}
-              sortable={false}
-              defaultPageSize={1000}
-              showPagination={false}
-              minRows={0}
-              className="-striped -highlight"
-            />
-          </div>
-        );
-      }
-
-      settingsArea = (
         <div>
-          <select onChange={this.onMapSelect} defaultValue="default">
-            <option value="default" disabled hidden>Select a Map</option>
-            {this.renderMapOptions()}
-          </select>
-          {mapAccessArea}
+          <div className='login-input-label-div'>
+            Public access level
+          </div>
+          <input 
+            className='login-input' 
+            type='text'
+            ref='publicAccessLevelInput'
+            defaultValue={this.state.mapAccess.publicAccessLevel}
+            onBlur={this.updatePublicAccessLevel.bind(this)}
+            disabled={disable}
+          >
+          </input>
+          <ReactTable
+            data={this.state.groupsData}
+            columns={[
+              {
+                Header: 'Group name',
+                accessor: 'name',
+                Cell: this.renderEditable
+              },
+              {
+                Header: 'Access level',
+                accessor: 'accessLevel',
+                Cell: this.renderEditable
+              },
+              {
+                Header: 'Actions',
+                accessor: 'actions',
+                Cell: this.renderActionButtons
+              }
+            ]}
+            sortable={false}
+            defaultPageSize={1000}
+            showPagination={false}
+            minRows={0}
+            className="-striped -highlight"
+          />
         </div>
       );
     }
-
-    return (
-      <div className="login-block" style={{width: '40em', marginLeft: 'auto', marginRight: 'auto'}}>
-        <h1 className='account-title'>
-          Map Management
-        </h1>
-        {settingsArea}
-      </div>
-    );
-  }
-}
-
-function showError(err) {
-  if (err.message) {
-    alert(err.message);
-  }
-  else if (typeof err === 'string' || err instanceof String) {
-    alert(err);
-  }
-  else {
-    alert('An error occurred. Try again later.Please contact us if this problem persists.');
+    else {
+      return (<div></div>)
+    }
   }
 }
 
@@ -361,4 +297,4 @@ function checkValidAccessLevel(accessLevel) {
     accessLevel < 0 || accessLevel > 1000)
 }
 
-export default MapManagement;
+export default AccessManagement;

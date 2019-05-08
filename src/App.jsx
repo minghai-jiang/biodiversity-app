@@ -39,13 +39,15 @@ class App extends Component {
       init: false,
       user: null,
     };
-
-    this.retrieveUser();
-    this.retrieveLanguage();
   }
 
   componentDidMount() {
     Modal.setAppElement('body');
+
+    this.retrieveLanguage()
+      .then(() => {
+        return this.retrieveUser();
+      });
   }
 
   closeMenu = () => {
@@ -53,7 +55,7 @@ class App extends Component {
     x.className = "";
   }
 
-  retrieveUser = () => {
+  retrieveUser = async () => {
     let user = null;
     let userJson = localStorage.getItem(localStorageUserItem);
 
@@ -71,29 +73,34 @@ class App extends Component {
       )
       .then(response => {
         if (response.ok) {
-          this.setState({ user: user });
+          this.setState({ user: user, init: true });
         }
         else {
+          this.setState({ init: true });
           localStorage.removeItem(localStorageUserItem);
         }
       })
       .catch(error => {
+        this.setState({ init: true });
         localStorage.removeItem(localStorageUserItem);
       });
     }
+    else {
+      this.setState({ init: true });
+    }
   }
 
-  retrieveLanguage = () => {
+  retrieveLanguage = async () => {
     let language = localStorage.getItem('language');
     if (!language) {
       language = 'english';
     }
 
-    this.setLanguage(language);
+    await this.setLanguage(language);
   }
 
-  setLanguage = (language) => {
-    fetch('/localization/' + language + '.json')
+  setLanguage = async (language) => {
+    await fetch('/localization/' + language + '.json')
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -103,8 +110,7 @@ class App extends Component {
         localStorage.setItem('language', language);
         this.setState({ 
           language: language, 
-          localization: json,
-          init: true
+          localization: json
         });
       })
       .catch(err => {
