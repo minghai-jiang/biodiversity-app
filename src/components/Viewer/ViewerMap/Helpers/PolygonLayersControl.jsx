@@ -98,6 +98,9 @@ const PolygonLayersControl = {
   },
 
   onOverlayAdd: (e, refresh) => {
+    polygonLayersControl_PopupContent = {};
+    polygonLayersControl_mapRef.closePopup();
+
     if (!polygonLayersControl_checkedLayers.includes(e.name)) {
       polygonLayersControl_checkedLayers.push(e.name);
     }
@@ -138,8 +141,8 @@ const PolygonLayersControl = {
       {
         if (props.map.classes[i].timestampNumber === props.timestampRange.end)
         {
-          classes = props.map.classes[i].classes;
-          spectral = props.map.spectral[i].indices;
+          props.map.classes[i] ? classes = props.map.classes[i].classes : classes = undefined;
+          props.map.spectral[i] ? spectral = props.map.spectral[i].indices : spectral = undefined;
           break;
         }
       }
@@ -455,7 +458,7 @@ function handlePolygon(type, contentFunction, id, properties, random)
 {
   contentFunction({
     id: id,
-    openPane: true,
+    openpane: true,
     type: type,
     properties: properties,
     random: random,

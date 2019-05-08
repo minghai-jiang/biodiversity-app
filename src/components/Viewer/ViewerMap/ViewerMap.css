@@ -29,7 +29,7 @@
   z-index: 1001;
 }
 
-.legend, .flyTo
+.legend, .flyTo, .GeoMessageFeed
 {
   background: #ffffff;
   z-index: 800;
@@ -44,7 +44,7 @@
   transition: max-width 0.5s, max-height 0.5s ;
 }
 
-.legend.active, .flyTo.active
+.legend.active, .flyTo.active, .GeoMessageFeed.active
 {
   padding: 1em;
   padding-top: 0;
@@ -60,7 +60,7 @@
   overflow: auto;
 }
 
-.legend i, .flyTo i
+.legend i, .flyTo i, .GeoMessageFeed i
 {
   height: 18px;
   width: 18px;
@@ -69,19 +69,19 @@
   margin-right: 0.5em;
 }
 
-.legend h1, .flyTo h1
+.legend h1, .flyTo h1, .GeoMessageFeed h1
 {
   font-size: 14pt;
   margin: 0;
 }
 
-.legend h2, .flyTo h2
+.legend h2, .flyTo h2, .GeoMessageFeed h2
 {
   font-size: 12pt;
   margin: 0;
 }
 
-.legend p, .flyTo p
+.legend p, .flyTo p, .GeoMessageFeed p
 {
   font-size: 12pt;
   margin: 0.2em ;
@@ -116,7 +116,7 @@
   margin-bottom: 0;
 }
 
-.legend.active .closeButton, .flyTo.active .closeButton
+.legend.active .closeButton, .flyTo.active .closeButton, .GeoMessageFeed.active .closeButton
 {
   color: #00a3a3;
   border: none;
@@ -133,7 +133,7 @@
   top: 25px;
 }
 
-.legend .closeButton:hover, .flyTo .closeButton:hover
+.legend .closeButton:hover, .flyTo .closeButton:hover, .GeoMessageFeed .closeButton:hover
 {
   background-color: #00a3a340;
 }

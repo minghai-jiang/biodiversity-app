@@ -9,6 +9,7 @@ let flyToControl_mapRef = null;
 let flyToElements = [];
 let flyToType = 'middle';
 let flyToID = 0;
+let flyToCustomPolygonId = '0';
 let flyToIdTile = {
   tileX: 0,
   tileY: 0,
@@ -80,6 +81,7 @@ const FlyToControl = {
     flyToElements = [];
     flyToType = 'middle';
     flyToID = 0;
+    flyToCustomPolygonId = '';
     flyToIdTile = {
       tileX: 0,
       tileY: 0,
@@ -93,6 +95,25 @@ const FlyToControl = {
     flyToControl_maxZoom = 18;
     flyToProps = {};
   },
+  flyTo: (type, id) =>
+  {
+    flyToType = type + 's';
+    if (type === 'custom polygon')
+    {
+      flyToType = 'customPolygons';
+      flyToCustomPolygonId = id;
+    }
+    else if(type === 'tile')
+    {
+      flyToIdTile = id;
+    }
+    else if (type === 'polygon')
+    {
+      flyToID = id;
+    }
+
+    handleSubmit()
+  }
 }
 
 function createOptions()
@@ -101,7 +122,7 @@ function createOptions()
   {
     let formElements = [];
     formElements.push(<h1 key='flyToTitle'>Fly to:</h1>)
-    let options = ['polygons', 'tiles'];
+    let options = ['polygons', 'tiles', 'customPolygons'];
     let select = [<option value="middle" key={flyToControl_map.uuid + 'middleOption'}>Middle Point</option>];
 
     for (let i = 0; i < options.length; i++)
@@ -129,6 +150,12 @@ function createOptions()
                           <input key={flyToControl_map.uuid + 'idInput'} type='number' placeholder={flyToID} onChange={onIdChange}/>
                         </label>
                       </div>);
+
+    formElements.push(<div key={flyToControl_map.uuid + 'customPolygonOptionsContainer'} className='optionContainer customPolygons hidden'>
+                    <label key={flyToControl_map.uuid + 'customIdInputLabel'}>ID: <br/>
+                      <input key={flyToControl_map.uuid + 'CustomIdInput'} type='text' placeholder={flyToCustomPolygonId} onChange={onIdChange}/>
+                    </label>
+                  </div>);
 
     formElements.push(<div key={flyToControl_map.uuid + 'tilesOptionsContainer'} className='optionContainer tiles hidden'>
                         <label key={flyToControl_map.uuid + 'tileXInputLabel'}>tileX: <br/>
@@ -170,37 +197,46 @@ function onOptionChange(e)
 function onIdChange(e)
 {
   let itemValue = e.target.value;
-  for (let i = 0; i < ['.', ','].length; i++)
-  {
-    let char = ['.', ','][i];
-    if(itemValue.indexOf(char) > 0)
+  if (e.target.type !== 'text')
+  {  
+    for (let i = 0; i < ['.', ','].length; i++)
     {
-      if(itemValue.split(char)[1].length > 4)
+      let char = ['.', ','][i];
+      if(itemValue.indexOf(char) > 0)
       {
-        e.target.value = Math.round(e.target.value * 1000) / 1000;
+        if(itemValue.split(char)[1].length > 4)
+        {
+          e.target.value = Math.round(e.target.value * 1000) / 1000;
+        }
       }
     }
   }
 
   let id = e.target.id.indexOf(flyToType) > -1 ? e.target.id.split(flyToType)[1].toLowerCase() : e.target.id;
-
   if (flyToType === 'polygons')
   {
     flyToID = parseInt(itemValue);
+  }
+  else if (flyToType === 'customPolygons')
+  {
+    flyToCustomPolygonId = itemValue;
   }
   else if(flyToType === 'tiles')
   {
     flyToIdTile[id] = parseInt(itemValue);
   }
-  else if (flyToType = 'middle')
+  else if (flyToType === 'middle')
   {
     flyToMiddle[id] = parseFloat(itemValue);
   }
 }
 
-async function handleSubmit(e)
+async function handleSubmit(e = null)
 {
-  e.preventDefault();
+  if(e)
+  {
+    e.preventDefault();
+  }
 
   if (flyToType === 'middle')
   {
@@ -216,6 +252,7 @@ async function handleSubmit(e)
 
     let typeShort = flyToType.substring(0, flyToType.length - 1);
     let body = {mapId: flyToControl_map.uuid, timestamp: flyToProps.timestampRange.end, }
+    let url = apiUrl + 'geometry/' + flyToType;
 
     if (flyToType === 'polygons')
     {
@@ -225,20 +262,37 @@ async function handleSubmit(e)
     {
       body['tileIds'] = [flyToIdTile];
     }
+    else if (flyToType === 'customPolygons')
+    {
+      body['customPolygonIds'] = [flyToCustomPolygonId];
+      delete body.timestamp;
+      url = apiUrl + 'geoMessage/customPolygon/geometries';
+    }
     
     let idGeometry = await QueryUtil.postData(
-      apiUrl + 'geometry/' + flyToType,
+      url,
       body,
       headers
     );
     
-    if (idGeometry.features && idGeometry.features.length > 0)
+
+
+    if (idGeometry && idGeometry.features && idGeometry.features.length > 0)
     {
       let geoJsonLayer = L.geoJson(idGeometry);
       let bounds = geoJsonLayer.getBounds();
       flyToControl_mapRef.flyToBounds(bounds);
       let name = idGeometry.features[0].properties.layer ? idGeometry.features[0].properties.layer : 'Standard Tiles';
-      let id = body['tileIds'] ? body['tileIds'] : body['polygonIds'];
+
+      let id = '';
+      for (let key in body)
+      {
+        if (key.indexOf('Ids') > -1 && key.indexOf('map') === -1)
+        {
+          id = body[key];
+        }
+      }
+
       returnChecked({name: name, type: flyToType, id:id, center: bounds.getCenter()});
     }
   }

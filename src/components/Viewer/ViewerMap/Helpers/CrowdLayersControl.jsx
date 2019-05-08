@@ -104,6 +104,9 @@ const CrowdLayersControl = {
   },
 
   onOverlayAdd: (e, refresh) => {
+    CrowdLayersControl_PopupContent = {};
+    CrowdLayersControl_mapRef.closePopup();
+
     if (!CrowdLayersControl_checkedLayers.includes(e.name)) {
       CrowdLayersControl_checkedLayers.push(e.name);
     }
@@ -413,7 +416,7 @@ function handlePolygon(type, contentFunction, id, properties, random)
 {
   contentFunction({
     id: id,
-    openPane: true,
+    openpane: true,
     type: type,
     properties: properties,
     random: random,

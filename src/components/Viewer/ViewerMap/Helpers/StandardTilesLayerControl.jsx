@@ -94,6 +94,9 @@ const StandardTilesLayer = {
   },
 
   onOverlayAdd: (e, refresh) => {
+    StandardTiles_PopupContent = {};
+    StandardTiles_mapRef.closePopup();
+
     if (!StandardTiles_checkedLayers.includes(e.name)) {
       StandardTiles_checkedLayers.push(e.name);
     }
@@ -413,7 +416,7 @@ function handleTile(type, contentFunction, id, properties, random)
 {
   contentFunction({
     id: id,
-    openPane: true,
+    openpane: true,
     type: type,
     properties: properties,
     random: random,

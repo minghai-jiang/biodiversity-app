@@ -1,4 +1,4 @@
-import React, { PureComponent} from 'react';
+import React, {Component} from 'react';
 import SlidingPane from 'react-sliding-pane';
 import LineChart from './DV/LineChart';
 import Slider from 'rc-slider';
@@ -12,7 +12,7 @@ import 'rc-tooltip/assets/bootstrap.css';
 import './InfoPane.css';
 import 'react-sliding-pane/dist/react-sliding-pane.css';
 
-export class InfoPane extends PureComponent {
+export class InfoPane extends Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
@@ -31,9 +31,10 @@ export class InfoPane extends PureComponent {
       crowdProperties: {},
     }
 
-    if (this.props && this.props.infoContent)
+    if (this.props && this.props.infoContent && this.props.infoContent.properties)
     {
       this.timestamp = this.props.infoContent.properties.timestamp;
+      this.headers = {Authorization: "Bearer " + this.props.user.token}
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -45,7 +46,19 @@ export class InfoPane extends PureComponent {
   };
 
   componentWillReceiveProps(nextProp){
-    if(nextProp && nextProp.infoContent && nextProp.infoContent.openPane && this.props.infoContent.random !== nextProp.infoContent.random)
+    let openpane = false;
+
+    if (nextProp.infoContent && nextProp.infoContent.props && nextProp.infoContent.props.openpane === 'true')
+    {
+      openpane = true;
+    }
+
+    if (nextProp.infoContent && nextProp.infoContent.type === 'div' && openpane === true && this.props.infoContent.props.random !== nextProp.infoContent.props.random)
+    {
+      this.toggleQueryPane(true);
+    }
+
+    if(nextProp && nextProp.infoContent && nextProp.infoContent.openpane && this.props.infoContent.random !== nextProp.infoContent.random)
     {
       this.toggleQueryPane(true);
     }
@@ -450,7 +463,9 @@ export class InfoPane extends PureComponent {
   }
 
   render() {
-    let graph = [];
+
+    let paneContent = [];
+    let key = '';
     if (this.props.map && this.props.infoContent)
     {
       let content = [];
@@ -483,13 +498,20 @@ export class InfoPane extends PureComponent {
 
         if (content.length >= 1)
         {
-          graph = <div className='graphContainer' key={'graph' + this.props.infoContent.type + this.props.infoContent.id + this.props.infoContent.properties.id}>{content}</div>
+          paneContent = <div className='graphContainer' key={'graph' + this.props.infoContent.type + this.props.infoContent.id + this.props.infoContent.properties.id}>{content}</div>
         }
+
+        key = this.props.infoContent.type + this.props.infoContent.id + this.props.infoContent.properties.id;
+      }
+      else if (this.props.infoContent.props && this.props.infoContent.props.type === 'GeoMessageFeed')
+      {
+        this.paneName = 'GeoMessage Feed';
+        paneContent = this.props.infoContent;
       }
 
       return (
           <SlidingPane
-            key={this.props.infoContent.type + this.props.infoContent.id + this.props.infoContent.properties.id}
+            key={key}
             className='query-pane'
             overlayClassName='modal-overlay'
             isOpen={this.state.openQueryPane}
@@ -497,7 +519,7 @@ export class InfoPane extends PureComponent {
             width={'0'}
             onRequestClose={() => { this.toggleQueryPane(false); }}
           >
-            {graph}
+            {paneContent}
             {this.state.GeoMessage}
             {this.state.save}
           </SlidingPane>
