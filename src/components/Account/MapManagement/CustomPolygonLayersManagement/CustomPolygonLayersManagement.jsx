@@ -225,8 +225,8 @@ class CustomPolygonLayersManagement extends PureComponent {
         <div
           style={{ backgroundColor: "#fafafa" }}
         >
-          <button onClick={() => this.saveCustomPolygonsLayer(cellInfo)}>Save</button>
-          <button onClick={() => this.deleteCustomPolygonsLayer(cellInfo)}>Delete</button>
+          <button onClick={() => this.saveCustomPolygonsLayer(cellInfo)}>{this.props.localization["Save"]}</button>
+          <button onClick={() => this.deleteCustomPolygonsLayer(cellInfo)}>{this.props.localization["Delete"]}</button>
         </div>
       );
     }
@@ -257,7 +257,7 @@ class CustomPolygonLayersManagement extends PureComponent {
                 Cell: this.renderEditable
               },
               {
-                Header: 'Actions',
+                Header: {this.props.localization["Actions"]},
                 accessor: 'actions',
                 Cell: this.renderActionButtons
               }
