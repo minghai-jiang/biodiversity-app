@@ -44,6 +44,11 @@
   transition: max-width 0.5s, max-height 0.5s ;
 }
 
+.leaflet-control-layers-toggle
+{
+  background-size: 26px;
+}
+
 .leaflet-control-layers.leaflet-control a.leaflet-control-layers-toggle
 {
   background-image: url('/images/ic_layers_black_48dp.png');
