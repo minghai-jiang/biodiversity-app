@@ -53,7 +53,6 @@ div.slide-pane__content div.messageContainer.other button:hover
 div.slide-pane__content div.messageContainer ul
 {
   margin: 0;
-  padding: 0;
   list-style: none;
   padding: 0.5em 1em;
 }
@@ -83,7 +82,7 @@ div.slide-pane__content div.messageContainer ul li.GeoLayer, div.slide-pane__con
 {
   text-align: right;
   font-size: 75%;
-  width: 50%;
+  width: 100%;
   font-weight: 200;
 }
 
@@ -104,6 +103,12 @@ div.slide-pane__content div.messageContainer div.GeoType
 div.slide-pane__content div.messageContainer div.GeoType:hover
 {
   background: #026464
+}
+
+div.slide-pane__content div.messageContainer ul.GeoPropsList
+{
+  margin: 0;
+  padding: 0;
 }
 
 div.slide-pane__content div.messageContainer .GeoPropsList li

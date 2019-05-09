@@ -40,7 +40,7 @@ div.content {
 
 .time-range-selector {
   position: absolute;
-  width: 100%;
+  margin: 1em 25vw;
   text-align: center;
   z-index: 650;
   top: 40px;
