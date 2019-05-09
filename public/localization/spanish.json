@@ -48,7 +48,7 @@
   "ChangeEmailSuccessMessage": "Le hemos enviado un correo electrónico para validar su dirección de correo electrónico. Por favor siga los procedimientos en el correo.",
   "ChangePasswordSuccessMessage": "Ahora puede iniciar sesión con su nueva contraseña.",
   "ResetPasswordSuccessMessage1": "Hemos enviado un correo electrónico a la dirección de correo electrónico dada.",
-  "ResetPasswordSuccessMessage2": "Please follow the procedure in the email to continue.",
+  "ResetPasswordSuccessMessage2": "Por favor siga el procedimiento en el correo electrónico para continuar.",
 
   "Map Manegement": "Gestión de mapas",
   "Map access": "Acceso al mapa",
