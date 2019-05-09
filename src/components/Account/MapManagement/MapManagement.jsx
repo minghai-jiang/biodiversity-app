@@ -196,9 +196,7 @@ class MapManagement extends PureComponent {
           <div style={{textAlign: 'right'}}>
             <div className='tooltip'>
               {this.props.localization["Access levels"]}
-              <span className='tooltiptext'>
-                {this.props.localization["levels"]}
-                </span>
+              <span className='tooltiptext' dangerouslySetInnerHTML={{__html: this.props.localization["levels"]}}/>
             </div>
           </div>
 

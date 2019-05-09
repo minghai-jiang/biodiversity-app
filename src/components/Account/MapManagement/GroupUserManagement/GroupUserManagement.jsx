@@ -50,11 +50,10 @@ class GroupUserManagement extends PureComponent {
 
     ApiManager.fetch('POST', '/settings/users', body, this.props.user)
       .then(result => {
-
         let groupUsers = [];
         groupUsers.push({
           id: 0,
-          username: {this.props.localization["new user"]}
+          username: this.props.localization["new user"]
         });
 
         for (let i = 1; i < result.length + 1; i++) {
@@ -177,12 +176,12 @@ class GroupUserManagement extends PureComponent {
             data={this.state.groupUsers}
             columns={[
               {
-                Header: {this.props.localization["Username"]},
+                Header: this.props.localization["Username"],
                 accessor: 'username',
                 Cell: this.renderEditable
               },
               {
-                Header: {this.props.localization["Actions"]},
+                Header: this.props.localization["Actions"],
                 accessor: 'actions',
                 Cell: this.renderActionButtons
               }

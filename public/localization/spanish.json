@@ -51,40 +51,26 @@
   "ResetPasswordSuccessMessage2": "Please follow the procedure in the email to continue.",
 
   "Map Manegement": "Gestión de mapas",
-  "Map access": "acceso al mapa",
+  "Map access": "Acceso al mapa",
   "Custom polygons": "Capas de polígono",
-  "Access levels": "niveles de acceso",
-   "Public access level": "Nivel de acceso publico",
+  "Access levels": "Niveles de acceso",
+  "Public access level": "Nivel de acceso publico",
   "Group name": "Nombre del grupo",
-  "Access level": "nivel de acceso",
-  "Actions":"comportamiento",
+  "Access level": "Nivel de acceso",
   "Create": "Crear",
   "Save": "Guardar",
   "Add": "Añadir",
   "Edit users": "Editar usuarios",
   "Delete":"Borrar",
-  "new group":"nuevo grupo",
+  "new group":"Nuevo grupo",
   "Layer Name": "Nombre de la capa",
   "Color": "Color",
   "Properties": "Campos obligatorios",
-  "new layer": "nueva capa",
+  "new layer": "Nueva capa",
   "property1,property2":"característica1,característica2",
-  "Username": "Nombre de usuario",
   "Actions": "Conducta",
-  "new user": "nuevo usuario",
+  "new user": "Nuevo usuario",
   
-  "levels":     "Un nivel de acceso más alto implica todos los niveles más bajos.<br/><br/>
-                Nivel 100: El derecho a ver el mapa.<br/>
-                Nivel 200: El derecho de acceder a los datos agregados de un mapa.<br/>
-                Nivel 300: El derecho a ver geoMessages.<br/>
-                Nivel 400: El derecho a añadir geoMessages.<br/>
-                Nivel 500: El derecho a añadir polígonos.<br/>
-                Nivel 600: El derecho a borrar geoMessages.<br/>
-                Nivel 700: El derecho a alterar o borrar polígonos.<br/>
-                Nivel 800: El derecho a alterar capas de polígonos.<br/>
-                Nivel 900: El derecho de agregar usuarios a grupos de usuarios hasta el nivel 900.<br/>
-                Nivel 1000: El derecho a hacer público el contenido y crear o alterar grupos de usuarios.<br/>"
-
-
+  "levels": "Un nivel de acceso más alto implica todos los niveles más bajos.<br/><br/>Nivel 100: El derecho a ver el mapa.<br/>Nivel 200: El derecho de acceder a los datos agregados de un mapa.<br/>Nivel 300: El derecho a ver geoMessages.<br/>Nivel 400: El derecho a añadir geoMessages.<br/>Nivel 500: El derecho a añadir polígonos.<br/>Nivel 600: El derecho a borrar geoMessages.<br/>Nivel 700: El derecho a alterar o borrar polígonos.<br/>Nivel 800: El derecho a alterar capas de polígonos.<br/>Nivel 900: El derecho de agregar usuarios a grupos de usuarios hasta el nivel 900.<br/>Nivel 1000: El derecho a hacer público el contenido y crear o alterar grupos de usuarios.<br/>"
 
 }
