@@ -114,7 +114,7 @@ function buttonClick()
 
 async function feedLoop(page)
 {
-  if (GeoMessageFeedElements.length === 0 || page === 'click')
+  if (GeoMessageFeedElements && GeoMessageFeedElements.length === 0 || page === 'click')
   {
     GeoMessageFeedElements = [];
     GeoMessageFeedElements.push({type: 'button', pageNumber: 0, messages: <button key={'GeoMessageFeedButton'} onClick={loadMore} className='button'>Load more</button>});
