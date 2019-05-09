@@ -255,7 +255,7 @@ export class Message extends Component {
           </ul>
           <li className='GeoLayer' key={this.props.info.id + 'layer'}>{this.props.info.layer}</li>
           <li className='GeoDate' key={this.props.info.id + 'date'}>{Moment(this.props.info.date).format('DD-MM-YYYY HH:mm')}</li>
-          <li><button key={this.props.info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, this.props.info, this.props.trigger)}>delete</button></li>
+          <li className='GeoDelete'><button key={this.props.info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, this.props.info, this.props.trigger)}>delete</button></li>
         </ul>
       </div>
     );

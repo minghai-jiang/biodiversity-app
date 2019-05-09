@@ -1,7 +1,7 @@
 div.slide-pane__content div.messageContainer
 {
   background-color: #b3b3b3;
-  border-radius: 5px;
+  border-radius: 5px 5px 0 5px;
   width: 75%;
   color: #e6e6e6;
   font-weight: 400;
@@ -14,6 +14,7 @@ div.slide-pane__content div.messageContainer.own
 {
   background-color: #00a3a3;
   margin-left: 0;
+  border-radius: 5px 5px 5px 0;
 }
 
 div.slide-pane__content div.messageContainer.other
@@ -21,11 +22,27 @@ div.slide-pane__content div.messageContainer.other
   color: #fafafa;
 }
 
-div.slide-pane__content div.messageContainer.other button
+div.slide-pane__content div.messageContainer .GeoDelete button
+{
+  margin-top: 1em;
+}
+
+div.slide-pane__content div.messageContainer.other .GeoDelete button
 {
   background-color: #737373;
-  border: 3px solid #666;
+  border: 3px solid #737373;
   color: #f5f5f5;
+}
+
+div.slide-pane__content div.messageContainer.other .GeoDelete button:hover
+{
+  border-color: #4d4d4d;
+}
+
+div.slide-pane__content div.messageContainer.other ul li.GeoDelete
+{
+  text-align: right;
+  width: 100%;
 }
 
 div.slide-pane__content div.messageContainer.other button:hover
@@ -127,7 +144,8 @@ div.slide-pane__content div.messageContainer button.linkButton:hover
   color: #026464;
   text-decoration: underline;
   color: white;
-}  
+  border-radius: 5px 5px 0 0;
+}
 
 div.slide-pane__content
 {

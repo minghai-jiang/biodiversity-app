@@ -139,6 +139,11 @@ div.graphContainer
   margin-top: 1em;
 }
 
+.slide-pane__close svg
+{
+  transform: rotate(180deg);
+}
+
 @media only screen and (max-device-width : 860px)
 {
   div.query-pane

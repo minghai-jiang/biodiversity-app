@@ -44,7 +44,27 @@
   transition: max-width 0.5s, max-height 0.5s ;
 }
 
-.legend.active, .flyTo.active, .GeoMessageFeed.active
+.leaflet-retina .leaflet-control-layers-toggle
+{
+  background-image: url('/images/ic_layers_black_48dp.png');
+}
+
+.leaflet-retina .leaflet-control-layers-toggle.GeoMessageFeed
+{
+  background-image: url('/images/ic_question_answer_black_48dp.png');
+}
+
+.leaflet-retina .leaflet-control-layers-toggle.flyTo
+{
+  background-image: url('/images/ic_flight_takeoff_black_48dp.png');
+}
+
+.leaflet-retina .leaflet-control-layers-toggle.legend
+{
+  background-image: url('/images/ic_info_black_48dp.png');
+}
+
+.leaflet-retina .leaflet-control-layers-toggle.legend.active, .leaflet-retina .leaflet-control-layers-toggle.flyTo.active, .leaflet-retina .leaflet-control-layers-toggle.GeoMessageFeed.active
 {
   padding: 1em;
   padding-top: 0;
@@ -54,8 +74,8 @@
   min-width: 48px;
   height: auto;
   width: auto;
+  background: none;
   background: #ffffffcc;
-  background-image: none;
   opacity: 1;
   overflow: auto;
 }

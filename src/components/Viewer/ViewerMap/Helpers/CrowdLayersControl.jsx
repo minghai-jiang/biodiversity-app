@@ -146,8 +146,8 @@ const CrowdLayersControl = {
       {
         if (props.map.classes[i].timestampNumber === props.timestampRange.end)
         {
-          classes = props.map.classes[i].classes;
-          spectral = props.map.spectral[i].indices;
+          props.map.classes[i] ? classes = props.map.classes[i].classes : classes = undefined;
+          props.map.spectral[i] ? spectral = props.map.spectral[i].indices : spectral = undefined;
           break;
         }
       }
