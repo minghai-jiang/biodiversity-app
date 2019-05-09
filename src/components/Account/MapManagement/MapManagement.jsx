@@ -11,6 +11,8 @@ import CustomPolygonLayersManagement from './CustomPolygonLayersManagement/Custo
 
 import ApiManager from '../../../ApiManager';
 
+import './MapManagement.css';
+
 class MapManagement extends PureComponent {
   constructor(props, context) {
     super(props, context);
@@ -164,10 +166,21 @@ class MapManagement extends PureComponent {
       }
 
         mapAccessArea = (
-          <div>
+          <div style={{marginTop: '20px'}}>
             <div>
-              <button onClick={() => this.changeMode(0)}>Map access</button>
-              <button onClick={() => this.changeMode(2)}>Custom polygons</button>
+              <button 
+                className='map-management-button'
+                onClick={() => this.changeMode(0)}
+              >
+                Map access
+              </button>
+              <button 
+                className='map-management-button'
+                style={{marginLeft: '20px'}} 
+                onClick={() => this.changeMode(2)}
+              >
+                Custom polygons
+              </button>
             </div>
             {modeElement}
           </div>
@@ -180,6 +193,25 @@ class MapManagement extends PureComponent {
             <option value="default" disabled hidden>Select a Map</option>
             {this.renderMapOptions()}
           </select>
+          <div style={{textAlign: 'right'}}>
+            <div className='tooltip'>
+              Access levels
+              <span className='tooltiptext'>
+                A higher access level implies all lower levels.<br/><br/>
+                Level 100: The right to view the map.<br/>
+                Level 200: The right to access aggregated data of a map.<br/>
+                Level 300: The right to view geoMessages.<br/>
+                Level 400: The right to add geoMessages.<br/>
+                Level 500: The right to add custom polygons.<br/>
+                Level 600: The right to delete geoMessages.<br/>
+                Level 700: The right to alter or delete custom polygons.<br/>
+                Level 800: The right to alter custom polygon layers.<br/>
+                Level 900: The right to add users to user groups up till degree 9.<br/>
+                Level 1000: The right to make content public and to create or alter user groups.<br/>
+              </span>
+            </div>
+          </div>
+
           {mapAccessArea}
         </div>
       );
