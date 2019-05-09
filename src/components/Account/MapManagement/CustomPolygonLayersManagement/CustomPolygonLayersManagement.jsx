@@ -55,9 +55,9 @@ class CustomPolygonLayersManagement extends PureComponent {
 
         customPolygonLayersdata.unshift({
           id: 0,
-          name: 'new layer',
+          name: {this.props.localization["new layer"]},
           color: 'ff0000ff',
-          properties: 'property1,property2'
+          properties: {this.props.localization["property1,property2"]}
         });
 
         this.setState({ customPolygonLayers: result, customPolygonLayersData: customPolygonLayersdata });
@@ -216,7 +216,7 @@ class CustomPolygonLayersManagement extends PureComponent {
         <div
           style={{ backgroundColor: "#fafafa" }}
         >
-          <button onClick={() => this.createCustomPolygonLayer(cellInfo)}>Create</button>
+          <button onClick={() => this.createCustomPolygonLayer(cellInfo)}>{this.props.localization["Create"]}</button>
         </div>
       );
     }
@@ -242,17 +242,17 @@ class CustomPolygonLayersManagement extends PureComponent {
             data={this.state.customPolygonLayersData}
             columns={[
               {
-                Header: 'Layer name',
+                Header: {this.props.localization["Layer name"]},
                 accessor: 'name',
                 Cell: this.renderEditable
               },
               {
-                Header: 'Color',
+                Header: {this.props.localization["Color"]},
                 accessor: 'color',
                 Cell: this.renderEditable
               },
               {
-                Header: 'Properties',
+                Header: {this.props.localization["Properties"]},
                 accessor: 'properties',
                 Cell: this.renderEditable
               },
