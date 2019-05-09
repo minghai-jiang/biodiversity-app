@@ -172,14 +172,14 @@ class MapManagement extends PureComponent {
                 className='map-management-button'
                 onClick={() => this.changeMode(0)}
               >
-                Map access
+                {this.props.localization["Map access"]}
               </button>
               <button 
                 className='map-management-button'
                 style={{marginLeft: '20px'}} 
                 onClick={() => this.changeMode(2)}
               >
-                Custom polygons
+                {this.props.localization["Custom polygons"]}
               </button>
             </div>
             {modeElement}
@@ -195,20 +195,10 @@ class MapManagement extends PureComponent {
           </select>
           <div style={{textAlign: 'right'}}>
             <div className='tooltip'>
-              Access levels
+              {this.props.localization["Access levels"]}
               <span className='tooltiptext'>
-                A higher access level implies all lower levels.<br/><br/>
-                Level 100: The right to view the map.<br/>
-                Level 200: The right to access aggregated data of a map.<br/>
-                Level 300: The right to view geoMessages.<br/>
-                Level 400: The right to add geoMessages.<br/>
-                Level 500: The right to add custom polygons.<br/>
-                Level 600: The right to delete geoMessages.<br/>
-                Level 700: The right to alter or delete custom polygons.<br/>
-                Level 800: The right to alter custom polygon layers.<br/>
-                Level 900: The right to add users to user groups up till degree 9.<br/>
-                Level 1000: The right to make content public and to create or alter user groups.<br/>
-              </span>
+                {this.props.localization["levels"]}
+                </span>
             </div>
           </div>
 
@@ -220,7 +210,7 @@ class MapManagement extends PureComponent {
     return (
       <div className="login-block" style={{width: '40em', marginLeft: 'auto', marginRight: 'auto'}}>
         <h1 className='account-title'>
-          Map Management
+          {this.props.localization["Map Manegement"]}
         </h1>
         {managementArea}
       </div>

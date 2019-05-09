@@ -55,7 +55,7 @@ class AccessManagement extends PureComponent {
 
         groupsData.unshift({
           id: 0,
-          name: 'new group',
+          name: {this.props.localization["new group"]},
           accessLevel: 500
         });
 
@@ -237,7 +237,7 @@ class AccessManagement extends PureComponent {
         <div
           style={{ backgroundColor: "#fafafa" }}
         >
-          <button onClick={() => this.createGroup(cellInfo)}>Create</button>
+          <button onClick={() => this.createGroup(cellInfo)}>{this.props.localization["Create"]}</button>
         </div>
       );
     }
@@ -246,9 +246,9 @@ class AccessManagement extends PureComponent {
         <div
           style={{ backgroundColor: "#fafafa" }}
         >
-          <button onClick={() => this.saveGroup(cellInfo)}>Save</button>
-          <button onClick={() => this.onGroupEditUsers(cellInfo)}>Edit users</button>
-          <button onClick={() => this.deleteGroup(cellInfo)}>Delete</button>
+          <button onClick={() => this.saveGroup(cellInfo)}>{this.props.localization['Save"]}</button>
+          <button onClick={() => this.onGroupEditUsers(cellInfo)}>{this.props.localization["Edit users"]}</button>
+          <button onClick={() => this.deleteGroup(cellInfo)}>{this.props.localization["Delete"]}</button>
         </div>
       );
     }
@@ -262,7 +262,7 @@ class AccessManagement extends PureComponent {
       return (
         <div>
           <div className='login-input-label-div'>
-            Public access level
+            {this.props.localization["Public access level"]}
           </div>
           <input 
             className='login-input' 
@@ -278,17 +278,17 @@ class AccessManagement extends PureComponent {
             data={this.state.groupsData}
             columns={[
               {
-                Header: 'Group name',
+                Header: {this.props.localization["Group name"]},
                 accessor: 'name',
                 Cell: this.renderEditable
               },
               {
-                Header: 'Access level',
+                Header: {this.props.localization["Access level"]},
                 accessor: 'accessLevel',
                 Cell: this.renderEditable
               },
               {
-                Header: 'Actions',
+                Header: {this.props.localization["Actions"]},
                 accessor: 'actions',
                 Cell: this.renderActionButtons
               }

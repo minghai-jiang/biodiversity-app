@@ -54,7 +54,7 @@ class GroupUserManagement extends PureComponent {
         let groupUsers = [];
         groupUsers.push({
           id: 0,
-          username: 'new user'
+          username: {this.props.localization["new user"]}
         });
 
         for (let i = 1; i < result.length + 1; i++) {
@@ -153,7 +153,7 @@ class GroupUserManagement extends PureComponent {
         <div
           style={{ backgroundColor: "#fafafa" }}
         >
-          <button onClick={() => this.addUserToGroup(cellInfo)}>Add</button>
+          <button onClick={() => this.addUserToGroup(cellInfo)}>{this.props.localization["Add"]}</button>
         </div>
       );
     }
@@ -162,7 +162,7 @@ class GroupUserManagement extends PureComponent {
         <div
           style={{ backgroundColor: "#fafafa" }}
         >
-          <button onClick={() => this.deleteUserFromGroup(cellInfo)}>Delete</button>
+          <button onClick={() => this.deleteUserFromGroup(cellInfo)}>{this.props.localization["Delete"]}</button>
         </div>
       );
     }
@@ -177,12 +177,12 @@ class GroupUserManagement extends PureComponent {
             data={this.state.groupUsers}
             columns={[
               {
-                Header: 'Username',
+                Header: {this.props.localization["Username"]},
                 accessor: 'username',
                 Cell: this.renderEditable
               },
               {
-                Header: 'Actions',
+                Header: {this.props.localization["Actions"]},
                 accessor: 'actions',
                 Cell: this.renderActionButtons
               }
