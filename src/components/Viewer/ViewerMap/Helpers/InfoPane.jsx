@@ -34,7 +34,7 @@ export class InfoPane extends Component {
     if (this.props && this.props.infoContent && this.props.infoContent.properties)
     {
       this.timestamp = this.props.infoContent.properties.timestamp;
-      this.headers = {Authorization: "Bearer " + this.props.user.token}
+      this.props.user ? this.headers = {Authorization: "Bearer " + this.props.user.token} : this.headers = undefined;
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);

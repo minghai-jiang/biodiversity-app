@@ -47,7 +47,7 @@ export class TimestampSelector extends PureComponent {
     if (this.props.timestamps)
     {
       let timestamps = this.props.timestamps;
-      let style = {width: '50%', margin: 'auto', marginTop: '1em'}
+      let style = {width: '50vw'}
 
       this.getMarks();
 
