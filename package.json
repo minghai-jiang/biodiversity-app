@@ -1,7 +1,8 @@
 {
-  "name": "website",
+  "name": "ellipsis_earth_intelligence",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://ellipsis-earth.com",
   "dependencies": {
     "highlight.js": "^9.14.2",
     "history": "^4.7.2",

@@ -1,13 +1,23 @@
 import React, { PureComponent} from 'react';
 import Moment from 'moment';
 
-import {FlexibleXYPlot, XAxis, YAxis, LineSeries, DiscreteColorLegend, Crosshair} from 'react-vis';
+import {
+  FlexibleXYPlot, 
+  XAxis, 
+  YAxis, 
+  LineSeries, 
+  DiscreteColorLegend, 
+  Crosshair, 
+  Highlight
+} from 'react-vis';
 import './react-vis-style.css';
 
 export class LineChart extends PureComponent {
   constructor(props, context) {
     super(props, context)
     this.state = {
+      lastDrawLocation: null,
+      showCrosshair: true,
       data: [],
       lines: [],
       meta: [],
@@ -92,7 +102,7 @@ export class LineChart extends PureComponent {
           {
             if (graphData[key])
             {
-              let date = Moment(row.date_to).unix() * 1000;
+              let date = Moment(row.date_from).unix() * 1000;
               graphData[key].data.push({x: date, y:row[key]})
               graphData.meta['ticksX'].push(date);
             }
@@ -151,7 +161,7 @@ export class LineChart extends PureComponent {
 
   crossHairTitle = (d) =>
   {
-    let title = {title: 'date', value: Moment(d[0].x).format('DD-MM-YY')}
+    let title = {title: 'date', value: Moment(d[0].x).format('YYYY-MM-DD')}
     return title;
   };
 
@@ -161,60 +171,63 @@ export class LineChart extends PureComponent {
       ticks: {stroke: '#808080'},
       text: {stroke: 'none', fill: '#545454', fontWeight: 200, fontSize: '10px'},
     };
+
+    let lastDrawLocation = this.state.lastDrawLocation;
       
-      if (this.state.lines.length > 0 && this.state.lines[0].type !== 'p')
+    if (this.state.lines.length > 0 && this.state.lines[0].type !== 'p')
+    {
+      let plot = [];
+
+      let xAxis;
+      let maxTick = 25;
+      if (this.state.meta.ticksX && this.state.meta.ticksX.length/this.state.lines.length > maxTick)
       {
-        let plot = [];
-
-        let xAxis;
-        let maxTick = 25;
-        if (this.state.meta.ticksX && this.state.meta.ticksX.length/this.state.lines.length > maxTick)
-        {
-          xAxis = <XAxis
-            key={'XAxis' + this.props.type + this.props.filter}
-            attr="x"
-            attrAxis="y"
-            orientation="bottom"
-            tickFormat={function tickFormat(d){return Moment(d).format('DD-MM-YY')}}
-            tickLabelAngle = {-35}
-            style={axixStyle}
-            left={50}
-            tickSizeOuter={3}
-            tickTotal={maxTick}
-          />;
-        }
-        else
-        {
-          xAxis = <XAxis
-            key={'XAxis' + this.props.type + this.props.filter}
-            attr="x"
-            attrAxis="y"
-            orientation="bottom"
-            tickFormat={function tickFormat(d){return Moment(d).format('DD-MM-YY')}}
-            tickLabelAngle = {-35}
-            style={axixStyle}
-            left={50}
-            tickSizeOuter={3}
-            tickValues={this.state.meta.ticksX}
-          />;
-        }
-
-        plot.push(xAxis);
-
-        let yAxix = <YAxis
-          key={'YAxis' + this.props.type + this.props.filter}
-          attr="y"
-          attrAxis="x"
-          orientation="left"
+        xAxis = <XAxis
+          key={'XAxis' + this.props.type + this.props.filter}
+          attr="x"
+          attrAxis="y"
+          orientation="bottom"
+          tickFormat={function tickFormat(d){return Moment(d).format('YY-MM-DD')}}
+          tickLabelAngle = {-35}
           style={axixStyle}
-          left={10}
+          left={50}
           tickSizeOuter={3}
+          tickTotal={maxTick}
         />;
-        plot.push(yAxix);
+      }
+      else
+      {
+        xAxis = <XAxis
+          key={'XAxis' + this.props.type + this.props.filter}
+          attr="x"
+          attrAxis="y"
+          orientation="bottom"
+          tickFormat={function tickFormat(d){return Moment(d).format('YY-MM-DD')}}
+          tickLabelAngle = {-35}
+          style={axixStyle}
+          left={50}
+          tickSizeOuter={3}
+          tickValues={this.state.meta.ticksX}
+        />;
+      }
 
-        let lines = this.state.lines;
-        plot.push(lines);
+      plot.push(xAxis);
 
+      let yAxix = <YAxis
+        key={'YAxis' + this.props.type + this.props.filter}
+        attr="y"
+        attrAxis="x"
+        orientation="left"
+        style={axixStyle}
+        left={10}
+        tickSizeOuter={3}
+      />;
+      plot.push(yAxix);
+
+      let lines = this.state.lines;
+      plot.push(lines);
+
+      if (this.state.showCrosshair) {
         let crosshair = <Crosshair
           key={'crossHair' + this.props.type + this.props.filter}
           values={this.state.crosshairValues}
@@ -223,34 +236,57 @@ export class LineChart extends PureComponent {
           titleFormat={(d) => this.crossHairTitle(d)}
         />;
         plot.push(crosshair);
+      }
 
-        let discreteLegend = <DiscreteColorLegend
-          key={'DiscreteColorLegend' + this.props.type + this.props.filter}
-          orientation='horizontal'
-          items={this.state.meta.legend}
-        />;
-        plot.push(discreteLegend);
+      let discreteLegend = <DiscreteColorLegend
+        key={'DiscreteColorLegend' + this.props.type + this.props.filter}
+        orientation='horizontal'
+        items={this.state.meta.legend}
+      />;
+      plot.push(discreteLegend);
 
-        return(
-          <FlexibleXYPlot
-            key={'FlexibleXYPlot' + this.props.type + this.props.filter}
-            height={200}
-            ref={this.props.type + 'Chart'}
-            style={{marginRight: 10}}
-            onMouseLeave={this._onMouseLeave}
-          >
-            {plot}
-          </FlexibleXYPlot>
-        );
-      }
-      else if(this.state.lines[0] && this.state.lines[0].type === 'p')
-      {
-        return(this.state.lines[0]);
-      }
-      else
-      {
-        return(<p>Loading Graph Data <img src='/images/spinner.png' alt='spinner'/></p>);
-      }
+      return(
+        <FlexibleXYPlot
+          key={'FlexibleXYPlot' + this.props.type + this.props.filter}
+          height={200}
+          ref={this.props.type + 'Chart'}
+          style={{marginRight: 10}}
+          onMouseLeave={this._onMouseLeave}
+          xDomain={
+            lastDrawLocation && [
+              lastDrawLocation.left,
+              lastDrawLocation.right
+            ]
+          }
+          // yDomain={
+          //   lastDrawLocation && [
+          //     lastDrawLocation.bottom,
+          //     lastDrawLocation.top
+          //   ]
+          // }
+          
+        >
+          {plot}
+          <Highlight
+            enableY={false}
+            onBrushStart={area => {
+              this.setState({ showCrosshair: false });
+            }}
+            onBrushEnd={area => {
+              this.setState({ lastDrawLocation: area, showCrosshair: true });
+            }}            
+          />
+        </FlexibleXYPlot>
+      );
+    }
+    else if(this.state.lines[0] && this.state.lines[0].type === 'p')
+    {
+      return(this.state.lines[0]);
+    }
+    else
+    {
+      return(<p>Loading Graph Data <img src='/images/spinner.png' alt='spinner'/></p>);
+    }
   }
 }
 
