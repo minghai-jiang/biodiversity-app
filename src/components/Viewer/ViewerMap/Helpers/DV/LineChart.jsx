@@ -227,16 +227,16 @@ export class LineChart extends PureComponent {
       let lines = this.state.lines;
       plot.push(lines);
 
-      if (this.state.showCrosshair) {
-        let crosshair = <Crosshair
-          key={'crossHair' + this.props.type + this.props.filter}
-          values={this.state.crosshairValues}
-          className={'test-class-name'}
-          itemsFormat={(d) => this.crossHairData(d)}
-          titleFormat={(d) => this.crossHairTitle(d)}
-        />;
-        plot.push(crosshair);
-      }
+      // if (this.state.showCrosshair) {
+      //   let crosshair = <Crosshair
+      //     key={'crossHair' + this.props.type + this.props.filter}
+      //     values={this.state.crosshairValues}
+      //     className={'test-class-name'}
+      //     itemsFormat={(d) => this.crossHairData(d)}
+      //     titleFormat={(d) => this.crossHairTitle(d)}
+      //   />;
+      //   plot.push(crosshair);
+      // }
 
       let discreteLegend = <DiscreteColorLegend
         key={'DiscreteColorLegend' + this.props.type + this.props.filter}
