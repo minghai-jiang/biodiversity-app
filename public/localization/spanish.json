@@ -62,14 +62,14 @@
   "Add": "Añadir",
   "Edit users": "Editar usuarios",
   "Delete":"Borrar",
-  "new group":"Nuevo grupo",
+  "new group":"nuevo grupo",
   "Layer name": "Nombre de la capa",
   "Color": "Color",
   "Properties": "Campos obligatorios",
-  "new layer": "Nueva capa",
+  "new layer": "nueva capa",
   "property1,property2":"característica1,característica2",
   "Actions": "Conducta",
-  "new user": "Nuevo usuario",
+  "new user": "nuevo usuario",
   
   "levels": "Un nivel de acceso más alto implica todos los niveles más bajos.<br/><br/>Nivel 100: El derecho a ver el mapa.<br/>Nivel 200: El derecho de acceder a los datos agregados de un mapa.<br/>Nivel 300: El derecho a ver geoMessages.<br/>Nivel 400: El derecho a añadir geoMessages.<br/>Nivel 500: El derecho a añadir polígonos.<br/>Nivel 600: El derecho a borrar geoMessages.<br/>Nivel 700: El derecho a alterar o borrar polígonos.<br/>Nivel 800: El derecho a alterar capas de polígonos.<br/>Nivel 900: El derecho de agregar usuarios a grupos de usuarios hasta el nivel 900.<br/>Nivel 1000: El derecho a hacer público el contenido y crear o alterar grupos de usuarios.<br/>"
 

@@ -257,7 +257,7 @@ class CustomPolygonLayersManagement extends PureComponent {
                 Cell: this.renderEditable
               },
               {
-                Header: {this.props.localization["Actions"]},
+                Header: this.props.localization["Actions"],
                 accessor: 'actions',
                 Cell: this.renderActionButtons
               }
