@@ -219,10 +219,9 @@ function prepareTileLayersOverlays (props) {
 
     let timestampStart = tileLayerType.stacking ? timestampRange.start : timestampRange.end;
 
-    let layerElements = [];
-
     tileLayersOfTypes.layers.forEach(layer => {
       let layerName = layer.name;
+      let layerElements = [];
 
       for (let j = timestampStart; j <= timestampRange.end; j++) {
 
