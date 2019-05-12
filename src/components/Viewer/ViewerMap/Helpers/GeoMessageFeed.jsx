@@ -1,5 +1,6 @@
 import React, { PureComponent} from 'react';
 import {Portal} from "react-leaflet-portal";
+import Select from 'react-select';
 
 import {Message} from './GeoMessage';
 
@@ -114,11 +115,13 @@ function buttonClick()
 
 async function feedLoop(page)
 {
+
   if (GeoMessageFeedElements && GeoMessageFeedElements.length === 0 || page === 'click')
   {
     GeoMessageFeedElements = [];
     GeoMessageFeedElements.push({type: 'button', pageNumber: 0, messages: <button key={'GeoMessageFeedButton'} onClick={loadMore} className='button'>Load more</button>});
     GeoMessageFeedElements.push(await getFeed(1));
+
     if(page === 'click')
     {
       GeoMessageFeed_page = 1;
@@ -200,17 +203,45 @@ async function makeFeed()
 
   feedContent.push(GeoMessageFeedElements[0].messages);
 
-  let feed = <div
-      className='GeoMessageContainer feed'
-      key={'GeoMessageContainer' + GeoMessageFeedElements[1].key}
-      ref={(div) => {GeoMessageFeed_list = div;}}
-      type= 'GeoMessageFeed'
-      id={GeoMessageFeedElements[1].key}
-      openpane='true'
+  let feed = (
+    <div 
+      type='GeoMessageFeed' 
+      openpane={'true'}
       random={Math.random()}
     >
-      {feedContent}
-    </div>;
+      {/* <Select 
+        isMulti
+        options={[
+          { value: 'chocolate', label: 'Chocolate' },
+          { value: 'strawberry1', label: 'Strawberry' },
+          { value: 'vanilla2', label: 'Vanilla' },
+          { value: 'chocolate3', label: 'Chocolate' },
+          { value: 'strawberry4', label: 'Strawberry' },
+          { value: 'vanilla5', label: 'Vanilla' },
+          { value: 'chocolate6', label: 'Chocolate' },
+          { value: 'strawberry7', label: 'Strawberry' },
+          { value: 'vanilla8', label: 'Vanilla' },
+          { value: 'chocolate9', label: 'Chocolate' },
+          { value: 'strawberry10', label: 'Strawberry' },
+          { value: 'vanilla11', label: 'Vanilla' },
+          { value: 'chocolate12', label: 'Chocolate' },
+          { value: 'strawberry13', label: 'Strawberry' },
+          { value: 'vanilla14', label: 'Vanilla' }
+        ]}
+      >
+        
+      </Select> */}
+      <div
+        className='GeoMessageContainer feed'
+        key={'GeoMessageContainer' + GeoMessageFeedElements[1].key}
+        ref={(div) => {GeoMessageFeed_list = div;}}        
+        id={GeoMessageFeedElements[1].key}
+      >
+        {feedContent}
+      </div>
+    </div>
+
+  );
 
   returnFeed(feed);
 }
