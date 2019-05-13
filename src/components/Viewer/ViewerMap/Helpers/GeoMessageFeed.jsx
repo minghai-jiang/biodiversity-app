@@ -129,18 +129,25 @@ async function feedLoop(page)
   {
     if (page !== 'group_change') {
       let mapGroups = GeoMessageFeed_props.map.groups;
-      if (mapGroups.length > 0) {
-        GeoMessageFeed_groups = [];
-    
-        mapGroups.forEach(group => {
-          GeoMessageFeed_groups.push({
-            value: group,
-            label: group
-          });
-        });
 
-        GeoMessageFeed_selectedGroups = cloneDeep(GeoMessageFeed_groups);
+      // Adding admin group as filtering option.
+      // It is not included as API response due to it being a special group.
+      if (!mapGroups.includes('admin')) {
+        mapGroups.push('admin'); 
       }
+
+      GeoMessageFeed_groups = [];
+  
+      mapGroups.forEach(group => {
+        GeoMessageFeed_groups.push({
+          value: group,
+          label: group
+        });
+      });
+
+      debugger;
+
+      GeoMessageFeed_selectedGroups = cloneDeep(GeoMessageFeed_groups);
     }
 
     GeoMessageFeedElements = [];
