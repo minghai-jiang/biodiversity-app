@@ -145,8 +145,6 @@ async function feedLoop(page)
         });
       });
 
-      debugger;
-
       GeoMessageFeed_selectedGroups = cloneDeep(GeoMessageFeed_groups);
     }
 

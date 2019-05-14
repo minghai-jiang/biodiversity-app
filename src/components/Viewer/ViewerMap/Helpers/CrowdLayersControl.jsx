@@ -181,11 +181,19 @@ const CrowdLayersControl = {
       let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
 
       let report;
+      let updateButton;
       let deleteButton;
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+        report = <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+
+        let updateInfo = {
+          refresh: CrowdLayersControl_refresh,
+          ...popup
+        };
+
+        updateButton =  <a className="noselect" onClick={() => {handlePolygon('update', contentFunction, updateInfo, properties, Math.random())} }>Update</a>;
         deleteButton =  <a className="noselect" onClick={() => {deletePolygon(properties)} }>Delete</a>;
       }
 
@@ -200,6 +208,7 @@ const CrowdLayersControl = {
             </div>
             {analyse}
             {report}
+            {updateButton}
             {deleteButton}
           </Popup>);
         delete CrowdLayersControl_PopupContent.e;
