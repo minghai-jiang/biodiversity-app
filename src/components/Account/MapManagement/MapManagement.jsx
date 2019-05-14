@@ -193,7 +193,7 @@ class MapManagement extends PureComponent {
             <option value="default" disabled hidden>Select a Map</option>
             {this.renderMapOptions()}
           </select>
-          <div style={{textAlign: 'right'}}>
+          <div style={{textAlign: 'left'}}>
             <div className='tooltip'>
               {this.props.localization["Access levels"]}
               <span className='tooltiptext' dangerouslySetInnerHTML={{__html: this.props.localization["levels"]}}/>
@@ -208,7 +208,7 @@ class MapManagement extends PureComponent {
     return (
       <div className="login-block" style={{width: '40em', marginLeft: 'auto', marginRight: 'auto'}}>
         <h1 className='account-title'>
-          {this.props.localization["Map Manegement"]}
+          {this.props.localization["Map Management"]}
         </h1>
         {managementArea}
       </div>
