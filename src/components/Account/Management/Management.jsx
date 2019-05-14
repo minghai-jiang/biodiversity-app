@@ -42,7 +42,7 @@ class AccountManagement extends PureComponent {
         <div className='login-input-label-div'>
           <NavLink to='/account/mapManagement' className="button-a">
             <div className="button button-accented main-block-single-button">
-              {this.props.localization['Map Manegement']}
+              {this.props.localization['Map Management']}
             </div>
           </NavLink>    
         </div>
