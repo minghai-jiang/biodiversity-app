@@ -296,46 +296,44 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
     
     if (polygonsGeoJson)
     {
-      if (user)
-      {
-        let filteredPolygonFeatures = [];
-        let filteredPolygonResult = await QueryUtil.postData(
-          apiUrl + 'geoMessage/polygon/ids',
-          {
-            mapId:  mapUuid,
-            xMin: bounds.xMin,
-            xMax: bounds.xMax,
-            yMin: bounds.yMin,
-            yMax: bounds.yMax,
-            limit: polygonLayersControl_maxPolygon,
-          }, headers
-        );
-
-        if (filteredPolygonResult && filteredPolygonResult.ids)
+      let filteredPolygonFeatures = [];
+      let filteredPolygonResult = await QueryUtil.postData(
+        apiUrl + 'geoMessage/polygon/ids',
         {
-          for (let i = 0; i < polygonsGeoJson.features.length; i++)
-          {
-            let polygonProperties = polygonsGeoJson.features[i].properties;
+          mapId:  mapUuid,
+          xMin: bounds.xMin,
+          xMax: bounds.xMax,
+          yMin: bounds.yMin,
+          yMax: bounds.yMax,
+          limit: polygonLayersControl_maxPolygon,
+        }, headers
+      );
 
-            for (let j = 0; j < filteredPolygonResult.ids.length; j++)
+      if (filteredPolygonResult && filteredPolygonResult.ids)
+      {
+        for (let i = 0; i < polygonsGeoJson.features.length; i++)
+        {
+          let polygonProperties = polygonsGeoJson.features[i].properties;
+
+          for (let j = 0; j < filteredPolygonResult.ids.length; j++)
+          {
+            if (polygonProperties.id === filteredPolygonResult.ids[j])
             {
-              if (polygonProperties.id === filteredPolygonResult.ids[j])
-              {
-                filteredPolygonFeatures.push(polygonsGeoJson.features[i]);
-              }
+              filteredPolygonFeatures.push(polygonsGeoJson.features[i]);
             }
           }
-        
-          let ids = [...new Set(filteredPolygonFeatures.map(item => item.id))];
-          polygonsGeoJson.features = polygonsGeoJson.features.filter(item => !ids.includes(item.id));
-          
-          filteredPolygons.type = "FeatureCollection";
-          filteredPolygons.count = filteredPolygonFeatures.length;
-          filteredPolygons.features = filteredPolygonFeatures;
-          filteredPolygons.name = 'Polygon Error';
         }
+      
+        let ids = [...new Set(filteredPolygonFeatures.map(item => item.id))];
+        polygonsGeoJson.features = polygonsGeoJson.features.filter(item => !ids.includes(item.id));
+        
+        filteredPolygons.type = "FeatureCollection";
+        filteredPolygons.count = filteredPolygonFeatures.length;
+        filteredPolygons.features = filteredPolygonFeatures;
+        filteredPolygons.name = 'Polygon Error';
       }
     }
+    
 
     polygonsGeoJson.name = layerName;
     polygonsGeoJson.color = layerColor;
