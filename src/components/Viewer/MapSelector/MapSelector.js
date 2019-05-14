@@ -84,8 +84,7 @@ export class MapSelector extends PureComponent {
     let polygonLayersPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/polygonLayers', {"mapId":  map.uuid }, this.header);
     let classPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/classes', {"mapId":  map.uuid }, this.header);
     let spectralPromise = QueryUtil.postData(this.props.apiUrl + 'metadata/spectral', {"mapId":  map.uuid }, this.header);
-    let crowdLayersPromise;
-    this.header.Authorization ? crowdLayersPromise = QueryUtil.postData(this.props.apiUrl + 'geoMessage/customPolygon/layers', {"mapId":  map.uuid }, this.header) : crowdLayersPromise = null;
+    let crowdLayersPromise = QueryUtil.postData(this.props.apiUrl + 'geoMessage/customPolygon/layers', {"mapId":  map.uuid }, this.header);
 
     let responseJsonTileLayers = await tileLayersPromise;
 

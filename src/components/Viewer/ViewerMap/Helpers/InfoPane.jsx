@@ -576,15 +576,20 @@ export class InfoPane extends Component {
         if (this.props.map.timestamps.length >= 1)
         {
           content.push(this.state.classes);
-          if (this.state.classes && this.state.classes.length > 0 && this.state.classes[0].props.children[1].props.data && this.state.classes[0].props.children[1].props.data.data.length > 1)
-          {
-            content.push(this.state.classesSlider);
+          if (this.state.classes[0] && this.state.classes[0].props.children[1]) {
+            if (this.state.classes && this.state.classes.length > 0 && this.state.classes[0].props.children[1].props.data && this.state.classes[0].props.children[1].props.data.data.length > 1)
+            {
+              content.push(this.state.classesSlider);
+            }
           }
 
           content.push(this.state.indeces);
-          if (this.state.indeces && this.state.inputClass !== '' && this.state.indeces.length > 0 && this.state.indeces[0].props.children[2].props.data && this.state.indeces[0].props.children[2].props.data.data.length > 1)
+          if (this.state.indeces[0] && this.state.indeces[0].props.children[2])
           {
-            content.push(this.state.indecesSlider);
+            if (this.state.indeces && this.state.inputClass !== '' && this.state.indeces.length > 0 && this.state.indeces[0].props.children[2].props.data && this.state.indeces[0].props.children[2].props.data.data.length > 1)
+            {
+              content.push(this.state.indecesSlider);
+            }
           }
         }
         else

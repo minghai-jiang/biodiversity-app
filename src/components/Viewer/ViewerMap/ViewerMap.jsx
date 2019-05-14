@@ -152,9 +152,17 @@ export class ViewerMap extends PureComponent {
 
       DrawingControl.update(this.props.user, this.props);
 
-      await PolygonLayersControl.update(nextProps, bounds);
-      await StandardTilesLayerControl.update(nextProps, bounds);
-      await CrowdLayersControl.update(nextProps, bounds, this.refreshMap);
+      let tilePromise = StandardTilesLayerControl.update(nextProps, bounds);
+      let polygonPromise = PolygonLayersControl.update(nextProps, bounds);
+      let customPolygonPromise = CrowdLayersControl.update(nextProps, bounds, this.refreshMap);
+
+      await tilePromise;
+      await polygonPromise;
+      await customPolygonPromise;
+
+      // await PolygonLayersControl.update(nextProps, bounds);
+      // await StandardTilesLayerControl.update(nextProps, bounds);
+      // await CrowdLayersControl.update(nextProps, bounds, this.refreshMap);
     }
   }
 
@@ -164,8 +172,10 @@ export class ViewerMap extends PureComponent {
     {
       return null;
     }
+
     let map = this.mapRef.current.leafletElement;
     let screenBounds = map.getBounds();
+
     let bounds = 
     {
       xMin: screenBounds.getWest(),
@@ -179,14 +189,16 @@ export class ViewerMap extends PureComponent {
 
     if (type === 'all')
     {
-      await PolygonLayersControl.update(props, bounds);
-      let polygonsInfo = PolygonLayersControl.getElement();
+      let tilePromise = StandardTilesLayerControl.update(props, bounds);
+      let polygonPromise = PolygonLayersControl.update(props, bounds);
+      let customPolygonPromise = CrowdLayersControl.update(props, bounds, this.refreshMap);
 
-      await StandardTilesLayerControl.update(props, bounds);
+      await tilePromise;
+      await polygonPromise;
+      await customPolygonPromise;
+
       let standardTilesInfo = StandardTilesLayerControl.getElement();
-
-      await CrowdLayersControl.update(props, bounds, this.refreshMap);
-      //let crowdInfo = CrowdLayersControl.getElement();
+      let polygonsInfo = PolygonLayersControl.getElement();
       
       LegendControl.update(this.props, polygonsInfo.polygonCounts, standardTilesInfo.polygonCounts);
       DrawingControl.update(this.props.user, this.props);
@@ -195,7 +207,6 @@ export class ViewerMap extends PureComponent {
     if (type === 'customPolygon')
     {
       await CrowdLayersControl.update(props, bounds, this.refreshMap);
-      //let crowdInfo = CrowdLayersControl.getElement();
     }
 
 
@@ -268,7 +279,7 @@ export class ViewerMap extends PureComponent {
     content.checkLayer = this.checkLayer;
     this.props.infoContent(content);
   }
-
+  
   onShapeDrawn = (shapeCoords) => {
     // Do something useful.
     //console.log(shapeCoords);
