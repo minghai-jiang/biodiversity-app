@@ -66,7 +66,7 @@ export class ViewerMap extends PureComponent {
     TileLayersControl.initialize(this.props);
     PolygonLayersControl.initialize(this.props, bounds, maxPolygons, map);
     StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles, map);
-    CrowdLayersControl.initialize(this.props, bounds, maxPolygons, map);
+    CrowdLayersControl.initialize(this.props, bounds, maxPolygons, map, this.refreshMap);
 
 
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
