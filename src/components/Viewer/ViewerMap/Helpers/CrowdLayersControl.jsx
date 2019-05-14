@@ -29,6 +29,7 @@ let CrowdLayersControl_PopupContent = {};
 let CrowdLayersControl_highlight = -1;
 let CrowdLayersControl_highlightCenter = [];
 let CrowdLayersControl_refresh = () => {};
+let CrowdLayersControl_shouldRefresh = false;
 
 let CrowdLayersControl_deleted = -1;
 
@@ -115,6 +116,8 @@ const CrowdLayersControl = {
     {
       CrowdLayersControl_highlight = e.id;
       CrowdLayersControl_highlightCenter = e.center;
+      CrowdLayersControl_refresh = refresh;
+      CrowdLayersControl_shouldRefresh = true;
     }
   },
 
@@ -400,6 +403,11 @@ function addFeatureData(feature, layer)
   }
 
   CrowdLayersControl_PopupContent = feature;
+
+  if (CrowdLayersControl_shouldRefresh) {
+    CrowdLayersControl_shouldRefresh = false;
+    CrowdLayersControl_refresh();
+  }
 }
 
 function onEachFeature(feature, layer) {

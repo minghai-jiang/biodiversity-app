@@ -28,6 +28,8 @@ let StandardTiles_PopupContent = {};
 let StandardTiles_highlight = {};
 let StandardTiles_highlightCenter = [];
 let StandardTiles_refresh = () => {};
+let StandardTiles_shouldRefresh = false;
+
 
 const StandardTilesLayer = {
   getElement: () => {
@@ -106,6 +108,7 @@ const StandardTilesLayer = {
       StandardTiles_highlight = e.id;
       StandardTiles_highlightCenter = e.center;
       StandardTiles_refresh = refresh;
+      StandardTiles_shouldRefresh = true;
     }
   },
 
@@ -397,6 +400,11 @@ function onEachFeature(feature, layer)
     feature.click = true;
 
     StandardTiles_PopupContent = feature;
+
+    if (StandardTiles_shouldRefresh) {
+      StandardTiles_shouldRefresh = false;
+      StandardTiles_refresh();
+    }
   }
 
   layer.on({

@@ -34,6 +34,7 @@ let polygonLayersControl_PopupContent = {};
 let polygonLayersControl_highlight = -1;
 let polygonLayersControl_highlightCenter = [];
 let polygonLayersControl_refresh = () => {};
+let polygonLayersControl_shouldRefresh = false;
 
 const PolygonLayersControl = {
   getElement: () => {
@@ -110,6 +111,7 @@ const PolygonLayersControl = {
       polygonLayersControl_highlight = e.id;
       polygonLayersControl_highlightCenter = e.center;
       polygonLayersControl_refresh = refresh;
+      polygonLayersControl_shouldRefresh = true;
     }
   },
 
@@ -431,6 +433,11 @@ function addFeatureData(feature, layer)
   }
 
   polygonLayersControl_PopupContent = feature;
+
+  if (polygonLayersControl_shouldRefresh) {
+    polygonLayersControl_shouldRefresh = false;
+    polygonLayersControl_refresh();
+  }
 }
 
 function onEachFeature(feature, layer) {
