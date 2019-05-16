@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import Jimp from 'jimp';
+
 import QueryUtil from '../../Utilities/QueryUtil';
 
 import "./Popup-form.css";
@@ -49,8 +51,16 @@ export class PopupForm extends Component {
     this.loadingImage = true;
 
     reader.onloadend = () => {
-      this.imageResult = reader.result;
-      this.loadingImage = false;
+      let buffer = Buffer.from(reader.result.split(',')[1], 'base64');
+      Jimp.read(buffer)
+        .then(() => {
+          this.imageResult = reader.result;
+          this.loadingImage = false;
+        })
+        .catch(() => {
+          this.loadingImage = false;
+          alert('Invalid image type.');
+        });
     }
 
     reader.readAsDataURL(file);
