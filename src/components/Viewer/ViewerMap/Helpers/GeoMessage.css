@@ -22,6 +22,24 @@ div.slide-pane__content div.messageContainer.other
   color: #fafafa;
 }
 
+div.slide-pane__content div.messageContainer .GeoDelete
+{
+  display: block;
+}
+
+div.slide-pane__content div.messageContainer .GeoGetImage
+{
+  display: block;
+}
+
+div.slide-pane__content div.messageContainer .GeoImage
+{
+  display: block;
+  width: 100%;
+  margin-top: 1em;
+}
+
+
 div.slide-pane__content div.messageContainer .GeoDelete button
 {
   margin-top: 1em;
@@ -159,7 +177,7 @@ div.slide-pane__content
 
 div.slide-pane__content .GeoMessageContainer
 {
-  max-height: calc(50vh - 2.25em - 32px);
+  /* max-height: calc(50vh - 2.25em - 32px); */
   overflow: auto;
   padding: 1em;
 }

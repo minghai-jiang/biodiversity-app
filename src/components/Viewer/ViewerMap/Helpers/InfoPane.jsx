@@ -28,7 +28,7 @@ export class InfoPane extends Component {
       data: {},
       save: [],
       selectedCrowdLayer: 'default',
-      crowdProperties: {},
+      crowdProperties: {}
     }
 
     if (this.props && this.props.infoContent && this.props.infoContent.properties)
@@ -599,7 +599,7 @@ export class InfoPane extends Component {
 
         if(content.length === 0 || content[0].length === 0)
         {
-          content.push(<p key='loadingData'>Loading Data <br/><img src='/images/spinner.png' alt='spinner'/></p>);
+          content.push(<p key='loadingData'>Loading Data <br/><img  className='loading-spinner' src='/images/spinner.png' alt='spinner'/></p>);
         }
 
         if (content.length >= 1)

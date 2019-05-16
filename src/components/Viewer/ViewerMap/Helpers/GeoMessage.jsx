@@ -154,7 +154,9 @@ export class Message extends Component {
   constructor(props, context)
   {
     super(props, context)
-    this.state = {}
+    this.state = {
+      imageData: null
+    }
   };
 
   deleteMessage = async(e, info, trigger) =>
@@ -192,6 +194,52 @@ export class Message extends Component {
     }
   }
 
+  getImage = (info) => {
+    if (!info.image || info.gettingImage) {
+      return;
+    }
+
+    if (info.imageData) {
+      if (this.state.imageData) {
+        this.setState({ imageData: null });
+      }
+      else {
+        this.setState({ imageData: info.imageData });
+      }
+      return;
+    }
+
+    info.gettingImage = true;
+
+    let body = { 
+      mapId: info.uuid, 
+      geoMessageId: info.id
+    };    
+
+    if (info.type) {
+      body.type = info.type
+    }
+    else if (info.kind === 'customPolygon') {
+      body.type = 'custom polygon';
+    }
+    else {
+      body.type = info.kind;
+    }
+
+    QueryUtil.postData(`${info.apiUrl}geoMessage/image`, body, info.headers)
+      .then(imageData => {
+        info.imageData = imageData.image;
+        info.gettingImage = false;
+        this.setState({ imageData: imageData.image });
+      })
+      .catch(err => {
+        info.gettingImage = false;
+        alert('An error occurred while getting image.');
+      })
+
+
+  }
+
   render = () => 
   {
     let propsList = [];
@@ -201,61 +249,71 @@ export class Message extends Component {
       classification: 'isClassification',
     };
 
-    for (let key in loopObj)
-    {
-      if(this.props.info && this.props.info[loopObj[key]]){propsList.push(<li className={key} key={this.props.info.id + key}>{key}</li>)};
+    let info = this.props.info;
+
+    for (let key in loopObj) {
+      if (info && info[loopObj[key]]) {
+        propsList.push(<li className={key} key={info.id + key}>{key}</li>)
+      };
     }
 
     let userGroups = '';
-    if (this.props.info.userGroups)
-    {    
-      for (var i = 0; i < this.props.info.userGroups.length; i++)
-      {
-        userGroups += this.props.info.userGroups[i];
+    if (info.userGroups) {    
+      for (var i = 0; i < info.userGroups.length; i++) {
+        userGroups += info.userGroups[i];
       }
     }
 
     let className = 'messageContainer';
-    if (this.props.user && this.props.user.username === this.props.info.user)
-    {
+    if (this.props.user && this.props.user.username === info.user) {
       className += ' own';
     }
-    else
-    {
+    else {
       className += ' other';
     }
 
     let typeListItem = [];
-    if (this.props.info && this.props.info.type)
-    {
-      let showID = this.props.info.elementId;
-      if(this.props.info.type === 'tile')
-      {
-        showID = 'tileX:' + this.props.info.elementId.tileX + ' tileY: ' + this.props.info.elementId.tileY;
+    if (info && info.type) {
+      let showID = info.elementId;
+
+      if (info.type === 'tile') {
+        showID = 'tileX:' + info.elementId.tileX + ' tileY: ' + info.elementId.tileY;
       }
 
       typeListItem.push(
-        <div className='GeoType' key={this.props.info.id + 'type'}>
-          <button className='button linkButton' onClick={() => FlyToControl.flyTo(this.props.info.type, this.props.info.elementId)}>
-            <h1>{this.props.info.type}</h1>
+        <div className='GeoType' key={info.id + 'type'}>
+          <button className='button linkButton' onClick={() => FlyToControl.flyTo(info.type, info.elementId)}>
+            <h1>{info.type}</h1>
             <span>{showID}</span>
           </button>
         </div>);
     }
 
     return(
-      <div className={className} key={this.props.info.id + 'container'}>
+      <div className={className} key={info.id + 'container'}>
         {typeListItem}
-        <ul key={this.props.info.id + 'messageList'}>
-          <li className='GeoName' key={this.props.info.id + 'name'}>{this.props.info.user}</li>
-          <li className='GeoUserGroup' key={this.props.info.id + 'userGroup'}>{userGroups}</li>
-          <li className='GeoMessage' key={this.props.info.id + 'message'}>{this.props.info.message}</li>
-          <ul className='GeoPropsList' key={this.props.info.id + 'propsList'}>
+        <ul key={info.id + 'messageList'}>
+          <li className='GeoName' key={info.id + 'name'}>{info.user}</li>
+          <li className='GeoUserGroup' key={info.id + 'userGroup'}>{userGroups}</li>
+          <li className='GeoMessage' key={info.id + 'message'}>{info.message}</li>
+          <ul className='GeoPropsList' key={info.id + 'propsList'}>
             {propsList}
           </ul>
-          <li className='GeoLayer' key={this.props.info.id + 'layer'}>{this.props.info.layer}</li>
-          <li className='GeoDate' key={this.props.info.id + 'date'}>{Moment(this.props.info.date).format('DD-MM-YYYY HH:mm')}</li>
-          <li className='GeoDelete'><button key={this.props.info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, this.props.info, this.props.trigger)}>delete</button></li>
+          <li className='GeoLayer' key={info.id + 'layer'}>{info.layer}</li>
+          <li className='GeoDate' key={info.id + 'date'}>{Moment(info.date).format('DD-MM-YYYY HH:mm')}</li>
+          <li className='GeoGetImage' key={info.id + 'image'}>
+            <button key={info.id + 'delete'} onClick={() => this.getImage(info)} disabled={!info.image}>          
+              View image
+            </button>
+          </li>
+          <li className='GeoDelete'>
+            <button key={info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, info, this.props.trigger)}>
+              Delete
+            </button>
+          </li>
+          <li className={this.state.imageData ? 'GeoImage' : ''}>
+            <img src={this.state.imageData}></img>
+          </li>
         </ul>
       </div>
     );

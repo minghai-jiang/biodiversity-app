@@ -285,7 +285,7 @@ export class LineChart extends PureComponent {
     }
     else
     {
-      return(<p>Loading Graph Data <img src='/images/spinner.png' alt='spinner'/></p>);
+      return(<p>Loading Graph Data <img className='loading-spinner' src='/images/spinner.png' alt='spinner'/></p>);
     }
   }
 }
