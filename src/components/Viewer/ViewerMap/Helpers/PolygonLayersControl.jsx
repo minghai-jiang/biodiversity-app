@@ -174,13 +174,7 @@ const PolygonLayersControl = {
       }
 
       let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
-
-      let report;
-
-      if (props.user)
-      {
-        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>
-      }
+      let report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>      
 
       polygonLayersControl_PopupContent.data.click = false;
       return (

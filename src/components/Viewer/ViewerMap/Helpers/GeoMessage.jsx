@@ -4,6 +4,8 @@ import QueryUtil from '../../../Utilities/QueryUtil';
 import Moment from 'moment';
 import FlyToControl from './FlyToControl';
 
+import ApiManager from '../../../../ApiManager';
+
 import './GeoMessage.css';
 
 export default class GeoMessage extends PureComponent {
@@ -41,49 +43,37 @@ export default class GeoMessage extends PureComponent {
     this.scrollToBottom();
   }
 
-  getMessages = async() =>
+  getMessages = async () =>
   {
     let messages = [];
     let messagesPromise;
 
-    if(this.props.properties.custom && this.props.properties.custom === true)
+    let body = {
+      mapId: this.props.properties.uuid,
+    };
+
+    if (this.props.properties.custom && this.props.properties.custom === true)
     {
-      messagesPromise = await QueryUtil.postData(
-        this.props.properties.apiUrl + 'geoMessage/customPolygon/getMessages',
-        {
-          mapId: this.props.properties.uuid,
-          customPolygonIds: [this.props.properties.id]
-        },
-        this.props.properties.headers 
-      );
+      body.customPolygonIds = [this.props.properties.id];
+
+      messagesPromise = ApiManager.fetch('POST', '/geoMessage/customPolygon/getMessages', body, this.props.user);
     }
     else if (this.props.properties.type && this.props.properties.type === 'Polygon')
     {
-      messagesPromise = await QueryUtil.postData(
-        this.props.properties.apiUrl + 'geoMessage/polygon/getMessages',
-        {
-          mapId: this.props.properties.uuid,
-          polygonIds: [this.props.properties.id],
-        },
-        this.props.properties.headers 
-      );
+      body.polygonIds = [this.props.properties.id];
+
+      messagesPromise = ApiManager.fetch('POST', '/geoMessage/polygon/getMessages', body, this.props.user);
     }
     else
     {
-      messagesPromise = await QueryUtil.postData(
-        this.props.properties.apiUrl + 'geoMessage/tile/getMessages',
-        {
-          mapId: this.props.properties.uuid,
-          tileIds: [{
-            tileX: this.props.properties.tileX,
-            tileY: this.props.properties.tileY,
-            zoom: this.props.properties.zoom,
-          }],
-        },
-        this.props.properties.headers 
-      );
+      body.tileIds = [{
+        tileX: this.props.properties.tileX,
+        tileY: this.props.properties.tileY,
+        zoom: this.props.properties.zoom,
+      }];
+      
+      messagesPromise = ApiManager.fetch('POST', '/geoMessage/tile/getMessages', body, this.props.user);
     }
-
 
     let allMessagesInfo = await messagesPromise;
     if (allMessagesInfo)
@@ -159,39 +149,32 @@ export class Message extends Component {
     }
   };
 
-  deleteMessage = async(e, info, trigger) =>
+  deleteMessage = async (e, info, trigger) =>
   {
-
     let url = '';
     let body = {}; 
 
-    if(info.kind)
+    if (info.kind)
     {
-      url = info.apiUrl + 'geoMessage/' + info.kind + '/deleteMessage';
+      url = '/geoMessage/' + info.kind + '/deleteMessage';
       body = { mapId: info.uuid, id: info.id };
     }
     else
     {
       let type = info.type;
-      if(info.type === 'custom polygon')
+      if (info.type === 'custom polygon')
       {
         type = 'customPolygon';
       }
 
-      url = info.apiUrl + 'geoMessage/' + type + '/deleteMessage';
+      url = '/geoMessage/' + type + '/deleteMessage';
       body = { mapId: info.mapId, id: info.uuid };
     }
 
-    let messagesDeletePromise= await QueryUtil.postData(
-      url,
-      body,
-      info.headers 
-    );
-
-    if (await messagesDeletePromise === 'OK')
-    {
-      trigger();
-    }
+    ApiManager.fetch('POST', url, body, this.props.user)
+      .then(() => {
+        trigger();
+      });
   }
 
   getImage = (info) => {
@@ -212,8 +195,8 @@ export class Message extends Component {
     info.gettingImage = true;
 
     let body = { 
-      mapId: info.uuid, 
-      geoMessageId: info.id
+      mapId: info.mapId ? info.mapId : info.uuid, 
+      geoMessageId: info.mapId ? info.uuid : info.id
     };    
 
     if (info.type) {
@@ -226,7 +209,7 @@ export class Message extends Component {
       body.type = info.kind;
     }
 
-    QueryUtil.postData(`${info.apiUrl}geoMessage/image`, body, info.headers)
+    ApiManager.fetch('POST', `/geoMessage/image`, body, this.props.user)
       .then(imageData => {
         info.imageData = imageData.image;
         info.gettingImage = false;
@@ -236,8 +219,6 @@ export class Message extends Component {
         info.gettingImage = false;
         alert('An error occurred while getting image.');
       })
-
-
   }
 
   render = () => 

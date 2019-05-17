@@ -182,15 +182,12 @@ const CrowdLayersControl = {
       }
 
       let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
-
-      let report;
+      let report = <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
       let updateButton;
       let deleteButton;
 
       if (props.user)
       {
-        report = <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
-
         let updateInfo = {
           refresh: CrowdLayersControl_refresh,
           ...popup

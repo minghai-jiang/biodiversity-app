@@ -43,21 +43,40 @@ export class PopupForm extends Component {
     let reader = new FileReader();
     let file = e.target.files[0];
 
-    if (file.size > 2000000) {
-      alert('Image too large (max 2 MB).');
-      return;
-    }
+    // if (file.size > 2000000) {
+    //   alert('Image too large (max 2 MB).');
+    //   return;
+    // }
 
     this.loadingImage = true;
 
     reader.onloadend = () => {
       let buffer = Buffer.from(reader.result.split(',')[1], 'base64');
-      Jimp.read(buffer)
-        .then(() => {
-          this.imageResult = reader.result;
+      Jimp.read(buffer)        
+        .then(image => {
+          if (image.bitmap.width > 1920 || image.bitmap.height > 1080) {
+            return image.scaleToFit(1920, 1080);
+          }
+          else {
+            return image;
+          }
+        })
+        .then(image => {
+          return image.getBufferAsync(Jimp.MIME_JPEG);
+        })
+        .then(imageBuffer => {
+          let maxSize = 5 * 1000 * 1000; // 5 MB
+          if (imageBuffer.length > maxSize) {
+            alert(`Image too large (max ${maxSize} MB).`);
+            return;
+          }
+
+          let base64 = imageBuffer.toString('base64');
+
+          this.imageResult = base64;
           this.loadingImage = false;
         })
-        .catch(() => {
+        .catch(err => {
           this.loadingImage = false;
           alert('Invalid image type.');
         });
