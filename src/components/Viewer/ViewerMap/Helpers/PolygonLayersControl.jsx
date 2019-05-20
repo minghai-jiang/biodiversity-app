@@ -34,6 +34,7 @@ let polygonLayersControl_PopupContent = {};
 let polygonLayersControl_highlight = -1;
 let polygonLayersControl_highlightCenter = [];
 let polygonLayersControl_refresh = () => {};
+let polygonLayersControl_shouldRefresh = false;
 
 const PolygonLayersControl = {
   getElement: () => {
@@ -110,6 +111,7 @@ const PolygonLayersControl = {
       polygonLayersControl_highlight = e.id;
       polygonLayersControl_highlightCenter = e.center;
       polygonLayersControl_refresh = refresh;
+      polygonLayersControl_shouldRefresh = true;
     }
   },
 
@@ -172,13 +174,7 @@ const PolygonLayersControl = {
       }
 
       let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
-
-      let report;
-
-      if (props.user)
-      {
-        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>
-      }
+      let report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>      
 
       polygonLayersControl_PopupContent.data.click = false;
       return (
@@ -296,46 +292,44 @@ async function getPolygonsJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, l
     
     if (polygonsGeoJson)
     {
-      if (user)
-      {
-        let filteredPolygonFeatures = [];
-        let filteredPolygonResult = await QueryUtil.postData(
-          apiUrl + 'geoMessage/polygon/ids',
-          {
-            mapId:  mapUuid,
-            xMin: bounds.xMin,
-            xMax: bounds.xMax,
-            yMin: bounds.yMin,
-            yMax: bounds.yMax,
-            limit: polygonLayersControl_maxPolygon,
-          }, headers
-        );
-
-        if (filteredPolygonResult && filteredPolygonResult.ids)
+      let filteredPolygonFeatures = [];
+      let filteredPolygonResult = await QueryUtil.postData(
+        apiUrl + 'geoMessage/polygon/ids',
         {
-          for (let i = 0; i < polygonsGeoJson.features.length; i++)
-          {
-            let polygonProperties = polygonsGeoJson.features[i].properties;
+          mapId:  mapUuid,
+          xMin: bounds.xMin,
+          xMax: bounds.xMax,
+          yMin: bounds.yMin,
+          yMax: bounds.yMax,
+          limit: polygonLayersControl_maxPolygon,
+        }, headers
+      );
 
-            for (let j = 0; j < filteredPolygonResult.ids.length; j++)
+      if (filteredPolygonResult && filteredPolygonResult.ids)
+      {
+        for (let i = 0; i < polygonsGeoJson.features.length; i++)
+        {
+          let polygonProperties = polygonsGeoJson.features[i].properties;
+
+          for (let j = 0; j < filteredPolygonResult.ids.length; j++)
+          {
+            if (polygonProperties.id === filteredPolygonResult.ids[j])
             {
-              if (polygonProperties.id === filteredPolygonResult.ids[j])
-              {
-                filteredPolygonFeatures.push(polygonsGeoJson.features[i]);
-              }
+              filteredPolygonFeatures.push(polygonsGeoJson.features[i]);
             }
           }
-        
-          let ids = [...new Set(filteredPolygonFeatures.map(item => item.id))];
-          polygonsGeoJson.features = polygonsGeoJson.features.filter(item => !ids.includes(item.id));
-          
-          filteredPolygons.type = "FeatureCollection";
-          filteredPolygons.count = filteredPolygonFeatures.length;
-          filteredPolygons.features = filteredPolygonFeatures;
-          filteredPolygons.name = 'Polygon Error';
         }
+      
+        let ids = [...new Set(filteredPolygonFeatures.map(item => item.id))];
+        polygonsGeoJson.features = polygonsGeoJson.features.filter(item => !ids.includes(item.id));
+        
+        filteredPolygons.type = "FeatureCollection";
+        filteredPolygons.count = filteredPolygonFeatures.length;
+        filteredPolygons.features = filteredPolygonFeatures;
+        filteredPolygons.name = 'Polygon Error';
       }
     }
+    
 
     polygonsGeoJson.name = layerName;
     polygonsGeoJson.color = layerColor;
@@ -433,6 +427,11 @@ function addFeatureData(feature, layer)
   }
 
   polygonLayersControl_PopupContent = feature;
+
+  if (polygonLayersControl_shouldRefresh) {
+    polygonLayersControl_shouldRefresh = false;
+    polygonLayersControl_refresh();
+  }
 }
 
 function onEachFeature(feature, layer) {

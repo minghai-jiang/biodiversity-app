@@ -28,7 +28,7 @@ export class InfoPane extends Component {
       data: {},
       save: [],
       selectedCrowdLayer: 'default',
-      crowdProperties: {},
+      crowdProperties: {}
     }
 
     if (this.props && this.props.infoContent && this.props.infoContent.properties)
@@ -37,7 +37,8 @@ export class InfoPane extends Component {
       this.props.user ? this.headers = {Authorization: "Bearer " + this.props.user.token} : this.headers = undefined;
     }
 
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSaveSubmit = this.handleSaveSubmit.bind(this);
+    this.handleUpdateSubmit = this.handleUpdateSubmit.bind(this);
     this.onPropertyChange = this.onPropertyChange.bind(this);
   }
 
@@ -319,20 +320,33 @@ export class InfoPane extends Component {
     {
       this.paneName = 'Save Custom Polygon';
     }
+    else if(this.props.infoContent && this.props.infoContent.type === 'update')
+    {
+      this.paneName = 'Update Custom Polygon';
+    }
   };
 
-  componentDidMount = async() =>
+  componentDidMount = () =>
   {
-/*    if(this.props.infoContent && this.props.infoContent.type === 'analyse')
-    {
-      this.paneName = 'Analysis of ' + this.props.infoContent.id
-    }
-    else if(this.props.infoContent && this.props.infoContent.type === 'report')
-    {
-      this.paneName = 'GeoMessage for ' + this.props.infoContent.id;
-    }*/
+    this.update();
+  };
 
-    if(this.props.infoContent && this.props.infoContent.type === 'analyse')
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props !== prevProps) {
+      this.update();
+    }
+  }
+
+  update = async () => {
+    let info = this.props.infoContent;
+
+    if (!info) {
+      return;
+    }
+
+    let type = info.type;
+
+    if (type === 'analyse')
     {
       let classes = await this.getClasses();
       let classesSlider = this.getSlider('class');
@@ -341,48 +355,107 @@ export class InfoPane extends Component {
 
       await this.setState({classes: classes, indeces: indeces, classesSlider: classesSlider, indecesSlider: indecesSlider})
     }
-    else if(this.props.infoContent && this.props.infoContent.type === 'report')
+    else if (type === 'report')
     {
-      this.setState({GeoMessage: <GeoMessage properties={this.props.infoContent.properties} user={this.props.user}/>})
+      this.setState({GeoMessage: <GeoMessage properties={info.properties} user={this.props.user}/>})
     }
-    else if(this.props.infoContent && this.props.infoContent.type === 'save')
+    else if (type === 'save' || type === 'update')
     {
       let options = [<option key='default' value="default" disabled hidden>Choose a layer</option>];
       let properties = [];
-      for (let i = 0; i < this.props.infoContent.properties.crowdLayers.length; i++)
-      {
-        let crowdLayer = this.props.infoContent.properties.crowdLayers[i];
-        options.push(<option key={crowdLayer.name} value={crowdLayer.name}>{crowdLayer.name}</option>);
-        let layerProps = [];
-        for (let j = 0; j < crowdLayer.properties.length; j++)
-        {
-          layerProps.push(
-            <label key={crowdLayer.properties[j] + 'Label'}>{crowdLayer.properties[j]}
-              <br/>
-              <input type='text' name={crowdLayer.name + ';' + crowdLayer.properties[j]} key={crowdLayer.properties[j]} onChange={this.onPropertyChange}/>
-              <br/>
-            </label>);
-        }
-        properties.push(<div key={crowdLayer.name + 'propertyContainer'} id={crowdLayer.name} className='hidden'>{layerProps}</div>)
+
+      let defaultLayerValue = 'default';
+      let currentProperties = {};
+
+      if (type === 'update') {
+        defaultLayerValue = info.id.properties.layer;
       }
 
-      let select = <select key='classSelector' defaultValue='default' onChange={this.onCrowdLayerChange}>{options}</select>;
+      for (let i = 0; i < info.properties.crowdLayers.length; i++)
+      {
+        let crowdLayer = info.properties.crowdLayers[i];
+        currentProperties[crowdLayer.name] = {};
+        options.push(<option key={crowdLayer.name} value={crowdLayer.name}>{crowdLayer.name}</option>);
+        let layerProps = [];
+
+        for (let j = 0; j < crowdLayer.properties.length; j++)
+        {
+          let propertyName = crowdLayer.properties[j];
+          let defaultValue = '';
+
+          if (type === 'update' && info.id.properties[propertyName]) {
+            defaultValue = info.id.properties[propertyName];
+            currentProperties[crowdLayer.name][propertyName] = defaultValue;
+          }
+
+          layerProps.push(
+            <label key={propertyName + 'Label'}>{propertyName}
+              <br/>
+              <input 
+                type='text' 
+                name={crowdLayer.name + ';' + propertyName} 
+                key={propertyName} 
+                defaultValue={defaultValue}
+                onChange={this.onPropertyChange}
+              />
+              <br/>
+            </label>
+          );
+        }
+
+        let hidden = 'hidden';
+        if (type === 'update' && crowdLayer.name === info.id.properties.layer) {
+          hidden = '';
+        }
+
+        properties.push(
+          <div 
+            key={crowdLayer.name + 'propertyContainer'} 
+            id={crowdLayer.name} 
+            className={hidden}
+          >
+            {layerProps}
+          </div>
+        );
+      }
+
+      let select = (
+        <select 
+          key='classSelector' 
+          defaultValue={defaultLayerValue} 
+          onChange={this.onCrowdLayerChange}
+        >
+          {options}
+        </select>
+      );
+
+      let submitClass = 'button hidden';
+      let onSubmit = this.handleSaveSubmit;
+      if (type === 'update') {
+        submitClass = 'button';
+        onSubmit = this.handleUpdateSubmit;
+      }
+
       let form = (
         <div className='saveFormContainer'>
-          <form key={'form'} onSubmit={this.handleSubmit}>
+          <form key={'form'} onSubmit={onSubmit}>
             {select}
             {properties}
-            <input type="submit" value="Submit" className="button hidden"/>
+            <input type="submit" value="Submit" className={submitClass}/>
           </form>
-        </div>);
-      this.setState({save: form});
-    }
-  };
+        </div>
+      );
 
-  async handleSubmit(event) {
+      this.setState({ save: form, crowdProperties: currentProperties, selectedCrowdLayer: defaultLayerValue });
+    }
+  }
+
+  handleSaveSubmit = async (event) => {
     event.preventDefault();
     let properties = {};
-    this.state.crowdProperties[this.state.selectedCrowdLayer] ? properties = this.state.crowdProperties[this.state.selectedCrowdLayer] : properties = {};
+    if (this.state.crowdProperties[this.state.selectedCrowdLayer]) {
+      properties = this.state.crowdProperties[this.state.selectedCrowdLayer]
+    }
 
     let geometry = {
       'type': 'FeatureCollection',
@@ -394,7 +467,7 @@ export class InfoPane extends Component {
           coordinates:[this.props.infoContent.properties.coordinates],
           }
         }]
-      }
+    }
 
     let addResult = await QueryUtil.postData(
       this.props.infoContent.properties.apiUrl + 'geoMessage/customPolygon/addPolygon',
@@ -407,12 +480,40 @@ export class InfoPane extends Component {
       }, this.headers
     );
 
-    if(await addResult === 'OK')
-    {
+    if (await addResult === 'OK') {
       this.props.infoContent.mapRef.closePopup();
       this.props.infoContent.refresh('customPolygon');
       this.props.infoContent.checkLayer(this.state.selectedCrowdLayer);
       //this.props.infoContent.clearLayers(this.props.infoContent.e.layer);
+      this.toggleQueryPane(false);
+    }
+  };
+
+  handleUpdateSubmit = async (event) => {
+    event.preventDefault();
+
+    let newLayer = this.state.selectedCrowdLayer;
+    let info = this.props.infoContent;
+
+    let properties = {};
+
+    if (this.state.crowdProperties[newLayer]) {
+      properties = this.state.crowdProperties[newLayer]
+    }
+
+    let result = await QueryUtil.postData(
+      this.props.infoContent.properties.apiUrl + 'geoMessage/customPolygon/alterPolygon',
+      {
+        mapId:  this.props.map.uuid,
+        customPolygonId: info.id.id,
+        newLayerName: newLayer,
+        newProperties: properties
+      }, 
+      this.headers
+    );
+
+    if (await result === 'OK') {
+      this.props.infoContent.id.refresh('customPolygon');
       this.toggleQueryPane(false);
     }
   };
@@ -475,15 +576,20 @@ export class InfoPane extends Component {
         if (this.props.map.timestamps.length >= 1)
         {
           content.push(this.state.classes);
-          if (this.state.classes && this.state.classes.length > 0 && this.state.classes[0].props.children[1].props.data && this.state.classes[0].props.children[1].props.data.data.length > 1)
-          {
-            content.push(this.state.classesSlider);
+          if (this.state.classes[0] && this.state.classes[0].props.children[1]) {
+            if (this.state.classes && this.state.classes.length > 0 && this.state.classes[0].props.children[1].props.data && this.state.classes[0].props.children[1].props.data.data.length > 1)
+            {
+              content.push(this.state.classesSlider);
+            }
           }
 
           content.push(this.state.indeces);
-          if (this.state.indeces && this.state.inputClass !== '' && this.state.indeces.length > 0 && this.state.indeces[0].props.children[2].props.data && this.state.indeces[0].props.children[2].props.data.data.length > 1)
+          if (this.state.indeces[0] && this.state.indeces[0].props.children[2])
           {
-            content.push(this.state.indecesSlider);
+            if (this.state.indeces && this.state.inputClass !== '' && this.state.indeces.length > 0 && this.state.indeces[0].props.children[2].props.data && this.state.indeces[0].props.children[2].props.data.data.length > 1)
+            {
+              content.push(this.state.indecesSlider);
+            }
           }
         }
         else
@@ -493,7 +599,7 @@ export class InfoPane extends Component {
 
         if(content.length === 0 || content[0].length === 0)
         {
-          content.push(<p key='loadingData'>Loading Data <br/><img src='/images/spinner.png' alt='spinner'/></p>);
+          content.push(<p key='loadingData'>Loading Data <br/><img  className='loading-spinner' src='/images/spinner.png' alt='spinner'/></p>);
         }
 
         if (content.length >= 1)

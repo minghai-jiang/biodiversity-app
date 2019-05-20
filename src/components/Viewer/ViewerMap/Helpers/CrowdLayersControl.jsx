@@ -29,6 +29,7 @@ let CrowdLayersControl_PopupContent = {};
 let CrowdLayersControl_highlight = -1;
 let CrowdLayersControl_highlightCenter = [];
 let CrowdLayersControl_refresh = () => {};
+let CrowdLayersControl_shouldRefresh = false;
 
 let CrowdLayersControl_deleted = -1;
 
@@ -115,6 +116,8 @@ const CrowdLayersControl = {
     {
       CrowdLayersControl_highlight = e.id;
       CrowdLayersControl_highlightCenter = e.center;
+      CrowdLayersControl_refresh = refresh;
+      CrowdLayersControl_shouldRefresh = true;
     }
   },
 
@@ -179,13 +182,18 @@ const CrowdLayersControl = {
       }
 
       let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
-
-      let report;
+      let report = <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+      let updateButton;
       let deleteButton;
 
       if (props.user)
       {
-        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+        let updateInfo = {
+          refresh: CrowdLayersControl_refresh,
+          ...popup
+        };
+
+        updateButton =  <a className="noselect" onClick={() => {handlePolygon('update', contentFunction, updateInfo, properties, Math.random())} }>Update</a>;
         deleteButton =  <a className="noselect" onClick={() => {deletePolygon(properties)} }>Delete</a>;
       }
 
@@ -200,6 +208,7 @@ const CrowdLayersControl = {
             </div>
             {analyse}
             {report}
+            {updateButton}
             {deleteButton}
           </Popup>);
         delete CrowdLayersControl_PopupContent.e;
@@ -391,6 +400,11 @@ function addFeatureData(feature, layer)
   }
 
   CrowdLayersControl_PopupContent = feature;
+
+  if (CrowdLayersControl_shouldRefresh) {
+    CrowdLayersControl_shouldRefresh = false;
+    CrowdLayersControl_refresh();
+  }
 }
 
 function onEachFeature(feature, layer) {

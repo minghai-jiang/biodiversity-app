@@ -1,5 +1,7 @@
 import React, { PureComponent} from 'react';
 import {Portal} from "react-leaflet-portal";
+import Select from 'react-select';
+import cloneDeep from 'lodash.clonedeep';
 
 import {Message} from './GeoMessage';
 
@@ -10,6 +12,8 @@ let returnChecked = (value) => {};
 let GeoMessageFeed_map = null;
 let GeoMessageFeed_props = {};
 let GeoMessageFeed_page = 1;
+let GeoMessageFeed_groups = null;
+let GeoMessageFeed_selectedGroups = null;
 let GeoMessageFeed_list;
 let returnFeed = (value) => {};
 let loadMore = () => {};
@@ -112,14 +116,43 @@ function buttonClick()
   feedLoop('click');
 }
 
+function onGroupChange (value) {
+  GeoMessageFeed_selectedGroups = value;
+
+  feedLoop('group_change');
+}
+
 async function feedLoop(page)
 {
-  if (GeoMessageFeedElements && GeoMessageFeedElements.length === 0 || page === 'click')
+
+  if (GeoMessageFeedElements && GeoMessageFeedElements.length === 0 || page === 'click' || page === 'group_change')
   {
+    if (page !== 'group_change') {
+      let mapGroups = GeoMessageFeed_props.map.groups;
+
+      // Adding admin group as filtering option.
+      // It is not included as API response due to it being a special group.
+      if (!mapGroups.includes('admin')) {
+        mapGroups.push('admin'); 
+      }
+
+      GeoMessageFeed_groups = [];
+  
+      mapGroups.forEach(group => {
+        GeoMessageFeed_groups.push({
+          value: group,
+          label: group
+        });
+      });
+
+      GeoMessageFeed_selectedGroups = cloneDeep(GeoMessageFeed_groups);
+    }
+
     GeoMessageFeedElements = [];
     GeoMessageFeedElements.push({type: 'button', pageNumber: 0, messages: <button key={'GeoMessageFeedButton'} onClick={loadMore} className='button'>Load more</button>});
     GeoMessageFeedElements.push(await getFeed(1));
-    if(page === 'click')
+
+    if (page === 'click' || page === 'group_change')
     {
       GeoMessageFeed_page = 1;
       makeFeed();
@@ -153,16 +186,23 @@ async function getFeed(page)
   {
     headers["Authorization"] = "Bearer " + GeoMessageFeed_props.user.token;
   }
-  
-  let feed = await QueryUtil.postData(
-    apiUrl + 'geoMessage/feed', 
-    {
-      mapId: GeoMessageFeed_props.map.uuid,
-      page: page, 
-      //userGroups: ,
-    },
-    headers
-  );
+
+  let feed = null;
+  let userGroups = []
+  if (GeoMessageFeed_selectedGroups && GeoMessageFeed_selectedGroups.length > 0) {
+    GeoMessageFeed_selectedGroups.forEach(option => {
+      userGroups.push(option.value);
+    });
+
+    feed = await QueryUtil.postData(apiUrl + 'geoMessage/feed', 
+      {
+        mapId: GeoMessageFeed_props.map.uuid,
+        page: page, 
+        userGroups: userGroups,
+      },
+      headers
+    );
+  }
   
   if (feed && feed.length > 0)
   {
@@ -177,7 +217,7 @@ async function getFeed(page)
 
     return({type:'page', pageNumber: page, messages: messages});
   }
-  else if (feed.length === 0)
+  else
   {
     return({type:'none'});
   }
@@ -200,17 +240,39 @@ async function makeFeed()
 
   feedContent.push(GeoMessageFeedElements[0].messages);
 
-  let feed = <div
-      className='GeoMessageContainer feed'
-      key={'GeoMessageContainer' + GeoMessageFeedElements[1].key}
-      ref={(div) => {GeoMessageFeed_list = div;}}
-      type= 'GeoMessageFeed'
-      id={GeoMessageFeedElements[1].key}
-      openpane='true'
+  let selectElement = (<div></div>);
+  if (GeoMessageFeed_groups && GeoMessageFeed_groups.length > 0) {
+    selectElement = (
+      <Select
+        placeholder={'Select groups for feed'}
+        isMulti
+        isClearable={true}
+        defaultValue={GeoMessageFeed_selectedGroups}
+        options={GeoMessageFeed_groups}
+        noOptionsMessage={() => {return 'All groups selected';}}
+        onChange={onGroupChange}
+      />
+    );
+  }
+
+  let feed = (
+    <div 
+      type='GeoMessageFeed' 
+      openpane={'true'}
       random={Math.random()}
     >
-      {feedContent}
-    </div>;
+      {selectElement}
+      <div
+        className='GeoMessageContainer feed'
+        key={'GeoMessageContainer' + GeoMessageFeedElements[1].key}
+        ref={(div) => {GeoMessageFeed_list = div;}}        
+        id={GeoMessageFeedElements[1].key}
+      >
+        {feedContent}
+      </div>
+    </div>
+
+  );
 
   returnFeed(feed);
 }

@@ -28,6 +28,8 @@ let StandardTiles_PopupContent = {};
 let StandardTiles_highlight = {};
 let StandardTiles_highlightCenter = [];
 let StandardTiles_refresh = () => {};
+let StandardTiles_shouldRefresh = false;
+
 
 const StandardTilesLayer = {
   getElement: () => {
@@ -106,6 +108,7 @@ const StandardTilesLayer = {
       StandardTiles_highlight = e.id;
       StandardTiles_highlightCenter = e.center;
       StandardTiles_refresh = refresh;
+      StandardTiles_shouldRefresh = true;
     }
   },
 
@@ -171,13 +174,8 @@ const StandardTilesLayer = {
         merged = {...properties, ...StandardTiles_PopupContent.properties};
 
         let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
-
-        let report;
-
-        if (props.user)
-        {
-          report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
-        }
+        let report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
+        
 
         StandardTiles_PopupContent.click = false;
         return (
@@ -265,45 +263,43 @@ async function getTilesJsonAux(apiUrl, user, mapUuid, timestampEnd, bounds, zoom
     {
       let filteredTiles = {};
 
-      if (user)
-      {
-        let filteredTilesFeatures = [];
-        let filteredTilesResult = await QueryUtil.postData(
-          apiUrl + 'geoMessage/tile/ids',
-          {
-            mapId:  mapUuid,
-            xMin: bounds.xMin,
-            xMax: bounds.xMax,
-            yMin: bounds.yMin,
-            yMax: bounds.yMax,
-            zoom: zoom
-          }, headers
-        );
-
-        if (filteredTilesResult)
+      let filteredTilesFeatures = [];
+      let filteredTilesResult = await QueryUtil.postData(
+        apiUrl + 'geoMessage/tile/ids',
         {
-          for (let i = 0; i < tilesGeoJson.features.length; i++)
-          {
-            let tileProperties = tilesGeoJson.features[i].properties;
+          mapId:  mapUuid,
+          xMin: bounds.xMin,
+          xMax: bounds.xMax,
+          yMin: bounds.yMin,
+          yMax: bounds.yMax,
+          zoom: zoom
+        }, headers
+      );
 
-            for (let j = 0; j < filteredTilesResult.tileIds.length; j++)
+      if (filteredTilesResult)
+      {
+        for (let i = 0; i < tilesGeoJson.features.length; i++)
+        {
+          let tileProperties = tilesGeoJson.features[i].properties;
+
+          for (let j = 0; j < filteredTilesResult.tileIds.length; j++)
+          {
+            if (tileProperties.tileX === filteredTilesResult.tileIds[j].tileX && tileProperties.tileY === filteredTilesResult.tileIds[j].tileY && tileProperties.zoom === filteredTilesResult.tileIds[j].zoom)
             {
-              if (tileProperties.tileX === filteredTilesResult.tileIds[j].tileX && tileProperties.tileY === filteredTilesResult.tileIds[j].tileY && tileProperties.zoom === filteredTilesResult.tileIds[j].zoom)
-              {
-                filteredTilesFeatures.push(tilesGeoJson.features[i]);
-              }
+              filteredTilesFeatures.push(tilesGeoJson.features[i]);
             }
           }
-        
-          let ids = [...new Set(filteredTilesFeatures.map(item => item.id))];
-          tilesGeoJson.features = tilesGeoJson.features.filter(item => !ids.includes(item.id));
-          
-          filteredTiles.type = "FeatureCollection";
-          filteredTiles.count = filteredTilesFeatures.length;
-          filteredTiles.features = filteredTilesFeatures;
-          filteredTiles.name = 'Standard Tiles Error';
         }
+      
+        let ids = [...new Set(filteredTilesFeatures.map(item => item.id))];
+        tilesGeoJson.features = tilesGeoJson.features.filter(item => !ids.includes(item.id));
+        
+        filteredTiles.type = "FeatureCollection";
+        filteredTiles.count = filteredTilesFeatures.length;
+        filteredTiles.features = filteredTilesFeatures;
+        filteredTiles.name = 'Standard Tiles Error';
       }
+      
 
       tilesGeoJson.name = 'Standard Tiles';
       //tilesGeoJson.color = layerColor;
@@ -399,6 +395,11 @@ function onEachFeature(feature, layer)
     feature.click = true;
 
     StandardTiles_PopupContent = feature;
+
+    if (StandardTiles_shouldRefresh) {
+      StandardTiles_shouldRefresh = false;
+      StandardTiles_refresh();
+    }
   }
 
   layer.on({

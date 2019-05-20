@@ -1,8 +1,9 @@
 import React, { Component, PureComponent } from 'react';
 import PopupForm from '../../Popup-form/Popup-form';
-import QueryUtil from '../../../Utilities/QueryUtil';
 import Moment from 'moment';
 import FlyToControl from './FlyToControl';
+
+import ApiManager from '../../../../ApiManager';
 
 import './GeoMessage.css';
 
@@ -10,12 +11,11 @@ export default class GeoMessage extends PureComponent {
   constructor(props, context)
   {
     super(props, context)
-    this.state =
-    {
+    this.state = {
       messages: [],
     }
     this.type = '';
-    if(this.props.properties.custom)
+    if (this.props.properties.custom)
     {
       this.type = 'customPolygon';
     }
@@ -41,49 +41,37 @@ export default class GeoMessage extends PureComponent {
     this.scrollToBottom();
   }
 
-  getMessages = async() =>
+  getMessages = async () =>
   {
     let messages = [];
     let messagesPromise;
 
-    if(this.props.properties.custom && this.props.properties.custom === true)
+    let body = {
+      mapId: this.props.properties.uuid,
+    };
+
+    if (this.props.properties.custom && this.props.properties.custom === true)
     {
-      messagesPromise = await QueryUtil.postData(
-        this.props.properties.apiUrl + 'geoMessage/customPolygon/getMessages',
-        {
-          mapId: this.props.properties.uuid,
-          customPolygonIds: [this.props.properties.id]
-        },
-        this.props.properties.headers 
-      );
+      body.customPolygonIds = [this.props.properties.id];
+
+      messagesPromise = ApiManager.fetch('POST', '/geoMessage/customPolygon/getMessages', body, this.props.user);
     }
     else if (this.props.properties.type && this.props.properties.type === 'Polygon')
     {
-      messagesPromise = await QueryUtil.postData(
-        this.props.properties.apiUrl + 'geoMessage/polygon/getMessages',
-        {
-          mapId: this.props.properties.uuid,
-          polygonIds: [this.props.properties.id],
-        },
-        this.props.properties.headers 
-      );
+      body.polygonIds = [this.props.properties.id];
+
+      messagesPromise = ApiManager.fetch('POST', '/geoMessage/polygon/getMessages', body, this.props.user);
     }
     else
     {
-      messagesPromise = await QueryUtil.postData(
-        this.props.properties.apiUrl + 'geoMessage/tile/getMessages',
-        {
-          mapId: this.props.properties.uuid,
-          tileIds: [{
-            tileX: this.props.properties.tileX,
-            tileY: this.props.properties.tileY,
-            zoom: this.props.properties.zoom,
-          }],
-        },
-        this.props.properties.headers 
-      );
+      body.tileIds = [{
+        tileX: this.props.properties.tileX,
+        tileY: this.props.properties.tileY,
+        zoom: this.props.properties.zoom,
+      }];
+      
+      messagesPromise = ApiManager.fetch('POST', '/geoMessage/tile/getMessages', body, this.props.user);
     }
-
 
     let allMessagesInfo = await messagesPromise;
     if (allMessagesInfo)
@@ -122,6 +110,7 @@ export default class GeoMessage extends PureComponent {
   messageTrigger = async() =>
   {
     let messages = await this.getMessages();
+    debugger;
     this.setState({messages: messages});
   }
 
@@ -140,11 +129,18 @@ export default class GeoMessage extends PureComponent {
         </div>
       )
     }
+    else {
+      geoMessages.push(<div style={{ marginLeft: '1.5em', marginTop: '1em' }}>No messages</div>);
+    }
 
     return(
       <div>
         {geoMessages}
-        <PopupForm properties={this.props.properties} messageTrigger={this.messageTrigger}/>
+        {
+          this.props.user ? 
+          <PopupForm properties={this.props.properties} messageTrigger={this.messageTrigger}/> :
+          null
+        }
       </div>
     );
   };
@@ -154,42 +150,81 @@ export class Message extends Component {
   constructor(props, context)
   {
     super(props, context)
-    this.state = {}
+    this.state = {
+      imageData: null
+    }
   };
 
-  deleteMessage = async(e, info, trigger) =>
+  deleteMessage = async (e, info, trigger) =>
   {
-
     let url = '';
     let body = {}; 
 
-    if(info.kind)
+    if (info.kind)
     {
-      url = info.apiUrl + 'geoMessage/' + info.kind + '/deleteMessage';
+      url = '/geoMessage/' + info.kind + '/deleteMessage';
       body = { mapId: info.uuid, id: info.id };
     }
     else
     {
       let type = info.type;
-      if(info.type === 'custom polygon')
+      if (info.type === 'custom polygon')
       {
         type = 'customPolygon';
       }
 
-      url = info.apiUrl + 'geoMessage/' + type + '/deleteMessage';
+      url = '/geoMessage/' + type + '/deleteMessage';
       body = { mapId: info.mapId, id: info.uuid };
     }
 
-    let messagesDeletePromise= await QueryUtil.postData(
-      url,
-      body,
-      info.headers 
-    );
+    ApiManager.fetch('POST', url, body, this.props.user)
+      .then(() => {
+        trigger();
+      });
+  }
 
-    if (await messagesDeletePromise === 'OK')
-    {
-      trigger();
+  getImage = (info) => {
+    if (!info.thumbnail || info.gettingImage) {
+      return;
     }
+
+    if (info.imageData) {
+      if (this.state.imageData) {
+        this.setState({ imageData: null });
+      }
+      else {
+        this.setState({ imageData: info.imageData });
+      }
+      return;
+    }
+
+    info.gettingImage = true;
+
+    let body = { 
+      mapId: info.mapId ? info.mapId : info.uuid, 
+      geoMessageId: info.mapId ? info.uuid : info.id
+    };    
+
+    if (info.type) {
+      body.type = info.type
+    }
+    else if (info.kind === 'customPolygon') {
+      body.type = 'custom polygon';
+    }
+    else {
+      body.type = info.kind;
+    }
+
+    ApiManager.fetch('POST', `/geoMessage/image`, body, this.props.user)
+      .then(imageData => {
+        info.imageData = imageData.image;
+        info.gettingImage = false;
+        this.setState({ imageData: imageData.image });
+      })
+      .catch(err => {
+        info.gettingImage = false;
+        alert('An error occurred while getting image.');
+      })
   }
 
   render = () => 
@@ -201,61 +236,82 @@ export class Message extends Component {
       classification: 'isClassification',
     };
 
-    for (let key in loopObj)
-    {
-      if(this.props.info && this.props.info[loopObj[key]]){propsList.push(<li className={key} key={this.props.info.id + key}>{key}</li>)};
+    let info = this.props.info;
+
+    for (let key in loopObj) {
+      if (info && info[loopObj[key]]) {
+        propsList.push(<li className={key} key={info.id + key}>{key}</li>)
+      };
     }
 
     let userGroups = '';
-    if (this.props.info.userGroups)
-    {    
-      for (var i = 0; i < this.props.info.userGroups.length; i++)
-      {
-        userGroups += this.props.info.userGroups[i];
+    if (info.userGroups) {    
+      for (var i = 0; i < info.userGroups.length; i++) {
+        userGroups += info.userGroups[i];
       }
     }
 
     let className = 'messageContainer';
-    if (this.props.user && this.props.user.username === this.props.info.user)
-    {
+    if (this.props.user && this.props.user.username === info.user) {
       className += ' own';
     }
-    else
-    {
+    else {
       className += ' other';
     }
 
     let typeListItem = [];
-    if (this.props.info && this.props.info.type)
-    {
-      let showID = this.props.info.elementId;
-      if(this.props.info.type === 'tile')
-      {
-        showID = 'tileX:' + this.props.info.elementId.tileX + ' tileY: ' + this.props.info.elementId.tileY;
+    if (info && info.type) {
+      let showID = info.elementId;
+
+      if (info.type === 'tile') {
+        showID = 'tileX:' + info.elementId.tileX + ' tileY: ' + info.elementId.tileY;
       }
 
       typeListItem.push(
-        <div className='GeoType' key={this.props.info.id + 'type'}>
-          <button className='button linkButton' onClick={() => FlyToControl.flyTo(this.props.info.type, this.props.info.elementId)}>
-            <h1>{this.props.info.type}</h1>
+        <div className='GeoType' key={info.id + 'type'}>
+          <button className='button linkButton' onClick={() => FlyToControl.flyTo(info.type, info.elementId)}>
+            <h1>{info.type}</h1>
             <span>{showID}</span>
           </button>
         </div>);
     }
 
-    return(
-      <div className={className} key={this.props.info.id + 'container'}>
+    return (
+      <div className={className} key={info.id + 'container'}>
         {typeListItem}
-        <ul key={this.props.info.id + 'messageList'}>
-          <li className='GeoName' key={this.props.info.id + 'name'}>{this.props.info.user}</li>
-          <li className='GeoUserGroup' key={this.props.info.id + 'userGroup'}>{userGroups}</li>
-          <li className='GeoMessage' key={this.props.info.id + 'message'}>{this.props.info.message}</li>
-          <ul className='GeoPropsList' key={this.props.info.id + 'propsList'}>
+        <ul key={info.id + 'messageList'}>
+          <li className='GeoName' key={info.id + 'name'}>{info.user}</li>
+          <li className='GeoUserGroup' key={info.id + 'userGroup'}>{userGroups}</li>
+          <li className='GeoMessage' key={info.id + 'message'}>{info.message}</li>
+          <ul className='GeoPropsList' key={info.id + 'propsList'}>
             {propsList}
           </ul>
-          <li className='GeoLayer' key={this.props.info.id + 'layer'}>{this.props.info.layer}</li>
-          <li className='GeoDate' key={this.props.info.id + 'date'}>{Moment(this.props.info.date).format('DD-MM-YYYY HH:mm')}</li>
-          <li className='GeoDelete'><button key={this.props.info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, this.props.info, this.props.trigger)}>delete</button></li>
+          <li className='GeoLayer' key={info.id + 'layer'}>{info.layer}</li>
+          <li className='GeoDate' key={info.id + 'date'}>{Moment(info.date).format('DD-MM-YYYY HH:mm')}</li>
+          {
+            info.thumbnail && !this.state.imageData ? 
+              <li className='GeoGetImage' key={info.id + 'image'}>
+                <img src={info.thumbnail} key={info.id + 'view_image'} style={{'width': 'auto', 'cursor': 'zoom-in'}} onClick={() => this.getImage(info)}></img>
+              </li> :
+              null
+          }
+          {
+            this.state.imageData ? 
+              <li id='lightbox' className={this.state.imageData ? 'GeoImage' : ''} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}>
+                <img src={this.state.imageData}></img>
+              </li> :
+              null
+          }
+          {
+            this.props.user ? (
+              <li className='GeoDelete'>
+                <button key={info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, info, this.props.trigger)}>
+                  Delete
+                </button>
+              </li>
+            ) : null
+          }
+
         </ul>
       </div>
     );

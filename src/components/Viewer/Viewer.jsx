@@ -47,42 +47,6 @@ class Viewer extends PureComponent {
     this.setState({infoContent: content})
   }
 
-
-/*  downloadShape = async () => {
-    let headers = {
-      "Content-Type": "application/json"
-    };
-    if (this.props.user) {
-      headers["Authorization"] = "Bearer " + this.props.user.token;
-    }
-
-    let timestamp = this.state.map.timestamps[this.state.timestampRange.end];
-    let bodyJson = JSON.stringify({
-      mapId: this.state.map.id,
-      timestampNumber: timestamp.number
-    });
-
-    let downloadWindow = window.open();
-    window.focus();
-
-    fetch(`${this.props.apiUrl}utilities/requestshapeDownload`,
-      {
-        method: 'POST',
-        headers: headers,
-        body: bodyJson
-      })
-      .then(response => {
-        return response.json();
-      })
-      .then(json => {
-        let downloadUrl = `${this.props.apiUrl}utilities/downloadShape/${json.token}`;
-        downloadWindow.location = downloadUrl;
-      })
-      .catch(error =>{
-        alert("Failed to download shape");
-      })
-  }*/
-
   render() {
     let keyPart = this.state.infoContent && this.state.infoContent.properties ? this.state.infoContent.properties.id : '';
     return (
@@ -116,17 +80,6 @@ class Viewer extends PureComponent {
           key={this.state.infoContent ? this.state.infoContent.type + this.state.infoContent.id + keyPart : null}
           user={this.props.user}
         />
-{/*        <QueryPane
-          apiUrl={this.props.apiUrl}
-          map={this.state.map}
-          timestampRange={this.state.timestampRange}
-          shape={this.state.shape}
-          user={this.props.user}
-        />
-        {this.state.map ? 
-        <div className='button viewer-button' onClick={() => { this.downloadShape(); }} style={{top: '47vh'}}>
-            Download Shape
-        </div> : null}*/}
     </div>
     );
   }
