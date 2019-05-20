@@ -17,7 +17,7 @@ export class Sector extends Component {
       sectorItemUrl : null
     };
   }
-   
+
   onSectorChange = e => {
     let itemValue = e.target.value;
     let contentUrl = '/html/' + this.props.language + '/sectors/sectors-select/' + itemValue + '.html';
@@ -31,7 +31,7 @@ export class Sector extends Component {
             <h1>Sectors</h1>
         </div>
 
-        <LoadUpdateUtil 
+        <LoadUpdateUtil
             contentUrl={'/html/' + this.props.language + '/sectors/sectors-home.html'}
         />
 
@@ -44,6 +44,7 @@ export class Sector extends Component {
               <option value="Forestry">{this.props.localization['Forestry']}</option>
               <option value="GovernmentAgencies">{this.props.localization['Government']}</option>
               <option value="NGOs">{this.props.localization['Ngo']}</option>
+              <option value="Agrobusiness">{this.props.localization['Agrobusiness']}</option>
             </select>
           </div>
         </div>
