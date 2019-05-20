@@ -244,6 +244,7 @@ async function makeFeed()
   if (GeoMessageFeed_groups && GeoMessageFeed_groups.length > 0) {
     selectElement = (
       <Select
+        className='select-groups'
         placeholder={'Select groups for feed'}
         isMulti
         isClearable={true}
