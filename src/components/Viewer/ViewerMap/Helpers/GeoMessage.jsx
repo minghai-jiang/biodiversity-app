@@ -276,7 +276,7 @@ export class Message extends Component {
         </div>);
     }
 
-    return(
+    return (
       <div className={className} key={info.id + 'container'}>
         {typeListItem}
         <ul key={info.id + 'messageList'}>
@@ -297,8 +297,8 @@ export class Message extends Component {
           }
           {
             this.state.imageData ? 
-              <li className={this.state.imageData ? 'GeoImage' : ''}>
-                <img src={this.state.imageData} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}></img>
+              <li id='lightbox' className={this.state.imageData ? 'GeoImage' : ''} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}>
+                <img src={this.state.imageData}></img>
               </li> :
               null
           }
