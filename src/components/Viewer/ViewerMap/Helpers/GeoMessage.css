@@ -30,6 +30,7 @@ div.slide-pane__content div.messageContainer .GeoDelete
 div.slide-pane__content div.messageContainer .GeoGetImage
 {
   display: block;
+  margin-top: 1em;
 }
 
 div.slide-pane__content div.messageContainer .GeoImage

@@ -1,6 +1,5 @@
 import React, { Component, PureComponent } from 'react';
 import PopupForm from '../../Popup-form/Popup-form';
-import QueryUtil from '../../../Utilities/QueryUtil';
 import Moment from 'moment';
 import FlyToControl from './FlyToControl';
 
@@ -12,12 +11,11 @@ export default class GeoMessage extends PureComponent {
   constructor(props, context)
   {
     super(props, context)
-    this.state =
-    {
+    this.state = {
       messages: [],
     }
     this.type = '';
-    if(this.props.properties.custom)
+    if (this.props.properties.custom)
     {
       this.type = 'customPolygon';
     }
@@ -112,6 +110,7 @@ export default class GeoMessage extends PureComponent {
   messageTrigger = async() =>
   {
     let messages = await this.getMessages();
+    debugger;
     this.setState({messages: messages});
   }
 
@@ -130,11 +129,18 @@ export default class GeoMessage extends PureComponent {
         </div>
       )
     }
+    else {
+      geoMessages.push(<div style={{ marginLeft: '1.5em', marginTop: '1em' }}>No messages</div>);
+    }
 
     return(
       <div>
         {geoMessages}
-        <PopupForm properties={this.props.properties} messageTrigger={this.messageTrigger}/>
+        {
+          this.props.user ? 
+          <PopupForm properties={this.props.properties} messageTrigger={this.messageTrigger}/> :
+          null
+        }
       </div>
     );
   };
@@ -178,7 +184,7 @@ export class Message extends Component {
   }
 
   getImage = (info) => {
-    if (!info.image || info.gettingImage) {
+    if (!info.thumbnail || info.gettingImage) {
       return;
     }
 
@@ -282,19 +288,30 @@ export class Message extends Component {
           </ul>
           <li className='GeoLayer' key={info.id + 'layer'}>{info.layer}</li>
           <li className='GeoDate' key={info.id + 'date'}>{Moment(info.date).format('DD-MM-YYYY HH:mm')}</li>
-          <li className='GeoGetImage' key={info.id + 'image'}>
-            <button key={info.id + 'delete'} onClick={() => this.getImage(info)} disabled={!info.image}>          
-              View image
-            </button>
-          </li>
-          <li className='GeoDelete'>
-            <button key={info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, info, this.props.trigger)}>
-              Delete
-            </button>
-          </li>
-          <li className={this.state.imageData ? 'GeoImage' : ''}>
-            <img src={this.state.imageData}></img>
-          </li>
+          {
+            info.thumbnail && !this.state.imageData ? 
+              <li className='GeoGetImage' key={info.id + 'image'}>
+                <img src={info.thumbnail} key={info.id + 'view_image'} style={{'width': 'auto', 'cursor': 'zoom-in'}} onClick={() => this.getImage(info)}></img>
+              </li> :
+              null
+          }
+          {
+            this.state.imageData ? 
+              <li className={this.state.imageData ? 'GeoImage' : ''}>
+                <img src={this.state.imageData} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}></img>
+              </li> :
+              null
+          }
+          {
+            this.props.user ? (
+              <li className='GeoDelete'>
+                <button key={info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, info, this.props.trigger)}>
+                  Delete
+                </button>
+              </li>
+            ) : null
+          }
+
         </ul>
       </div>
     );
