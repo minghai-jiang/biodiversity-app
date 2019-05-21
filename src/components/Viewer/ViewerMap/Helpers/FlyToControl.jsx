@@ -7,7 +7,7 @@ import QueryUtil from '../../../Utilities/QueryUtil';
 let flyToControl_map = null;
 let flyToControl_mapRef = null;
 let flyToElements = [];
-let flyToType = 'middle';
+let flyToType = 'my_location';
 let flyToID = 0;
 let flyToCustomPolygonId = '0';
 let flyToIdTile = {
@@ -22,6 +22,7 @@ let flyToMiddle = {
 }
 let flyToControl_maxZoom = 18;
 let flyToProps = {};
+let flyTo_geolocation = null;
 let returnChecked = (value) => {};
 
 const FlyToControl = {
@@ -53,6 +54,15 @@ const FlyToControl = {
     returnChecked = checkedFunction;
     createOptions();
 
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition((position) => {
+        let lat = position.coords.latitude;
+        let long = position.coords.longitude;
+
+        flyTo_geolocation = [lat, long];
+      })
+    }
+
     return(flyToElements);
   },
 
@@ -79,7 +89,7 @@ const FlyToControl = {
     flyToControl_map = null;
     flyToControl_mapRef = null;
     flyToElements = [];
-    flyToType = 'middle';
+    flyToType = 'my_location';
     flyToID = 0;
     flyToCustomPolygonId = '';
     flyToIdTile = {
@@ -118,22 +128,30 @@ const FlyToControl = {
 
 function createOptions()
 {
-  if(flyToControl_map)
+  if (flyToControl_map)
   {
     let formElements = [];
     formElements.push(<h1 key='flyToTitle'>Fly to:</h1>)
-    let options = ['polygons', 'tiles', 'customPolygons'];
-    let select = [<option value="middle" key={flyToControl_map.uuid + 'middleOption'}>Middle Point</option>];
-
-    for (let i = 0; i < options.length; i++)
-    {
-      let typeShort = options[i].substring(0, options[i].length - 1);
-      select.push(<option value={options[i]} key={flyToControl_map.uuid + options[i] + 'Option'}>{typeShort}</option>);
+    let select = []
+    if (navigator.geolocation) {
+      select.push(<option value="my_location" key={flyToControl_map.uuid + 'myLocationOption'}>My location</option>);
     }
+    select.push(<option value="center" key={flyToControl_map.uuid + 'centerOption'}>Center</option>);
+    select.push(<option value="polygons" key={flyToControl_map.uuid + 'polygonsOption'}>Polygons</option>);
+    select.push(<option value="tiles" key={flyToControl_map.uuid + 'tilesption'}>Tiles</option>);
+    select.push(<option value="customPolygons" key={flyToControl_map.uuid + 'customPolygonsOption'}>Custom polygons</option>);
 
-    formElements.push(<label key={flyToControl_map.uuid + 'typeSelectLabel'}>Select id type: <br/><select defaultValue="middle" key={flyToControl_map.uuid + 'typeSelect'} onChange={onOptionChange}>{select}</select></label>);
+    formElements.push(
+      <label key={flyToControl_map.uuid + 'typeSelectLabel'}>
+        Select id type: 
+        <br/>
+        <select defaultValue="my_location" key={flyToControl_map.uuid + 'typeSelect'} onChange={onOptionChange}>
+          {select}
+        </select>
+      </label>
+    );
 
-    formElements.push(<div key={flyToControl_map.uuid + 'middlePointContainer'} className='optionContainer middle'>
+    formElements.push(<div key={flyToControl_map.uuid + 'centerPointContainer'} className='optionContainer center'>
                         <label key={flyToControl_map.uuid + 'latitudeInputLabel'}>Latitude: <br/>
                           <input key={flyToControl_map.uuid + 'latitudeInput'} type='number' pattern="(\-)?(\d+)((\.|\,|\d){1,5})?" step='0.0001' placeholder={flyToMiddle.latitude} min='-90' max='90' onChange={onIdChange} id='latitude'/>
                         </label>
@@ -141,7 +159,7 @@ function createOptions()
                           <input key={flyToControl_map.uuid + 'longitudeInput'} type='number' pattern="(\-)?(\d+)((\.|\,|\d){1,5})?" step='0.0001' placeholder={flyToMiddle.longitude} min='-180' max='180' onChange={onIdChange} id='longitude'/>
                         </label>
                         <label key={flyToControl_map.uuid + 'zoomMiddleInputLabel'}>Zoom: <br/>
-                          <input key={flyToControl_map.uuid + 'zoomMiddleInput'} type='number' placeholder={flyToMiddle.zoom} onChange={onIdChange} min='0' max={flyToControl_maxZoom} id='middleZoom'/>
+                          <input key={flyToControl_map.uuid + 'zoomMiddleInput'} type='number' placeholder={flyToMiddle.zoom} onChange={onIdChange} min='0' max={flyToControl_maxZoom} id='centerZoom'/>
                         </label>
                       </div>);
 
@@ -169,8 +187,15 @@ function createOptions()
                         </label>
                       </div>);
 
-    formElements.push(<input type="submit" value="Fly To" className="button" key={flyToControl_map.uuid + 'submitButton'}/>);
-    flyToElements.push(<form key={flyToControl_map.uuid} onSubmit={handleSubmit}>{formElements}</form>);
+    formElements.push(
+      <input type="submit" value="Fly To" className="button" key={flyToControl_map.uuid + 'submitButton'} onClick={handleSubmit}/>
+    );
+
+    flyToElements.push(
+      <form key={flyToControl_map.uuid}>
+        {formElements}
+      </form>
+    );
   }
 }
 
@@ -225,20 +250,24 @@ function onIdChange(e)
   {
     flyToIdTile[id] = parseInt(itemValue);
   }
-  else if (flyToType === 'middle')
+  else if (flyToType === 'center')
   {
     flyToMiddle[id] = parseFloat(itemValue);
   }
 }
 
-async function handleSubmit(e = null)
+function handleSubmit(e = null)
 {
-  if(e)
-  {
+  if (e) {
     e.preventDefault();
   }
 
-  if (flyToType === 'middle')
+  if (flyToType === 'my_location') {
+    if (flyTo_geolocation) {
+      flyToControl_mapRef.flyTo(flyTo_geolocation, flyToControl_map.zoom);
+    }
+  }
+  else if (flyToType === 'center')
   {
     flyToControl_mapRef.flyTo([flyToMiddle.latitude, flyToMiddle.longitude], flyToMiddle.zoom);
   }
@@ -269,32 +298,33 @@ async function handleSubmit(e = null)
       url = apiUrl + 'geoMessage/customPolygon/geometries';
     }
     
-    let idGeometry = await QueryUtil.postData(
+    let idGeometryPromise = QueryUtil.postData(
       url,
       body,
       headers
-    );
-    
+    ); 
 
-
-    if (idGeometry && idGeometry.features && idGeometry.features.length > 0)
-    {
-      let geoJsonLayer = L.geoJson(idGeometry);
-      let bounds = geoJsonLayer.getBounds();
-      flyToControl_mapRef.flyToBounds(bounds);
-      let name = idGeometry.features[0].properties.layer ? idGeometry.features[0].properties.layer : 'Standard Tiles';
-
-      let id = '';
-      for (let key in body)
-      {
-        if (key.indexOf('Ids') > -1 && key.indexOf('map') === -1)
+    idGeometryPromise
+      .then(idGeometry => {
+        if (idGeometry && idGeometry.features && idGeometry.features.length > 0)
         {
-          id = body[key];
+          let geoJsonLayer = L.geoJson(idGeometry);
+          let bounds = geoJsonLayer.getBounds();
+          flyToControl_mapRef.flyToBounds(bounds);
+          let name = idGeometry.features[0].properties.layer ? idGeometry.features[0].properties.layer : 'Standard Tiles';
+    
+          let id = '';
+          for (let key in body)
+          {
+            if (key.indexOf('Ids') > -1 && key.indexOf('map') === -1)
+            {
+              id = body[key];
+            }
+          }
+    
+          returnChecked({name: name, type: flyToType, id:id, center: bounds.getCenter()});
         }
-      }
-
-      returnChecked({name: name, type: flyToType, id:id, center: bounds.getCenter()});
-    }
+      });
   }
 }
 

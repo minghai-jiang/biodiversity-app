@@ -6,6 +6,8 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import {
   Map,
   LayersControl,
+  Marker,
+  Popup
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-draw";
@@ -26,9 +28,18 @@ const getPolygonJsonWaitTime = 1000;
 const maxPolygons = isMobile ? 500 : 3000;
 const maxStandardTiles = isMobile ? 500 : 3000;
 
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
+
 export class ViewerMap extends PureComponent {
   mapRef = createRef();
   getPolygonJsonTimeout = null;
+  geolocation = null;
 
   constructor(props) {
     super(props);
@@ -69,14 +80,22 @@ export class ViewerMap extends PureComponent {
     StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles, map);
     CrowdLayersControl.initialize(this.props, bounds, maxPolygons, map, this.refreshMap);
 
-
-    LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
-    
+    LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);    
     FlyToControl.initialize(this.props, map, this.flyToChecked);
-
-    GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);
-    
+    GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);    
     DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition((position) => {
+        let hadGeolocation = this.geolocation ? true : false;
+
+        this.geolocation = [position.coords.latitude, position.coords.longitude];
+
+        if (!hadGeolocation) {
+          this.forceUpdate();
+        }
+      });
+    }
   }
 
   componentWillUnmount = () => {
@@ -165,7 +184,7 @@ export class ViewerMap extends PureComponent {
 
   getPolygonsJson = async (props, type = 'all') =>
   {
-    if(!this.mapRef || !this.mapRef.current)
+    if (!this.mapRef || !this.mapRef.current)
     {
       return null;
     }
@@ -342,6 +361,14 @@ export class ViewerMap extends PureComponent {
           { StandardTilesLayerControl.onFeatureClick(this.props, this.getPopupContent) }
           { CrowdLayersControl.onFeatureClick(this.props, this.getPopupContent) }
           { DrawingControl.onFeatureClick() }
+          {
+            this.geolocation ?
+              <Marker position={this.geolocation}>
+                <Popup>You are here</Popup>
+              </Marker> :
+              null
+          }
+  
         </Map>
       </div>
     );
