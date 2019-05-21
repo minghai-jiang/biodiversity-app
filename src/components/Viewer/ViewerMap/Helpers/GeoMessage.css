@@ -244,6 +244,9 @@ div.select-groups {
 	padding: 0.5em 1em;
 }
 
-.geomessage-submit-button:disabled {
-  
+@media only screen and (max-device-width : 860px)
+{
+  li#lightbox {
+    left: -10vw;
+  }
 }
