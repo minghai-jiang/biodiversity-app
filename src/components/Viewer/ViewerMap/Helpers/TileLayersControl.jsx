@@ -49,7 +49,7 @@ const tileLayerTypes = [
 const mapParams = {
   tileSize: 256,
   attribution: 'Ellipsis Earth Intelligence',
-  maxZoom: 20,
+  maxZoom: 19,
   noWrap: true,
   format: 'image/png'
 };
@@ -57,10 +57,11 @@ const mapParams = {
 const baseSatelliteOverlay = (
   <LayersControl.Overlay checked name="Base satellite" key="Base streets-satellite">
     <TileLayer
-      url="https://api.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWhqaWFuZyIsImEiOiJjamhkNXU3azcwZW1oMzZvNjRrb214cDVsIn0.QZWgmabi2gRJAWr1Vr3h7w"
-      attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href = "https://www.mapbox.com/" > Mapbox</a >'
+      url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
+      attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
       noWrap={true}
       zIndex={0}
+      maxZoom={19}
     />
   </LayersControl.Overlay>
 )
@@ -251,175 +252,5 @@ function prepareTileLayersOverlays (props) {
 
   return controlOverlays;
 }
-
-// export class TileLayersControl extends PureComponent {
-
-
-//   componentWillReceiveProps = (nextProps) => {
-//     let differentMap = nextProps.map !== this.props.map;
-//     let differentTimestamp = nextProps.timestampRange !== this.props.timestampRange ||
-//       nextProps.timestampRange.start !== this.props.timestampRange.start || 
-//       nextProps.timestampRange.end !== this.props.timestampRange.end
-    
-//     if (differentMap || differentTimestamp) {
-//       if (differentMap) {
-//         this.preparedtileLayers = this.prepareLayers(nextProps);
-//       }
-
-//       let controlOverlays = this.prepareTileLayersOverlays();
-
-//       this.setState({ controlOverlays: controlOverlays });
-//     }
-//   }
-
-//   onOverlayAdd = (e) => {
-//     if (!this.checkedLayers.includes(e.name)) {
-//       this.checkedLayers.push(e.name);
-//     }
-//   }
-
-//   onOverlayRemove = (e) => {    
-//     let index = this.checkedLayers.indexOf(e.name);
-//     if (index > -1) {
-//       this.checkedLayers.splice(index, 1);
-//     }
-//   }
-
-//   prepareLayers = (props) => {
-//     let map = props.map;
-//     if (!map || !map.tileLayers) {
-//       return [];
-//     }
-
-//     this.checkedLayers.length = 0;
-    
-//     let preparedtileLayers = [];
-
-//     for (var i = 0; i < tileLayerTypes.length; i++)
-//     {
-//       let tileLayerType = tileLayerTypes[i];
-
-//       let mapTileLayerType = map.tileLayers.find(x => x.type === tileLayerType.name);
-
-//       if (!mapTileLayerType) {
-//         continue;
-//       }
-
-//       let tileLayersOfTypes = [];
-
-//       for (var j = 0; j < mapTileLayerType.layers.length; j++)
-//       {
-//         let tileLayerName = mapTileLayerType.layers[j];
-
-//         if (tileLayerType.checked && !this.checkedLayers.includes(tileLayerName)) {
-//           this.checkedLayers.push(tileLayerName);
-//         }
-
-//         let tileLayersOfType = tileLayerTypes.find(x => x.name === tileLayerName);
-
-//         if (!tileLayersOfType) {
-//           tileLayersOfType = {
-//             name: tileLayerName,
-//             timestampElements: []
-//           };
-
-//           tileLayersOfTypes.push(tileLayersOfType);
-//         }
-
-//         mapTileLayerType.timestamps.forEach(timestampNumber => {
-//           let url = `${props.apiUrl}tileLayer/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
-
-//           tileLayersOfType.timestampElements.push({
-//             timestampNumber: timestampNumber,
-//             element: (<TileLayer
-//               url={url}
-//               tileSize={mapParams.tileSize}
-//               noWrap={mapParams.noWrap}
-//               maxZoom={mapParams.maxZoom}
-//               attribution={mapParams.attribution}
-//               format={mapParams.format}
-//               zIndex={tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1)}
-//               key={timestampNumber + '.' + j}
-//               errorTileUrl={props.publicFilesUrl + 'images/dummy_tile.png'}
-//               bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
-//             />)
-//           });
-//         })
-//       }
-
-//       preparedtileLayers.push({
-//         type: tileLayerType.name,
-//         layers: tileLayersOfTypes
-//       });
-//     }
-
-//     return preparedtileLayers;
-//   }
-
-//   prepareTileLayersOverlays = () => {
-//     let controlOverlays = [];
-
-//     let map = this.props.map;
-//     let timestampRange = this.props.timestampRange;
-
-//     if (!map || !timestampRange || !this.state.preparedtileLayers) {
-//       return null;
-//     }
-
-//     for (let i = 0; i < tileLayerTypes.length; i++) {
-//       let tileLayerType = tileLayerTypes[i];
-
-//       let tileLayersOfTypes = this.state.preparedtileLayers.find(x => x.type === tileLayerType.name);
-
-//       if (!tileLayersOfTypes) {
-//         continue;
-//       }
-
-//       let timestampStart = tileLayerType.stacking ? timestampRange.start : timestampRange.end;
-
-//       let layerElements = [];
-
-//       tileLayersOfTypes.layers.forEach(layer => {
-//         let layerName = layer.name;
-
-//         for (let j = timestampStart; j <= timestampRange.end; j++) {
-
-//           let timestampNumber = map.timestamps[j].timestampNumber;
-//           let timestampElement = layer.timestampElements.find(x => x.timestampNumber === timestampNumber);
-
-//           if (!timestampElement) {
-//             continue;
-//           }
-
-//           layerElements.push(timestampElement.element);
-//         }
-
-//         controlOverlays.push(
-//           <LayersControl.Overlay 
-//             name={layerName} 
-//             key={map.name + layerName} 
-//             checked={this.state.checkedLayers.includes(layerName)}
-//           >
-//             <LayerGroup name={layerName} key={layerName}>
-//               {layerElements}
-//             </LayerGroup>
-//           </LayersControl.Overlay>
-//         );
-//       })
-//     }
-
-//     return controlOverlays;
-//   }
-
-//   render() {
-//     return (
-//       <LayersControl position="topright">
-//         { this.baseSatellieOverlay }
-//         { this.state.controlOverlays }
-//       </LayersControl>
-//     );
-//   }
-
-// }
 
 export default TileLayersControl;

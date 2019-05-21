@@ -1,10 +1,13 @@
 import React, { PureComponent, createRef } from 'react';
+import { isMobile } from 'react-device-detect';
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import {
   Map,
   LayersControl,
+  Marker,
+  Popup
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-draw";
@@ -22,12 +25,21 @@ import GeoMessageFeed from './Helpers/GeoMessageFeed';
 import DrawingControl from './Helpers/DrawingControl';
 
 const getPolygonJsonWaitTime = 1000;
-const maxPolygons = 3000;
-const maxStandardTiles = 3000;
+const maxPolygons = isMobile ? 500 : 3000;
+const maxStandardTiles = isMobile ? 500 : 3000;
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
 
 export class ViewerMap extends PureComponent {
   mapRef = createRef();
   getPolygonJsonTimeout = null;
+  geolocation = null;
 
   constructor(props) {
     super(props);
@@ -44,7 +56,7 @@ export class ViewerMap extends PureComponent {
       legend: [],
     };
 
-    this.maxZoom = 14;
+    this.maxZoom = 19;
   }
 
   componentDidMount = async () => {
@@ -68,14 +80,22 @@ export class ViewerMap extends PureComponent {
     StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles, map);
     CrowdLayersControl.initialize(this.props, bounds, maxPolygons, map, this.refreshMap);
 
-
-    LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);
-    
+    LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);    
     FlyToControl.initialize(this.props, map, this.flyToChecked);
-
-    GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);
-    
+    GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);    
     DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition((position) => {
+        let hadGeolocation = this.geolocation ? true : false;
+
+        this.geolocation = [position.coords.latitude, position.coords.longitude];
+
+        if (!hadGeolocation) {
+          this.forceUpdate();
+        }
+      });
+    }
   }
 
   componentWillUnmount = () => {
@@ -91,7 +111,7 @@ export class ViewerMap extends PureComponent {
   componentWillReceiveProps = async (nextProps) => {
     let differentMap = nextProps.map !== this.props.map;
     
-    nextProps.map ? this.maxZoom = nextProps.map.zoom : this.maxZoom = 14;
+    nextProps.map ? this.maxZoom = nextProps.map.zoom : this.maxZoom = 19;
 
     this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
 
@@ -159,16 +179,12 @@ export class ViewerMap extends PureComponent {
       await tilePromise;
       await polygonPromise;
       await customPolygonPromise;
-
-      // await PolygonLayersControl.update(nextProps, bounds);
-      // await StandardTilesLayerControl.update(nextProps, bounds);
-      // await CrowdLayersControl.update(nextProps, bounds, this.refreshMap);
     }
   }
 
   getPolygonsJson = async (props, type = 'all') =>
   {
-    if(!this.mapRef || !this.mapRef.current)
+    if (!this.mapRef || !this.mapRef.current)
     {
       return null;
     }
@@ -345,8 +361,15 @@ export class ViewerMap extends PureComponent {
           { StandardTilesLayerControl.onFeatureClick(this.props, this.getPopupContent) }
           { CrowdLayersControl.onFeatureClick(this.props, this.getPopupContent) }
           { DrawingControl.onFeatureClick() }
+          {
+            this.geolocation ?
+              <Marker position={this.geolocation}>
+                <Popup>You are here</Popup>
+              </Marker> :
+              null
+          }
+  
         </Map>
-        {/* <PopupForm props={this.state.popupProps} /> */}
       </div>
     );
   }

@@ -110,7 +110,6 @@ export default class GeoMessage extends PureComponent {
   messageTrigger = async() =>
   {
     let messages = await this.getMessages();
-    debugger;
     this.setState({messages: messages});
   }
 
@@ -130,7 +129,7 @@ export default class GeoMessage extends PureComponent {
       )
     }
     else {
-      geoMessages.push(<div style={{ marginLeft: '1.5em', marginTop: '1em' }}>No messages</div>);
+      geoMessages.push(<div key='no-message-div' style={{ marginLeft: '1.5em', marginTop: '1em' }}>No messages</div>);
     }
 
     return(
@@ -290,14 +289,14 @@ export class Message extends Component {
           <li className='GeoDate' key={info.id + 'date'}>{Moment(info.date).format('DD-MM-YYYY HH:mm')}</li>
           {
             info.thumbnail && !this.state.imageData ? 
-              <li className='GeoGetImage' key={info.id + 'image'}>
-                <img src={info.thumbnail} key={info.id + 'view_image'} style={{'width': 'auto', 'cursor': 'zoom-in'}} onClick={() => this.getImage(info)}></img>
+              <li className='GeoGetImage' key={info.id + 'thumbnail-li'}>
+                <img src={info.thumbnail} key={info.id + 'thumbnail'} style={{'width': 'auto', 'cursor': 'zoom-in'}} onClick={() => this.getImage(info)}></img>
               </li> :
               null
           }
           {
             this.state.imageData ? 
-              <li id='lightbox' className={this.state.imageData ? 'GeoImage' : ''} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}>
+              <li id='lightbox' className={this.state.imageData ? 'GeoImage' : ''} key={info.id + 'image'} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}>
                 <img src={this.state.imageData}></img>
               </li> :
               null

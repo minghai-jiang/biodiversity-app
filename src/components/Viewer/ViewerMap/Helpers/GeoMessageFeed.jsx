@@ -1,7 +1,9 @@
 import React, { PureComponent} from 'react';
-import {Portal} from "react-leaflet-portal";
+import { Portal } from "react-leaflet-portal";
 import Select from 'react-select';
 import cloneDeep from 'lodash.clonedeep';
+import { isMobile } from 'react-device-detect';
+
 
 import {Message} from './GeoMessage';
 
@@ -240,11 +242,21 @@ async function makeFeed()
 
   feedContent.push(GeoMessageFeedElements[0].messages);
 
+  const customStyles = {
+    menu: (provided, state) => ({
+      ...provided,
+      marginTop: '0px',
+      position: 'static'
+    })
+  };
+
   let selectElement = (<div></div>);
   if (GeoMessageFeed_groups && GeoMessageFeed_groups.length > 0) {
     selectElement = (
       <Select
+        className='select-groups'
         placeholder={'Select groups for feed'}
+        styles={customStyles}
         isMulti
         isClearable={true}
         defaultValue={GeoMessageFeed_selectedGroups}

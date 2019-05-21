@@ -140,9 +140,13 @@
   cursor: pointer;
 }
 
-.button:hover {
+.button:hover:enabled {
     background-color: #00a3a3;
     color: #ffffff;
+}
+
+.button:disabled {
+  background-color: #aaaaaa;
 }
 
 .button-accented {
@@ -151,7 +155,7 @@
     color: #00a3a3
 }
 
-.button-accented:hover {
+.button-accented:hover:enabled {
     background-color: #00a3a3;
     color: #ffffff
 }

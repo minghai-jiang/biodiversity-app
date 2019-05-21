@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import jimp from 'jimp';
+import { readAndCompressImage } from "browser-image-resizer";
 
 import QueryUtil from '../../Utilities/QueryUtil';
 
@@ -9,6 +9,8 @@ const MAX_IMAGE_SIZE = {
   width: 1920,
   height: 1080
 };
+
+const IMAGE_MIME_TYPES = ['image/gif', 'image/jpeg', 'image/png'];
 
 export class PopupForm extends Component {
 
@@ -25,6 +27,7 @@ export class PopupForm extends Component {
         type: 'hidden',
         text: '',
       },
+      submitting: false
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -45,30 +48,52 @@ export class PopupForm extends Component {
   handleImageChange(e) {
     e.preventDefault();
 
-    let reader = new FileReader();
     let file = e.target.files[0];
-
-    if (file.size > 10000000) {
-      alert('Image too large (max 10 MB).');
+    
+    if (!IMAGE_MIME_TYPES.includes(file.type)) {
+      alert('Invalid image type.');
       return;
     }
 
-    this.loadingImage = true;
+    let cb = async () => {
+      this.loadingImage = true;
 
-    reader.onloadend = () => {
-      let buffer = Buffer.from(reader.result.split(',')[1], 'base64');
-      jimp.read(buffer)
-        .then(() => {
-          this.imageResult = reader.result;
+      const imgConfig = {
+        quality: 0.8,
+        maxWidth: MAX_IMAGE_SIZE.width,
+        maxHeight: MAX_IMAGE_SIZE.height,
+        autoRotate: true
+      };
+
+      readAndCompressImage(file, imgConfig)
+        .then(image => {
+          if (image.size > 10000000) {
+            alert('Image too large (max 10 MB).');
+            this.setState({ submitting: false });
+            return;
+          }
+
+          return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = function() {
+              resolve(reader.result);
+            };
+            reader.readAsDataURL(image);
+          });
+        })
+        .then(base64 => {
+          this.imageResult = base64;
           this.loadingImage = false;
+          this.setState({ submitting: false });
         })
         .catch(err => {
           this.loadingImage = false;
+          this.setState({ submitting: false });
           alert('Invalid image type.');
         });
     }
 
-    reader.readAsDataURL(file);
+    this.setState({ submitting: true }, () => { setTimeout(cb, 100); });
   }
 
 
@@ -76,9 +101,11 @@ export class PopupForm extends Component {
     event.preventDefault();
 
     if (this.loadingImage) {
-      alert('Image is done loading. Try again in a few moments.');
+      alert('Image is loading. Try again in a few moments.');
       return;
     }
+
+    this.setState({ submitting: true });
 
     let props = this.props.properties;
     let feedbackResult;
@@ -95,47 +122,58 @@ export class PopupForm extends Component {
       body.image = this.imageResult;
     }
 
-    if (props.custom === true)
-    {
-      body.customPolygonId = props.id;
-
-      feedbackResult = await QueryUtil.postData(
-        props.apiUrl + 'geoMessage/customPolygon/addMessage', 
-        body, 
-        props.headers
-      );
+    try {
+      if (props.custom === true)
+      {
+        body.customPolygonId = props.id;
+  
+        feedbackResult = await QueryUtil.postData(
+          props.apiUrl + 'geoMessage/customPolygon/addMessage', 
+          body, 
+          props.headers
+        );
+      }
+      else if(props.type === 'Polygon')
+      {
+        body.polygonId = props.id;
+  
+        feedbackResult = await QueryUtil.postData(
+          props.apiUrl + 'geoMessage/polygon/addMessage', 
+          body, 
+          props.headers
+        );
+      }
+      else
+      {
+        body.tileX = props.tileX;
+        body.tileY = props.tileY;
+        body.zoom = props.zoom;
+  
+        feedbackResult = await QueryUtil.postData(
+          props.apiUrl + 'geoMessage/tile/addMessage',
+          body,
+          props.headers
+        );
+      }
     }
-    else if(props.type === 'Polygon')
-    {
-      body.polygonId = props.id;
-
-      feedbackResult = await QueryUtil.postData(
-        props.apiUrl + 'geoMessage/polygon/addMessage', 
-        body, 
-        props.headers
-      );
-    }
-    else
-    {
-      body.tileX = props.tileX;
-      body.tileY = props.tileY;
-      body.zoom = props.zoom;
-
-      feedbackResult = await QueryUtil.postData(
-        props.apiUrl + 'geoMessage/tile/addMessage',
-        body,
-        props.headers
-      );
+    catch {
+      this.setState({ submitting: false });
     }
 
     let notification; let type;
-    if(feedbackResult === 'OK')
+    if (feedbackResult === 'OK')
     {
       type = 'notification';
       notification = 'Thanks for submitting this message';
     }
 
-    this.setState({text: '', clouds: false, classification: false, notification: {type: type, text: notification}});
+    this.setState({
+      text: '', 
+      clouds: false, 
+      classification: false, 
+      notification: {type: type, text: notification},
+      submitting: false
+    });
 
     this.props.messageTrigger();
   }
@@ -167,7 +205,12 @@ export class PopupForm extends Component {
             <input type="file" accept='image/*' onChange={(e)=>this.handleImageChange(e)} />
           </div>
           <div>
-            <input type="submit" value="Submit" className="button"/>
+            <input type="submit" value="Submit" className="button" disabled={this.state.submitting}/>
+            {
+              this.state.submitting ?
+                <img className='loading-spinner' src='/images/spinner.png' alt='spinner' /> :
+                null
+            }
           </div>
         </form>
         <div key={id + 'notification' + this.state.notification.text} className={this.state.notification.type}>{this.state.notification.text}</div>

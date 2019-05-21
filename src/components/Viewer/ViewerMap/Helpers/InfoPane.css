@@ -84,7 +84,7 @@ div.slide-pane__content table::-webkit-scrollbar-thumb:hover {
   background: #999999; 
 }
 
-div.slide-pane__content img.loading-spinner
+img.loading-spinner
 {
   height: 24px;
   width: 24px;

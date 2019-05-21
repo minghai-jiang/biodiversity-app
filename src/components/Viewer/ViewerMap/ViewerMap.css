@@ -239,3 +239,14 @@
   color: #026464;
   text-decoration: underline;
 }
+
+.leaflet-control-attribution {
+  max-width: 80vw;
+}
+
+@media only screen and (max-device-width : 860px)
+{
+  .leaflet-control-attribution {
+    font-size: 8px
+  }  
+}
