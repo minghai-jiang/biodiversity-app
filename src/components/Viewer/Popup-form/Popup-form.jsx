@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import jimp from 'jimp';
+import { readAndCompressImage } from "browser-image-resizer";
 
 import QueryUtil from '../../Utilities/QueryUtil';
 
@@ -9,6 +9,8 @@ const MAX_IMAGE_SIZE = {
   width: 1920,
   height: 1080
 };
+
+const IMAGE_MIME_TYPES = ['image/gif', 'image/jpeg', 'image/png'];
 
 export class PopupForm extends Component {
 
@@ -47,38 +49,51 @@ export class PopupForm extends Component {
     e.preventDefault();
 
     let file = e.target.files[0];
-
-    let cb = async () => {
-      let reader = new FileReader();
-
-      if (file.size > 10000000) {
-        alert('Image too large (max 10 MB).');
-        this.setState({ submitting: false });
-        return;
-      }
-
-      this.loadingImage = true;
-
-      reader.onloadend = async () => {
-        let buffer = Buffer.from(reader.result.split(',')[1], 'base64');
-        jimp.read(buffer)
-          .then(() => {
-            this.imageResult = reader.result;
-            this.loadingImage = false;
-            this.setState({ submitting: false });
-          })
-          .catch(err => {
-            this.loadingImage = false;
-            this.setState({ submitting: false });
-            alert('Invalid image type.');
-          });
-      }
-  
-      reader.readAsDataURL(file);
+    
+    if (!IMAGE_MIME_TYPES.includes(file.type)) {
+      alert('Invalid image type.');
+      return;
     }
 
-    this.setState({ submitting: true });
-    setTimeout(cb, 100);
+    let cb = async () => {
+      this.loadingImage = true;
+
+      const imgConfig = {
+        quality: 0.8,
+        maxWidth: MAX_IMAGE_SIZE.width,
+        maxHeight: MAX_IMAGE_SIZE.height,
+        autoRotate: true
+      };
+
+      readAndCompressImage(file, imgConfig)
+        .then(image => {
+          if (image.size > 10000000) {
+            alert('Image too large (max 10 MB).');
+            this.setState({ submitting: false });
+            return;
+          }
+
+          return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = function() {
+              resolve(reader.result);
+            };
+            reader.readAsDataURL(image);
+          });
+        })
+        .then(base64 => {
+          this.imageResult = base64;
+          this.loadingImage = false;
+          this.setState({ submitting: false });
+        })
+        .catch(err => {
+          this.loadingImage = false;
+          this.setState({ submitting: false });
+          alert('Invalid image type.');
+        });
+    }
+
+    this.setState({ submitting: true }, () => { setTimeout(cb, 100); });
   }
 
 
