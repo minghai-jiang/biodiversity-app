@@ -45,7 +45,7 @@ export class ViewerMap extends PureComponent {
       legend: [],
     };
 
-    this.maxZoom = 14;
+    this.maxZoom = 19;
   }
 
   componentDidMount = async () => {
@@ -92,7 +92,7 @@ export class ViewerMap extends PureComponent {
   componentWillReceiveProps = async (nextProps) => {
     let differentMap = nextProps.map !== this.props.map;
     
-    nextProps.map ? this.maxZoom = nextProps.map.zoom : this.maxZoom = 14;
+    nextProps.map ? this.maxZoom = nextProps.map.zoom : this.maxZoom = 19;
 
     this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
 
@@ -343,7 +343,6 @@ export class ViewerMap extends PureComponent {
           { CrowdLayersControl.onFeatureClick(this.props, this.getPopupContent) }
           { DrawingControl.onFeatureClick() }
         </Map>
-        {/* <PopupForm props={this.state.popupProps} /> */}
       </div>
     );
   }
