@@ -28,7 +28,7 @@ export class Sector extends Component {
     return (
       <div>
         <div className="main-block-header">
-            <h1>Sectors</h1>
+            <h1>{this.props.localization["sectors"]}</h1>
         </div>
 
         <LoadUpdateUtil

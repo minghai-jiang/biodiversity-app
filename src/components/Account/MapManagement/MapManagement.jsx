@@ -126,8 +126,8 @@ class MapManagement extends PureComponent {
         if (this.state.mode === 0) {
           modeElement = (
             <AccessManagement
-              apiUrl={this.props.apiUrl} 
-              language={this.props.language} 
+              apiUrl={this.props.apiUrl}
+              language={this.props.language}
               localization={this.props.localization}
               user={this.props.user}
               showError={showError}
@@ -140,8 +140,8 @@ class MapManagement extends PureComponent {
         else if (this.state.mode === 1) {
             modeElement = (
               <GroupUserManagement
-                apiUrl={this.props.apiUrl} 
-                language={this.props.language} 
+                apiUrl={this.props.apiUrl}
+                language={this.props.language}
                 localization={this.props.localization}
                 user={this.props.user}
                 showError={showError}
@@ -154,8 +154,8 @@ class MapManagement extends PureComponent {
         else if (this.state.mode === 2) {
           modeElement = (
             <CustomPolygonLayersManagement
-              apiUrl={this.props.apiUrl} 
-              language={this.props.language} 
+              apiUrl={this.props.apiUrl}
+              language={this.props.language}
               localization={this.props.localization}
               user={this.props.user}
               showError={showError}
@@ -168,15 +168,15 @@ class MapManagement extends PureComponent {
         mapAccessArea = (
           <div style={{marginTop: '20px'}}>
             <div>
-              <button 
+              <button
                 className='map-management-button'
                 onClick={() => this.changeMode(0)}
               >
                 {this.props.localization["Map access"]}
               </button>
-              <button 
+              <button
                 className='map-management-button'
-                style={{marginLeft: '20px'}} 
+                style={{marginLeft: '20px'}}
                 onClick={() => this.changeMode(2)}
               >
                 {this.props.localization["Custom polygons"]}
@@ -190,7 +190,7 @@ class MapManagement extends PureComponent {
       managementArea = (
         <div>
           <select onChange={this.onMapSelect} defaultValue="default">
-            <option value="default" disabled hidden>Select a Map</option>
+            <option value="default" disabled hidden>{this.props.localization["SelectMap"]}</option>
             {this.renderMapOptions()}
           </select>
           <div style={{textAlign: 'left'}}>

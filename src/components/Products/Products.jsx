@@ -16,24 +16,24 @@ export class Products extends Component {
     return (
       <div>
         <div className="main-content">
-          <Route 
-            exact 
-            path="/products" 
-            render={() => 
-              <ProductsHome publicFilesUrl={this.props.publicFilesUrl} language={this.props.language}/>
-            } 
+          <Route
+            exact
+            path="/products"
+            render={() =>
+              <ProductsHome publicFilesUrl={this.props.publicFilesUrl} language={this.props.language} localization={this.props.localization}/>
+            }
           />
-          <Route 
-            path="/products/documentation" 
-            render={() => 
+          <Route
+            path="/products/documentation"
+            render={() =>
               <ProductsDocumentation publicFilesUrl={this.props.publicFilesUrl} language={this.props.language}/>
-            } 
+            }
           />
-          <Route 
-            path="/products/tutorial" 
-            render={() => 
+          <Route
+            path="/products/tutorial"
+            render={() =>
               <ProductsTutorial publicFilesUrl={this.props.publicFilesUrl} language={this.props.language}/>
-            } 
+            }
           />
         </div>
         <Footer></Footer>

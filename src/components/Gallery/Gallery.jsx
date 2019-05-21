@@ -15,7 +15,7 @@ export class Gallery extends Component {
       galleryItemUrl : null
     };
   }
-   
+
   onGalleryChange = e => {
     let itemValue = e.target.value;
     let contentUrl = '/markdown/' + itemValue + '.md';
@@ -26,10 +26,10 @@ export class Gallery extends Component {
     return (
       <div>
         <div className="main-block-header">
-          <h1>Gallery</h1>
+          <h1>{this.props.localization["gallery"]}</h1>
         </div>
-        <div className="main-block main-block-first product-block-first">            
-          <LoadUpdateUtil 
+        <div className="main-block main-block-first product-block-first">
+          <LoadUpdateUtil
             contentUrl={'/html/' + this.props.language + '/gallery/gallery.html'}
           />
         </div>
@@ -46,8 +46,8 @@ export class Gallery extends Component {
             </select>
           </div>
           <div className="main-block-content main-block-content-left">
-            <LoadUpdateUtil 
-              contentUrl={this.state.galleryItemUrl} 
+            <LoadUpdateUtil
+              contentUrl={this.state.galleryItemUrl}
               isMarkdown={true}
             />
           </div>

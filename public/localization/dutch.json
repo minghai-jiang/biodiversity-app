@@ -10,6 +10,10 @@
 
   "Language": "Taal",
 
+  "products": "Producten",
+  "gallery": "Galerij",
+  "sectors": "Sectoren",
+
   "ChoosePrompt": "Maak uw keuze",
 
   "SelectSector": "Selecteer uw sector",
@@ -51,6 +55,7 @@
   "ResetPasswordSuccessMessage2": "Volg de instructies in de email om door te gaan.",
 
   "Map Management": "Kaarten beheer",
+  "SelectMap": "Selecteer een kaart",
   "Map access": "Kaarten toegang",
   "Custom polygons": "Polygonlagen",
   "Access levels": "Toegangniveaus",

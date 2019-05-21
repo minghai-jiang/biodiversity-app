@@ -8,11 +8,11 @@ export class ProductsHome extends Component {
     return (
       <div>
         <div className="main-block-header">
-            <h1>Products</h1>
+            <h1>{this.props.localization["products"]}</h1>
         </div>
 
-        <LoadUpdateUtil 
-          contentUrl={'/html/' + this.props.language + '/products/products-home.html'} 
+        <LoadUpdateUtil
+          contentUrl={'/html/' + this.props.language + '/products/products-home.html'}
         />
 
       </div>

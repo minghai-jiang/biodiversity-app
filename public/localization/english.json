@@ -9,7 +9,9 @@
   "Logout": "Logout",
 
   "Language": "Language",
-
+  "products": "Products",
+  "gallery": "Gallery",
+  "sectors": "Sectors",
   "ChoosePrompt": "Please choose",
 
   "SelectSector": "Select sector",
@@ -53,6 +55,7 @@
   "ResetPasswordSuccessMessage2": "Please follow the procedure in the email to continue.",
 
   "Map Management": "Map Management",
+  "SelectMap": "Select a map",
   "Map access": "Map access",
   "Custom polygons": "Polygon layers",
   "Access levels": "Access levels",
