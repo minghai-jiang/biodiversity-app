@@ -20,6 +20,7 @@
     "plotly.js": "^1.47.4",
     "rc-slider": "^8.6.7",
     "react": "^16.7.0",
+    "react-device-detect": "^1.6.2",
     "react-dom": "^16.7.0",
     "react-leaflet": "^2.1.4",
     "react-leaflet-portal": "^0.1.11",

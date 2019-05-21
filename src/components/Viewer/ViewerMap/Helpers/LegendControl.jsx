@@ -1,6 +1,7 @@
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 
-import {Portal} from "react-leaflet-portal";
+import { Portal } from "react-leaflet-portal";
 
 import LegendRow from './LegendRow';
 
@@ -20,11 +21,16 @@ const LegendControl = {
       return null;
     }
 
+    let initialClass = 'leaflet-control-layers leaflet-control-layers-toggle legend';
+    if (!isMobile) {
+      initialClass += ' active';
+    }
+
     return ( 
       <Portal key="legendPortal" position="bottomright">
         <div 
           key='legendContainer'
-          className='leaflet-control-layers leaflet-control-layers-toggle legend active'
+          className={initialClass}
           onClick={addActive}
         >
           {legendControl_legendElement}

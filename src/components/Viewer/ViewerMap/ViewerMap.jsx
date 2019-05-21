@@ -1,4 +1,5 @@
 import React, { PureComponent, createRef } from 'react';
+import { isMobile } from 'react-device-detect';
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -22,8 +23,8 @@ import GeoMessageFeed from './Helpers/GeoMessageFeed';
 import DrawingControl from './Helpers/DrawingControl';
 
 const getPolygonJsonWaitTime = 1000;
-const maxPolygons = 3000;
-const maxStandardTiles = 3000;
+const maxPolygons = isMobile ? 500 : 3000;
+const maxStandardTiles = isMobile ? 500 : 3000;
 
 export class ViewerMap extends PureComponent {
   mapRef = createRef();
@@ -159,10 +160,6 @@ export class ViewerMap extends PureComponent {
       await tilePromise;
       await polygonPromise;
       await customPolygonPromise;
-
-      // await PolygonLayersControl.update(nextProps, bounds);
-      // await StandardTilesLayerControl.update(nextProps, bounds);
-      // await CrowdLayersControl.update(nextProps, bounds, this.refreshMap);
     }
   }
 
