@@ -108,8 +108,8 @@ class App extends Component {
       })
       .then(json => {
         localStorage.setItem('language', language);
-        this.setState({ 
-          language: language, 
+        this.setState({
+          language: language,
           localization: json
         });
       })
@@ -124,7 +124,7 @@ class App extends Component {
       this.props.history.push('/');
     });
   }
-  
+
   onLogout = () => {
     localStorage.removeItem(localStorageUserItem);
     this.setState({ user: null });
@@ -148,50 +148,51 @@ class App extends Component {
           />
           <div className="content" ref={ref => this.el = ref}>
             <Route exact path="/"
-              render={() => 
+              render={() =>
                 <Home
                   language={this.state.language}
                 />
               }
             />
-            <Route 
-              path="/viewer" 
-              render={() => 
-                <Viewer apiUrl={apiUrl} user={this.state.user}/>
-              } 
-            />
-            <Route path="/products" 
+            <Route
+              path="/viewer"
               render={() =>
-                <Products 
-                  publicFilesUrl={publicFilesUrl} 
-                  language={this.state.language}
-                />
+                <Viewer apiUrl={apiUrl} user={this.state.user}/>
               }
             />
-            <Route 
-              path="/sectors" 
-              render={() => 
-                <Sector 
+            <Route path="/products"
+              render={() =>
+                <Products
                   publicFilesUrl={publicFilesUrl}
                   language={this.state.language}
                   localization={this.state.localization}
                 />
               }
             />
-            <Route 
-              path="/gallery" 
-              render={() => 
-                <Gallery 
+            <Route
+              path="/sectors"
+              render={() =>
+                <Sector
                   publicFilesUrl={publicFilesUrl}
                   language={this.state.language}
                   localization={this.state.localization}
                 />
               }
             />
-            <Route 
-              path="/about" 
-              render={() => 
-                <About 
+            <Route
+              path="/gallery"
+              render={() =>
+                <Gallery
+                  publicFilesUrl={publicFilesUrl}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              }
+            />
+            <Route
+              path="/about"
+              render={() =>
+                <About
                   publicFilesUrl={publicFilesUrl}
                   language={this.state.language}
                   localization={this.state.localization}
@@ -199,31 +200,31 @@ class App extends Component {
             }
             />
             <Route path="/contact" component={Contact} />
-            <Route 
-              path="/login" 
-              render={() => 
-                <Login 
-                  apiUrl={apiUrl} 
+            <Route
+              path="/login"
+              render={() =>
+                <Login
+                  apiUrl={apiUrl}
                   onLogin={this.onLogin}
                   language={this.state.language}
                   localization={this.state.localization}
-                /> 
+                />
               }
             />
-            <Route 
-              path="/account" 
-              render={() => 
-                <Account 
+            <Route
+              path="/account"
+              render={() =>
+                <Account
                   apiUrl={apiUrl}
-                  user={this.state.user} 
+                  user={this.state.user}
                   language={this.state.language}
                   localization={this.state.localization}
                   onLogout={this.onLogout}
                 />
-              } 
+              }
             />
-          </div>               
-        </div>   
+          </div>
+        </div>
       );
     }
     else {

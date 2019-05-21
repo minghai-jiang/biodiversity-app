@@ -19,7 +19,7 @@ export class MainMenu extends Component {
     var x = document.getElementById("main-menu");
     if (x.className === "") {
       x.className = "responsive";
-    } 
+    }
     else {
       x.className = "";
     }
@@ -79,7 +79,7 @@ export class MainMenu extends Component {
               {this.props.localization['AboutUs']}
             </NavLink>
           </li>
-          <li style={{float: "right"}}>              
+          <li style={{float: "right"}}>
             <div className="main-menu-item dropdown">
               <button className="dropbtn">
                 {this.props.localization['Language']}
@@ -87,8 +87,9 @@ export class MainMenu extends Component {
               <div className="dropdown-content">
                 <a href="#" onClick={() => this.changeLanguage('english')}>English</a>
                 <a href="#" onClick={() => this.changeLanguage('spanish')}>Español</a>
+                <a href="#" onClick={() => this.changeLanguage('dutch')}>Nederlands</a>
               </div>
-            </div> 
+            </div>
           </li>
           <li style={{display: this.props.user ? 'none' : 'block', float: "right"}}>
             <NavLink to="/login" className="main-menu-item">
@@ -96,19 +97,19 @@ export class MainMenu extends Component {
             </NavLink>
           </li>
 
-          {/* <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>              
+          {/* <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>
             <a className='main-menu-item' style={{cursor: 'pointer'}} onClick={this.logout.bind(this)}>Logout</a>
           </li> */}
 
-          <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>   
+          <li style={{display: this.props.user ? 'block' : 'none', float: "right"}}>
             <NavLink to="/account/management" className="main-menu-item">
-              {this.props.user ? this.props.user.username : ''}  
+              {this.props.user ? this.props.user.username : ''}
             </NavLink>
           </li>
-        </ul> 
+        </ul>
         <a href={void(0)} className="icon" onClick={this.toggleMenu}>
           <img alt="hamburger-menu" src="/images/three-lines.png"></img>
-        </a>          
+        </a>
       </div>
     )
   }
