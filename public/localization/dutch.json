@@ -1,0 +1,75 @@
+{
+  "Home": "Home",
+  "Viewer": "Viewer",
+  "Products": "Producten",
+  "Sectors": "Sectoren",
+  "Gallery": "Galerij",
+  "AboutUs": "Over ons",
+  "Login": "Inloggen",
+  "Logout": "Uitloggen",
+
+  "Language": "Taal",
+
+  "ChoosePrompt": "Maak uw keuze",
+
+  "SelectSector": "Selecteer uw sector",
+  "Forestry": "Bosbouw",
+  "ConsultancyEngineering": "Consultancy en ingenieur bureaus",
+  "Government": "Overheden",
+  "Ngo": "NGO's",
+
+  "ApiTutorial": "API Tutorial",
+  "Documentation": "Documentatie",
+  "Northern Paraguay deforestation": "Paraguay deforestation",
+  "Flora management in the Netherlands": "Flora management in the Netherlands",
+  "Appendix": "Appendix",
+
+  "Username": "Gebruikersnaam",
+  "Password": "Wachtwoord",
+  "PasswordRepeat": "Herhaal wachtwoord",
+  "Email": "Emailadres",
+
+  "NewEmail": "Nieuw emailadres",
+  "NewPassword": "Nieuw wachtwoord",
+  "NewPasswordRepeat": "Herhaal nieuw wachtwoord",
+
+  "SignUp": "Registreer",
+  "Register": "Registreer",
+  "ForgotPasswordQuestion": "Wachtwoord vergeten?",
+  "ResetPassword": "Wijzig wachtwoord",
+
+  "AccountManagement": "Account beheren",
+  "ChangePassword": "Wijzig wachtwoord",
+  "ChangeEmail": "Wijzig emailadres",
+
+  "Success": "Gelukt!",
+  "RegisterSuccessMessage1": "We hebben een email naar u verzonden ter validatie. Volg de insturcites in deze mail.",
+  "RegisterSuccessMessage2": "U kunt nu inloggen met uw gegevens.",
+  "ChangeEmailSuccessMessage": "We hebben een email naar u verzonden ter validatie. Volg de insturcites in deze mail.",
+  "ChangePasswordSuccessMessage": "U kunt nu inloggen met uw nieuwe wachtwoord.",
+  "ResetPasswordSuccessMessage1": "We hebben een emal verzonden naar uw adres.",
+  "ResetPasswordSuccessMessage2": "Volg de instructies in de email om door te gaan.",
+
+  "Map Management": "Kaarten beheer",
+  "Map access": "Kaarten toegang",
+  "Custom polygons": "Polygonlagen",
+  "Access levels": "Toegangniveaus",
+  "Public access level": "Publiek toegangniveau",
+  "Group name": "Groepnaam",
+  "Access level": "Toegangniveau",
+  "Create": "Maak aan",
+  "Save": "Sla op",
+  "Add": "Voeg toe",
+  "Edit users": "Pas aan",
+  "Delete":"Verwijder",
+  "new group":"Nieuwe groep",
+  "Layer name": "Naam van de laag",
+  "Color": "Kleur",
+  "Properties": "atributen",
+  "new layer": "Nieuwe laag",
+  "property1,property2":"Eigenschap1,Eigenshap2",
+  "Actions": "Acties",
+  "new user": "nieuwe gebruiker",
+
+"levels": "Ieder toegangsniveau impliceert alle lagere toegangsniveaus.<br/><br/>Niveau 100: Het recht om een kaart te zien.<br/>Niveau 200: Het recht om de geaggregeerde data van een kaart te zien..<br/>Niveau 300: Het recht om geoMessages te zien.<br/>Niveau 400: Het recht om geoMessages te schrijven.<br/>Niveau 500: Het recht op polygonen toe te voegen.<br/>Niveau 600: Het recht om geoMessages te verwijdren.<br/>Niveau 700: Het recht om polygonen te wijzigen of verwijderen.<br/>Niveau 800: Het recht om polygonlagen te wijzigen of verwijdren.<br/>Niveau 900: Het recht om gebruikers toe te voegen aan groepen tot niveau 900. <br/>Niveau 1000: Het recht om een kaart te publiceren en gebruikersgroepen te maken.<br/>"
+}
