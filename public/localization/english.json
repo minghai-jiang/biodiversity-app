@@ -56,7 +56,7 @@
 
   "Map Management": "Map Management",
   "formManagement": "Forms" ,
-  "forms": "Forms" ,
+  "form": "Form" ,
   "Change": "Change" ,
   "SelectMap": "Select a map",
   "Map access": "Map access",
@@ -70,6 +70,7 @@
   "Question": "Question",
   "Obligatory":"Obligatory",
   "type":"Type",
+  "saveForm": "Save form",
   "Save": "Save",
   "Edit users": "Edit users",
   "Delete":"Delete",

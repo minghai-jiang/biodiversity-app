@@ -8,22 +8,27 @@ import cloneDeep from 'lodash.clonedeep';
 import ApiManager from '../../../../ApiManager';
 
 import CreateForm from './CreateForm/CreateForm';
+import ChangeForm from './ChangeForm/ChangeForm';
+
 
 class FormManagment extends PureComponent {
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      forms: [{name: 'new form'}],
-      formsData: [{name: 'new form'}],
+      forms: [{name: 'new form'},{name: 'old form'}],
+      formsData: [{name: 'new form'},{name: 'old form'}],
       mode:0,
+      formToChange:null
     };
   }
 
 
 
 
-  changeForm = (cellInfo) => {
+  changeForm = (mode,cellInfo) => {
+    this.setState({mode:mode,formToChange: this.state.forms[cellInfo.index-1]['name']});
+
   }
 
   deleteFrom = (cellInfo) => {
@@ -66,8 +71,8 @@ class FormManagment extends PureComponent {
         <div
           style={{ backgroundColor: "#fafafa" }}
         >
-          <button onClick={() => this.changeForm(cellInfo)}>{this.props.localization["Change"]}</button>
-          <button onClick={() => this.deleteFrom(cellInfo)}>{this.props.localization["Delete"]}</button>
+          <button onClick={() => this.changeForm(2,cellInfo)}>{this.props.localization["Change"]}</button>
+          <button onClick={() => this.deleteFrom()}>{this.props.localization["Delete"]}</button>
         </div>
       );
     }
@@ -85,7 +90,7 @@ class FormManagment extends PureComponent {
               data={this.state.formsData}
               columns={[
                 {
-                  Header: this.props.localization["forms"],
+                  Header: this.props.localization["form"],
                   accessor: 'name',
                   Cell: this.renderEditable
                 },
@@ -119,6 +124,21 @@ class FormManagment extends PureComponent {
           </CreateForm>
         )
       }
+
+      if (this.state.mode === 2) {
+        modeElement = (
+          <ChangeForm
+            apiUrl={this.props.apiUrl}
+            language={this.props.language}
+            localization={this.props.localization}
+            user={this.props.user}
+            map={this.props.map}
+            formName = {this.state.formToChange}
+          >
+          </ChangeForm>
+        )
+      }
+
 
       return (
         modeElement

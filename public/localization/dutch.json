@@ -56,7 +56,7 @@
 
   "Map Management": "Kaarten beheer",
   "formManagement": "Formulieren" ,
-  "forms": "Formulieren" ,
+  "form": "Formulier" ,
   "Change": "Pas aan" ,
   "Create": "Voeg toe",
   "Type": "Type",
@@ -70,6 +70,7 @@
   "Group name": "Groepnaam",
   "Access level": "Toegangniveau",
   "Save": "Sla op",
+  "saveForm": "Sla formulier op",
   "Add": "Voeg toe",
   "Edit users": "Pas aan",
   "Delete":"Verwijder",

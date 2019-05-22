@@ -18,12 +18,22 @@ class CreateForm extends PureComponent {
 
 
   add = () => {
-    this.state.form.push(this.state.form[0])
-    this.setState(this.state.form)
-    console.log(this.state.form)
-  }
-  delete = (cellInfo) => {}
+    let x = {"Question": '', "Type": '', "Obligatory": ''}
+    x["Question"] = this.state.form[0]["Question"]
+    x["Type"] = this.state.form[0]["Type"]
+    x["Obligatory"] = this.state.form[0]["Obligatory"]
 
+    this.state.form.splice(1,0,x)
+    this.setState(this.state.form)
+  }
+
+  delete = (cellInfo) => {
+    this.state.form.splice(cellInfo.index - 1,1)
+    this.setState(this.state.form)
+  }
+
+  save = () => {
+      }
 
   renderEditable = (cellInfo) => {
     return (
@@ -122,6 +132,7 @@ class CreateForm extends PureComponent {
           minRows={0}
           className="-striped -highlight"
         />
+        <button onClick={() => this.save()}>{this.props.localization["saveForm"]}</button>
       </div>
     )
       return (

@@ -56,7 +56,7 @@
 
   "Map Management": "Gestión de mapas",
   "formManagement": "Formularios" ,
-  "forms": "Formularios" ,
+  "form": "Formulario" ,
   "Change": "Cambio" ,
   "Type": "Tipo",
   "SelectMap": "seleccione mapa",
@@ -67,6 +67,7 @@
   "Group name": "Nombre del grupo",
   "Access level": "Nivel de acceso",
   "Create": "Crear",
+  "saveForm": "Guardar formulario",
   "Question": "Pregunta",
   "Obligatory":"Obligatorio",
   "Save": "Guardar",
