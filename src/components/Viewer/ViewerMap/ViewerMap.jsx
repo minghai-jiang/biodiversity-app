@@ -290,7 +290,9 @@ export class ViewerMap extends PureComponent {
     let limitZoom = TileLayersControl.onOverlayRemove(e);
     if (!limitZoom) {
       this.maxZoom = 19;
-      this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
+      if (this.mapRef.current) {
+        this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
+      }
     }
 
     PolygonLayersControl.onOverlayRemove(e);
