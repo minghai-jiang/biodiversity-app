@@ -347,30 +347,15 @@ export class ViewerMap extends PureComponent {
           <LayersControl position="topright">
             { TileLayersControl.getElement() }
           </LayersControl>
-
-          {
-            PolygonLayersControl.getElement().polygonControlOverlays ? 
-              <LayersControl position="topright">
-                { PolygonLayersControl.getElement().polygonControlOverlays }
-              </LayersControl> :
-              null
-          }
-
-          {
-            StandardTilesLayerControl.getElement().polygonControlOverlays ?
-              <LayersControl position="topright">
-                { StandardTilesLayerControl.getElement().polygonControlOverlays }
-              </LayersControl> :
-              null
-          }
-
-          {
-            CrowdLayersControl.getElement().polygonControlOverlays ? 
-              <LayersControl position="topright">
-                { CrowdLayersControl.getElement().polygonControlOverlays }
-              </LayersControl> :
-              null
-          }
+          <LayersControl position="topright">
+            { StandardTilesLayerControl.getElement().polygonControlOverlays }
+          </LayersControl>
+          <LayersControl position="topright">
+            { PolygonLayersControl.getElement().polygonControlOverlays }
+          </LayersControl>
+          <LayersControl position="topright" className='layers-icon'>
+            { CrowdLayersControl.getElement().polygonControlOverlays }
+          </LayersControl>
 
           { LegendControl.getElement() }
           { FlyToControl.getElement() }
