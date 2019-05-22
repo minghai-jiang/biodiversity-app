@@ -8,6 +8,7 @@ import cloneDeep from 'lodash.clonedeep';
 import AccessManagement from './AccessManagement/AccessManagement';
 import GroupUserManagement from './GroupUserManagement/GroupUserManagement';
 import CustomPolygonLayersManagement from './CustomPolygonLayersManagement/CustomPolygonLayersManagement';
+import FormManagement from './FormManagement/FormManagement';
 
 import ApiManager from '../../../ApiManager';
 
@@ -20,7 +21,8 @@ class MapManagement extends PureComponent {
     this.state = {
       maps: null,
       selectedMap: null,
-      mode: 0
+      mode: 0,
+      formManagementKey: 0
     };
   }
 
@@ -37,7 +39,11 @@ class MapManagement extends PureComponent {
   }
 
   changeMode = (mode) => {
-    this.setState({ mode: mode });
+    let newKey = this.state.formManagementKey;
+    if (mode === 3) {
+        newKey = Math.random();
+    }
+    this.setState({ mode: mode, formManagementKey: newKey });
   }
 
   onGroupUserManagement = (group) => {
@@ -165,6 +171,22 @@ class MapManagement extends PureComponent {
           )
       }
 
+      else if (this.state.mode === 3) {
+        modeElement = (
+          <FormManagement
+            key={this.state.formManagementKey}
+            apiUrl={this.props.apiUrl}
+            language={this.props.language}
+            localization={this.props.localization}
+            user={this.props.user}
+            showError={showError}
+            map={this.state.selectedMap}
+          >
+          </FormManagement>
+        )
+    }
+
+
         mapAccessArea = (
           <div style={{marginTop: '20px'}}>
             <div>
@@ -180,6 +202,13 @@ class MapManagement extends PureComponent {
                 onClick={() => this.changeMode(2)}
               >
                 {this.props.localization["Custom polygons"]}
+              </button>
+              <button
+                className='map-management-button'
+                style={{marginLeft: '20px'}}
+                onClick={() => this.changeMode(3)}
+              >
+                {this.props.localization["formManagement"]}
               </button>
             </div>
             {modeElement}
