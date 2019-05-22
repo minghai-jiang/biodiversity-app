@@ -12,7 +12,7 @@ class CreateForm extends PureComponent {
     super(props, context);
 
     this.state = {
-      form : [{"Question": 'Your question', "Type": 'Text', "Obligatory": 'Yes'}]
+      form : [{"Question": 'Your question', "Type": "Numeric", "Obligatory": "Yes"}],
           };
   }
 
@@ -50,26 +50,41 @@ class CreateForm extends PureComponent {
   }
 
   renderDropdown = (cellInfo) => {
-    return (
-      <div style={{ backgroundColor: "#fafafa" }}>
-      <select name="Type">
-        <option value="Text">Text</option>
-        <option value="Numeric">Numeric</option>
-        <option value="Boolean">Boolean</option>
-      </select>
-      </div>
-    );
+    let element = <div> </div>
+      element = (   <div style={{ backgroundColor: "#fafafa" }}>
+          <select value = {this.state.form[cellInfo.index][cellInfo.column.id]}
+           name="Type"
+           onChange = {e => {
+             let x = Object.assign({}, this.state.form);
+             x[cellInfo.index][cellInfo.column.id] = e.target.value;
+             this.setState({x})
+            }}>
+            <option  value="Text">Text</option>
+            <option value="Numeric">Numeric</option>
+            <option value="Boolean">Boolean</option>
+          </select>
+          </div>
+        );
+    return (element)
+
   }
 
   renderTickbox = (cellInfo) => {
-    return (
-      <div style={{ backgroundColor: "#fafafa" }}>
-      <select name="Obligatory">
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
-      </select>
-      </div>
-    );
+    let element = <div> </div>
+      element = (   <div style={{ backgroundColor: "#fafafa" }}>
+          <select value = {this.state.form[cellInfo.index][cellInfo.column.id]}
+           name="Type"
+           onChange = {e => {
+             let x = Object.assign({}, this.state.form);
+             x[cellInfo.index][cellInfo.column.id] = e.target.value;
+             this.setState({x})
+            }}>
+            <option  value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+          </div>
+        );
+    return (element)
   }
 
   renderActionButtons = (cellInfo) => {
@@ -113,12 +128,12 @@ class CreateForm extends PureComponent {
             {
               Header: this.props.localization["Type"],
               accessor: 'Type',
-              Cell: this.renderEditable
+              Cell: this.renderDropdown
             },
             {
               Header: this.props.localization["Obligatory"],
               accessor: 'Obligatory',
-              Cell: this.renderEditable
+              Cell: this.renderTickbox
             },
             {
               Header: this.props.localization["Actions"],

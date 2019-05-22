@@ -32,6 +32,8 @@ class FormManagment extends PureComponent {
   }
 
   deleteFrom = (cellInfo) => {
+      this.state.formsData.splice(cellInfo.index - 1,1)
+      this.setState(this.state.formsData)
   }
 
   createForm = (mode) => {
@@ -72,7 +74,7 @@ class FormManagment extends PureComponent {
           style={{ backgroundColor: "#fafafa" }}
         >
           <button onClick={() => this.changeForm(2,cellInfo)}>{this.props.localization["Change"]}</button>
-          <button onClick={() => this.deleteFrom()}>{this.props.localization["Delete"]}</button>
+          <button onClick={() => this.deleteFrom(cellInfo)}>{this.props.localization["Delete"]}</button>
         </div>
       );
     }
