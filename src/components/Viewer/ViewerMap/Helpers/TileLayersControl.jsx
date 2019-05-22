@@ -107,12 +107,31 @@ const TileLayersControl = {
 
     tileLayersControl_map = props.map;
     tileLayersControl_timestampRange = props.timestampRange;
+
+    let limitZoom = tileLayersControl_checkedLayers.length > 1 || 
+    (tileLayersControl_checkedLayers.length > 0 && tileLayersControl_checkedLayers[0] !== 'Base satellite');
+
+    return limitZoom;
   },
 
   onOverlayAdd: (e) => {
-    if (!tileLayersControl_checkedLayers.includes(e.name)) {
+    let tileLayer = null;
+    for (let i = 0; i < tileLayersControl_preparedtileLayers.length; i++) {
+      tileLayer = tileLayersControl_preparedtileLayers[i].layers.find(x => x.name === e.name);
+
+      if (tileLayer) {
+        break;
+      }
+    }
+
+    if (!tileLayersControl_checkedLayers.includes(e.name) && tileLayer) {
       tileLayersControl_checkedLayers.push(e.name);
     }
+
+    let limitZoom = tileLayersControl_checkedLayers.length > 1 || 
+      (tileLayersControl_checkedLayers.length > 0 && tileLayersControl_checkedLayers[0] !== 'Base satellite');
+
+    return limitZoom;
   },
 
   onOverlayRemove: (e) => {    
@@ -120,6 +139,11 @@ const TileLayersControl = {
     if (index > -1) {
       tileLayersControl_checkedLayers.splice(index, 1);
     }
+
+    let limitZoom = tileLayersControl_checkedLayers.length > 1 || 
+      (tileLayersControl_checkedLayers.length > 0 && tileLayersControl_checkedLayers[0] !== 'Base satellite');
+
+    return limitZoom;
   },
 
   clear: (e) => {
@@ -178,7 +202,7 @@ function tileLayersControl_prepareLayers (props) {
             url={url}
             tileSize={mapParams.tileSize}
             noWrap={mapParams.noWrap}
-            maxZoom={mapParams.maxZoom}
+            maxZoom={map.zoom}
             attribution={mapParams.attribution}
             format={mapParams.format}
             zIndex={tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1)}

@@ -40,6 +40,7 @@ export class ViewerMap extends PureComponent {
   mapRef = createRef();
   getPolygonJsonTimeout = null;
   geolocation = null;
+  maxZoom = 19;
 
   constructor(props) {
     super(props);
@@ -110,10 +111,6 @@ export class ViewerMap extends PureComponent {
 
   componentWillReceiveProps = async (nextProps) => {
     let differentMap = nextProps.map !== this.props.map;
-    
-    nextProps.map ? this.maxZoom = nextProps.map.zoom : this.maxZoom = 19;
-
-    this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
 
     if (differentMap ||
         nextProps.timestampRange !== this.props.timestampRange ||
@@ -130,6 +127,16 @@ export class ViewerMap extends PureComponent {
         LegendControl.clear();
         FlyToControl.clear();
         GeoMessageFeed.clear();
+
+        let limitZoom = TileLayersControl.update(nextProps);
+        if (limitZoom) {
+          this.maxZoom = nextProps.map.zoom;
+        }
+        else {
+          this.maxZoom = 19;
+        }
+  
+        this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
 
         let bounds = L.latLngBounds(L.latLng(nextProps.map.yMin, nextProps.map.xMin), L.latLng(nextProps.map.yMax, nextProps.map.xMax));
         boundsFlyTo = bounds;
@@ -152,9 +159,7 @@ export class ViewerMap extends PureComponent {
       {
         let bounds = L.latLngBounds(L.latLng(this.props.map.yMin, this.props.map.xMin), L.latLng(this.props.map.yMax, this.props.map.xMax));
         boundsFlyTo = bounds;
-      } 
-      
-      TileLayersControl.update(nextProps);
+      }
 
       let map = this.mapRef.current.leafletElement;
       let screenBounds = map.getBounds();
@@ -246,7 +251,13 @@ export class ViewerMap extends PureComponent {
     }
 
     this.mapRef.current.leafletElement.closePopup();
-    TileLayersControl.onOverlayAdd(e);
+
+    let limitZoom = TileLayersControl.onOverlayAdd(e);
+    if (limitZoom) {
+      this.maxZoom = this.props.map.zoom;
+      this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
+    }
+
     PolygonLayersControl.onOverlayAdd(e);
     StandardTilesLayerControl.onOverlayAdd(e);
     CrowdLayersControl.onOverlayAdd(e);
@@ -276,7 +287,12 @@ export class ViewerMap extends PureComponent {
       checkedLayers.splice(index, 1);
     }
 
-    TileLayersControl.onOverlayRemove(e);
+    let limitZoom = TileLayersControl.onOverlayRemove(e);
+    if (!limitZoom) {
+      this.maxZoom = 19;
+      this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
+    }
+
     PolygonLayersControl.onOverlayRemove(e);
     StandardTilesLayerControl.onOverlayRemove(e);
     CrowdLayersControl.onOverlayRemove(e);
