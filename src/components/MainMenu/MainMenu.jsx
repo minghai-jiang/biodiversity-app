@@ -79,10 +79,11 @@ export class MainMenu extends Component {
               {this.props.localization['AboutUs']}
             </NavLink>
           </li>
-          <li style={{float: "right"}}>
-            <div className="main-menu-item dropdown">
+          <li style={{float: "right", display: 'block'}}>
+            <div className="main-menu-item dropdown" style={{ width: '100%'}}>
               <button className="dropbtn">
-                {this.props.localization['Language']}
+                <img src='/images/language.png' style={{width: '15%', verticalAlign: 'middle'}}/>
+                <span style={{verticalAlign: 'middle' }}>{this.props.localization['Language']}</span>
               </button>
               <div className="dropdown-content">
                 <a href="#" onClick={() => this.changeLanguage('english')}>English</a>
@@ -93,7 +94,9 @@ export class MainMenu extends Component {
           </li>
           <li style={{display: this.props.user ? 'none' : 'block', float: "right"}}>
             <NavLink to="/login" className="main-menu-item">
-              {this.props.localization['Login']}
+              <span >
+                {this.props.localization['Login']}
+              </span>
             </NavLink>
           </li>
 
