@@ -82,8 +82,7 @@ export class MainMenu extends Component {
           <li style={{float: "right", display: 'block'}}>
             <div className="main-menu-item dropdown" style={{ width: '100%'}}>
               <button className="dropbtn">
-                <img src='/images/language.png' style={{width: '15%', verticalAlign: 'middle'}}/>
-                <span style={{verticalAlign: 'middle' }}>{this.props.localization['Language']}</span>
+                <img src='/images/language.png' style={{width: '25%', verticalAlign: 'middle'}}/>
               </button>
               <div className="dropdown-content">
                 <a href="#" onClick={() => this.changeLanguage('english')}>English</a>
