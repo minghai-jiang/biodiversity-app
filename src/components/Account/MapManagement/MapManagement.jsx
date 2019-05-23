@@ -94,10 +94,6 @@ class MapManagement extends PureComponent {
     let key = 0;
 
     this.state.maps.forEach(map => {
-      if (map.accessLevel < 900) {
-        return;
-      }
-
       options.push(
         <option value={map.uuid} key={key++} >{map.name}</option>
       );
@@ -182,7 +178,9 @@ class MapManagement extends PureComponent {
                 {this.props.localization["Custom polygons"]}
               </button>
             </div>
-            {modeElement}
+            <div style={{ marginTop: '20px' }}>
+              {modeElement}
+            </div>
           </div>
         );
       }
