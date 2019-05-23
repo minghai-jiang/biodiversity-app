@@ -43,7 +43,11 @@ export class InfoPane extends Component {
   }
 
   toggleQueryPane = (open) => {
-    this.setState({ openQueryPane: open });
+    this.setState({ openQueryPane: open }, () => {
+      if (open && this.props.infoContent && this.props.infoContent.type === 'report') {
+        this.scrollToBottom();
+      }
+    });
   };
 
   componentWillReceiveProps(nextProp){
@@ -59,10 +63,12 @@ export class InfoPane extends Component {
       this.toggleQueryPane(true);
     }
 
-    if(nextProp && nextProp.infoContent && nextProp.infoContent.openpane && this.props.infoContent.random !== nextProp.infoContent.random)
+    if (nextProp && nextProp.infoContent && nextProp.infoContent.openpane && this.props.infoContent.random !== nextProp.infoContent.random)
     {
       this.toggleQueryPane(true);
     }
+    
+
   };
 
   getOptions = () =>
@@ -357,7 +363,8 @@ export class InfoPane extends Component {
     }
     else if (type === 'report')
     {
-      this.setState({GeoMessage: <GeoMessage properties={info.properties} user={this.props.user}/>})
+      let geoMessage = <GeoMessage properties={info.properties} map={this.props.map} user={this.props.user}/>;
+      this.setState({GeoMessage: geoMessage})
     }
     else if (type === 'save' || type === 'update')
     {
@@ -563,6 +570,16 @@ export class InfoPane extends Component {
     this.setState({inputClass: itemValue, indeces: indeces})
   }
 
+  scrollToBottom = () => {
+    // debugger;
+    // if (this.messagesEnd) {
+    //   this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+    // }
+
+    let content = document.getElementsByClassName('slide-pane__content');
+    let x = null;
+  }
+
   render() {
 
     let paneContent = [];
@@ -571,7 +588,7 @@ export class InfoPane extends Component {
     {
       let content = [];
 
-      if(this.props.infoContent.type === 'analyse')
+      if (this.props.infoContent.type === 'analyse')
       {
         if (this.props.map.timestamps.length >= 1)
         {
@@ -616,19 +633,21 @@ export class InfoPane extends Component {
       }
 
       return (
-          <SlidingPane
-            key={key}
-            className='query-pane'
-            overlayClassName='modal-overlay'
-            isOpen={this.state.openQueryPane}
-            title={this.paneName}
-            width={'0'}
-            onRequestClose={() => { this.toggleQueryPane(false); }}
-          >
+        <SlidingPane
+          key={key}
+          className='query-pane'
+          overlayClassName='modal-overlay'
+          isOpen={this.state.openQueryPane}
+          title={this.paneName}
+          width={'0'}
+          onRequestClose={() => { this.toggleQueryPane(false); }}
+        >
+          <div>
             {paneContent}
             {this.state.GeoMessage}
             {this.state.save}
-          </SlidingPane>
+          </div>
+        </SlidingPane>
       );
     }
     else {

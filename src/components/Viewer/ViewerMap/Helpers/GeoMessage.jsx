@@ -91,7 +91,9 @@ export default class GeoMessage extends PureComponent {
               message.uuid = this.props.properties.uuid;
               message.headers = this.props.properties.headers;
               message.apiUrl = this.props.properties.apiUrl;
-              messages.push(<Message key={message.id} info={message} user={this.props.user} trigger={this.messageTrigger}/>);
+              messages.push(
+                <Message key={message.id} info={message} map={this.props.map} user={this.props.user} trigger={this.messageTrigger}/>
+              );
             }
           }
         }
@@ -156,6 +158,10 @@ export class Message extends Component {
 
   deleteMessage = async (e, info, trigger) =>
   {
+    if (!window.confirm('Are you sure you want to delete this message?')) {
+      return;
+    }
+
     let url = '';
     let body = {}; 
 
@@ -251,12 +257,15 @@ export class Message extends Component {
     }
 
     let className = 'messageContainer';
-    if (this.props.user && this.props.user.username === info.user) {
+    let isOwnMessage = this.props.user && this.props.user.username === info.user;
+    if (isOwnMessage) {
       className += ' own';
     }
     else {
       className += ' other';
     }
+
+    let canDelete = (isOwnMessage && this.props.map.accessLevel >= 400) || (!isOwnMessage && this.props.map.accessLevel >= 600);
 
     let typeListItem = [];
     if (info && info.type) {
@@ -278,40 +287,52 @@ export class Message extends Component {
     return (
       <div className={className} key={info.id + 'container'}>
         {typeListItem}
-        <ul key={info.id + 'messageList'}>
-          <li className='GeoName' key={info.id + 'name'}>{info.user}</li>
-          <li className='GeoUserGroup' key={info.id + 'userGroup'}>{userGroups}</li>
-          <li className='GeoMessage' key={info.id + 'message'}>{info.message}</li>
-          <ul className='GeoPropsList' key={info.id + 'propsList'}>
-            {propsList}
-          </ul>
-          <li className='GeoLayer' key={info.id + 'layer'}>{info.layer}</li>
-          <li className='GeoDate' key={info.id + 'date'}>{Moment(info.date).format('DD-MM-YYYY HH:mm')}</li>
-          {
-            info.thumbnail && !this.state.imageData ? 
-              <li className='GeoGetImage' key={info.id + 'thumbnail-li'}>
-                <img src={info.thumbnail} key={info.id + 'thumbnail'} style={{'width': 'auto', 'cursor': 'zoom-in'}} onClick={() => this.getImage(info)}></img>
-              </li> :
-              null
-          }
+        <div className='GeoMessage'>
+          <div className='GeoName' key={info.id + 'name'}>{info.user}</div>     
+          <div className='GeoUserGroup' key={info.id + 'userGroup'}>{userGroups}</div>
+          <div className='GeoMessage' key={info.id + 'message'}>{info.message}</div>
+          <table>
+            <tr>
+              <td>
+              {
+                info.thumbnail && !this.state.imageData ? 
+                  <div className='GeoGetImage' key={info.id + 'thumbnail-li'} style={{ width: 'auto' }}>
+                    <img src={info.thumbnail} key={info.id + 'thumbnail'} style={{'width': 'auto', 'cursor': 'zoom-in'}} onClick={() => this.getImage(info)}></img>
+                  </div> :
+                  null
+              }
+              </td>
+              <td style={{ width: '100%', textAlign: 'right', verticalAlign: 'bottom' }}>
+                <div>
+                  {
+                    canDelete ?
+                      <div className='GeoDate' key={info.id + 'date'}>{Moment(info.date).format('YYYY-MM-DD HH:mm')}</div> :
+                      null
+                  }
+                  {
+                    this.props.user ? (
+                      <div className='GeoDelete'>
+                        <img 
+                          src='/images/trash.png' 
+                          onClick={(event) => this.deleteMessage(event, info, this.props.trigger)}
+                          style={{ width: '1.7em', opacity: '0.7', cursor: 'pointer' }}
+                        />                      
+                      </div>
+                    ) : null
+                  }
+                </div>
+
+              </td>
+            </tr>
+          </table>
           {
             this.state.imageData ? 
-              <li id='lightbox' className={this.state.imageData ? 'GeoImage' : ''} key={info.id + 'image'} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}>
+              <div id='lightbox' className={this.state.imageData ? 'GeoImage' : ''} key={info.id + 'image'} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}>
                 <img src={this.state.imageData}></img>
-              </li> :
+              </div> :
               null
           }
-          {
-            this.props.user ? (
-              <li className='GeoDelete'>
-                <button key={info.id + 'delete'} className='button' onClick={(event) => this.deleteMessage(event, info, this.props.trigger)}>
-                  Delete
-                </button>
-              </li>
-            ) : null
-          }
-
-        </ul>
+        </div>
       </div>
     );
   };

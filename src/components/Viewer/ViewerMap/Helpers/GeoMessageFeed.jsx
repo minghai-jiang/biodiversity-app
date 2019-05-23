@@ -214,7 +214,9 @@ async function getFeed(page)
       feed[j].mapId = GeoMessageFeed_props.map.uuid;
       feed[j].headers = headers;
 
-      messages.push(<Message key={feed[j].uuid} info={feed[j]} user={GeoMessageFeed_props.user} trigger={buttonClick}/>);
+      messages.push(
+        <Message key={feed[j].uuid} info={feed[j]} map={GeoMessageFeed_map} user={GeoMessageFeed_props.user} trigger={buttonClick}/>
+      );
     }
 
     return({type:'page', pageNumber: page, messages: messages});

@@ -10,7 +10,7 @@ div.slide-pane__header h2, div.slide-pane__header .slide-pane__close
 
 div.slide-pane__content
 {
-	background-color: #e6e6e6;
+  background-color: #e6e6e6;
 }
 
 .LineChart
