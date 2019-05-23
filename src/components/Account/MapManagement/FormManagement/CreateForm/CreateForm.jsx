@@ -17,6 +17,18 @@ class CreateForm extends PureComponent {
   }
 
 
+  moveUp = (cellInfo) => {
+    this.state.form[cellInfo.index- 1] = [this.state.form[cellInfo.index], this.state.form[cellInfo.index]=this.state.form[cellInfo.index- 1]][0];
+    console.log(this.state.form)
+    this.setState(this.state.form)
+  }
+
+  moveDown = (cellInfo) => {
+    this.state.form[cellInfo.index+ 1] = [this.state.form[cellInfo.index], this.state.form[cellInfo.index]=this.state.form[cellInfo.index+ 1]][0];
+    console.log(this.state.form)
+    this.setState(this.state.form)
+  }
+
   add = () => {
     let x = {"Question": '', "Type": '', "Obligatory": ''}
     x["Question"] = this.state.form[0]["Question"]
@@ -109,6 +121,48 @@ class CreateForm extends PureComponent {
 
   }
 
+  renderMoveButtons = (cellInfo) => {
+    if(cellInfo.index === 1 && this.state.form.length > 2) {
+      return (
+        <div
+          style={{ backgroundColor: "#fafafa" }}
+        >
+        <button onClick={() => this.moveDown(cellInfo)}>Down</button>
+        </div>
+      );
+    }
+    else if(cellInfo.index === this.state.form.length -1 && this.state.form.length > 2 ) {
+      return (
+        <div
+          style={{ backgroundColor: "#fafafa" }}
+        >
+        <button onClick={() => this.moveUp(cellInfo)}>Up</button>
+        </div>
+      );
+    }
+    else if (cellInfo.index > 1 && cellInfo.index < this.state.form.length  ) {
+      return (
+        <div
+          style={{ backgroundColor: "#fafafa" }}
+        >
+        <button onClick={() => this.moveUp(cellInfo)}>Up</button>
+        <button onClick={() => this.moveDown(cellInfo)}>Down</button>
+        </div>
+      );
+    }
+
+    else {
+      return (
+        <div
+          style={{ backgroundColor: "#fafafa" }}
+        >
+        </div>
+      );
+    }
+
+  }
+
+
   render() {
     let modeElement = (<div></div>);
 
@@ -120,6 +174,11 @@ class CreateForm extends PureComponent {
           key={Math.random()}
           data={this.state.form}
           columns={[
+            {
+              Header: "Move",
+              accessor: 'move',
+              Cell: this.renderMoveButtons
+            },
             {
               Header: this.props.localization["Question"],
               accessor: 'Question',

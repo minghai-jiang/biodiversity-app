@@ -16,6 +16,15 @@ class ChangeForm extends PureComponent {
           };
   }
 
+  moveUp = (cellInfo) => {
+    this.state.questions[cellInfo.index- 1] = [this.state.questions[cellInfo.index], this.state.questions[cellInfo.index]=this.state.questions[cellInfo.index- 1]][0];
+    this.setState(this.state.questions)
+  }
+
+  moveDown = (cellInfo) => {
+    this.state.questions[cellInfo.index+ 1] = [this.state.questions[cellInfo.index], this.state.questions[cellInfo.index]=this.state.questions[cellInfo.index+ 1]][0];
+    this.setState(this.state.questions)
+  }
 
   add = () => {
     let x = {"Question": '', "Type": '', "Obligatory": ''}
@@ -69,7 +78,46 @@ class ChangeForm extends PureComponent {
 
   }
 
+  renderMoveButtons = (cellInfo) => {
+    if(cellInfo.index === 1 && this.state.questions.length > 2) {
+      return (
+        <div
+          style={{ backgroundColor: "#fafafa" }}
+        >
+        <button onClick={() => this.moveDown(cellInfo)}>Down</button>
+        </div>
+      );
+    }
+    else if(cellInfo.index === this.state.questions.length -1 && this.state.questions.length > 2 ) {
+      return (
+        <div
+          style={{ backgroundColor: "#fafafa" }}
+        >
+        <button onClick={() => this.moveUp(cellInfo)}>Up</button>
+        </div>
+      );
+    }
+    else if (cellInfo.index > 1 && cellInfo.index < this.state.questions.length  ) {
+      return (
+        <div
+          style={{ backgroundColor: "#fafafa" }}
+        >
+        <button onClick={() => this.moveUp(cellInfo)}>Up</button>
+        <button onClick={() => this.moveDown(cellInfo)}>Down</button>
+        </div>
+      );
+    }
 
+    else {
+      return (
+        <div
+          style={{ backgroundColor: "#fafafa" }}
+        >
+        </div>
+      );
+    }
+
+  }
   renderDropdown = (cellInfo) => {
     let element = <div> </div>
       element = (   <div style={{ backgroundColor: "#fafafa" }}>
@@ -118,6 +166,11 @@ class ChangeForm extends PureComponent {
           key={Math.random()}
           data={this.state.questions}
           columns={[
+            {
+              Header: "Move",
+              accessor: 'move',
+              Cell: this.renderMoveButtons
+            },
             {
               Header: this.props.localization["Question"],
               accessor: 'Question',
