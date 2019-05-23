@@ -226,7 +226,7 @@ div#lightbox img {
 }
 
 div.select-groups {
-  position: fixed;
+  position: static;
 	width: 100%;
 	padding: 0.5em 1em;
 }
