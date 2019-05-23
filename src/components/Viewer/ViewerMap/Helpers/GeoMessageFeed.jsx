@@ -132,10 +132,10 @@ async function feedLoop(page)
     if (page !== 'group_change') {
       let mapGroups = GeoMessageFeed_props.map.groups;
 
-      // Adding admin group as filtering option.
+      // Adding 'no group' group as filtering option.
       // It is not included as API response due to it being a special group.
-      if (!mapGroups.includes('admin')) {
-        mapGroups.push('admin'); 
+      if (!mapGroups.includes('no group')) {
+        mapGroups.push('no group'); 
       }
 
       GeoMessageFeed_groups = [];
