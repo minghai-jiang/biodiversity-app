@@ -113,8 +113,8 @@ export class PopupForm extends Component {
     let body = {
       mapId:  props.uuid,
       timestamp: props.timestamp,
-      isMask: this.state.clouds,
-      isClassification: this.state.classification,
+      isMask: false,
+      isClassification: false,
       message: this.state.text,
     }
 
@@ -189,18 +189,6 @@ export class PopupForm extends Component {
             <h3>Type a GeoMessage</h3>
             <textarea name="text" value={this.state.text} onChange={this.handleChange} placeholder='GeoMessage' maxLength='3000'/>
           </label><br/>
-          <h4>Is there something wrong?</h4>
-          <p>There is a problem with:</p>
-          <label>
-            <input type="checkbox" name="clouds" checked={this.state.clouds} onChange={this.handleChange}/>
-              Clouds
-            <br/>
-          </label>
-          <label>
-            <input type="checkbox" name="classification" checked={this.state.classification} onChange={this.handleChange}/>
-              Classification
-            <br/>
-          </label>
           <div>
             <input type="file" accept='image/*' onChange={(e)=>this.handleImageChange(e)} />
           </div>
