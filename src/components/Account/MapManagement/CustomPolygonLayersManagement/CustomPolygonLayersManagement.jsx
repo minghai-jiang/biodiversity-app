@@ -104,14 +104,14 @@ class CustomPolygonLayersManagement extends PureComponent {
         newLayerData.name = 'new layer';
         newLayerData.color = 'ff0000ff';
         newLayerData.properties = 'property1,property2';
-        
+
         let customPolygonLayersData = [...this.state.customPolygonLayersData];
 
         this.setState({ customPolygonLayersData: customPolygonLayersData });
       })
       .catch(err => {
         this.props.showError(err);
-      });    
+      });
   }
 
   saveCustomPolygonsLayer = (cellInfo) => {
@@ -210,6 +210,26 @@ class CustomPolygonLayersManagement extends PureComponent {
     );
   }
 
+  renderColorDropdown = (cellInfo) => {
+    let element = <div> </div>
+      element = (   <div style={{ backgroundColor: "#fafafa" }}>
+          <select value = {this.state.customPolygonLayersData[cellInfo.index][cellInfo.column.id]}
+           name="Type"
+           onChange = {e => {
+             let x = Object.assign({}, this.state.customPolygonLayersData);
+             x[cellInfo.index][cellInfo.column.id] = e.target.value;
+             this.setState({x})
+            }}>
+            <option  value="ff0000ff">rood</option>
+            <option value="00ff00ff">groen</option>
+            <option value="0000ffff">blauw</option>
+            <option value="ffff00ff">yellow</option>
+          </select>
+          </div>
+        );
+    return (element)
+  }
+
   renderActionButtons = (cellInfo) => {
     if (cellInfo.index === 0) {
       return (
@@ -249,7 +269,7 @@ class CustomPolygonLayersManagement extends PureComponent {
               {
                 Header: this.props.localization["Color"],
                 accessor: 'color',
-                Cell: this.renderEditable
+                Cell: this.renderColorDropdown
               },
               {
                 Header: this.props.localization["Properties"],
