@@ -39,7 +39,10 @@ L.Icon.Default.mergeOptions({
 export class ViewerMap extends PureComponent {
   mapRef = createRef();
   getPolygonJsonTimeout = null;
+
+  lastGeoLocationUpdate = null;
   geolocation = null;
+
   maxZoom = 19;
 
   constructor(props) {
@@ -88,13 +91,16 @@ export class ViewerMap extends PureComponent {
 
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition((position) => {
-        let hadGeolocation = this.geolocation ? true : false;
-
         this.geolocation = [position.coords.latitude, position.coords.longitude];
 
-        if (!hadGeolocation) {
+        let currentTime = (new Date).getTime();
+
+        if (!this.lastGeoLocationUpdate || this.lastGeoLocationUpdate + (1000 * 1) > currentTime) {
           this.forceUpdate();
         }
+
+        this.lastGeoLocationUpdate = currentTime;
+
       });
     }
   }
