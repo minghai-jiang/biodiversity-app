@@ -61,7 +61,7 @@ const FlyToControl = {
         let long = position.coords.longitude;
 
         flyTo_geolocation = [lat, long];
-      });
+      }, null, { enableHighAccuracy: true });
     }
 
     return(flyToElements);
@@ -271,7 +271,7 @@ function handleSubmit(e = null)
         let long = position.coords.longitude;
   
         flyTo_geolocation = [lat, long];
-      });
+      }, null, { enableHighAccuracy: true });
 
       flyTo_geolocation = navigator.geolocation.getCurrentPosition((position) => {
         let lat = position.coords.latitude;
@@ -279,7 +279,7 @@ function handleSubmit(e = null)
   
         flyTo_geolocation = [lat, long];
         flyToControl_mapRef.flyTo(flyTo_geolocation, flyToControl_map.zoom);
-      });
+      }, null, { enableHighAccuracy: true });
     }    
     else {
       flyToControl_mapRef.flyTo(flyTo_geolocation, flyToControl_map.zoom);

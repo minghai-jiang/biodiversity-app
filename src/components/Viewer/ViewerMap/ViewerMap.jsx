@@ -100,8 +100,7 @@ export class ViewerMap extends PureComponent {
         }
 
         this.lastGeoLocationUpdate = currentTime;
-
-      });
+      }, (err) => {  }, { enableHighAccuracy: true });
     }
   }
 
