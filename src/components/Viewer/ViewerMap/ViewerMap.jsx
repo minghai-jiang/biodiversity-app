@@ -119,14 +119,6 @@ export class ViewerMap extends PureComponent {
 
       let boundsFlyTo;
 
-      let limitZoom = TileLayersControl.update(nextProps);
-      if (limitZoom) {
-        this.maxZoom = nextProps.map.zoom;
-      }
-      else {
-        this.maxZoom = 19;
-      }
-
       if (differentMap) {
         TileLayersControl.clear();
         PolygonLayersControl.clear();
@@ -135,6 +127,14 @@ export class ViewerMap extends PureComponent {
         LegendControl.clear();
         FlyToControl.clear();
         GeoMessageFeed.clear();
+
+        let limitZoom = TileLayersControl.update(nextProps);
+        if (limitZoom) {
+          this.maxZoom = nextProps.map.zoom;
+        }
+        else {
+          this.maxZoom = 19;
+        }
   
         this.mapRef.current.leafletElement.setMaxZoom(this.maxZoom);
 
@@ -169,6 +169,16 @@ export class ViewerMap extends PureComponent {
         xMax: screenBounds.getEast(),
         yMin: screenBounds.getSouth(),
         yMax: screenBounds.getNorth()
+      }
+
+      if (!differentMap) {
+        let limitZoom = TileLayersControl.update(nextProps);
+        if (limitZoom) {
+          this.maxZoom = nextProps.map.zoom;
+        }
+        else {
+          this.maxZoom = 19;
+        }
       }
 
       LegendControl.update(nextProps, [], []);
