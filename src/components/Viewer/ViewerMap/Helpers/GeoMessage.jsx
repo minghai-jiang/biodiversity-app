@@ -100,7 +100,7 @@ export default class GeoMessage extends PureComponent {
       }
     }
 
-    return(messages)
+    return messages.reverse();
   };
 
   componentWillMount = async() =>
@@ -136,12 +136,12 @@ export default class GeoMessage extends PureComponent {
 
     return(
       <div>
-        {geoMessages}
         {
           this.props.user ? 
           <PopupForm properties={this.props.properties} messageTrigger={this.messageTrigger}/> :
           null
         }
+        {geoMessages}
       </div>
     );
   };
@@ -304,13 +304,9 @@ export class Message extends Component {
               </td>
               <td style={{ width: '100%', textAlign: 'right', verticalAlign: 'bottom' }}>
                 <div>
+                  <div className='GeoDate' key={info.id + 'date'}>{Moment(info.date).format('YYYY-MM-DD HH:mm')}</div>
                   {
-                    canDelete ?
-                      <div className='GeoDate' key={info.id + 'date'}>{Moment(info.date).format('YYYY-MM-DD HH:mm')}</div> :
-                      null
-                  }
-                  {
-                    this.props.user ? (
+                    canDelete ? (
                       <div className='GeoDelete'>
                         <img 
                           src='/images/trash.png' 
