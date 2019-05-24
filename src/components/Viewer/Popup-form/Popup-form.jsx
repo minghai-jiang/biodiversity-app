@@ -184,6 +184,7 @@ export class PopupForm extends Component {
     
     return (
       <div id='formDiv'>
+        <div key={id + 'notification' + this.state.notification.text} className={this.state.notification.type}>{this.state.notification.text}</div>
         <form key={id} id='popupForm' onSubmit={this.handleSubmit}>
           <label>
             <h3>Type a GeoMessage</h3>
@@ -201,7 +202,6 @@ export class PopupForm extends Component {
             }
           </div>
         </form>
-        <div key={id + 'notification' + this.state.notification.text} className={this.state.notification.type}>{this.state.notification.text}</div>
       </div>
     );
   }
