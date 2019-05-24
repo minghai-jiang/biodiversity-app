@@ -265,7 +265,9 @@ export class Message extends Component {
       className += ' other';
     }
 
-    let canDelete = (isOwnMessage && this.props.map.accessLevel >= 400) || (!isOwnMessage && this.props.map.accessLevel >= 600);
+    let canDelete = 
+      (isOwnMessage && this.props.map.accessLevel >= 400) ||
+      (!isOwnMessage && this.props.map.accessLevel >= 600);
 
     let typeListItem = [];
     if (info && info.type) {
@@ -279,7 +281,6 @@ export class Message extends Component {
         <div className='GeoType' key={info.id + 'type'}>
           <button className='button linkButton' onClick={() => FlyToControl.flyTo(info.type, info.elementId)}>
             <h1>{info.type}</h1>
-            <span>{showID}</span>
           </button>
         </div>);
     }
@@ -311,8 +312,8 @@ export class Message extends Component {
                         <img 
                           src='/images/trash.png' 
                           onClick={(event) => this.deleteMessage(event, info, this.props.trigger)}
-                          style={{ width: '1.7em', opacity: '0.7', cursor: 'pointer' }}
-                        />                      
+                          style={{ width: '2.3em', opacity: '0.7', padding: '0.2em', border: '1px solid black', cursor: 'pointer' }}
+                        />              
                       </div>
                     ) : null
                   }
@@ -324,6 +325,9 @@ export class Message extends Component {
           {
             this.state.imageData ? 
               <div id='lightbox' className={this.state.imageData ? 'GeoImage' : ''} key={info.id + 'image'} style={{'cursor': 'zoom-out'}} onClick={() => {this.setState({ imageData: null })}}>
+                <div style={{ position: 'fixed', right: '0px', marginTop: '1em', marginRight: '1em', width: '1em', height: '1em' }}>
+                  <img src='/images/x.png'/>
+                </div>
                 <img src={this.state.imageData}></img>
               </div> :
               null
