@@ -20,26 +20,6 @@ let GeoMessageFeed_list;
 let returnFeed = (value) => {};
 let loadMore = () => {};
 
-
-/*let flyToControl_map = null;
-let flyToControl_mapRef = null;
-let flyToElements = [];
-let flyToType = 'middle';
-let flyToID = 0;
-let flyToIdTile = {
-  tileX: 0,
-  tileY: 0,
-  zoom: 14
-}
-let flyToMiddle = {
-  longitude: 0,
-  latitude: 0,
-  zoom: 14
-}
-let flyToControl_maxZoom = 18;
-let flyToProps = {};
-let returnChecked = (value) => {};*/
-
 const GeoMessageFeed = {
   getElement: () => {
 
@@ -195,16 +175,17 @@ async function getFeed(page)
     GeoMessageFeed_selectedGroups.forEach(option => {
       userGroups.push(option.value);
     });
-
-    feed = await QueryUtil.postData(apiUrl + 'geoMessage/feed', 
-      {
-        mapId: GeoMessageFeed_props.map.uuid,
-        page: page, 
-        userGroups: userGroups,
-      },
-      headers
-    );
   }
+
+  feed = await QueryUtil.postData(apiUrl + 'geoMessage/feed', 
+    {
+      mapId: GeoMessageFeed_props.map.uuid,
+      page: page, 
+      userGroups: userGroups,
+    },
+    headers
+  );
+  
   
   if (feed && feed.length > 0)
   {
