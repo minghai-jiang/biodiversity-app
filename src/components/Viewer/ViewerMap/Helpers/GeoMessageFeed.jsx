@@ -196,7 +196,7 @@ async function getFeed(page)
       feed[j].headers = headers;
 
       messages.push(
-        <Message key={feed[j].uuid} info={feed[j]} map={GeoMessageFeed_map} user={GeoMessageFeed_props.user} trigger={buttonClick}/>
+        <Message key={feed[j].uuid} info={feed[j]} map={GeoMessageFeed_props.map} user={GeoMessageFeed_props.user} trigger={buttonClick}/>
       );
     }
 
