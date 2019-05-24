@@ -38,12 +38,6 @@ const tileLayerTypes = [
     stacking: false,
     zIndex: 300
   }
-/*  {
-    name: changesTileLayer,
-    checked: false,
-    stacking: true,
-    zIndex: 400
-  }*/
 ];
 
 const mapParams = {

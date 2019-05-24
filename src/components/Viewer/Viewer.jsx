@@ -25,9 +25,12 @@ class Viewer extends PureComponent {
   }
 
   onSelectMap = map => {
+
+    let lastTimestamp = Math.max(0, map.timestamps.length - 1);
+
     this.setState({
       map: map,
-      timestampRange: { start: 0, end: 0 }
+      timestampRange: { start: lastTimestamp, end: lastTimestamp }
     });
   }
 
