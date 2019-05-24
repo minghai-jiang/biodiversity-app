@@ -83,7 +83,7 @@ export class ViewerMap extends PureComponent {
 
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);    
     FlyToControl.initialize(this.props, map, this.flyToChecked);
-    GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);    
+    GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);
     DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap);
 
     if (navigator.geolocation) {
@@ -184,7 +184,6 @@ export class ViewerMap extends PureComponent {
       LegendControl.update(nextProps, [], []);
       FlyToControl.update(nextProps, map, boundsFlyTo.getCenter(), this.flyToChecked);
       GeoMessageFeed.update(nextProps, map, this.flyToChecked, this.props.infoContent);
-
       DrawingControl.update(this.props.user, this.props);
 
       let tilePromise = StandardTilesLayerControl.update(nextProps, bounds);

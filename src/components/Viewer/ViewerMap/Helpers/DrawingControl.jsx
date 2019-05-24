@@ -7,6 +7,7 @@ import {
 } from "react-leaflet";
 
 let DrawingControl_user;
+let DrawingControl_map;
 let DrawingControl_contentFunction;
 let DrawingControl_Popup;
 let DrawingControl_Props;
@@ -17,6 +18,7 @@ let DrawingControl_drawnItems;
 const DrawingControl = {
   initialize: (map, callback, user, contentFunction, props, mapRef, refresh) => {
     DrawingControl_user = user;
+    DrawingControl_map = props.map;
     DrawingControl_contentFunction = contentFunction;
     DrawingControl_Props = props;
 
@@ -28,6 +30,7 @@ const DrawingControl = {
   update:(user, props) =>
   {
     DrawingControl_user = user;
+    DrawingControl_map = props.map;
     DrawingControl_Props = props;
   },
   onFeatureClick: () =>
@@ -85,29 +88,6 @@ function onShapeDrawnClosure(event, drawnItems, callback) {
 
   layer.on('click', (e) => onClickCustomPolygon(e, shapeCoords))
   callback(shapeCoords);
-
-  // let map = this.props.map;
-  
-  // if (event.layerType === 'rectangle' && map)
-  // {
-  //   let headers = [];
-  //   if (this.props.user)
-  //   {
-  //     headers["Authorization"] = "Bearer " + this.props.user.token;
-  //   }
-
-  //   this.setState({popupProps: {
-  //     uuid: map.uuid,
-  //     bounds: event.layer.getBounds(),
-  //     timestamp: this.props.timestampRange.end,
-  //     header: headers
-  //   }});
-
-  //   let form = document.getElementById('formDiv');
-  //   form.classList.add('block');
-  // }
-
-  // this.props.onShapeDrawn(shapeCoords);
 }
 
 function onClickCustomPolygon(e, shapeCoords)
@@ -153,10 +133,14 @@ function onClickCustomPolygon(e, shapeCoords)
       crowdLayers: DrawingControl_Props.map.crowdLayers,
     }
 
-    let analyse = <a className="noselect" onClick={() => {handleCustomPolygon('analyse', DrawingControl_contentFunction, id, properties, Math.random())} }>Analyse</a>
+    let analyse;
     let report;
 
-    if (DrawingControl_user)
+    if (DrawingControl_map.accessLevel >= 200) {
+      analyse = <a className="noselect" onClick={() => {handleCustomPolygon('analyse', DrawingControl_contentFunction, id, properties, Math.random())} }>Analyse</a>
+    }
+
+    if (DrawingControl_map.accessLevel >= 500)
     {
       report =  <a className="noselect" onClick={() => {handleCustomPolygon('save', DrawingControl_contentFunction, id, properties, Math.random(), e)} }>Save Polygon</a>
     }

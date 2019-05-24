@@ -571,7 +571,6 @@ export class InfoPane extends Component {
   }
 
   scrollToBottom = () => {
-    // debugger;
     // if (this.messagesEnd) {
     //   this.messagesEnd.scrollIntoView({ behavior: "smooth" });
     // }

@@ -173,9 +173,16 @@ const StandardTilesLayer = {
 
         merged = {...properties, ...StandardTiles_PopupContent.properties};
 
-        let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
-        let report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
+        let analyse;
+        let report;
         
+        if (props.map.accessLevel >= 200) {
+          analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
+        }
+
+        if (props.map.accessLevel >= 300) {
+          report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
+        }
 
         StandardTiles_PopupContent.click = false;
         return (

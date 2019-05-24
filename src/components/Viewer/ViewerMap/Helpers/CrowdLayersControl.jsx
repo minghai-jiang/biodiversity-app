@@ -181,21 +181,28 @@ const CrowdLayersControl = {
         }
       }
 
-      let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
-      let report = <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+      let analyse; 
+      let report; 
       let updateButton;
       let deleteButton;
 
-      if (props.user)
-      {
-        let updateInfo = {
-          refresh: CrowdLayersControl_refresh,
-          ...popup
-        };
+      let updateInfo = {
+        refresh: CrowdLayersControl_refresh,
+        ...popup
+      };
 
+      if (props.map.accessLevel >= 200) {
+        analyse = <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+      }
+
+      if (props.map.accessLevel >= 300) {
+        report = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
+      }
+
+      if (props.map.accessLevel >= 700) {
         updateButton =  <a className="noselect" onClick={() => {handlePolygon('update', contentFunction, updateInfo, properties, Math.random())} }>Update</a>;
         deleteButton =  <a className="noselect" onClick={() => {deletePolygon(properties)} }>Delete</a>;
-      }
+      }      
 
       let popupContent;
       if (id !== CrowdLayersControl_deleted)

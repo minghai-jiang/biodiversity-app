@@ -173,8 +173,16 @@ const PolygonLayersControl = {
         }
       }
 
-      let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
-      let report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>      
+      let analyse;
+      let report;
+
+      if (props.map.accessLevel >= 200) {
+        analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
+      }
+
+      if (props.map.accessLevel >= 300) {
+        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>      
+      }
 
       polygonLayersControl_PopupContent.data.click = false;
       return (
