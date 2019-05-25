@@ -70,7 +70,7 @@ export class ViewerMap extends PureComponent {
     map.on('moveend', this.onMapMoveEnd);
     map.on('overlayadd', this.onOverlayAdd);
     map.on('overlayremove', this.onOverlayRemove);
-    map.on('click', this.onClick);
+    // map.on('click', this.onClick);
 
     let screenBounds = map.getBounds();
     let bounds = 
@@ -82,9 +82,9 @@ export class ViewerMap extends PureComponent {
     }
 
     TileLayersControl.initialize(this.props);
-    PolygonLayersControl.initialize(this.props, bounds, maxPolygons, map);
-    StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles, map);
-    CrowdLayersControl.initialize(this.props, bounds, maxPolygons, map, this.refreshMap);
+    PolygonLayersControl.initialize(this.props, bounds, maxPolygons, map, this.onClick);
+    StandardTilesLayerControl.initialize(this.props, bounds, maxStandardTiles, map, this.onClick);
+    CrowdLayersControl.initialize(this.props, bounds, maxPolygons, map, this.refreshMap, this.onClick);
 
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);    
     FlyToControl.initialize(this.props, map, this.flyToChecked);
@@ -268,10 +268,10 @@ export class ViewerMap extends PureComponent {
     }
 
     if (this.lastBounds 
-      && Math.abs(this.lastBounds.xMin - bounds.xMin) < 0.001
-      && Math.abs(this.lastBounds.xMax - bounds.xMax) < 0.001
-      && Math.abs(this.lastBounds.yMin - bounds.yMin) < 0.001
-      && Math.abs(this.lastBounds.yMax - bounds.yMax) < 0.001) {
+      && Math.abs(this.lastBounds.xMin - bounds.xMin) < 0.01
+      && Math.abs(this.lastBounds.xMax - bounds.xMax) < 0.01
+      && Math.abs(this.lastBounds.yMin - bounds.yMin) < 0.01
+      && Math.abs(this.lastBounds.yMax - bounds.yMax) < 0.01) {
       // console.log('Ignoring move end.');
       return;
     }

@@ -30,6 +30,7 @@ let CrowdLayersControl_highlight = -1;
 let CrowdLayersControl_highlightCenter = [];
 let CrowdLayersControl_refresh = () => {};
 let CrowdLayersControl_shouldRefresh = false;
+let CrowdLayersControl_onFeatureClick = null;
 
 let CrowdLayersControl_deleted = -1;
 
@@ -41,7 +42,7 @@ const CrowdLayersControl = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons, map, refresh) => {
+  initialize: async (props, bounds, maxPolygons, map, refresh, onFeatureClick) => {
     CrowdLayersControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -61,6 +62,7 @@ const CrowdLayersControl = {
     CrowdLayersControl_props = props;
 
     CrowdLayersControl_refresh = refresh;
+    CrowdLayersControl_onFeatureClick = onFeatureClick;
   },
 
   update: async (props, bounds, refresh) => {
@@ -427,6 +429,7 @@ function onEachFeature(feature, layer) {
       CrowdLayersControl_mapRef.closePopup();
       feature.e = e;
       addFeatureData(feature, layer);
+      CrowdLayersControl_onFeatureClick();
       //CrowdLayersControl_refresh();
     }
   });

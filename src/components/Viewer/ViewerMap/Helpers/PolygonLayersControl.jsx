@@ -36,6 +36,8 @@ let polygonLayersControl_highlightCenter = [];
 let polygonLayersControl_refresh = () => {};
 let polygonLayersControl_shouldRefresh = false;
 
+let polygonLayersControl_onFeatureClick = null;
+
 const PolygonLayersControl = {
   getElement: () => {
     return { 
@@ -44,7 +46,7 @@ const PolygonLayersControl = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons, map) => {
+  initialize: async (props, bounds, maxPolygons, map, onFeatureClick) => {
     polygonLayersControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -60,6 +62,8 @@ const PolygonLayersControl = {
 
     polygonLayersControl_map = props.map;
     polygonLayersControl_mapRef = map;
+
+    polygonLayersControl_onFeatureClick = onFeatureClick;
   },
 
   update: async (props, bounds) => {
@@ -455,6 +459,8 @@ function onEachFeature(feature, layer) {
       polygonLayersControl_mapRef.closePopup();
       feature.e = e;
       addFeatureData(feature, layer);
+      debugger;
+      polygonLayersControl_onFeatureClick();
       //polygonLayersControl_refresh();
     }
   });

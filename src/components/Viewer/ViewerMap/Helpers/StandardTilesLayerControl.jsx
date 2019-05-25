@@ -29,7 +29,7 @@ let StandardTiles_highlight = {};
 let StandardTiles_highlightCenter = [];
 let StandardTiles_refresh = () => {};
 let StandardTiles_shouldRefresh = false;
-
+let StandardTiles_onFeatureClick = null;
 
 const StandardTilesLayer = {
   getElement: () => {
@@ -39,7 +39,7 @@ const StandardTilesLayer = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons, map) => {
+  initialize: async (props, bounds, maxPolygons, map, onFeatureClick) => {
     StandardTilesControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -56,6 +56,8 @@ const StandardTilesLayer = {
 
     StandardTiles_map = props.map;
     StandardTiles_mapRef = map;
+
+    StandardTiles_onFeatureClick = onFeatureClick;
   },
 
   update: async (props, bounds) => {
@@ -415,6 +417,7 @@ function onEachFeature(feature, layer)
       feature.e = e;
       feature.click = true;
       StandardTiles_PopupContent = feature;
+      StandardTiles_onFeatureClick();
       //StandardTiles_refresh();
     }
   });
