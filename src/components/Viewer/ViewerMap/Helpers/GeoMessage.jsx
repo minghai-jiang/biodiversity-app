@@ -137,7 +137,7 @@ export default class GeoMessage extends PureComponent {
     return(
       <div>
         {
-          this.props.map.accessLevel >= 400 ? 
+          this.props.user && this.props.map.accessLevel >= 400 ? 
             <PopupForm properties={this.props.properties} messageTrigger={this.messageTrigger}/> :
             null
         }

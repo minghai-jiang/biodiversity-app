@@ -199,7 +199,7 @@ const CrowdLayersControl = {
         report = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
       }
 
-      if (props.map.accessLevel >= 700) {
+      if (props.user && props.map.accessLevel >= 700) {
         updateButton =  <a className="noselect" onClick={() => {handlePolygon('update', contentFunction, updateInfo, properties, Math.random())} }>Update</a>;
         deleteButton =  <a className="noselect" onClick={() => {deletePolygon(properties)} }>Delete</a>;
       }      
