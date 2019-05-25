@@ -106,8 +106,11 @@ const FlyToControl = {
     flyToControl_maxZoom = 18;
     flyToProps = {};
   },
+
   flyTo: (type, id) =>
   {
+    let oldFlyToType = flyToType;
+
     flyToType = type + 's';
     if (type === 'custom polygon')
     {
@@ -123,7 +126,9 @@ const FlyToControl = {
       flyToID = id;
     }
 
-    handleSubmit()
+    handleSubmit();
+
+    flyToType = oldFlyToType;
   }
 }
 
