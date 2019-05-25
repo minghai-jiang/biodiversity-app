@@ -22,6 +22,8 @@ class Login extends PureComponent {
       return;
     }
 
+    username = username.toLowerCase();
+
     let bodyJson = JSON.stringify({
       username: username,
       password: password
