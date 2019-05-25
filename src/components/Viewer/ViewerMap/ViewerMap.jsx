@@ -45,6 +45,8 @@ export class ViewerMap extends PureComponent {
 
   maxZoom = 19;
 
+  lastBounds = null;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -250,9 +252,33 @@ export class ViewerMap extends PureComponent {
 
   onMapMoveEnd = (e) =>
   {
+    let map = this.mapRef.current.leafletElement;
+    let screenBounds = map.getBounds();
+
+    let bounds = 
+    {
+      xMin: screenBounds.getWest(),
+      xMax: screenBounds.getEast(),
+      yMin: screenBounds.getSouth(),
+      yMax: screenBounds.getNorth()
+    }
+
     let f = () => {
       this.getPolygonsJson(this.props);
     }
+
+    if (this.lastBounds 
+      && Math.abs(this.lastBounds.xMin - bounds.xMin) < 0.001
+      && Math.abs(this.lastBounds.xMax - bounds.xMax) < 0.001
+      && Math.abs(this.lastBounds.yMin - bounds.yMin) < 0.001
+      && Math.abs(this.lastBounds.yMax - bounds.yMax) < 0.001) {
+      // console.log('Ignoring move end.');
+      return;
+    }
+
+    // console.log('Executing move end.');
+
+    this.lastBounds = bounds;
 
     clearTimeout(this.getPolygonJsonTimeout);
     this.getPolygonJsonTimeout = setTimeout(f.bind(this), getPolygonJsonWaitTime);
