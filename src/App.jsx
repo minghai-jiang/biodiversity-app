@@ -73,6 +73,10 @@ class App extends Component {
       )
       .then(response => {
         if (response.ok) {
+          if (user.username) {
+            user.username = user.username.toLowerCase();
+          }
+          
           this.setState({ user: user, init: true });
         }
         else {
