@@ -6,7 +6,8 @@ class Register extends PureComponent {
     super(props, context);
 
     this.state = {
-      success: false
+      success: false,
+      submitting: false
     };
   }
 
@@ -20,39 +21,44 @@ class Register extends PureComponent {
       return;
     }
 
-    if (password !== repeatPassword) {
-      alert('Password and the repeat password do not match.');
-      return;
-    }
-
-    let bodyJson = JSON.stringify({
-      username: username,
-      password: password,
-      email: email
-    });
-
-    fetch(
-      `${this.props.apiUrl}account/register`,
-      {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json"
-        },  
-        body: bodyJson
+    this.setState({ submitting: true }, () => {
+      if (password !== repeatPassword) {
+        alert('Password and the repeat password do not match.');
+        return;
       }
-    )
-    .then(async response => {      
-      if (response.ok) {
-        this.setState({ success: true });
-      }
-      else {
-        let errorJson = await response.json();
-        throw new Error(`Status: ${errorJson.status}\n${errorJson.message}`);
-      }
+  
+      let bodyJson = JSON.stringify({
+        username: username,
+        password: password,
+        email: email
+      });
+  
+      fetch(
+        `${this.props.apiUrl}account/register`,
+        {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          },  
+          body: bodyJson
+        }
+      )
+      .then(async response => {      
+        if (response.ok) {
+          this.setState({ success: true, submitting: false });
+        }
+        else {
+          let errorJson = await response.json();
+          throw new Error(`Status: ${errorJson.status}\n${errorJson.message}`);
+        }
+      })
+      .catch(error => {
+        alert(error);
+        this.setState({ submitting: false });
+      });
     })
-    .catch(error => {
-      alert(error);
-    });
+
+
   }
 
   onEnter = (event) => {
@@ -120,11 +126,16 @@ class Register extends PureComponent {
                   <input className='login-input' tabIndex={0} type='email' ref='emailInput' onKeyUp={this.onEnter.bind(this)}></input>
                 </div>
               </div>
-              <div className='login-input-label-div' onClick={this.register.bind(this)} onKeyUp={this.onEnter.bind(this)}>
-                <div className="button main-block-single-button" tabIndex={0}>
-                  {this.props.localization["Register"]}                                               
-                </div>
-              </div>
+              {
+                this.state.submitting ?
+                  <img className='loading-spinner' src='/images/spinner.png' alt='spinner' /> :
+                  <div className='login-input-label-div' onClick={this.register.bind(this)} onKeyUp={this.onEnter.bind(this)} disabled={this.state.submitting}>
+                    <div className="button main-block-single-button" tabIndex={0}>
+                      {this.props.localization["Register"]}                                               
+                    </div>
+                  </div>
+              }
+
             </form>
         }
 
