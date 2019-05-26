@@ -66,13 +66,12 @@ export class ViewerMap extends PureComponent {
   }
 
   setLocation = (position) => {
-    console.log('Updating');
     this.geolocation = [position.coords.latitude, position.coords.longitude];
     this.forceUpdate();
     setTimeout(() => {
       navigator.geolocation.getCurrentPosition(this.setLocation, null, { enableHighAccuracy: true });
       }, 
-      30000
+      1000 * 60
     );
   }
 
