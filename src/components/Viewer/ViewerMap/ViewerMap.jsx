@@ -65,6 +65,17 @@ export class ViewerMap extends PureComponent {
     this.maxZoom = 19;
   }
 
+  setLocation = (position) => {
+    console.log('Updating');
+    this.geolocation = [position.coords.latitude, position.coords.longitude];
+    this.forceUpdate();
+    setTimeout(() => {
+      navigator.geolocation.getCurrentPosition(this.setLocation, null, { enableHighAccuracy: true });
+      }, 
+      30000
+    );
+  }
+
   componentDidMount = async () => {
     let map = this.mapRef.current.leafletElement;
     map.on('moveend', this.onMapMoveEnd);
@@ -92,17 +103,21 @@ export class ViewerMap extends PureComponent {
     DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap);
 
     if (navigator.geolocation) {
-      navigator.geolocation.watchPosition((position) => {
-        this.geolocation = [position.coords.latitude, position.coords.longitude];
+      navigator.geolocation.getCurrentPosition(this.setLocation.bind(this), null, { enableHighAccuracy: true });
 
-        let currentTime = (new Date).getTime();
 
-        if (!this.lastGeoLocationUpdate || this.lastGeoLocationUpdate + (1000 * 1) > currentTime) {
-          this.forceUpdate();
-        }
 
-        this.lastGeoLocationUpdate = currentTime;
-      }, (err) => {  }, { enableHighAccuracy: true });
+      // navigator.geolocation.watchPosition((position) => {
+
+      //   let currentTime = (new Date).getTime();
+
+      //   if (!this.lastGeoLocationUpdate || this.lastGeoLocationUpdate + (1000 * 20) > currentTime) {
+      //     console.log('Updating');
+      //     this.lastGeoLocationUpdate = currentTime;
+      //     this.forceUpdate();
+      //   }
+
+      // }, (err) => {  }, { enableHighAccuracy: true });
     }
   }
 
@@ -252,33 +267,33 @@ export class ViewerMap extends PureComponent {
 
   onMapMoveEnd = (e) =>
   {
-    let map = this.mapRef.current.leafletElement;
-    let screenBounds = map.getBounds();
+    // let map = this.mapRef.current.leafletElement;
+    // let screenBounds = map.getBounds();
 
-    let bounds = 
-    {
-      xMin: screenBounds.getWest(),
-      xMax: screenBounds.getEast(),
-      yMin: screenBounds.getSouth(),
-      yMax: screenBounds.getNorth()
-    }
+    // let bounds = 
+    // {
+    //   xMin: screenBounds.getWest(),
+    //   xMax: screenBounds.getEast(),
+    //   yMin: screenBounds.getSouth(),
+    //   yMax: screenBounds.getNorth()
+    // }
 
     let f = () => {
       this.getPolygonsJson(this.props);
     }
 
-    if (this.lastBounds 
-      && Math.abs(this.lastBounds.xMin - bounds.xMin) < 0.01
-      && Math.abs(this.lastBounds.xMax - bounds.xMax) < 0.01
-      && Math.abs(this.lastBounds.yMin - bounds.yMin) < 0.01
-      && Math.abs(this.lastBounds.yMax - bounds.yMax) < 0.01) {
-      // console.log('Ignoring move end.');
-      return;
-    }
+    // if (this.lastBounds 
+    //   && Math.abs(this.lastBounds.xMin - bounds.xMin) < 0.01
+    //   && Math.abs(this.lastBounds.xMax - bounds.xMax) < 0.01
+    //   && Math.abs(this.lastBounds.yMin - bounds.yMin) < 0.01
+    //   && Math.abs(this.lastBounds.yMax - bounds.yMax) < 0.01) {
+    //   // console.log('Ignoring move end.');
+    //   return;
+    // }
 
-    // console.log('Executing move end.');
+    // // console.log('Executing move end.');
 
-    this.lastBounds = bounds;
+    // this.lastBounds = bounds;
 
     clearTimeout(this.getPolygonJsonTimeout);
     this.getPolygonJsonTimeout = setTimeout(f.bind(this), getPolygonJsonWaitTime);

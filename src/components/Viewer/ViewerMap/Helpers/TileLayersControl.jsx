@@ -24,19 +24,19 @@ const tileLayerTypes = [
     name: imagesTileLayer, 
     checked: true,
     stacking: true,
-    zIndex: 100
+    zIndex: 1000
   },
   {
     name: labelsTileLayer, 
     checked: true,
     stacking: false,
-    zIndex: 200,
+    zIndex: 2000,
   },
   {
     name: indicesTileLayer, 
     checked: false,
     stacking: false,
-    zIndex: 300
+    zIndex: 3000
   }
 ];
 
@@ -54,7 +54,7 @@ const baseSatelliteOverlay = (
       url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
       attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
       noWrap={true}
-      zIndex={0}
+      zIndex={100}
       maxZoom={19}
     />
   </LayersControl.Overlay>
@@ -187,8 +187,11 @@ function tileLayersControl_prepareLayers (props) {
         tileLayersOfTypes.push(tileLayersOfType);
       }
 
-      mapTileLayerType.timestamps.forEach(timestampNumber => {
+      for (let i = 0; i < mapTileLayerType.timestamps.length; i++) {
+        let timestampNumber = mapTileLayerType.timestamps[i];
+
         let url = `${props.apiUrl}tileService/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
+        let zIndex = tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1);
 
         tileLayersOfType.timestampElements.push({
           timestampNumber: timestampNumber,
@@ -199,13 +202,13 @@ function tileLayersControl_prepareLayers (props) {
             maxZoom={map.zoom}
             attribution={mapParams.attribution}
             format={mapParams.format}
-            zIndex={tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1)}
+            zIndex={zIndex}
             key={timestampNumber + '.' + j}
             errorTileUrl={props.publicFilesUrl + 'images/dummy_tile.png'}
             bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
           />)
         });
-      })
+      }
     }
 
     preparedtileLayers.push({
@@ -243,7 +246,6 @@ function prepareTileLayersOverlays (props) {
       let layerElements = [];
 
       for (let j = timestampStart; j <= timestampRange.end; j++) {
-
         let timestampNumber = map.timestamps[j].timestampNumber;
         let timestampElement = layer.timestampElements.find(x => x.timestampNumber === timestampNumber);
 

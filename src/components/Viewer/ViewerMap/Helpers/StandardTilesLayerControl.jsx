@@ -413,7 +413,7 @@ function onEachFeature(feature, layer)
 
   layer.on({
     click: function(e){
-      StandardTiles_mapRef.closePopup();
+      // StandardTiles_mapRef.closePopup();
       feature.e = e;
       feature.click = true;
       StandardTiles_PopupContent = feature;

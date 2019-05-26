@@ -426,7 +426,7 @@ function onEachFeature(feature, layer) {
 
   layer.on({
     click: function(e){
-      CrowdLayersControl_mapRef.closePopup();
+      // CrowdLayersControl_mapRef.closePopup();
       feature.e = e;
       addFeatureData(feature, layer);
       CrowdLayersControl_onFeatureClick();

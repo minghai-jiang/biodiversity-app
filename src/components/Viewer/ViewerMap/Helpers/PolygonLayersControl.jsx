@@ -456,10 +456,9 @@ function onEachFeature(feature, layer) {
 
   layer.on({
     click: function(e){
-      polygonLayersControl_mapRef.closePopup();
+      // polygonLayersControl_mapRef.closePopup();
       feature.e = e;
       addFeatureData(feature, layer);
-      debugger;
       polygonLayersControl_onFeatureClick();
       //polygonLayersControl_refresh();
     }

@@ -17,6 +17,7 @@ class Viewer extends PureComponent {
       map: null,
       shape: null,
       infoContent: null,
+      popupContent: null,
       feed: [],
     };
   }
@@ -49,6 +50,10 @@ class Viewer extends PureComponent {
     this.setState({infoContent: content})
   }
 
+  onPopupContent = (content) => {
+    this.setState({ popupContent: content });
+  }
+
   render() {
     let keyPart = this.state.infoContent && this.state.infoContent.properties ? this.state.infoContent.properties.id : '';
     return (
@@ -66,6 +71,9 @@ class Viewer extends PureComponent {
             onSlide={this.onSelectTimestampRange}
           />
         </div>
+        <div style={{ backgroundColor: 'red', position: 'absolute', zIndex: '10000', top: '30vh' }}>
+          {this.state.popupContent}
+        </div>
         <ViewerMap
           apiUrl={this.props.apiUrl} 
           publicFilesUrl={this.props.publicFilesUrl}
@@ -73,6 +81,7 @@ class Viewer extends PureComponent {
           timestampRange={this.state.timestampRange}
           onShapeDrawn={this.onShapeDrawn}
           infoContent={this.getContent}
+          onPopupContent={this.onPopupContent}
           user={this.props.user}
         />
         <InfoPane
