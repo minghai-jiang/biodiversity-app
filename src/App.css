@@ -140,6 +140,11 @@
   cursor: pointer;
 }
 
+.button:hover {
+  background-color: #00a3a3;
+  color: #ffffff;
+}
+
 .button:hover:enabled {
     background-color: #00a3a3;
     color: #ffffff;
