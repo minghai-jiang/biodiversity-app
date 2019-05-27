@@ -190,7 +190,8 @@ export class PopupForm extends Component {
             <h3>Type a GeoMessage</h3>
             <textarea name="text" value={this.state.text} onChange={this.handleChange} placeholder='GeoMessage' maxLength='3000'/>
           </label><br/>
-          <div>
+          <div style={{ marginBottom: '1.2em' }}>
+            <span style={{ fontSize: '70%', marginRight: '0.5em'}}>Upload image:</span>
             <input type="file" accept='image/*' onChange={(e)=>this.handleImageChange(e)} />
           </div>
           <div>
