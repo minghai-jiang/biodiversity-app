@@ -21,6 +21,8 @@
   "ConsultancyEngineering": "Consultoría e Ingeniería",
   "Government": "Agencias de Gobierno",
   "Ngo": "ONG",
+  "Agrobusiness": "Agronegocios",
+
 
   "ApiTutorial": "API Tutorial",
   "Documentation": "Documentation",
@@ -54,7 +56,20 @@
   "ResetPasswordSuccessMessage1": "Hemos enviado un correo electrónico a la dirección de correo electrónico dada.",
   "ResetPasswordSuccessMessage2": "Por favor siga el procedimiento en el correo electrónico para continuar.",
 
+
+  "red": "rojo",
+  "green": "verde",
+  "yellow": "amarillo",
+  "blue":"azul",
+  "Yes":"Si",
+  "No":"No",
+  "Text":"Texto",
+  "Move": "Movimiento",
+  "Numeric":"Número",
+  "Boolean":"Si/no",
   "Map Management": "Gestión de mapas",
+  "Creating": "Creando",
+  "Altering":"Alterando",
   "formManagement": "Formularios" ,
   "form": "Formulario" ,
   "Change": "Cambio" ,

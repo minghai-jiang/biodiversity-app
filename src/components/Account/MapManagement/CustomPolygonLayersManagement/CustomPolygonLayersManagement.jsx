@@ -220,10 +220,10 @@ class CustomPolygonLayersManagement extends PureComponent {
              x[cellInfo.index][cellInfo.column.id] = e.target.value;
              this.setState({x})
             }}>
-            <option  value="ff0000ff">rood</option>
-            <option value="00ff00ff">groen</option>
-            <option value="0000ffff">blauw</option>
-            <option value="ffff00ff">yellow</option>
+            <option  value="ff0000ff">{this.props.localization["red"]}</option>
+            <option value="00ff00ff">{this.props.localization["green"]}</option>
+            <option value="0000ffff">{this.props.localization["blue"]}</option>
+            <option value="ffff00ff">{this.props.localization["yellow"]}</option>
           </select>
           </div>
         );

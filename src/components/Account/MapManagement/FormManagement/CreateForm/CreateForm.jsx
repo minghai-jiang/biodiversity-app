@@ -40,8 +40,8 @@ class CreateForm extends PureComponent {
   }
 
   delete = (cellInfo) => {
-    this.state.form.splice(cellInfo.index - 1,1)
-    this.setState(this.state.form)
+    this.state.form.splice(cellInfo.index ,1)
+    this.setState({state: this.state})
   }
 
   save = () => {
@@ -71,9 +71,9 @@ class CreateForm extends PureComponent {
              x[cellInfo.index][cellInfo.column.id] = e.target.value;
              this.setState({x})
             }}>
-            <option  value="Text">Text</option>
-            <option value="Numeric">Numeric</option>
-            <option value="Boolean">Boolean</option>
+            <option  value="Text">{this.props.localization["Text"]}</option>
+            <option value="Numeric">{this.props.localization["Numeric"]}</option>
+            <option value="Boolean">{this.props.localization["Boolean"]}</option>
           </select>
           </div>
         );
@@ -91,8 +91,8 @@ class CreateForm extends PureComponent {
              x[cellInfo.index][cellInfo.column.id] = e.target.value;
              this.setState({x})
             }}>
-            <option  value="Yes">Yes</option>
-            <option value="No">No</option>
+            <option  value="Yes">{this.props.localization["Yes"]}</option>
+            <option value="No">{this.props.localization["No"]}</option>
           </select>
           </div>
         );
@@ -168,14 +168,14 @@ class CreateForm extends PureComponent {
 
     modeElement = (
       <div>
-      <h2> Creating {this.props.formName} </h2>
+      <h2> {this.props.localization["Creating"]} {this.props.formName} </h2>
 
         <ReactTable
           key={Math.random()}
           data={this.state.form}
           columns={[
             {
-              Header: "Move",
+              Header: this.props.localization["Move"],
               accessor: 'move',
               Cell: this.renderMoveButtons
             },

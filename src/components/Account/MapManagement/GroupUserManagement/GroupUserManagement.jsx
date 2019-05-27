@@ -171,7 +171,7 @@ class GroupUserManagement extends PureComponent {
     if (this.state.groupUsers) {
       return (
         <div>
-        <h2> Altering {this.props.group["name"]}</h2>
+        <h2> {this.props.localization["Altering"]} {this.props.group["name"]}</h2>
           <ReactTable
             key={Math.random()}
             data={this.state.groupUsers}
