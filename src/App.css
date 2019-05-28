@@ -195,7 +195,11 @@
 }
 
 @media only screen and (max-device-width : 640px) {
-    .main-block-header {    
-        font-size: 22pt;
-    }
+  .main-block-header {    
+      font-size: 22pt;
+  }
+
+  .main-block-single-button {
+    width: 100%;
+  }
 }
