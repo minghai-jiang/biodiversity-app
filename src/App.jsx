@@ -5,6 +5,8 @@ import {
 import Modal from 'react-modal';
 import { withRouter } from 'react-router';
 
+import './Extensions/Array';
+
 import MainMenu from "./components/MainMenu/MainMenu";
 
 import Viewer from './components/Viewer/Viewer';

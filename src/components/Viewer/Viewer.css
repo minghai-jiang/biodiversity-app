@@ -2,10 +2,33 @@ div.content {
     margin-bottom: 0em;
 }
 
-.map {
+.viewer {
     height: 100%;
-    width: 100%;
+    width: 100vw;
     position: relative;
+}
+
+.map-container {
+  height: 92%;
+}
+
+.viewer-menu {
+  width: 100vw;
+  height: 8%;
+}
+
+.viewer-menu > div {
+  display: inline-block;
+  width: 33.33333vw;
+  height: 100%;
+}
+
+.viewer-menu > .button {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-left-width: 1.4px;
+  border-right-width: 1.4px;
 }
 
 .leaflet-container
