@@ -31,6 +31,7 @@
   bottom: 0;
   height: calc(100% - 3.5em);
   width: 100%;
+  overflow-x: hidden
 }
 
 .main-content {
