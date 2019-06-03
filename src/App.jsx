@@ -163,7 +163,11 @@ class App extends Component {
             <Route
               path="/viewer"
               render={() =>
-                <Viewer apiUrl={apiUrl} user={this.state.user}/>
+                <Viewer 
+                  user={this.state.user}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
               }
             />
             <Route path="/products"

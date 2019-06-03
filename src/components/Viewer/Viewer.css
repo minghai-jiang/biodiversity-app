@@ -8,8 +8,12 @@ div.content {
     position: relative;
 }
 
-.map-container {
+.viewer-main-container {
   height: 92%;
+}
+
+.map-container {
+  height: 100%;
 }
 
 .viewer-menu {
