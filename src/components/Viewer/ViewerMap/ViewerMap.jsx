@@ -99,7 +99,7 @@ export class ViewerMap extends PureComponent {
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);    
     FlyToControl.initialize(this.props, map, this.flyToChecked);
     GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);
-    DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap);
+    DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap, this.onClick);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(this.setLocation.bind(this), null, { enableHighAccuracy: true });
