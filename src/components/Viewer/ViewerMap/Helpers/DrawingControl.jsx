@@ -14,9 +14,10 @@ let DrawingControl_Props;
 let DrawingControl_refresh;
 let DrawingControl_mapRef;
 let DrawingControl_drawnItems;
+let DrawingControl_onFeatureClick;
 
 const DrawingControl = {
-  initialize: (map, callback, user, contentFunction, props, mapRef, refresh) => {
+  initialize: (map, callback, user, contentFunction, props, mapRef, refresh, onFeatureClick) => {
     DrawingControl_user = user;
     DrawingControl_map = props.map;
     DrawingControl_contentFunction = contentFunction;
@@ -24,6 +25,7 @@ const DrawingControl = {
 
     DrawingControl_refresh = refresh;
     DrawingControl_mapRef = mapRef;
+    DrawingControl_onFeatureClick = onFeatureClick;
 
     createDrawButton(map, {polygon: {allowIntersection: false }}, callback);
   },
@@ -33,6 +35,7 @@ const DrawingControl = {
     DrawingControl_map = props.map;
     DrawingControl_Props = props;
   },
+
   onFeatureClick: () =>
   {
     return(DrawingControl_Popup);
@@ -158,6 +161,8 @@ function onClickCustomPolygon(e, shapeCoords)
         {report}
       </Popup>
     );
+
+    DrawingControl_onFeatureClick();
   }
 }
 
