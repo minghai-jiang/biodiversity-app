@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react';
 import { NavLink } from 'react-router-dom';
 
-import { Footer } from '../footer/footer';
+import Footer from '../Footer/Footer';
 
-import "./Login.css";
+import './Login.css';
 
 import ApiManager from '../../ApiManager';
 import ErrorHandler from '../../ErrorHandler';

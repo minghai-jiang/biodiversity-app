@@ -1,11 +1,8 @@
 import React, { Component } from "react";
-/*import {
-    Route
-} from "react-router-dom";*/
 
 import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 
-import { Footer } from "../footer/footer";
+import Footer from "../Footer/Footer";
 
 export class Gallery extends Component {
     constructor(props) {

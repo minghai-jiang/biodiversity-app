@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 
-import { Footer } from "../footer/footer";
+import Footer from "../Footer/Footer";
 
 import "./About.css";
 

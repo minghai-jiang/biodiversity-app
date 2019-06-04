@@ -9,7 +9,7 @@ import ChangeEmail from './ChangeEmail/ChangeEmail';
 import ResetPassword from './ResetPassword/ResetPassword';
 import Register from './Register/Register';
 import MapManagement from './MapManagement/MapManagement';
-import { Footer } from '../footer/footer';
+import Footer from '../Footer/Footer';
 
 import "./Account.css";
 

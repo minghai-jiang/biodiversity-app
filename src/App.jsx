@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
     Route
-} from "react-router-dom";
+} from 'react-router-dom';
 import Modal from 'react-modal';
 import { withRouter } from 'react-router';
 
@@ -10,24 +10,24 @@ import './Extensions/Array';
 import ApiManager from './ApiManager';
 import ErrorHandler from './ErrorHandler';
 
-import MainMenu from "./components/MainMenu/MainMenu";
-import Viewer from './components/Viewer/Viewer';
-import Home from "./components/Home/Home";
-import About from "./components/About/About";
-import Products from "./components/Products/Products";
-import Login from './components/Login/Login';
-import Sector from './components/Sectors/Sectors';
-import Gallery from './components/Gallery/Gallery';
-import Account from './components/Account/Account';
+import MainMenu from './Components/MainMenu/MainMenu';
+import Viewer from './Components/Viewer/Viewer';
+import Home from './Components/Home/Home';
+import About from './Components/About/About';
+import Products from './Components/Products/Products';
+import Login from './Components/Login/Login';
+import Sector from './Components/Sectors/Sectors';
+import Gallery from './Components/Gallery/Gallery';
+import Account from './Components/Account/Account';
 
-import "./App.css";
+import './App.css';
 
 const localStorageUserItem = 'user';
 
 class App extends Component {
   constructor(props, context) {
     super(props, context)
-    document.title = "Ellipsis Earth Intelligence";
+    document.title = 'Ellipsis Earth Intelligence';
 
     this.state = {
       init: false,
@@ -45,8 +45,8 @@ class App extends Component {
   }
 
   closeMenu = () => {
-    var x = document.getElementById("main-menu");
-    x.className = "";
+    var x = document.getElementById('main-menu');
+    x.className = '';
   }
 
   retrieveUser = async () => {
@@ -123,15 +123,15 @@ class App extends Component {
   render() {
     if (this.state.init) {
       return (
-        <div className="App" onClick={this.closeMenu}>
+        <div className='App' onClick={this.closeMenu}>
           <MainMenu
             user={this.state.user}
             language={this.state.language}
             localization={this.state.localization}
             onLanguageChange={this.onLanguageChange}
           />
-          <div className="content" ref={ref => this.el = ref}>
-            <Route exact path="/"
+          <div className='content' ref={ref => this.el = ref}>
+            <Route exact path='/'
               render={() =>
                 <Home
                   language={this.state.language}
@@ -139,7 +139,7 @@ class App extends Component {
               }
             />
             <Route
-              path="/viewer"
+              path='/viewer'
               render={() =>
                 <Viewer 
                   user={this.state.user}
@@ -148,7 +148,7 @@ class App extends Component {
                 />
               }
             />
-            <Route path="/products"
+            <Route path='/products'
               render={() =>
                 <Products
                   language={this.state.language}
@@ -157,7 +157,7 @@ class App extends Component {
               }
             />
             <Route
-              path="/sectors"
+              path='/sectors'
               render={() =>
                 <Sector
                   language={this.state.language}
@@ -166,7 +166,7 @@ class App extends Component {
               }
             />
             <Route
-              path="/gallery"
+              path='/gallery'
               render={() =>
                 <Gallery
                   language={this.state.language}
@@ -175,7 +175,7 @@ class App extends Component {
               }
             />
             <Route
-              path="/about"
+              path='/about'
               render={() =>
                 <About
                   language={this.state.language}
@@ -184,7 +184,7 @@ class App extends Component {
             }
             />
             <Route
-              path="/login"
+              path='/login'
               render={() =>
                 <Login
                   onLogin={this.onLogin}
@@ -194,7 +194,7 @@ class App extends Component {
               }
             />
             <Route
-              path="/account"
+              path='/account'
               render={() =>
                 <Account
                   user={this.state.user}
