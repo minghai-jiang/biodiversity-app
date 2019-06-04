@@ -13,7 +13,6 @@ export class ProductsDocumentation extends Component {
             Documentation
           </div>
           <div className='main-block-content main-block-content-left documentation-block'>
-            {/* <Markdown publicFilesUrl={this.props.publicFilesUrl} file="documentation"></Markdown> */}
             <LoadUpdateUtil 
               contentUrl={'/markdown/Documentation.md'}
               isMarkdown={true}

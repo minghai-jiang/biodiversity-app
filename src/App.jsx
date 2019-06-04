@@ -14,7 +14,6 @@ import MainMenu from "./components/MainMenu/MainMenu";
 import Viewer from './components/Viewer/Viewer';
 import Home from "./components/Home/Home";
 import About from "./components/About/About";
-import Contact from "./components/contact/contact";
 import Products from "./components/Products/Products";
 import Login from './components/Login/Login';
 import Sector from './components/Sectors/Sectors';
@@ -152,7 +151,6 @@ class App extends Component {
             <Route path="/products"
               render={() =>
                 <Products
-                  publicFilesUrl={publicFilesUrl}
                   language={this.state.language}
                   localization={this.state.localization}
                 />
@@ -162,7 +160,6 @@ class App extends Component {
               path="/sectors"
               render={() =>
                 <Sector
-                  publicFilesUrl={publicFilesUrl}
                   language={this.state.language}
                   localization={this.state.localization}
                 />
@@ -172,7 +169,6 @@ class App extends Component {
               path="/gallery"
               render={() =>
                 <Gallery
-                  publicFilesUrl={publicFilesUrl}
                   language={this.state.language}
                   localization={this.state.localization}
                 />
@@ -182,13 +178,11 @@ class App extends Component {
               path="/about"
               render={() =>
                 <About
-                  publicFilesUrl={publicFilesUrl}
                   language={this.state.language}
                   localization={this.state.localization}
                 />
             }
             />
-            <Route path="/contact" component={Contact} />
             <Route
               path="/login"
               render={() =>

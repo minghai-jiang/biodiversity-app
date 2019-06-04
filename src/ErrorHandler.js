@@ -1,6 +1,6 @@
 const ErrorHandler = {
   alert: (error) => {
-    if (typeof myVar === 'string' || myVar instanceof String) {
+    if (typeof error === 'string' || error instanceof String) {
       alert(new Error(error));
     }
     else if (error.status) {

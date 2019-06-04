@@ -14,7 +14,6 @@ export class ProductsTutorial extends Component {
                         Ellipsis-Earth tutorial
                     </h1>
                     <div className="main-block-content main-block-content-left">
-                        {/* <Markdown publicFilesUrl={this.props.publicFilesUrl} file="tutorial"></Markdown> */}
                         <LoadUpdateUtil 
                           contentUrl={'/markdown/tutorial.md'}
                           isMarkdown={true}

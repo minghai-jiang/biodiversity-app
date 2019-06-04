@@ -204,7 +204,6 @@ function tileLayersControl_prepareLayers (props) {
             format={mapParams.format}
             zIndex={zIndex}
             key={timestampNumber + '.' + j}
-            errorTileUrl={props.publicFilesUrl + 'images/dummy_tile.png'}
             bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
           />)
         });
