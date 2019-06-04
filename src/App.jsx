@@ -193,7 +193,6 @@ class App extends Component {
               path="/login"
               render={() =>
                 <Login
-                  apiUrl={apiUrl}
                   onLogin={this.onLogin}
                   language={this.state.language}
                   localization={this.state.localization}
@@ -204,7 +203,6 @@ class App extends Component {
               path="/account"
               render={() =>
                 <Account
-                  apiUrl={apiUrl}
                   user={this.state.user}
                   language={this.state.language}
                   localization={this.state.localization}
