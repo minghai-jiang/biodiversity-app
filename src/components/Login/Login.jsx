@@ -1,9 +1,12 @@
 import React, { PureComponent } from 'react';
 import { NavLink } from 'react-router-dom';
 
-import { Footer } from "../footer/footer";
+import { Footer } from '../footer/footer';
 
 import "./Login.css";
+
+import ApiManager from '../../ApiManager';
+import ErrorHandler from '../../ErrorHandler';
 
 class Login extends PureComponent {
   constructor(props, context) {
@@ -24,41 +27,24 @@ class Login extends PureComponent {
 
     username = username.toLowerCase();
 
-    let bodyJson = JSON.stringify({
+    let body ={
       username: username,
       password: password
-    });
+    };
 
-    fetch(
-      `${this.props.apiUrl}account/login`,
-      {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json"
-        },  
-        body: bodyJson
-      }
-    )
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      else {
-        throw new Error('Invalid username or password.');
-      }
-    })
-    .then(data => {
-      let token = data.token;
-      let user = {
-        username: username,
-        token: token,
-      };
+    ApiManager.post(`/account/login`, body)
+      .then(data => {
+        let token = data.token;
+        let user = {
+          username: username,
+          token: token,
+        };
 
-      this.props.onLogin(user);
-    })
-    .catch(error => {
-      alert(error);
-    });
+        this.props.onLogin(user);
+      })
+      .catch(error => {
+        ErrorHandler.alert(error);
+      });
   }
 
   onEnter = (event) => {

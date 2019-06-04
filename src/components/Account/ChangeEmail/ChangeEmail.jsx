@@ -1,6 +1,9 @@
 import React, { PureComponent } from 'react';
 import { NavLink, Redirect } from 'react-router-dom';
 
+import ApiManager from '../../../ApiManager';
+import ErrorHandler from '../../../ErrorHandler';
+
 class ChangeEmail extends PureComponent {
   constructor(props, context) {
     super(props, context);
@@ -17,33 +20,17 @@ class ChangeEmail extends PureComponent {
       return;
     }
 
-    let bodyJson = JSON.stringify({
+    let body = {
       newEmail: newEmail
-    });
+    };
 
-    fetch(
-      `${this.props.apiUrl}account/changeEmail`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.props.user.token
-        },  
-        body: bodyJson
-      }
-    )
-    .then(async (response) => {      
-      if (response.ok) {
+    ApiManager.post(`/account/changeEmail`, body, this.props.user)
+      .then(() => {
         this.setState({ success: true });
-      }
-      else {
-        let errorJson = await response.json();
-        throw new Error(`Status: ${errorJson.status}\n${errorJson.message}`);
-      }
-    })
-    .catch(error => {
-      alert(error);
-    });
+      })
+      .catch(err => {
+        ErrorHandler.alert(err);
+      });
   }
 
   onEnter = (event) => {
@@ -61,20 +48,20 @@ class ChangeEmail extends PureComponent {
     }
 
     return (
-      <div className="login-block">
+      <div className='login-block'>
         <h1 className='account-title'>
-          {this.props.localization["ChangeEmail"]}
+          {this.props.localization['ChangeEmail']}
         </h1>
         {
           this.state.success ?
           <div className='main-content'>
             <h2>{this.props.localization["Success"]}</h2>
             <p>
-              {this.props.localization["ChangeEmailSuccessMessage"]}
+              {this.props.localization['ChangeEmailSuccessMessage']}
             </p>
             <div>
               <NavLink to='/account/management' style={{fontSize: '12pt'}}>
-                {this.props.localization["AccountManagement"]}
+                {this.props.localization['AccountManagement']}
               </NavLink>          
             </div>
           </div>
@@ -90,8 +77,8 @@ class ChangeEmail extends PureComponent {
             </div>
 
             <div className='login-input-label-div' onClick={this.changeEmail.bind(this)} onKeyUp={this.onEnter.bind(this)}>
-              <div className="button main-block-single-button" tabIndex={0}>
-                {this.props.localization["ChangeEmail"]}                                               
+              <div className='button main-block-single-button' tabIndex={0}>
+                {this.props.localization['ChangeEmail']}   
               </div>
             </div>
           </form>

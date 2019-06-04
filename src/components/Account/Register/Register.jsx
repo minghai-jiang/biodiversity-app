@@ -1,6 +1,9 @@
 import React, { PureComponent } from 'react';
 import { NavLink } from 'react-router-dom';
 
+import ApiManager from '../../../ApiManager';
+import ErrorHandler from '../../../ErrorHandler';
+
 class Register extends PureComponent {
   constructor(props, context) {
     super(props, context);
@@ -27,38 +30,21 @@ class Register extends PureComponent {
         return;
       }
   
-      let bodyJson = JSON.stringify({
+      let body = {
         username: username,
         password: password,
         email: email
-      });
+      };
   
-      fetch(
-        `${this.props.apiUrl}account/register`,
-        {
-          method: 'POST',
-          headers: {
-            "Content-Type": "application/json"
-          },  
-          body: bodyJson
-        }
-      )
-      .then(async response => {      
-        if (response.ok) {
+      ApiManager.post(`/account/register`, body)
+        .then(() => {      
           this.setState({ success: true, submitting: false });
-        }
-        else {
-          let errorJson = await response.json();
-          throw new Error(`Status: ${errorJson.status}\n${errorJson.message}`);
-        }
-      })
-      .catch(error => {
-        alert(error);
-        this.setState({ submitting: false });
+        })
+        .catch(error => {
+          ErrorHandler.alert(error);
+          this.setState({ submitting: false });
+        });
       });
-    })
-
-
   }
 
   onEnter = (event) => {

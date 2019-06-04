@@ -7,8 +7,10 @@ import { withRouter } from 'react-router';
 
 import './Extensions/Array';
 
-import MainMenu from "./components/MainMenu/MainMenu";
+import ApiManager from './ApiManager';
+import ErrorHandler from './ErrorHandler';
 
+import MainMenu from "./components/MainMenu/MainMenu";
 import Viewer from './components/Viewer/Viewer';
 import Home from "./components/Home/Home";
 import About from "./components/About/About";
@@ -22,15 +24,6 @@ import Account from './components/Account/Account';
 import "./App.css";
 
 const localStorageUserItem = 'user';
-
-const apiUrl = "https://api.ellipsis-earth.com/";
-const publicFilesUrl = "https://public.ellipsis-earth.com/";
-
-//const apiUrl = "https://dev.api.ellipsis-earth.com/";
-// const publicFilesUrl = "https://dev.public.ellipsis-earth.com/";
-
-// const apiUrl = "http://localhost:7552/";
-// const publicFilesUrl = "http://localhost:3000/";
 
 class App extends Component {
   constructor(props, context) {
@@ -61,39 +54,25 @@ class App extends Component {
     let user = null;
     let userJson = localStorage.getItem(localStorageUserItem);
 
-    if (userJson) {
-      user = JSON.parse(userJson);
+    if (!userJson) {
+      this.setState({ init: true });
+      return;
+    }
 
-      fetch(
-        `${apiUrl}account/validateLogin`,
-        {
-          method: 'GET',
-          headers: {
-            "Authorization": "Bearer " + user.token
-          }
+    user = JSON.parse(userJson);
+
+    ApiManager.get(`/account/validateLogin`, null, user)
+      .then(() => {
+        if (user.username) {
+          user.username = user.username.toLowerCase();
         }
-      )
-      .then(response => {
-        if (response.ok) {
-          if (user.username) {
-            user.username = user.username.toLowerCase();
-          }
-          
-          this.setState({ user: user, init: true });
-        }
-        else {
-          this.setState({ init: true });
-          localStorage.removeItem(localStorageUserItem);
-        }
+        
+        this.setState({ user: user, init: true });
       })
-      .catch(error => {
+      .catch(() => {
         this.setState({ init: true });
         localStorage.removeItem(localStorageUserItem);
       });
-    }
-    else {
-      this.setState({ init: true });
-    }
   }
 
   retrieveLanguage = async () => {
@@ -120,7 +99,7 @@ class App extends Component {
         });
       })
       .catch(err => {
-        alert(err);
+        ErrorHandler.alert(err);
       });
   }
 

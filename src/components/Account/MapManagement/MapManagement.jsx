@@ -122,7 +122,6 @@ class MapManagement extends PureComponent {
         if (this.state.mode === 0) {
           modeElement = (
             <AccessManagement
-              apiUrl={this.props.apiUrl}
               language={this.props.language}
               localization={this.props.localization}
               user={this.props.user}
@@ -136,7 +135,6 @@ class MapManagement extends PureComponent {
         else if (this.state.mode === 1) {
             modeElement = (
               <GroupUserManagement
-                apiUrl={this.props.apiUrl}
                 language={this.props.language}
                 localization={this.props.localization}
                 user={this.props.user}
@@ -150,7 +148,6 @@ class MapManagement extends PureComponent {
         else if (this.state.mode === 2) {
           modeElement = (
             <CustomPolygonLayersManagement
-              apiUrl={this.props.apiUrl}
               language={this.props.language}
               localization={this.props.localization}
               user={this.props.user}

@@ -1,6 +1,9 @@
 import React, { PureComponent } from 'react';
 import { NavLink, Redirect } from 'react-router-dom';
 
+import ApiManager from '../../../ApiManager';
+import ErrorHandler from '../../../ErrorHandler';
+
 class ChangePassword extends PureComponent {
   constructor(props, context) {
     super(props, context);
@@ -23,33 +26,17 @@ class ChangePassword extends PureComponent {
       return;
     }
 
-    let bodyJson = JSON.stringify({
+    let body = {
       newPassword: newPassword
-    });
+    };
 
-    fetch(
-      `${this.props.apiUrl}account/changePassword`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.props.user.token
-        },  
-        body: bodyJson
-      }
-    )
-    .then(async (response) => {      
-      if (response.ok) {
+    ApiManager.post(`/account/changePassword`, body, this.props.user)
+      .then(() => {   
         this.setState({ success: true });
-      }
-      else {
-        let errorJson = await response.json();
-        throw new Error(`Status: ${errorJson.status}\n${errorJson.message}`);
-      }
-    })
-    .catch(error => {
-      alert(error);
-    });
+      })
+      .catch(err => {
+        ErrorHandler.alert(err);
+      });
   }
 
   onEnter = (event) => {

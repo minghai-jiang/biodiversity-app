@@ -30,8 +30,7 @@ export class Account extends Component {
           <Route 
             path="/account/management" 
             render={() => 
-              <AccountManagement 
-                apiUrl={this.props.apiUrl} 
+              <AccountManagement
                 language={this.props.language} 
                 localization={this.props.localization}
                 user={this.props.user}
@@ -42,8 +41,7 @@ export class Account extends Component {
           <Route 
             path="/account/changePassword" 
             render={() => 
-              <ChangePassword 
-                apiUrl={this.props.apiUrl} 
+              <ChangePassword
                 language={this.props.language} 
                 localization={this.props.localization}
                 user={this.props.user}
@@ -53,8 +51,7 @@ export class Account extends Component {
           <Route 
             path="/account/changeEmail" 
             render={() => 
-              <ChangeEmail 
-                apiUrl={this.props.apiUrl} 
+              <ChangeEmail
                 language={this.props.language} 
                 localization={this.props.localization}
                 user={this.props.user}
@@ -64,8 +61,7 @@ export class Account extends Component {
           <Route 
             path="/account/register" 
             render={() => 
-              <Register 
-                apiUrl={this.props.apiUrl} 
+              <Register
                 language={this.props.language} 
                 localization={this.props.localization}
               />
@@ -74,8 +70,7 @@ export class Account extends Component {
           <Route 
             path="/account/resetPassword" 
             render={() => 
-              <ResetPassword 
-                apiUrl={this.props.apiUrl} 
+              <ResetPassword
                 language={this.props.language} 
                 localization={this.props.localization}
               />
@@ -84,8 +79,7 @@ export class Account extends Component {
           <Route 
             path="/account/mapManagement" 
             render={() => 
-              <MapManagement 
-                apiUrl={this.props.apiUrl} 
+              <MapManagement
                 language={this.props.language} 
                 localization={this.props.localization}
                 user={this.props.user}

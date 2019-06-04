@@ -1,6 +1,9 @@
 import React, { PureComponent } from 'react';
 import { NavLink } from 'react-router-dom';
 
+import ApiManager from '../../../ApiManager';
+import ErrorHandler from '../../../ErrorHandler';
+
 class ResetPassword extends PureComponent {
   constructor(props, context) {
     super(props, context);
@@ -17,32 +20,17 @@ class ResetPassword extends PureComponent {
       return;
     }
 
-    let bodyJson = JSON.stringify({
+    let body = {
       email: email
-    });
+    };
 
-    fetch(
-      `${this.props.apiUrl}account/resetPassword`,
-      {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json"
-        },  
-        body: bodyJson
-      }
-    )
-    .then(async response => {      
-      if (response.ok) {
+    ApiManager.post(`/account/resetPassword`, body, this.props.user)
+      .then(() => {      
         this.setState({ success: true });
-      }
-      else {
-        let errorJson = await response.json();
-        throw new Error(`Status: ${errorJson.status}\n${errorJson.message}`);
-      }
-    })
-    .catch(error => {
-      alert(error);
-    });
+      })
+      .catch(err => {
+        ErrorHandler.alert(err);
+      });
   }
 
   onEnter = (event) => {
