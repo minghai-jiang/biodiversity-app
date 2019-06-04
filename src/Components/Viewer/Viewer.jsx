@@ -64,8 +64,6 @@ class Viewer extends PureComponent {
 
   render() {
     let mapPane = null;
-    let controlsPane = null;
-    let dataPane = null;
 
     if (this.state.panes.includes(MAP_PANE_NAME)) {
       let mapPaneWidth = '100vw';
@@ -111,14 +109,20 @@ class Viewer extends PureComponent {
         </div>
 
         <div className='viewer-menu'>
-          <div className='button' onClick={() => this.onViewerMenuClick(CONTROL_PANE_NAME)}>
-            {this.props.localization['ViewerControlsPane']}
+          <div className='button viewer-menu-button' onClick={() => this.onViewerMenuClick(CONTROL_PANE_NAME)}>
+            <div className='viewer-menu-button-content'>
+              {this.props.localization['ViewerControlsPane']}
+            </div>
           </div>
-          <div className='button' onClick={() => this.onViewerMenuClick(MAP_PANE_NAME)}>
-            {this.props.localization['ViewerMapPane']}
+          <div className='button viewer-menu-button' onClick={() => this.onViewerMenuClick(MAP_PANE_NAME)}>
+            <div className='viewer-menu-button-content'>
+              {this.props.localization['ViewerMapPane']}           
+            </div>
           </div>
-          <div className='button' onClick={() => this.onViewerMenuClick(DATA_PANE_NAME)}>
-            {this.props.localization['ViewerDataPane']}
+          <div className='button viewer-menu-button' onClick={() => this.onViewerMenuClick(DATA_PANE_NAME)}>
+            <div className='viewer-menu-button-content'>
+              {this.props.localization['ViewerDataPane']}        
+            </div>
           </div>
         </div>
       </div>

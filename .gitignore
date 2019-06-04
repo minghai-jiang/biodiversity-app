@@ -35,3 +35,4 @@ build.tar
 src/components/Viewer/TimestampSelector/TimestampSelector - Copy.js
 src/components/Viewer/ViewerMap/ViewerMap - copy.js
 do_publish.sh
+do_publish_dev.sh

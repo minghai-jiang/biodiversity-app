@@ -2,24 +2,29 @@
   font-size: 11pt
 }
 
+.rc-slider {
+  touch-action: auto;
+}
+
 .rc-slider-handle {
   border-color: #00a3a3;
-  margin-top: -4px
+  margin-top: -4px;
+  touch-action: auto
 }
 
 .rc-slider-handle:active {
-    border-color: #00a3a3;
-    box-shadow: 0 0 5px #00a3a3;
+  border-color: #00a3a3;
+  box-shadow: 0 0 5px #00a3a3;
 }
 
 .rc-slider-handle:hover {
-    border-color: #00a3a3;
-    cursor: pointer;
+  border-color: #00a3a3;
+  cursor: pointer;
 }
 
 .rc-slider-handle:focus {
-    border-color: #00a3a3;
-    box-shadow: 0 0 5px 2px #00a3a3a8;
+  border-color: #00a3a3;
+  box-shadow: 0 0 5px 2px #00a3a3a8;
 }
 
 .rc-slider-track {
@@ -32,21 +37,21 @@
 }
 
 .rc-slider-dot-active {
-    border-color:#00a3a380;
+  border-color:#00a3a380;
 }
 
 .rc-slider-tooltip {
-    z-index: 10000001;
+  z-index: 10000001;
 }
 
 .time-range-selector
 {
-    opacity: 0.25;
-    -webkit-transition: opacity 0.25s; /* Safari */
-    transition: opacity 0.25s;
+  opacity: 0.25;
+  -webkit-transition: opacity 0.25s; /* Safari */
+  transition: opacity 0.25s;
 }
 
 .time-range-selector:hover, .time-range-selector:active, .time-range-selector:focus
 {
-    opacity: 1;
+  opacity: 1;
 }

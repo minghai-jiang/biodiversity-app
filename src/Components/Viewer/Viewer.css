@@ -17,6 +17,16 @@ div.content {
   height: 8%;
 }
 
+.viewer-menu > .viewer-menu-button {
+  padding: 0px
+}
+
+.viewer-menu-button-content {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%); 
+}
+
 .viewer-menu > div {
   display: inline-block;
   width: 33.33333vw;
