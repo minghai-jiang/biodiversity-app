@@ -118,6 +118,22 @@ export default class GeoMessage extends PureComponent {
   render = () => 
   {
     let geoMessages = [];
+
+    if (!this.props.user) {
+      geoMessages.push(
+        <div key='no-message-div' style={{ marginLeft: '1.5em', marginTop: '1em' }}>
+          Please login to post geomessages.
+        </div>
+      );
+    }
+    else if (this.props.map.accessLevel < 400) {
+      geoMessages.push(
+        <div key='no-message-div' style={{ marginLeft: '1.5em', marginTop: '1em' }}>
+          Inscufficient permissions to post geomessages. Contact the owner of this map.
+        </div>
+      );
+    }
+
     if (this.state.messages.length > 0)
     {
       geoMessages.push(
@@ -131,8 +147,14 @@ export default class GeoMessage extends PureComponent {
       )
     }
     else {
-      geoMessages.push(<div key='no-message-div' style={{ marginLeft: '1.5em', marginTop: '1em' }}>No messages</div>);
+      geoMessages.push(
+        <div key='no-message-div' style={{ marginLeft: '1.5em', marginTop: '1em' }}>
+          No messages found.
+        </div>
+      );
     }
+
+
 
     return(
       <div>

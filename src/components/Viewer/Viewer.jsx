@@ -10,6 +10,7 @@ import {
 } from "react-leaflet";
 
 import ControlsPane from './ControlsPane/ControlsPane';
+import DataPane from './DataPane/DataPane';
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -54,30 +55,74 @@ class Viewer extends PureComponent {
     }
 
     if (changed) {
-      this.setState({ panes: currentPanes });
+      currentPanes = [...currentPanes];
+      this.setState({ panes: currentPanes }, () => {
+        console.log(this.state.panes);
+      });
     }
   }
 
   render() {
+    let mapPane = null;
+    let controlsPane = null;
+    let dataPane = null;
+
+    if (this.state.panes.includes(MAP_PANE_NAME)) {
+      let mapPaneWidth = '100vw';
+      if (!isMobile) {
+        if (this.state.panes.length === 2) {
+          mapPaneWidth = '75vw';
+        }
+        else if (this.state.panes.length === 3) {
+          mapPaneWidth = '50vw';
+        }
+      }
+      else {
+        if (!this.state.panes.includes(MAP_PANE_NAME)) {
+          mapPaneWidth = '0vw';
+        }
+      }
+
+      mapPane = (
+        <div className='map-pane' style={{ width: mapPaneWidth }}>
+          <Map center={[51.505, -0.09]} zoom={13}>
+            <TileLayer
+              url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
+              attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
+            />  
+          </Map>
+        </div>
+      );
+    }
+
+    if (this.state.panes.includes(CONTROL_PANE_NAME)) {
+      controlsPane = (
+        <div className='controls-pane'>
+          <ControlsPane>
+            
+          </ControlsPane>
+        </div>
+      );
+    }
+
+    if (this.state.panes.includes(DATA_PANE_NAME)) {
+      dataPane = (
+        <div className='data-pane'>
+          <DataPane>
+            
+          </DataPane>
+        </div>
+      );
+    }
+
     return (
       <div className='viewer'>
         
         <div className='viewer-main-container'>
-          <div>
-            <ControlsPane>
-              
-            </ControlsPane>
-          </div>
-          <div className='map-container'>
-            <Map center={[51.505, -0.09]} zoom={13}>
-              <TileLayer
-                url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
-                attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
-              />  
-            </Map>
-          </div>
+          {controlsPane}
+          {mapPane}
+          {dataPane}
         </div>
-
 
         <div className='viewer-menu'>
           <div className='button' onClick={() => this.onViewerMenuClick(CONTROL_PANE_NAME)}>

@@ -12,10 +12,6 @@ div.content {
   height: 92%;
 }
 
-.map-container {
-  height: 100%;
-}
-
 .viewer-menu {
   width: 100vw;
   height: 8%;
@@ -33,6 +29,21 @@ div.content {
   -webkit-box-sizing: border-box;
   border-left-width: 1.4px;
   border-right-width: 1.4px;
+}
+
+.map-pane {
+  height: 100%;
+  display: inline-block;
+}
+
+.controls-pane {
+  display: inline-block;
+  width: 25vw;
+}
+
+.data-pane {
+  display: inline-block;
+  width: 25vw;
 }
 
 .leaflet-container
@@ -161,4 +172,14 @@ div.viewer-button {
   padding: 0.2em 0.7em;
 
   z-index: 100000;
+}
+
+@media only screen and (max-width: 600px) {
+  .controls-pane {
+    width: 100vw;
+  }
+  
+  .data-pane {
+    width: 100vw;
+  }
 }

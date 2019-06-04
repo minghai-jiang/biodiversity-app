@@ -12,9 +12,9 @@ import {
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 
-import "./ControlsPane.css";
+import "./DataPane.css";
 
-class ControlsPane extends PureComponent {
+class DataPane extends PureComponent {
   constructor(props, context) {
     super(props, context);
 
@@ -28,11 +28,11 @@ class ControlsPane extends PureComponent {
 
   render() {
     return (
-      <div className='viewer-controls-pane'>
-        Controls Pane
+      <div className='viewer-data-pane'>
+        Data Pane
       </div>
     );
   }
 }
 
-export default ControlsPane;
+export default DataPane;
