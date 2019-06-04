@@ -1,18 +1,9 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import {
-  Map,
-  TileLayer,
-  LayersControl,
-  Marker,
-  Popup
-} from "react-leaflet";
+import './ControlsPane.css';
 
-import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
-
-import "./ControlsPane.css";
+import MapSelector from './MapSelector/MapSelector';
 
 class ControlsPane extends PureComponent {
   constructor(props, context) {
@@ -27,9 +18,17 @@ class ControlsPane extends PureComponent {
   }
 
   render() {
+    let style = {};
+    if (!this.props.isOpen) {
+      style = { display: 'none' };
+    }
+
     return (
-      <div className='viewer-controls-pane'>
-        Controls Pane
+      <div className='viewer-pane controls-pane' style={style}>
+        <MapSelector
+          user={this.props.user}
+          key='map-selector'
+        />
       </div>
     );
   }

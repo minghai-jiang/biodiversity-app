@@ -27,8 +27,13 @@ class DataPane extends PureComponent {
   }
 
   render() {
+    let style = {};
+    if (!this.props.isOpen) {
+      style = { display: 'none' };
+    }
+    
     return (
-      <div className='viewer-data-pane'>
+      <div className='viewer-pane data-pane' style={style}>
         Data Pane
       </div>
     );

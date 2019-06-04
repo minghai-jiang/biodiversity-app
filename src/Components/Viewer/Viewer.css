@@ -31,25 +31,23 @@ div.content {
   border-right-width: 1.4px;
 }
 
-.map-pane {
+.viewer-pane {
+  float: left;
   height: 100%;
-  display: inline-block;
 }
 
-.controls-pane {
-  display: inline-block;
-  width: 25vw;
+.map-pane {
+  width: 100vw;
 }
 
-.data-pane {
-  display: inline-block;
-  width: 25vw;
-}
+
+
+
 
 .leaflet-container
 {
-    height: 100%;
-    position: relative;
+  height: 100%;
+  position: relative;
 }
 
 .leaflet-control

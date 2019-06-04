@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
 
 import {
@@ -7,14 +7,14 @@ import {
   LayersControl,
   Marker,
   Popup
-} from "react-leaflet";
+} from 'react-leaflet';
 
 import ControlsPane from './ControlsPane/ControlsPane';
 import DataPane from './DataPane/DataPane';
 
-import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
-import "./Viewer.css";
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import './Viewer.css';
 
 const MAP_PANE_NAME = 'map_pane';
 const CONTROL_PANE_NAME = 'control_pane';
@@ -84,7 +84,7 @@ class Viewer extends PureComponent {
       }
 
       mapPane = (
-        <div className='map-pane' style={{ width: mapPaneWidth }}>
+        <div className='viewer-pane map-pane' style={{ width: mapPaneWidth }}>
           <Map center={[51.505, -0.09]} zoom={13}>
             <TileLayer
               url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
@@ -95,33 +95,19 @@ class Viewer extends PureComponent {
       );
     }
 
-    if (this.state.panes.includes(CONTROL_PANE_NAME)) {
-      controlsPane = (
-        <div className='controls-pane'>
-          <ControlsPane>
-            
-          </ControlsPane>
-        </div>
-      );
-    }
-
-    if (this.state.panes.includes(DATA_PANE_NAME)) {
-      dataPane = (
-        <div className='data-pane'>
-          <DataPane>
-            
-          </DataPane>
-        </div>
-      );
-    }
-
     return (
       <div className='viewer'>
         
         <div className='viewer-main-container'>
-          {controlsPane}
+          <ControlsPane
+            user={this.props.user}
+            isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
+          />
           {mapPane}
-          {dataPane}
+          <DataPane
+            user={this.props.user}
+            isOpen={this.state.panes.includes(DATA_PANE_NAME)}
+          />
         </div>
 
         <div className='viewer-menu'>
