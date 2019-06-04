@@ -2,14 +2,19 @@
   font-size: 11pt
 }
 
-.rc-slider {
-  touch-action: auto;
+.rc-slider-rail {
+  height: 8px;
+}
+
+.rc-slider-step {
+  height: 8px;
 }
 
 .rc-slider-handle {
   border-color: #00a3a3;
-  margin-top: -4px;
-  touch-action: auto
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
 }
 
 .rc-slider-handle:active {
@@ -28,12 +33,12 @@
 }
 
 .rc-slider-track {
-  height: 6px;
+  height: 8px;
 }
 
 .rc-slider-track {
   background-color: #00a3a380;
-  height: 6px;
+  height: 8px;
 }
 
 .rc-slider-dot-active {
