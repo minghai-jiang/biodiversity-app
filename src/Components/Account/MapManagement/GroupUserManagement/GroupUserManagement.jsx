@@ -1,9 +1,7 @@
 import React, { PureComponent } from 'react';
-import { NavLink, Redirect } from 'react-router-dom';
 
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
-import cloneDeep from 'lodash.clonedeep';
 
 import ApiManager from '../../../../ApiManager';
 

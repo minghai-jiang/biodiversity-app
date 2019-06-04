@@ -1,10 +1,13 @@
-.rc-slider-handle
-{
-    border-color: #00a3a3;
+.timestamp-selector {
+  font-size: 11pt
 }
 
-.rc-slider-handle:active
-{
+.rc-slider-handle {
+  border-color: #00a3a3;
+  margin-top: -4px
+}
+
+.rc-slider-handle:active {
     border-color: #00a3a3;
     box-shadow: 0 0 5px #00a3a3;
 }
@@ -14,23 +17,25 @@
     cursor: pointer;
 }
 
-.rc-slider-handle:focus
-{
+.rc-slider-handle:focus {
     border-color: #00a3a3;
     box-shadow: 0 0 5px 2px #00a3a3a8;
 }
 
-.rc-slider-track
-{
-    background-color: #00a3a380;
+.rc-slider-track {
+  height: 6px;
+}
+
+.rc-slider-track {
+  background-color: #00a3a380;
+  height: 6px;
 }
 
 .rc-slider-dot-active {
     border-color:#00a3a380;
 }
 
-.rc-slider-tooltip
-{
+.rc-slider-tooltip {
     z-index: 10000001;
 }
 

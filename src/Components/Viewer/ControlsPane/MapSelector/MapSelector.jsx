@@ -49,7 +49,7 @@ export class MapSelector extends PureComponent {
     if (!map.timestamps || !map.layer) {      
       this.getMapMetadata(map)
         .then(() => {
-          // this.props.onSelect(map);
+          this.props.onSelectMap(map);
         })
         .catch(err => {
           ErrorHandler.alert(err);
