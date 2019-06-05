@@ -49,7 +49,7 @@ class Viewer extends PureComponent {
         changed = true;
       }
     }
-    else {
+    else {  
       if (!currentPanes.includes(paneName)) {
         currentPanes = [paneName];
         changed = true;
@@ -65,41 +65,30 @@ class Viewer extends PureComponent {
   }
 
   onLayersChange = (layers) => {
-    debugger;
     this.setState({ leafletLayers: layers });
   }
 
   render() {
-    let mapPane = null;
+
+    let mapPaneStyle = {
+      display: 'block',
+      width: '100vw'
+    };
 
     if (this.state.panes.includes(MAP_PANE_NAME)) {
-      let mapPaneWidth = '100vw';
+
       if (!isMobile) {
         if (this.state.panes.length === 2) {
-          mapPaneWidth = '75vw';
+          mapPaneStyle.width = '75vw';
         }
         else if (this.state.panes.length === 3) {
-          mapPaneWidth = '50vw';
-        }
-      }
-      else {
-        if (!this.state.panes.includes(MAP_PANE_NAME)) {
-          mapPaneWidth = '0vw';
+          mapPaneStyle.width = '50vw';
         }
       }
 
-      mapPane = (
-        <div className='viewer-pane map-pane' style={{ width: mapPaneWidth }}>
-          <Map center={[51.505, -0.09]} zoom={13}>
-            <TileLayer
-              url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
-              attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
-              zIndex={1}
-            />  
-            {this.state.leafletLayers}
-          </Map>
-        </div>
-      );
+    }
+    else {
+      mapPaneStyle.display = 'none';
     }
 
     return (
@@ -111,7 +100,18 @@ class Viewer extends PureComponent {
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
             onLayersChange={this.onLayersChange}
           />
-          {mapPane}
+          
+          <div className='viewer-pane map-pane' style={mapPaneStyle}>
+            <Map center={[40.509865, -0.118092]} zoom={2}>
+              <TileLayer
+                url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
+                attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
+                zIndex={1}
+              />  
+              {this.state.leafletLayers}
+            </Map>
+          </div>
+
           <DataPane
             user={this.props.user}
             isOpen={this.state.panes.includes(DATA_PANE_NAME)}
@@ -142,6 +142,7 @@ class Viewer extends PureComponent {
 
 function arrayRemove(arr) {
   let what, a = arguments, L = a.length, ax;
+  debugger;
   while (L > 1 && arr.length) {
       what = a[--L];
       while ((ax= arr.indexOf(what)) !== -1) {

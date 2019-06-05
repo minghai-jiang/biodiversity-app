@@ -47,7 +47,6 @@ class TileLayersControl extends PureComponent {
       this.props.timestampRange.end !== prevProps.timestampRange.end
 
     if (differentMap || differentTimestamp) {
-      debugger;
       let newLeafletTileLayers = this.prepareLayers(this.props.map, this.props.timestampRange);
 
       this.props.onLayersChange(newLeafletTileLayers);
