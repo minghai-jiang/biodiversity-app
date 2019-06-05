@@ -3,6 +3,8 @@ const apiUrl = "https://dev.api.ellipsis-earth.com";
 // const apiUrl = "http://localhost:7552";
 
 const ApiManager = {
+  apiUrl: apiUrl,
+
   get: async (url, body, user) => {
     return apiManagerFetch('GET', url, body, user);
   },

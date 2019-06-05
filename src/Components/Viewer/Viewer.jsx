@@ -25,7 +25,9 @@ class Viewer extends PureComponent {
     super(props, context);
 
     this.state = {
-      panes: [MAP_PANE_NAME]
+      panes: [MAP_PANE_NAME],
+
+      leafletLayers: []
     };
   }
 
@@ -62,6 +64,11 @@ class Viewer extends PureComponent {
     }
   }
 
+  onLayersChange = (layers) => {
+    debugger;
+    this.setState({ leafletLayers: layers });
+  }
+
   render() {
     let mapPane = null;
 
@@ -87,7 +94,9 @@ class Viewer extends PureComponent {
             <TileLayer
               url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
               attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
+              zIndex={1}
             />  
+            {this.state.leafletLayers}
           </Map>
         </div>
       );
@@ -100,6 +109,7 @@ class Viewer extends PureComponent {
           <ControlsPane
             user={this.props.user}
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
+            onLayersChange={this.onLayersChange}
           />
           {mapPane}
           <DataPane

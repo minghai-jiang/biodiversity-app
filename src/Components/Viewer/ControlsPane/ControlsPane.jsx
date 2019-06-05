@@ -6,7 +6,17 @@ import './ControlsPane.css';
 import MapSelector from './MapSelector/MapSelector';
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 
+import TileLayersControl from './TileLayersControl/TileLayersControl';
+
+const TILE_LAYERS_NAME = 'tile';
+const STANDARD_TILE_LAYERS_NAME = 'standard_tile';
+const POLYGON_LAYERS_NAME = 'polygon';
+const CUSTOM_POLYGON_LAYERS_NAME = 'custom_polygon';
+
 class ControlsPane extends PureComponent {
+
+  tileLayers = []
+
   constructor(props, context) {
     super(props, context);
 
@@ -35,6 +45,16 @@ class ControlsPane extends PureComponent {
     }
   }
 
+  onLayersChange = (type, layers) => {
+    if (type === TILE_LAYERS_NAME) {
+      this.tileLayers = layers;
+    }
+
+    let allLayers = [].concat(this.tileLayers);
+
+    this.props.onLayersChange(allLayers);
+  }
+
   render() {
     let style = {};
     if (!this.props.isOpen) {
@@ -50,6 +70,12 @@ class ControlsPane extends PureComponent {
         <TimestampSelector
           map={this.state.map}
           onSelectTimestamp={this.onSelectTimestamp}
+        />
+
+        <TileLayersControl
+          map={this.state.map}
+          timestampRange={this.state.timestampRange}
+          onLayersChange={(layers) => this.onLayersChange(TILE_LAYERS_NAME, layers)}
         />
       </div>
     );
