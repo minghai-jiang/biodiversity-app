@@ -9,6 +9,8 @@ import {
   Popup
 } from 'react-leaflet';
 
+import TimestampSelector from './TimestampSelector/TimestampSelector';
+
 import ControlsPane from './ControlsPane/ControlsPane';
 import DataPane from './DataPane/DataPane';
 
@@ -26,6 +28,12 @@ class Viewer extends PureComponent {
 
     this.state = {
       panes: [MAP_PANE_NAME],
+
+      map: null,
+      timestampRange: {
+        start: 0,
+        end: 0
+      },
 
       leafletLayers: []
     };
@@ -64,8 +72,25 @@ class Viewer extends PureComponent {
     }
   }
 
+  onSelectMap = (map) => {
+    this.setState({ 
+      map: map,
+      timestampRange: {
+        start: map.timestamps.length - 1,
+        end: map.timestamps.length - 1
+      }
+    });
+  }
+
   onLayersChange = (layers) => {
     this.setState({ leafletLayers: layers });
+  }
+
+  onSelectTimestamp = (timestampRange) => {
+    if (this.state.timestampRange.start !== timestampRange.start || 
+      this.state.timestampRange.end !== timestampRange.end) {
+      this.setState({ timestampRange: timestampRange });
+    }
   }
 
   render() {
@@ -98,10 +123,17 @@ class Viewer extends PureComponent {
           <ControlsPane
             user={this.props.user}
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
+            timestampRange={this.state.timestampRange}
+            onSelectMap={this.onSelectMap}
             onLayersChange={this.onLayersChange}
           />
           
           <div className='viewer-pane map-pane' style={mapPaneStyle}>
+            <TimestampSelector
+              map={this.state.map}
+              onSelectTimestamp={this.onSelectTimestamp}
+              width={mapPaneStyle.width}
+            />
             <Map center={[40.509865, -0.118092]} zoom={2}>
               <TileLayer
                 url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'

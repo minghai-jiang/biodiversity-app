@@ -1,5 +1,15 @@
 .timestamp-selector {
-  font-size: 11pt
+  position: absolute;
+  top: 18px;
+  width: 100%;
+  z-index: 5000;
+  font-size: 11pt;
+  color: white
+}
+
+.rc-slider {
+  margin: auto;
+  width: 50%;
 }
 
 .rc-slider-rail {

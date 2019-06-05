@@ -74,7 +74,7 @@ export class TimestampSelector extends PureComponent {
     this.props.onSelectTimestamp(timestampRange);
   }
 
-  render() {    
+  render() {
     if (!this.props.map) {
       return null;
     }
@@ -119,7 +119,7 @@ export class TimestampSelector extends PureComponent {
     }
 
     return (
-      <div className='timestamp-selector'>
+      <div className='timestamp-selector' style={{ width: this.props.width }}>
         <div>
           Timestamps (
           <input type='checkbox' id='timestamp-range' onChange={this.onRangeToggleChange} checked={this.state.range}/>
