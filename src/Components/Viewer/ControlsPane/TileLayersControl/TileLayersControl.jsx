@@ -4,22 +4,26 @@ import L from 'leaflet';
 
 import ApiManager from '../../../../ApiManager';
 
+const IMAGES_TILE_LAYER_NAME = 'images';
+const LABELS_TILE_LAYER_NAME = 'labels';
+const SPECTRAL_TILE_LAYER_NAME = 'indices';
+
 const tileLayerTypes = [ 
   {
-    name: 'images', 
-    checked: true,
+    name: IMAGES_TILE_LAYER_NAME, 
+    defaultSelected: true,
     stacking: true,
     zIndex: 1000
   },
   {
-    name: 'labels', 
-    checked: true,
+    name: LABELS_TILE_LAYER_NAME, 
+    defaultSelected: true,
     stacking: false,
     zIndex: 2000,
   },
   {
-    name: 'indices', 
-    checked: false,
+    name: SPECTRAL_TILE_LAYER_NAME, 
+    defaultSelected: false,
     stacking: false,
     zIndex: 3000
   }
@@ -31,7 +35,8 @@ class TileLayersControl extends PureComponent {
     super(props, context);
 
     this.state = {
-
+      availableLayers: [],
+      selectedLayers: []
     };
   }  
 
@@ -47,10 +52,63 @@ class TileLayersControl extends PureComponent {
       this.props.timestampRange.end !== prevProps.timestampRange.end
 
     if (differentMap || differentTimestamp) {
+
+      if (differentMap) {
+        let availableLayers = this.getAvailableLayers();
+        let selectedLayers = this.getDefaultSelectedLayers(availableLayers);
+        this.setState({ availableLayers: availableLayers, selectedLayers: selectedLayers });
+      }
+
       let newLeafletTileLayers = this.prepareLayers(this.props.map, this.props.timestampRange);
 
       this.props.onLayersChange(newLeafletTileLayers);
     }
+  }
+
+  getAvailableLayers = (map) => {
+    let availableLayersUnsorted = [];
+
+    for (let i = 0; i < map.layers.tile.length; i++) {
+
+      let mapTimestampTileLayers = map.layers.tile[i];
+
+      for (let y = 0; y < mapTimestampTileLayers.layers.length; y++) {
+        let layer = mapTimestampTileLayers.layers[y];
+
+        let availableLayer = availableLayersUnsorted.find(x => x.type === layer.type && x.name === layer.name);
+
+        if (!availableLayer) {
+          availableLayersUnsorted.push({
+            type: layer.type,
+            name: layer.name
+          });
+        }
+      }
+    }
+
+    let imageLayers = availableLayersUnsorted.filter(x => x.type === IMAGES_TILE_LAYER_NAME);
+    let labelLayers = availableLayersUnsorted.filter(x => x.type === LABELS_TILE_LAYER_NAME);
+    let spectralLayers = availableLayersUnsorted.filter(x => x.type === SPECTRAL_TILE_LAYER_NAME);
+
+    let availableLayers = [...imageLayers, ...labelLayers, ...spectralLayers];
+
+    return availableLayers;
+  }
+
+  getDefaultSelectedLayers = (availableLayers) => {
+    let selectedLayers = [];
+
+    for (let i = 0; i < availableLayers.length; i++) {
+      let availableLayer = availableLayers[i];
+
+      let tileLayerType = tileLayerTypes.find(x => x.type === availableLayer.type);
+
+      if (tileLayerType.defaultSelected) {
+        selectedLayers.push(availableLayer);
+      }
+    }
+
+    return selectedLayers;
   }
 
   prepareLayers = (map, timestampRange) => {
