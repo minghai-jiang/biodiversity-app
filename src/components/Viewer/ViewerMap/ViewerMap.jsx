@@ -97,7 +97,7 @@ export class ViewerMap extends PureComponent {
     CrowdLayersControl.initialize(this.props, bounds, maxPolygons, map, this.refreshMap, this.onClick);
 
     LegendControl.initialize(this.props, maxPolygons, maxStandardTiles);    
-    FlyToControl.initialize(this.props, map, this.flyToChecked);
+    FlyToControl.initialize(this.props, map, this.flyToChecked, this.onFlyTo);
     GeoMessageFeed.initialize(this.props, map, this.flyToChecked, this.props.infoContent);
     DrawingControl.initialize(map, this.onShapeDrawn, this.user, this.getPopupContent, this.props, this.mapRef.current.leafletElement, this.refreshMap, this.onClick);
 
@@ -386,6 +386,11 @@ export class ViewerMap extends PureComponent {
     {
       CrowdLayersControl.onOverlayAdd(value, this.refreshMap);
     }
+  }
+
+  onFlyTo = (location) => {
+    this.geolocation = location;
+    this.forceUpdate();
   }
 
   render() {
