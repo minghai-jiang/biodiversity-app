@@ -1,13 +1,9 @@
 import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import {
-  Map,
-  TileLayer,
-  LayersControl,
-  Marker,
-  Popup
-} from 'react-leaflet';
+import { Map } from 'react-leaflet';
+
+import Utility from '../../Utility';
 
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 
@@ -53,11 +49,11 @@ class Viewer extends PureComponent {
         changed = true;
       }
       else if (paneName !== MAP_PANE_NAME) {
-        arrayRemove(currentPanes, paneName);
+        currentPanes = Utility.arrayRemove(currentPanes, paneName);
         changed = true;
       }
     }
-    else {  
+    else {
       if (!currentPanes.includes(paneName)) {
         currentPanes = [paneName];
         changed = true;
@@ -135,11 +131,6 @@ class Viewer extends PureComponent {
               width={mapPaneStyle.width}
             />
             <Map center={[40.509865, -0.118092]} zoom={2}>
-              <TileLayer
-                url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
-                attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
-                zIndex={1}
-              />  
               {this.state.leafletLayers}
             </Map>
           </div>
@@ -170,18 +161,6 @@ class Viewer extends PureComponent {
       </div>
     );
   }
-}
-
-function arrayRemove(arr) {
-  let what, a = arguments, L = a.length, ax;
-  debugger;
-  while (L > 1 && arr.length) {
-      what = a[--L];
-      while ((ax= arr.indexOf(what)) !== -1) {
-          arr.splice(ax, 1);
-      }
-  }
-  return arr;
 }
 
 export default Viewer;

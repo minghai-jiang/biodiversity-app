@@ -3,6 +3,9 @@ import React, { PureComponent } from 'react';
 import ApiManager from '../../../../ApiManager';
 import ErrorHandler from '../../../../ErrorHandler';
 
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+
 import './MapSelector.css';
 
 export class MapSelector extends PureComponent {
@@ -11,7 +14,9 @@ export class MapSelector extends PureComponent {
 
     this.state = {
       maps: [],
-      mapOptions: []
+      mapOptions: [],
+
+      selectedMap: { id: 'default' }
     };
   }
   
@@ -45,6 +50,8 @@ export class MapSelector extends PureComponent {
     if (!map) {
       return;
     }
+
+    this.setState({ selectedMap: map });
 
     if (!map.timestamps || !map.layer) {      
       this.getMapMetadata(map)
@@ -101,7 +108,7 @@ export class MapSelector extends PureComponent {
       {
         let map = this.state.maps[i];
         options.push(
-          <option value={map.id} key={i}>{map.name}</option>
+          <MenuItem value={map.id} key={i}>{map.name}</MenuItem>
         );
       }
     }
@@ -111,10 +118,10 @@ export class MapSelector extends PureComponent {
 
   render() {
     return (
-      <select key='map-selector' className='map-selector' onChange={this.selectMap} defaultValue='default'>
-        <option value='default' disabled hidden>Select a Map</option>
+      <Select key='map-selector' className='map-selector' onChange={this.selectMap} value={this.state.selectedMap.id}>
+        <MenuItem value='default' disabled hidden>Select a Map</MenuItem>
         {this.renderMapOptions()}
-      </select>
+      </Select>
     );
   }
 }

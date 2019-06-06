@@ -15,6 +15,9 @@ const CUSTOM_POLYGON_LAYERS_NAME = 'custom_polygon';
 class ControlsPane extends PureComponent {
 
   tileLayers = []
+  standardTileLayers = []
+  polygonLayers = []
+  customPolygonLayers = []
 
   constructor(props, context) {
     super(props, context);
@@ -31,11 +34,21 @@ class ControlsPane extends PureComponent {
   }
 
   onLayersChange = (type, layers) => {
+
     if (type === TILE_LAYERS_NAME) {
       this.tileLayers = layers;
     }
+    else if (type === STANDARD_TILE_LAYERS_NAME) {
+      this.standardTileLayers = layers
+    }
+    else if (type === POLYGON_LAYERS_NAME) {
+      this.polygonLayers = layers;
+    }
+    else if (type === CUSTOM_POLYGON_LAYERS_NAME) {
+      this.customPolygonLayers = layers;
+    }
 
-    let allLayers = [].concat(this.tileLayers);
+    let allLayers = this.tileLayers.concat(this.standardTileLayers, this.polygonLayers, this.customPolygonLayers);
 
     this.props.onLayersChange(allLayers);
   }

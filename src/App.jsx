@@ -5,6 +5,10 @@ import {
 import Modal from 'react-modal';
 import { withRouter } from 'react-router';
 
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import teal from '@material-ui/core/colors/teal';
+
 import ApiManager from './ApiManager';
 import ErrorHandler from './ErrorHandler';
 
@@ -21,6 +25,12 @@ import Account from './Components/Account/Account';
 import './App.css';
 
 const localStorageUserItem = 'user';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: teal
+  },
+});
 
 class App extends Component {
   constructor(props, context) {
@@ -122,87 +132,89 @@ class App extends Component {
     if (this.state.init) {
       return (
         <div className='App' onClick={this.closeMenu}>
-          <MainMenu
-            user={this.state.user}
-            language={this.state.language}
-            localization={this.state.localization}
-            onLanguageChange={this.onLanguageChange}
-          />
-          <div className='content' ref={ref => this.el = ref}>
-            <Route exact path='/'
-              render={() =>
-                <Home
-                  language={this.state.language}
-                />
+          <ThemeProvider theme={theme}>
+            <MainMenu
+              user={this.state.user}
+              language={this.state.language}
+              localization={this.state.localization}
+              onLanguageChange={this.onLanguageChange}
+            />
+            <div className='content' ref={ref => this.el = ref}>
+              <Route exact path='/'
+                render={() =>
+                  <Home
+                    language={this.state.language}
+                  />
+                }
+              />
+              <Route
+                path='/viewer'
+                render={() =>
+                  <Viewer 
+                    user={this.state.user}
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route path='/products'
+                render={() =>
+                  <Products
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route
+                path='/sectors'
+                render={() =>
+                  <Sector
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route
+                path='/gallery'
+                render={() =>
+                  <Gallery
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route
+                path='/about'
+                render={() =>
+                  <About
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
               }
-            />
-            <Route
-              path='/viewer'
-              render={() =>
-                <Viewer 
-                  user={this.state.user}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route path='/products'
-              render={() =>
-                <Products
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path='/sectors'
-              render={() =>
-                <Sector
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path='/gallery'
-              render={() =>
-                <Gallery
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path='/about'
-              render={() =>
-                <About
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-            }
-            />
-            <Route
-              path='/login'
-              render={() =>
-                <Login
-                  onLogin={this.onLogin}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path='/account'
-              render={() =>
-                <Account
-                  user={this.state.user}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                  onLogout={this.onLogout}
-                />
-              }
-            />
-          </div>
+              />
+              <Route
+                path='/login'
+                render={() =>
+                  <Login
+                    onLogin={this.onLogin}
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route
+                path='/account'
+                render={() =>
+                  <Account
+                    user={this.state.user}
+                    language={this.state.language}
+                    localization={this.state.localization}
+                    onLogout={this.onLogout}
+                  />
+                }
+              />
+            </div>
+          </ThemeProvider>          
         </div>
       );
     }
