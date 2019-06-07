@@ -2,8 +2,8 @@ import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
 
 import { Map, Marker } from 'react-leaflet';
-import "leaflet-draw";
-import L from "leaflet";
+import 'leaflet-draw';
+import L from 'leaflet';
 
 import Utility from '../../Utility';
 
@@ -67,7 +67,6 @@ class Viewer extends PureComponent {
       if (!this.state.geolocation || this.state.geolocation.latitude !== position.latitude || 
         this.state.geolocation.longitude !== position.longitude) {
           let newGeolocation = [position.coords.latitude, position.coords.longitude];
-
           this.setState({ geolocation: newGeolocation });
       }
     }
@@ -162,7 +161,9 @@ class Viewer extends PureComponent {
           <ControlsPane
             user={this.props.user}
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
+            leafletMap={this.leafletMap}
             timestampRange={this.state.timestampRange}
+            geolocation={this.state.geolocation}
             onSelectMap={this.onSelectMap}
             onLayersChange={this.onLayersChange}
           />
@@ -177,6 +178,7 @@ class Viewer extends PureComponent {
               center={[40.509865, -0.118092]} 
               zoom={2}
               ref={this.leafletMap}
+              maxZoom={19}
             >
               {this.state.leafletLayers}
               {this.state.geolocation ? <Marker position={this.state.geolocation}/> : null}

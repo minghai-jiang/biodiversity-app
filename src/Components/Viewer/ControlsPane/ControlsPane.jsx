@@ -1,11 +1,13 @@
 import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import './ControlsPane.css';
+import L from 'leaflet';
 
 import MapSelector from './MapSelector/MapSelector';
-
 import TileLayersControl from './TileLayersControl/TileLayersControl';
+
+import './ControlsPane.css';
+
 
 const TILE_LAYERS_NAME = 'tile';
 const STANDARD_TILE_LAYERS_NAME = 'standard_tile';
@@ -30,6 +32,15 @@ class ControlsPane extends PureComponent {
   }  
 
   onSelectMap = (map) => {
+    let leafletMap = this.props.leafletMap;
+
+    if (leafletMap) {
+      let leafletElement = leafletMap.current.leafletElement;
+
+      let bounds = L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax));
+      leafletElement.flyToBounds(bounds);
+    }
+
     this.setState({ map: map }, () => this.props.onSelectMap(map));
   }
 
