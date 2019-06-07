@@ -115,7 +115,9 @@ class Viewer extends PureComponent {
 
     if (changed) {
       currentPanes = [...currentPanes];
-      this.setState({ panes: currentPanes });
+      this.setState({ panes: currentPanes }, () => {
+        this.leafletMap.current.leafletElement.invalidateSize();
+      });
     }
   }
 

@@ -40,7 +40,7 @@ export class MapSelector extends PureComponent {
       });
   }
 
-  selectMap = async (e) => {
+  selectMap = (e) => {
     if (!e.target.value) {
       return;
     } 
@@ -50,6 +50,7 @@ export class MapSelector extends PureComponent {
     if (!map) {
       return;
     }
+
 
     this.setState({ selectedMap: map });
 

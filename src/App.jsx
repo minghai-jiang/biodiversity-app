@@ -79,11 +79,7 @@ class App extends Component {
       .catch(() => {
         this.setState({ init: true });
         localStorage.removeItem(localStorageUserItem);
-      });
-    }
-    else {
-      this.setState({ init: true });
-    }
+      });    
   }
 
   retrieveLanguage = async () => {
