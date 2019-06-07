@@ -12,7 +12,7 @@ class CreateForm extends PureComponent {
     super(props, context);
 
     this.state = {
-      form : [{"Question": 'Your question', "Type": "Numeric", "Obligatory": "Yes"}],
+      form : [{"question": 'your question', "type": "numeric", "obligatory": "yes"}],
           };
   }
 
@@ -25,15 +25,14 @@ class CreateForm extends PureComponent {
 
   moveDown = (cellInfo) => {
     this.state.form[cellInfo.index+ 1] = [this.state.form[cellInfo.index], this.state.form[cellInfo.index]=this.state.form[cellInfo.index+ 1]][0];
-    console.log(this.state.form)
     this.setState(this.state.form)
   }
 
   add = () => {
-    let x = {"Question": '', "Type": '', "Obligatory": ''}
-    x["Question"] = this.state.form[0]["Question"]
-    x["Type"] = this.state.form[0]["Type"]
-    x["Obligatory"] = this.state.form[0]["Obligatory"]
+    let x = {"question": '', "type": '', "obligatory": ''}
+    x["question"] = this.state.form[0]["question"]
+    x["type"] = this.state.form[0]["type"]
+    x["obligatory"] = this.state.form[0]["obligatory"]
 
     this.state.form.splice(1,0,x)
     this.setState(this.state.form)
@@ -45,6 +44,20 @@ class CreateForm extends PureComponent {
   }
 
   save = () => {
+    let form = this.state.form
+    form.shift()
+    form = {"questions": form}
+    console.log(form)
+    ApiManager.fetch('POST', '/geoMessage/addForm', {"mapId": this.props.map.uuid, "formName":this.props.formName, "form": form}, this.props.user)
+      .then(() => {
+        //redirect
+      })
+      .catch(err => {
+        console.log(err);
+        this.props.showError(err);
+      });
+
+
       }
 
   renderEditable = (cellInfo) => {
@@ -71,9 +84,9 @@ class CreateForm extends PureComponent {
              x[cellInfo.index][cellInfo.column.id] = e.target.value;
              this.setState({x})
             }}>
-            <option  value="Text">{this.props.localization["Text"]}</option>
-            <option value="Numeric">{this.props.localization["Numeric"]}</option>
-            <option value="Boolean">{this.props.localization["Boolean"]}</option>
+            <option  value="text">{this.props.localization["Text"]}</option>
+            <option value="numeric">{this.props.localization["Numeric"]}</option>
+            <option value="boolean">{this.props.localization["Boolean"]}</option>
           </select>
           </div>
         );
@@ -91,8 +104,8 @@ class CreateForm extends PureComponent {
              x[cellInfo.index][cellInfo.column.id] = e.target.value;
              this.setState({x})
             }}>
-            <option  value="Yes">{this.props.localization["Yes"]}</option>
-            <option value="No">{this.props.localization["No"]}</option>
+            <option  value="yes">{this.props.localization["Yes"]}</option>
+            <option value="no">{this.props.localization["No"]}</option>
           </select>
           </div>
         );
@@ -181,17 +194,17 @@ class CreateForm extends PureComponent {
             },
             {
               Header: this.props.localization["Question"],
-              accessor: 'Question',
+              accessor: 'question',
               Cell: this.renderEditable
             },
             {
               Header: this.props.localization["Type"],
-              accessor: 'Type',
+              accessor: 'type',
               Cell: this.renderDropdown
             },
             {
               Header: this.props.localization["Obligatory"],
-              accessor: 'Obligatory',
+              accessor: 'obligatory',
               Cell: this.renderTickbox
             },
             {

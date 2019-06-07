@@ -7,6 +7,8 @@ const ApiManager = {
 
     url = `${apiUrl}${url}`;
 
+    console.log(url);
+
     let headers = {};
 
     if (body) {
@@ -31,7 +33,7 @@ const ApiManager = {
 
     return await fetch(url, options)
       .then(response => {
-        gottenResponse = response;        
+        gottenResponse = response;
 
         let contentType = response.headers.get('Content-Type');
         isText = contentType.includes('text/plain');
@@ -47,10 +49,10 @@ const ApiManager = {
         if (gottenResponse.status === 200) {
           return result
         }
-        else {  
+        else {
           if (!isText) {
             throw result;
-          }        
+          }
           else {
             throw {
               status: gottenResponse.status,

@@ -12,9 +12,11 @@ class ChangeForm extends PureComponent {
     super(props, context);
 
     this.state = {
-      questions : [{"Question": 'question1', "Type": 'Text', "Obligatory": 'Yes'},{"Question": 'question2', "Type": 'Numeric', "Obligatory": 'Yes'}]
+      questions : [{'type': 'numeric', 'obligatory': 'no', 'question': 'your question'}].concat(this.props.form["form"]["questions"])
           };
   }
+
+
 
   moveUp = (cellInfo) => {
     this.state.questions[cellInfo.index- 1] = [this.state.questions[cellInfo.index], this.state.questions[cellInfo.index]=this.state.questions[cellInfo.index- 1]][0];
@@ -27,13 +29,16 @@ class ChangeForm extends PureComponent {
   }
 
   add = () => {
-    let x = {"Question": '', "Type": '', "Obligatory": ''}
-    x["Question"] = this.state.questions[0]["Question"]
-    x["Type"] = this.state.questions[0]["Type"]
-    x["Obligatory"] = this.state.questions[0]["Obligatory"]
+    console.log(this.state.questions)
+    let x = {"question": '', "type": '', "obligatory": ''}
+    x["question"] = this.state.questions[0]["question"]
+    x["type"] = this.state.questions[0]["type"]
+    x["obligatory"] = this.state.questions[0]["obligatory"]
 
     this.state.questions.splice(1,0,x)
-    this.setState(this.state.questions)
+
+    let newQuestions = [...this.state.questions];
+    this.setState({ questions: newQuestions });
   }
 
   delete = (cellInfo) => {
@@ -41,6 +46,25 @@ class ChangeForm extends PureComponent {
     this.state.questions.splice(cellInfo.index ,1)
     this.setState({state: this.state})
   }
+
+  save = () => {
+let questions = this.state.questions
+questions.shift()
+let form = {"questions": questions}
+console.log(this.props.form["formname"])
+console.log(this.props.map.uuid)
+console.log(form["questions"])
+
+ApiManager.fetch('POST', '/geoMessage/alterForm', {"mapId": this.props.map.uuid, "newName":this.props.form["formname"], "oldName":this.props.form["formname"], "form": form}, this.props.user)
+  .then(() => {
+    //redirect
+  })
+  .catch(err => {
+    console.log(err);
+    this.props.showError(err);
+  });
+
+    }
 
 
   renderEditable = (cellInfo) => {
@@ -129,9 +153,9 @@ class ChangeForm extends PureComponent {
              x[cellInfo.index][cellInfo.column.id] = e.target.value;
              this.setState({x})
             }}>
-            <option  value="Text">{this.props.localization["Text"]}</option>
-            <option value="Numeric">{this.props.localization["Numeric"]}</option>
-            <option value="Boolean">{this.props.localization["Boolean"]}</option>
+            <option  value="text">{this.props.localization["Text"]}</option>
+            <option value="numeric">{this.props.localization["Numeric"]}</option>
+            <option value="boolean">{this.props.localization["Boolean"]}</option>
           </select>
           </div>
         );
@@ -149,8 +173,8 @@ class ChangeForm extends PureComponent {
              x[cellInfo.index][cellInfo.column.id] = e.target.value;
              this.setState({x})
             }}>
-            <option  value="Yes">{this.props.localization["Yes"]}</option>
-            <option value="No">{this.props.localization["No"]}</option>
+            <option  value="yes">{this.props.localization["Yes"]}</option>
+            <option value="no">{this.props.localization["No"]}</option>
           </select>
           </div>
         );
@@ -161,7 +185,7 @@ class ChangeForm extends PureComponent {
 
     modeElement = (
       <div>
-      <h2> {this.props.localization["Creating"]} {this.props.formName} </h2>
+      <h2> {this.props.localization["Altering"]} {this.props.form["formname"]} </h2>
 
         <ReactTable
           key={Math.random()}
@@ -174,17 +198,17 @@ class ChangeForm extends PureComponent {
             },
             {
               Header: this.props.localization["Question"],
-              accessor: 'Question',
+              accessor: 'question',
               Cell: this.renderEditable
             },
             {
               Header: this.props.localization["Type"],
-              accessor: 'Type',
+              accessor: 'type',
               Cell: this.renderDropdown
             },
             {
               Header: this.props.localization["Obligatory"],
-              accessor: 'Obligatory',
+              accessor: 'obligatory',
               Cell: this.renderTickbox
             },
             {

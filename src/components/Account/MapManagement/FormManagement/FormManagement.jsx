@@ -16,24 +16,47 @@ class FormManagment extends PureComponent {
     super(props, context);
 
     this.state = {
-      forms: [{name: 'new form'},{name: 'old form'}],
-      formsData: [{name: 'new form'},{name: 'old form'}],
+      forms: [],
       mode:0,
-      formToChange:null
+      formToChange:null,
+      data: []
     };
   }
 
-
+  componentDidMount() {
+    ApiManager.fetch('POST', '/geoMessage/getForms', {"mapId": this.props.map.uuid}, this.props.user)
+      .then((forms) => {
+        forms = [{'formname': this.props.localization["new form"]}].concat(forms)
+        this.setState({forms:forms });
+      })
+      .catch(err => {
+        console.log(err);
+        this.props.showError(err);
+      });
+  }
 
 
   changeForm = (mode,cellInfo) => {
-    this.setState({mode:mode,formToChange: this.state.forms[cellInfo.index-1]['name']});
+    console.log(this.state.forms[cellInfo.index]["form"]["questions"])
+    this.setState({mode:mode,formToChange: this.state.forms[cellInfo.index]});
 
   }
 
   deleteFrom = (cellInfo) => {
-      this.state.formsData.splice(cellInfo.index - 1,1)
-      this.setState(this.state.formsData)
+      ApiManager.fetch('POST', '/geoMessage/deleteForm', {"mapId": this.props.map.uuid, "formName":this.state.forms[cellInfo.index]['formname']}, this.props.user)
+        .then(() => {
+          this.state.forms.splice(cellInfo.index,1)
+        }).then(() => {
+          console.log(this.state.forms)
+          let newForms = [...this.state.forms];
+          this.setState({ forms: newForms });
+          })
+        .catch(err => {
+          console.log(err);
+          this.props.showError(err);
+        });
+
+
   }
 
   createForm = (mode) => {
@@ -47,9 +70,27 @@ class FormManagment extends PureComponent {
       <div style={{ backgroundColor: "#fafafa" }}>
         <input
           type='text'
-          defaultValue={this.state.formsData[cellInfo.index][cellInfo.column.id]}
+          defaultValue={this.state.forms[cellInfo.index][cellInfo.column.id]}
           onBlur={e => {
-            this.state.formsData[cellInfo.index][cellInfo.column.id] = e.target.value;
+            let body = {"mapId": this.props.map.uuid, "newName":e.target.value, "oldName":this.state.forms[cellInfo.index]["formname"], "form": this.state.forms[cellInfo.index]["form"]};
+            ApiManager.fetch('POST', '/geoMessage/alterForm', body, this.props.user)
+                          .then(() => {
+                            this.state.forms[cellInfo.index][cellInfo.column.id] = body.newName;
+                            //redirect
+                          })
+                          .catch(err => {
+                            console.log(err);
+                            this.props.showError(err);
+                            this.state.forms[cellInfo.index][cellInfo.column.id] = this.state.forms[cellInfo.index]["formname"];
+                            let newForms = [...this.state.forms];
+                            this.setState({forms:newForms})
+                          });
+
+
+
+
+
+
           }}
         />
       </div>
@@ -89,11 +130,12 @@ class FormManagment extends PureComponent {
         modeElement = (
           <div>
             <ReactTable
-              data={this.state.formsData}
+              key={Math.random()}
+              data={this.state.forms}
               columns={[
                 {
                   Header: this.props.localization["form"],
-                  accessor: 'name',
+                  accessor: 'formname',
                   Cell: this.renderEditable
                 },
                 {
@@ -119,9 +161,10 @@ class FormManagment extends PureComponent {
             apiUrl={this.props.apiUrl}
             language={this.props.language}
             localization={this.props.localization}
+            showError={this.props.showError}
             user={this.props.user}
             map={this.props.map}
-            formName = {this.state.formsData[0]["name"]}
+            formName = {this.state.forms[0]["formname"]}
           >
           </CreateForm>
         )
@@ -133,9 +176,10 @@ class FormManagment extends PureComponent {
             apiUrl={this.props.apiUrl}
             language={this.props.language}
             localization={this.props.localization}
+            showError={this.props.showError}
             user={this.props.user}
             map={this.props.map}
-            formName = {this.state.formToChange}
+            form = {this.state.formToChange}
           >
           </ChangeForm>
         )
