@@ -373,7 +373,10 @@ export class ViewerMap extends PureComponent {
   render() {
     return (
       <div className='mapContainer'>
-        <Map center={[51.505, -0.09]} zoom={13}>
+        <Map 
+          center={[51.505, -0.09]} 
+          zoom={13}
+        >
           <TileLayer
             url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
             attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'

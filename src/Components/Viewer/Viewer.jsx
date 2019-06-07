@@ -1,7 +1,9 @@
 import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import { Map } from 'react-leaflet';
+import { Map, Marker } from 'react-leaflet';
+import "leaflet-draw";
+import L from "leaflet";
 
 import Utility from '../../Utility';
 
@@ -12,15 +14,30 @@ import DataPane from './DataPane/DataPane';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+
 import './Viewer.css';
+
+// This block is purely to get the marker icon working of Leaflet.
+// Taken somewhere from the web.
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
 
 const MAP_PANE_NAME = 'map_pane';
 const CONTROL_PANE_NAME = 'control_pane';
 const DATA_PANE_NAME = 'data_pane';
 
 class Viewer extends PureComponent {
+
+  leafletMap = null;
+
   constructor(props, context) {
     super(props, context);
+
+    this.leafletMap = React.createRef();
 
     this.state = {
       panes: [MAP_PANE_NAME],
@@ -31,11 +48,39 @@ class Viewer extends PureComponent {
         end: 0
       },
 
-      leafletLayers: []
+      leafletLayers: [],
+
+      geolocation: null
     };
   }
 
   componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      this.setLocation, 
+      () => this.setLocation(null), 
+      { enableHighAccuracy: true }
+    );
+  }
+
+  setLocation = (position) => {
+    if (position) {      
+      if (!this.state.geolocation || this.state.geolocation.latitude !== position.latitude || 
+        this.state.geolocation.longitude !== position.longitude) {
+          let newGeolocation = [position.coords.latitude, position.coords.longitude];
+
+          this.setState({ geolocation: newGeolocation });
+      }
+    }
+
+    setTimeout(() => {
+        navigator.geolocation.getCurrentPosition(
+          this.setLocation, 
+          () => this.setLocation(null), 
+          { enableHighAccuracy: true }
+        );
+      }, 
+      1000 * 10
+    );
   }
 
   onViewerMenuClick = (paneName) => {
@@ -62,9 +107,7 @@ class Viewer extends PureComponent {
 
     if (changed) {
       currentPanes = [...currentPanes];
-      this.setState({ panes: currentPanes }, () => {
-        console.log(this.state.panes);
-      });
+      this.setState({ panes: currentPanes });
     }
   }
 
@@ -130,8 +173,13 @@ class Viewer extends PureComponent {
               onSelectTimestamp={this.onSelectTimestamp}
               width={mapPaneStyle.width}
             />
-            <Map center={[40.509865, -0.118092]} zoom={2}>
+            <Map 
+              center={[40.509865, -0.118092]} 
+              zoom={2}
+              ref={this.leafletMap}
+            >
               {this.state.leafletLayers}
+              {this.state.geolocation ? <Marker position={this.state.geolocation}/> : null}
             </Map>
           </div>
 
