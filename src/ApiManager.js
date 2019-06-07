@@ -1,5 +1,5 @@
 const apiUrl = "https://api.ellipsis-earth.com";
-// const apiUrl = "https://dev.api.ellipsis-earth.com";
+//const apiUrl = "https://dev.api.ellipsis-earth.com";
 // const apiUrl = "http://localhost:7552";
 
 const ApiManager = {
@@ -52,10 +52,10 @@ const ApiManager = {
         if (gottenResponse.status === 200) {
           return result
         }
-        else {  
-          if (isText) {
+        else {
+          if (!isText) {
             throw result;
-          }        
+          }
           else {
             throw {
               status: gottenResponse.status,
