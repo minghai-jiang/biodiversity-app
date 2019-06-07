@@ -72,6 +72,7 @@ class FormManagment extends PureComponent {
           type='text'
           defaultValue={this.state.forms[cellInfo.index][cellInfo.column.id]}
           onBlur={e => {
+            if(cellInfo.index> 0){
             let body = {"mapId": this.props.map.uuid, "newName":e.target.value, "oldName":this.state.forms[cellInfo.index]["formname"], "form": this.state.forms[cellInfo.index]["form"]};
             ApiManager.fetch('POST', '/geoMessage/alterForm', body, this.props.user)
                           .then(() => {
@@ -85,13 +86,10 @@ class FormManagment extends PureComponent {
                             let newForms = [...this.state.forms];
                             this.setState({forms:newForms})
                           });
-
-
-
-
-
-
-          }}
+          }else{
+            this.state.forms[cellInfo.index][cellInfo.column.id] = e.target.value;
+          }
+        }}
         />
       </div>
     );
