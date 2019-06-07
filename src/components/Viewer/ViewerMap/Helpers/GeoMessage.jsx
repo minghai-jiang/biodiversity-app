@@ -234,11 +234,16 @@ export class Message extends Component {
 
     ApiManager.fetch('POST', `/geoMessage/image`, body, this.props.user)
       .then(imageData => {
-        info.imageData = imageData.image;
-        info.gettingImage = false;
-        this.setState({ imageData: imageData.image });
+        let reader = new FileReader();
+        reader.onloadend = () => {
+          let base64 = reader.result;
+          this.setState({ imageData: base64 });
+          info.gettingImage = false;
+        }
+        reader.readAsDataURL(imageData);
       })
       .catch(err => {
+        debugger;
         info.gettingImage = false;
         alert('An error occurred while getting image.');
       })

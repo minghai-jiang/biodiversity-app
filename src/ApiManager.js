@@ -1,5 +1,5 @@
 const apiUrl = "https://api.ellipsis-earth.com";
-//const apiUrl = "https://dev.api.ellipsis-earth.com";
+// const apiUrl = "https://dev.api.ellipsis-earth.com";
 // const apiUrl = "http://localhost:7552";
 
 const ApiManager = {
@@ -18,6 +18,7 @@ const ApiManager = {
     }
 
     let gottenResponse = null;
+    let isJson = false;
     let isText = false;
 
     let options = {
@@ -34,13 +35,17 @@ const ApiManager = {
         gottenResponse = response;        
 
         let contentType = response.headers.get('Content-Type');
+        isJson = contentType.includes('application/json');
         isText = contentType.includes('text/plain');
 
-        if (!isText) {
+        if (isJson) {
           return response.json();
         }
-        else {
+        else if (isText) {
           return response.text();
+        }
+        else {
+          return response.blob();
         }
       })
       .then(result => {
@@ -48,7 +53,7 @@ const ApiManager = {
           return result
         }
         else {  
-          if (!isText) {
+          if (isText) {
             throw result;
           }        
           else {
