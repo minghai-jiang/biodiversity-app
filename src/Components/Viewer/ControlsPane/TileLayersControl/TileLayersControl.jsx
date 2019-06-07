@@ -16,7 +16,6 @@ import ApiManager from '../../../../ApiManager';
 const BASE_SATELLITE_LAYER_NAME = 'base';
 const IMAGES_TILE_LAYER_NAME = 'images';
 const LABELS_TILE_LAYER_NAME = 'labels';
-const SPECTRAL_TILE_LAYER_NAME = 'indices';
 
 const BASE_SATELLITE_LAYER_TYPE = {
   name: BASE_SATELLITE_LAYER_NAME,
@@ -43,12 +42,6 @@ const tileLayerTypes = [
     defaultSelected: true,
     stacking: false,
     zIndex: 2000,
-  },
-  {
-    name: SPECTRAL_TILE_LAYER_NAME, 
-    defaultSelected: false,
-    stacking: false,
-    zIndex: 3000
   }
 ];
 
@@ -134,9 +127,8 @@ class TileLayersControl extends PureComponent {
 
     let imageLayers = availableLayersUnsorted.filter(x => x.type === IMAGES_TILE_LAYER_NAME);
     let labelLayers = availableLayersUnsorted.filter(x => x.type === LABELS_TILE_LAYER_NAME);
-    let spectralLayers = availableLayersUnsorted.filter(x => x.type === SPECTRAL_TILE_LAYER_NAME);
 
-    let availableLayers = [BASE_SATELLITE_AVAILABLE_LAYER, ...imageLayers, ...labelLayers, ...spectralLayers];
+    let availableLayers = [BASE_SATELLITE_AVAILABLE_LAYER, ...imageLayers, ...labelLayers];
 
     return availableLayers;
   

@@ -9,16 +9,13 @@ import Typography from '@material-ui/core/Typography';
 
 import Utility from '../../../../Utility';
 
-import './StandardTileLayersControl.css';
+import './PolygonLayersControl.css';
 
 import ApiManager from '../../../../ApiManager';
 
-const STANDARD_TILES_LAYERS_NAME = 'standard tiles';
-const STANDARD_TILES_LAYER = { type: STANDARD_TILES_LAYERS_NAME, name: STANDARD_TILES_LAYERS_NAME };
+const MAX_POLYGONS = 500;
 
-const MAX_TILES = 500;
-
-class StandardTileLayersControl extends PureComponent {
+class PolygonLayersControl extends PureComponent {
 
   constructor(props, context) {
     super(props, context);
@@ -59,8 +56,7 @@ class StandardTileLayersControl extends PureComponent {
       let selectedLayers = this.state.selectedLayers;
 
       if (differentMap) {
-
-        availableLayers = [STANDARD_TILES_LAYER];
+        availableLayers = this.getAvailableLayers(this.props.map);
         selectedLayers = [];
 
         this.setState({ 
@@ -68,12 +64,37 @@ class StandardTileLayersControl extends PureComponent {
           selectedLayers: selectedLayers
         });
       }
-      
-      this.prepareLayers(this.props.map, this.props.timestampRange, selectedLayers)
+
+      this.prepareLayers(this.props.map, this.props.timestampRange, availableLayers, selectedLayers)
         .then(leafletLayers => {
           this.props.onLayersChange(leafletLayers);
         });
     }
+  }
+
+  getAvailableLayers = (map) => {
+    let availableLayers = [];
+
+    for (let i = 0; i < map.layers.polygon.length; i++) {
+
+      let mapTimestampPolygonLayers = map.layers.polygon[i];
+
+      for (let y = 0; y < mapTimestampPolygonLayers.layers.length; y++) {
+        let layer = mapTimestampPolygonLayers.layers[y];
+
+        let availableLayer = availableLayers.find(x => x.name === layer.name);
+
+        if (!availableLayer) {
+          availableLayers.push({
+            name: layer.name,
+            color: layer.color,
+            hasAggregatedData: layer.hasAggregatedData
+          });
+        }
+      }
+    }
+
+    return availableLayers;  
   }
 
   createLayerCheckboxes = () => {
@@ -108,54 +129,66 @@ class StandardTileLayersControl extends PureComponent {
     return options;
   }
 
-  prepareLayers = async (map, timestampRange, selectedLayers) => {
-    if (!selectedLayers.includes(STANDARD_TILES_LAYER)) {
-      return;
+  prepareLayers = async (map, timestampRange, availableLayers, selectedLayers) => {
+    let promises = [];
+    
+    for (let i = 0; i < availableLayers.length; i++) {
+
+      let polygonLayer = availableLayers[i]
+
+      if (!selectedLayers.find(x => x.name === polygonLayer.name)) {
+        continue;
+      }
+
+      let bounds = this.props.leafletMapViewport.bounds;
+
+      let body = {
+        mapId: map.id,
+        timestamp: map.timestamps[timestampRange.end].timestampNumber,
+        layer: polygonLayer.name,
+        xMin: bounds.xMin,
+        xMax: bounds.xMax,
+        yMin: bounds.yMin,
+        yMax: bounds.yMax,
+        zoom: map.zoom,
+        limit: MAX_POLYGONS
+      }
+
+      let leafletGeojsonLayerPromise = ApiManager.post('/metadata/polygons', body, this.props.user)
+        .then(polygonIds => {
+          if (polygonIds.count > MAX_POLYGONS) {
+            return null;
+          }
+
+          body = {
+            mapId: map.id,
+            timestamp: map.timestamps[timestampRange.end].timestampNumber,
+            polygonIds: polygonIds.ids
+          }
+
+          return ApiManager.post('/geometry/polygons', body, this.props.user);
+        })
+        .then(polygonsGeoJson => {
+          if (!polygonsGeoJson) {
+            return [];
+          }
+
+          return (
+            <GeoJSON
+              key={Math.random()}
+              data={polygonsGeoJson}
+              style={{ color: `#${polygonLayer.color}`, weight: 1, opacity: 0.3 }}
+              zIndex={4000 + i}
+            />
+          );        
+        });
+
+      promises.push(leafletGeojsonLayerPromise);
     }
 
-    let bounds = this.props.leafletMapViewport.bounds;
+    let leafletGeoJsonLayers = await Promise.all(promises);
 
-    let body =  {
-      mapId: map.id,
-      timestamp: map.timestamps[timestampRange.end].timestampNumber,
-      xMin: bounds.xMin,
-      xMax: bounds.xMax,
-      yMin: bounds.yMin,
-      yMax: bounds.yMax,
-      zoom: map.zoom,
-      limit: MAX_TILES
-    }
-
-    let leafletGeojsonLayer = await ApiManager.post('/metadata/tiles', body, this.props.user)
-      .then(standardTileIds => {
-        if (standardTileIds.count > MAX_TILES) {
-          return null;
-        }
-
-        body = {
-          mapId: map.id,
-          timestamp: map.timestamps[timestampRange.end].timestampNumber,
-          tileIds: standardTileIds.ids
-        }
-
-        return ApiManager.post('/geometry/tiles', body, this.props.user);
-      })
-      .then(standardTilesGeoJson => {
-        if (!standardTilesGeoJson) {
-          return [];
-        }
-
-        return (
-          <GeoJSON
-            key={Math.random()}
-            data={standardTilesGeoJson}
-            style={{ color: 'cornflowerblue', weight: 1, opacity: 0.3 }}
-            zIndex={3000}
-          />
-        );        
-      });
-
-    return leafletGeojsonLayer;
+    return leafletGeoJsonLayers;
   }
 
   onLayerChange = (e) => {
@@ -184,7 +217,8 @@ class StandardTileLayersControl extends PureComponent {
 
     if (changed) {
       this.setState({ selectedLayers: newSelectedLayers });
-      this.prepareLayers(this.props.map, this.props.timestampRange, newSelectedLayers) 
+
+      this.prepareLayers(this.props.map, this.props.timestampRange, this.state.availableLayers, newSelectedLayers)
         .then(standardTilesLayers => {
           this.props.onLayersChange(standardTilesLayers);
         });
@@ -201,7 +235,7 @@ class StandardTileLayersControl extends PureComponent {
       <Card className='tile-layers-contol'>
         <CardContent>
           <Typography gutterBottom variant="h6" component="h2">
-            Standard tile layer
+            Polygon layers
           </Typography>
           {this.createLayerCheckboxes()}
         </CardContent>
@@ -210,4 +244,4 @@ class StandardTileLayersControl extends PureComponent {
   }
 }
 
-export default StandardTileLayersControl;
+export default PolygonLayersControl;

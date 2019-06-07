@@ -17,7 +17,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 
 import './Viewer.css';
 
-// This block is purely to get the marker icon working of Leaflet.
+// This block is purely to get the marker icon of Leaflet to work.
 // Taken somewhere from the web.
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({

@@ -1,4 +1,5 @@
 .data-pane {
   width: 25vw;
   padding: 0.7em;
+  overflow-y: auto;
 }
