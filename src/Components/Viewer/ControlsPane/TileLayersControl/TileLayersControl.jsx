@@ -5,6 +5,7 @@ import L from 'leaflet';
 import Checkbox from '@material-ui/core/Checkbox';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
 
 import Utility from '../../../../Utility';
 
@@ -307,9 +308,17 @@ class TileLayersControl extends PureComponent {
   }
 
   render() {
+
+    if (!this.props.map) {
+      return null;
+    }
+
     return (
       <Card className='tile-layers-contol'>
         <CardContent>
+          <Typography gutterBottom variant="h6" component="h2">
+            Tile layers
+          </Typography>
           {this.createLayerCheckboxes()}
         </CardContent>
       </Card>

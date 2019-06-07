@@ -30,9 +30,15 @@ const MAP_PANE_NAME = 'map_pane';
 const CONTROL_PANE_NAME = 'control_pane';
 const DATA_PANE_NAME = 'data_pane';
 
+const DEFAULT_VIEWPORT = {
+  center: [40.509865, -0.118092],
+  zoom: 2
+}
+
 class Viewer extends PureComponent {
 
   leafletMap = null;
+  setNewViewportTimer = null;
 
   constructor(props, context) {
     super(props, context);
@@ -49,6 +55,7 @@ class Viewer extends PureComponent {
       },
 
       leafletLayers: [],
+      leafletMapViewport: DEFAULT_VIEWPORT,
 
       geolocation: null
     };
@@ -60,6 +67,8 @@ class Viewer extends PureComponent {
       () => this.setLocation(null), 
       { enableHighAccuracy: true }
     );
+
+    this.onLeafletMapViewportChanged(DEFAULT_VIEWPORT);
   }
 
   setLocation = (position) => {
@@ -131,6 +140,21 @@ class Viewer extends PureComponent {
     }
   }
 
+  onLeafletMapViewportChanged = (viewport) => {
+    if (this.setNewViewportTimer) {
+      clearTimeout(this.setNewViewportTimer);
+    }
+    
+    viewport.bounds = getLeafletMapBounds(this.leafletMap);    
+
+    this.setNewViewportTimer = setTimeout(
+      () => {
+        this.setState({ leafletMapViewport: viewport })
+      }, 
+      1000
+    );
+  }
+
   render() {
 
     let mapPaneStyle = {
@@ -162,6 +186,7 @@ class Viewer extends PureComponent {
             user={this.props.user}
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
             leafletMap={this.leafletMap}
+            leafletMapViewport={this.state.leafletMapViewport}
             timestampRange={this.state.timestampRange}
             geolocation={this.state.geolocation}
             onSelectMap={this.onSelectMap}
@@ -175,10 +200,11 @@ class Viewer extends PureComponent {
               width={mapPaneStyle.width}
             />
             <Map 
-              center={[40.509865, -0.118092]} 
-              zoom={2}
+              center={DEFAULT_VIEWPORT.center} 
+              zoom={DEFAULT_VIEWPORT.zoom}
               ref={this.leafletMap}
               maxZoom={19}
+              onViewportChanged={this.onLeafletMapViewportChanged}
             >
               {this.state.leafletLayers}
               {this.state.geolocation ? <Marker position={this.state.geolocation}/> : null}
@@ -211,6 +237,19 @@ class Viewer extends PureComponent {
       </div>
     );
   }
+}
+
+function getLeafletMapBounds(leafletMap) {
+  let screenBounds = leafletMap.current.leafletElement.getBounds();
+  let bounds = 
+  {
+    xMin: screenBounds.getWest(),
+    xMax: screenBounds.getEast(),
+    yMin: screenBounds.getSouth(),
+    yMax: screenBounds.getNorth()
+  }
+
+  return bounds;
 }
 
 export default Viewer;
