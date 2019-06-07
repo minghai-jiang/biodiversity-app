@@ -80,6 +80,10 @@ class App extends Component {
         this.setState({ init: true });
         localStorage.removeItem(localStorageUserItem);
       });
+    }
+    else {
+      this.setState({ init: true });
+    }
   }
 
   retrieveLanguage = async () => {

@@ -24,6 +24,7 @@ let flyToControl_maxZoom = 18;
 let flyToProps = {};
 let flyTo_geolocation = null;
 let flyTo_watchId = null;
+let flyTo_onFlyTo = null;
 let returnChecked = (value) => {};
 
 const FlyToControl = {
@@ -46,11 +47,12 @@ const FlyToControl = {
     )
   },
 
-  initialize: (props, map, checkedFunction) => {
+  initialize: (props, map, checkedFunction, onFlyTo) => {
     flyToProps = props;
     flyToControl_map = props.map;
     flyToControl_mapRef = map;
     flyToControl_maxZoom = flyToControl_mapRef.getMaxZoom();
+    flyTo_onFlyTo = onFlyTo;
 
     returnChecked = checkedFunction;
     createOptions();
@@ -284,10 +286,12 @@ function handleSubmit(e = null)
   
         flyTo_geolocation = [lat, long];
         flyToControl_mapRef.flyTo(flyTo_geolocation, flyToControl_map.zoom);
+        flyTo_onFlyTo(flyTo_geolocation);
       }, null, { enableHighAccuracy: true });
     }    
     else {
       flyToControl_mapRef.flyTo(flyTo_geolocation, flyToControl_map.zoom);
+      flyTo_onFlyTo(flyTo_geolocation);
     }
   }
   else if (flyToType === 'center')

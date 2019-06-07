@@ -1,5 +1,5 @@
-// const apiUrl = "https://api.ellipsis-earth.com";
-const apiUrl = "https://dev.api.ellipsis-earth.com";
+const apiUrl = "https://api.ellipsis-earth.com";
+//const apiUrl = "https://dev.api.ellipsis-earth.com";
 // const apiUrl = "http://localhost:7552";
 
 const ApiManager = {
@@ -33,6 +33,7 @@ async function apiManagerFetch(method, url, body, user) {
 
   let gottenResponse = null;
   let isText = false;
+  let isJson = false;
 
   let options = {
     method: method,
@@ -48,13 +49,17 @@ async function apiManagerFetch(method, url, body, user) {
       gottenResponse = response;        
 
       let contentType = response.headers.get('Content-Type');
+      isJson = contentType.includes('application/json');
       isText = contentType.includes('text/plain');
 
       if (!isText) {
         return response.json();
       }
-      else {
+      else if (isText) {
         return response.text();
+      }
+      else {
+        return response.blob();
       }
     })
     .then(result => {

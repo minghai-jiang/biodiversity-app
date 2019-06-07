@@ -37,7 +37,7 @@ class GroupUserManagement extends PureComponent {
       },
       () => { this.update(); }
       );
-    }  
+    }
   }
 
   getGroupUsers = (e) => {
@@ -96,7 +96,7 @@ class GroupUserManagement extends PureComponent {
       })
       .catch(err => {
         this.props.showError(err);
-      });    
+      });
   }
 
   deleteUserFromGroup = (cellInfo) => {
@@ -169,6 +169,7 @@ class GroupUserManagement extends PureComponent {
     if (this.state.groupUsers) {
       return (
         <div>
+        <h2> {this.props.localization["Altering"]} {this.props.group["name"]}</h2>
           <ReactTable
             key={Math.random()}
             data={this.state.groupUsers}
