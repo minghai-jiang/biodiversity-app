@@ -82,9 +82,10 @@ export class MapSelector extends PureComponent {
       timestampsPromise,
       tileLayersPromise, 
       polygonLayersPromise, 
+      customPolygonLayersPromise,
+
       classesPromise, 
-      spectralIndicesPromise, 
-      customPolygonLayersPromise
+      spectralIndicesPromise
     ];
 
     return Promise.all(promises)

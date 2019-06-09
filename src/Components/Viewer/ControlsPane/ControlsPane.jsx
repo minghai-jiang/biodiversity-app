@@ -7,6 +7,7 @@ import MapSelector from './MapSelector/MapSelector';
 import TileLayersControl from './TileLayersControl/TileLayersControl';
 import StandardTileLayersControl from './StandardTileLayersControl/StandardTileLayersControl';
 import PolygonLayersControl from './PolygonLayersControl/PolygonLayersControl';
+import CustomPolygonLayersControl from './CustomPolygonLayersControl/CustomPolygonLayersControl';
 
 import './ControlsPane.css';
 
@@ -93,6 +94,14 @@ class ControlsPane extends PureComponent {
         />
 
         <PolygonLayersControl
+          map={this.state.map}
+          leafletMap={this.props.leafletMap}
+          leafletMapViewport={this.props.leafletMapViewport}
+          timestampRange={this.props.timestampRange}
+          onLayersChange={(layers) => this.onLayersChange(STANDARD_TILE_LAYERS_NAME, layers)}
+        />
+
+        <CustomPolygonLayersControl
           map={this.state.map}
           leafletMap={this.props.leafletMap}
           leafletMapViewport={this.props.leafletMapViewport}

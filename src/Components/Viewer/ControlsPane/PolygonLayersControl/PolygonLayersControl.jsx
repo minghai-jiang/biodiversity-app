@@ -2,10 +2,16 @@ import React, { PureComponent } from 'react';
 import { GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 
-import Checkbox from '@material-ui/core/Checkbox';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
+import { 
+  Card,
+  Checkbox,
+  CardHeader,
+  CardContent,
+  Collapse,
+  IconButton,
+  Typography
+} from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import Utility from '../../../../Utility';
 
@@ -24,7 +30,9 @@ class PolygonLayersControl extends PureComponent {
       availableLayers: [],
       selectedLayers: [],
 
-      options: []
+      options: [],
+
+      expanded: true
     };
   }
 
@@ -112,7 +120,7 @@ class PolygonLayersControl extends PureComponent {
         <div>
           <Checkbox 
             key={availableLayer.name} 
-            classes={{ root: 'controls-pane-checkbox' }}
+            classes={{ root: 'layers-control-checkbox' }}
             color='primary'
             value={availableLayer.name} 
             name={availableLayer.name}
@@ -225,6 +233,10 @@ class PolygonLayersControl extends PureComponent {
     }
   }
 
+  onExpandClick = () => {
+    this.setState({ expanded: !this.state.expanded });
+  }
+
   render() {
 
     if (!this.props.map) {
@@ -232,13 +244,32 @@ class PolygonLayersControl extends PureComponent {
     }
 
     return (
-      <Card className='tile-layers-contol'>
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="h2">
-            Polygon layers
-          </Typography>
-          {this.createLayerCheckboxes()}
-        </CardContent>
+      <Card className='layers-contol'>
+        <CardHeader
+          className='card-header'
+          title={
+            <Typography gutterBottom variant="h6" component="h2">
+              Polygons
+            </Typography>
+          }
+          action={
+            <IconButton
+              className={this.state.expanded ? 'expand-icon expanded' : 'expand-icon'}
+              onClick={this.onExpandClick}
+              aria-expanded={this.state.expanded}
+              aria-label='Show'
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          }
+        />
+        <Collapse in={this.state.expanded}>
+          <CardContent
+            className={'card-content'}
+          >
+            {this.createLayerCheckboxes()}
+          </CardContent>
+        </Collapse>
       </Card>
     );
   }
