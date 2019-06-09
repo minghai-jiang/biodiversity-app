@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { GeoJSON } from 'react-leaflet';
-import L from 'leaflet';
 
 import { 
   Card,
@@ -14,6 +13,7 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import Utility from '../../../../Utility';
+import ViewerUtility from '../../ViewerUtility';
 
 import './StandardTileLayersControl.css';
 
@@ -158,7 +158,8 @@ class StandardTileLayersControl extends PureComponent {
             key={Math.random()}
             data={standardTilesGeoJson}
             style={{ color: 'cornflowerblue', weight: 1, opacity: 0.3 }}
-            zIndex={3000}
+            zIndex={ViewerUtility.standardTileLayerZIndex}
+            onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
           />
         );        
       });
@@ -201,6 +202,10 @@ class StandardTileLayersControl extends PureComponent {
 
   onExpandClick = () => {
     this.setState({ expanded: !this.state.expanded });
+  }
+
+  onFeatureClick = (feature) => {
+    this.props.onFeatureClick(ViewerUtility.tileLayerType, feature);
   }
 
   render() {

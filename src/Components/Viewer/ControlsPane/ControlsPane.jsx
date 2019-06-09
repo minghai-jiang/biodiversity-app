@@ -91,6 +91,7 @@ class ControlsPane extends PureComponent {
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(STANDARD_TILE_LAYERS_NAME, layers)}
+          onFeatureClick={this.props.onFeatureClick}
         />
 
         <PolygonLayersControl

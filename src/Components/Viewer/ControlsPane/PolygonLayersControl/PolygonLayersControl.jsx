@@ -14,6 +14,7 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import Utility from '../../../../Utility';
+import ViewerUtility from '../../ViewerUtility';
 
 import './PolygonLayersControl.css';
 
@@ -186,7 +187,8 @@ class PolygonLayersControl extends PureComponent {
               key={Math.random()}
               data={polygonsGeoJson}
               style={{ color: `#${polygonLayer.color}`, weight: 1, opacity: 0.3 }}
-              zIndex={4000 + i}
+              zIndex={ViewerUtility.polygonLayerZIndex + i}
+              onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
             />
           );        
         });
@@ -235,6 +237,10 @@ class PolygonLayersControl extends PureComponent {
 
   onExpandClick = () => {
     this.setState({ expanded: !this.state.expanded });
+  }
+
+  onFeatureClick = (feature) => {
+    this.props.onFeatureClick(ViewerUtility.polygonLayerType, feature);
   }
 
   render() {

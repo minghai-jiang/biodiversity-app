@@ -157,6 +157,9 @@ class Viewer extends PureComponent {
     );
   }
 
+  onFeatureClick = (type, feature) => {
+  }
+
   render() {
 
     let mapPaneStyle = {
@@ -193,6 +196,7 @@ class Viewer extends PureComponent {
             geolocation={this.state.geolocation}
             onSelectMap={this.onSelectMap}
             onLayersChange={this.onLayersChange}
+            onFeatureClick={this.onFeatureClick}
           />
           
           <div className='viewer-pane map-pane' style={mapPaneStyle}>

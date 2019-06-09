@@ -14,6 +14,7 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import Utility from '../../../../Utility';
+import ViewerUtility from '../../ViewerUtility';
 
 import './TileLayersControl.css';
 
@@ -27,7 +28,7 @@ const BASE_SATELLITE_LAYER_TYPE = {
   name: BASE_SATELLITE_LAYER_NAME,
   defaultSelected: true,
   stacking: false,
-  zIndex: 100
+  zIndex: ViewerUtility.tileLayerZIndex
 }
 
 const BASE_SATELLITE_AVAILABLE_LAYER = {
@@ -41,13 +42,13 @@ const tileLayerTypes = [
     name: IMAGES_TILE_LAYER_NAME, 
     defaultSelected: true,
     stacking: true,
-    zIndex: 1000
+    zIndex: ViewerUtility.tileLayerZIndex + 1
   },
   {
     name: LABELS_TILE_LAYER_NAME, 
     defaultSelected: true,
     stacking: false,
-    zIndex: 2000,
+    zIndex: ViewerUtility.tileLayerZIndex + 1 + 300,
   }
 ];
 
