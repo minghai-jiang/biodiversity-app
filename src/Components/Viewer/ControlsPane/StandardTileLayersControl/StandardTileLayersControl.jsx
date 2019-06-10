@@ -19,8 +19,11 @@ import './StandardTileLayersControl.css';
 
 import ApiManager from '../../../../ApiManager';
 
-const STANDARD_TILES_LAYERS_NAME = 'standard tiles';
-const STANDARD_TILES_LAYER = { type: STANDARD_TILES_LAYERS_NAME, name: STANDARD_TILES_LAYERS_NAME };
+const STANDARD_TILES_LAYERS_DISPLAY_NAME = 'standard tiles';
+const STANDARD_TILES_LAYER = { 
+  type: STANDARD_TILES_LAYERS_DISPLAY_NAME, 
+  name: STANDARD_TILES_LAYERS_DISPLAY_NAME 
+};
 
 const MAX_TILES = 500;
 
@@ -96,7 +99,7 @@ class StandardTileLayersControl extends PureComponent {
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
       let option = (
-        <div>
+        <div key={availableLayer.name}>
           <Checkbox 
             key={availableLayer.name} 
             classes={{ root: 'layers-control-checkbox' }}
@@ -205,7 +208,7 @@ class StandardTileLayersControl extends PureComponent {
   }
 
   onFeatureClick = (feature) => {
-    this.props.onFeatureClick(ViewerUtility.tileLayerType, feature);
+    this.props.onFeatureClick(feature);
   }
 
   render() {

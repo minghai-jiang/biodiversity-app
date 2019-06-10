@@ -118,7 +118,7 @@ class PolygonLayersControl extends PureComponent {
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
       let option = (
-        <div>
+        <div key={availableLayer.name}>
           <Checkbox 
             key={availableLayer.name} 
             classes={{ root: 'layers-control-checkbox' }}
@@ -240,7 +240,7 @@ class PolygonLayersControl extends PureComponent {
   }
 
   onFeatureClick = (feature) => {
-    this.props.onFeatureClick(ViewerUtility.polygonLayerType, feature);
+    this.props.onFeatureClick(feature);
   }
 
   render() {

@@ -11,6 +11,7 @@ import TimestampSelector from './TimestampSelector/TimestampSelector';
 
 import ControlsPane from './ControlsPane/ControlsPane';
 import DataPane from './DataPane/DataPane';
+import SelectionPane from './SelectionPane/SelectionPane';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -46,6 +47,9 @@ class Viewer extends PureComponent {
     this.leafletMap = React.createRef();
 
     this.state = {
+      leafletMapViewport: DEFAULT_VIEWPORT,
+      isSmallWindow: isMobile,
+
       panes: [MAP_PANE_NAME],
 
       map: null,
@@ -55,9 +59,9 @@ class Viewer extends PureComponent {
       },
 
       leafletLayers: [],
-      leafletMapViewport: DEFAULT_VIEWPORT,
+      selectedElement: null,
 
-      geolocation: null
+      geolocation: null,
     };
   }
 
@@ -69,6 +73,11 @@ class Viewer extends PureComponent {
     );
 
     this.onLeafletMapViewportChanged(DEFAULT_VIEWPORT);
+
+    if (!isMobile) {
+      window.addEventListener('resize', this.onWindowResize);   
+      this.onWindowResize(); 
+    }
   }
 
   setLocation = (position) => {
@@ -91,12 +100,26 @@ class Viewer extends PureComponent {
     );
   }
 
+  onWindowResize = () => {
+    let isSmallWindow = window.innerWidth <= 600;
+    
+    if (this.state.isSmallWindow !== isSmallWindow) {
+
+      let panes = this.state.panes;
+      if (isSmallWindow) {
+        panes = [MAP_PANE_NAME];
+      }
+
+      this.setState({ isSmallWindow: isSmallWindow, panes: panes });
+    }
+  }
+
   onViewerMenuClick = (paneName) => {
     let currentPanes = this.state.panes;
 
     let changed = false;
 
-    if (!isMobile) {
+    if (!isMobile && !this.state.isSmallWindow) {
       if (!currentPanes.includes(paneName)) {
         currentPanes.push(paneName);
         changed = true;
@@ -158,6 +181,13 @@ class Viewer extends PureComponent {
   }
 
   onFeatureClick = (type, feature) => {
+    let element = {
+      key: Math.random(),
+      type: type,
+      feature: feature
+    };
+
+    this.setState({ selectedElement: element });
   }
 
   render() {
@@ -190,6 +220,7 @@ class Viewer extends PureComponent {
           <ControlsPane
             user={this.props.user}
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
+            isSmallWindow={this.state.isSmallWindow}
             leafletMap={this.leafletMap}
             leafletMapViewport={this.state.leafletMapViewport}
             timestampRange={this.state.timestampRange}
@@ -204,6 +235,10 @@ class Viewer extends PureComponent {
               map={this.state.map}
               onSelectTimestamp={this.onSelectTimestamp}
               width={mapPaneStyle.width}
+            />
+            <SelectionPane
+              user={this.state.user}
+              element={this.state.selectedElement}
             />
             <Map 
               center={DEFAULT_VIEWPORT.center} 

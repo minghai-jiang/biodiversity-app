@@ -44,15 +44,14 @@ div.content {
 .viewer-pane {
   float: left;
   height: 100%;
+  background-color: #f4f4f4;
 }
 
 .map-pane {
   width: 100vw;
+  position: relative;
+  background-color: #f4f4f4;
 }
-
-
-
-
 
 .leaflet-container
 {

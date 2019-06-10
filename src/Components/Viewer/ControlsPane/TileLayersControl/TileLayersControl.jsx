@@ -178,7 +178,7 @@ class TileLayersControl extends PureComponent {
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
       let option = (
-        <div>
+        <div key={availableLayer.name}>
           <Checkbox 
             key={availableLayer.name} 
             classes={{ root: 'layers-control-checkbox' }}
