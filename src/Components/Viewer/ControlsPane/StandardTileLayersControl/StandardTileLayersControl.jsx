@@ -139,7 +139,7 @@ class StandardTileLayersControl extends PureComponent {
 
     let leafletGeojsonLayer = await ApiManager.post('/metadata/tiles', body, this.props.user)
       .then(standardTileIds => {
-        if (standardTileIds.count > MAX_TILES) {
+        if (!standardTileIds || standardTileIds.count === 0 || standardTileIds.count > MAX_TILES) {
           return null;
         }
 

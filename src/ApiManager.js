@@ -5,6 +5,27 @@ const apiUrl = "https://dev.api.ellipsis-earth.com";
 const ApiManager = {
   apiUrl: apiUrl,
 
+  accessLevels: {
+    viewMap: 100,
+    aggregatedData: 200,
+    viewGeoMessages: 300,
+    addGeoMessages: 400,
+    addGeoMessageImage: 410,
+    addCustomPolygons: 500,
+    deleteGeomessages: 600,
+    alterOrDeleteCustomPolygons: 700,
+    forms: 750,
+    customPolygonLayers: 800,
+    userManagement: 900,
+    owner: 1000,
+  
+    mapPublicLevelOne: 300, // viewGeoMessages
+    mapPublicLevelTwo: 500, // addCustomPolygons
+  
+    min: 0,
+    max: 1000
+  },
+
   get: async (url, body, user) => {
     return apiManagerFetch('GET', url, body, user);
   },

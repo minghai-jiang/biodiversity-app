@@ -160,7 +160,7 @@ class CustomPolygonLayersControl extends PureComponent {
 
       let leafletGeojsonLayerPromise = ApiManager.post('/geoMessage/customPolygon/ids', body, this.props.user)
         .then(customPolygonIds => {
-          if (customPolygonIds.count > MAX_CUSTOM_POLYGONS) {
+          if (!customPolygonIds || customPolygonIds.count === 0 || customPolygonIds.count > MAX_CUSTOM_POLYGONS) {
             return null;
           }
 

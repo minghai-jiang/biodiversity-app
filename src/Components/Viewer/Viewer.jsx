@@ -75,8 +75,12 @@ class Viewer extends PureComponent {
     this.onLeafletMapViewportChanged(DEFAULT_VIEWPORT);
 
     if (!isMobile) {
-      window.addEventListener('resize', this.onWindowResize);   
-      this.onWindowResize(); 
+      window.addEventListener('resize', this.onWindowResize);  
+      this.onWindowResize(null, () => {
+        if (!this.state.isSmallWindow) {
+          this.setState({ panes: [CONTROL_PANE_NAME, MAP_PANE_NAME] });
+        }
+      });
     }
   }
 
@@ -100,17 +104,19 @@ class Viewer extends PureComponent {
     );
   }
 
-  onWindowResize = () => {
+  onWindowResize = (e, cb) => {
     let isSmallWindow = window.innerWidth <= 600;
     
     if (this.state.isSmallWindow !== isSmallWindow) {
-
       let panes = this.state.panes;
       if (isSmallWindow) {
         panes = [MAP_PANE_NAME];
       }
 
-      this.setState({ isSmallWindow: isSmallWindow, panes: panes });
+      this.setState({ isSmallWindow: isSmallWindow, panes: panes }, cb);
+    }
+    else if (cb) {
+      cb();
     }
   }
 
@@ -237,7 +243,8 @@ class Viewer extends PureComponent {
               width={mapPaneStyle.width}
             />
             <SelectionPane
-              user={this.state.user}
+              user={this.props.user}
+              map={this.state.map}
               element={this.state.selectedElement}
             />
             <Map 

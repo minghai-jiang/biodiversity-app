@@ -5,11 +5,20 @@ const ViewerUtility = {
   polygonLayerType: 'polygon',
   customPolygonTileLayerType: 'custom_polygon',
 
+  drawnPolygonlayerType: 'drawn_polygon',
+
   tileLayerZIndex: 200,
   standardTileLayerZIndex: 1000,
   polygonLayerZIndex: 1001,
   customPolygonLayerZIndex: 1100,
+  drawnPpolygonLayerZIndex: 1200,
 
+  dataPaneActions: {
+    analyse: 'analyse',
+    geomessage: 'geoMessage',
+    alterCustomPolygon: 'alter_custom_polygon',
+    feed: 'geomessage_feed'
+  }
 }
 
 export default ViewerUtility;

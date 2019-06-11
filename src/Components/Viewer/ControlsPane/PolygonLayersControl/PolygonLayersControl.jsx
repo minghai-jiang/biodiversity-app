@@ -165,7 +165,7 @@ class PolygonLayersControl extends PureComponent {
 
       let leafletGeojsonLayerPromise = ApiManager.post('/metadata/polygons', body, this.props.user)
         .then(polygonIds => {
-          if (polygonIds.count > MAX_POLYGONS) {
+          if (!polygonIds || polygonIds.count === 0 || polygonIds.count > MAX_POLYGONS) {
             return null;
           }
 

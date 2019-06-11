@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react';
 
 import { 
   Card,
-  Checkbox,
+  Button,
   CardHeader,
   CardContent,
-  Collapse,
+  CardActions,
   IconButton,
   Typography
 } from '@material-ui/core';
@@ -14,6 +14,9 @@ import ClearIcon from '@material-ui/icons/Clear';
 import ViewerUtility from '../ViewerUtility';
 
 import './SelectionPane.css';
+import ApiManager from '../../../ApiManager';
+
+const DELETE_CUSTOM_POLYGON_ACTION = 'delete_custom_polygon';
 
 class SelectionPane extends PureComponent {
 
@@ -26,7 +29,10 @@ class SelectionPane extends PureComponent {
   }  
 
   componentDidUpdate(prevProps) {
-    if (!prevProps.element || prevProps.element.key !== this.props.element.key) {
+    if (!this.props.map) {
+      this.setState({ isOpen: false });
+    }
+    else if (!prevProps.element || prevProps.element.key !== this.props.element.key) {
       this.setState({ isOpen: true });
     } 
   }
@@ -35,24 +41,106 @@ class SelectionPane extends PureComponent {
     this.setState({ isOpen: false });
   }
 
+  onElementActionClick = (action) => {
+    debugger;
+  }
+
   render() {
 
     if (!this.state.isOpen) {
       return null;
     }
 
+    let map = this.props.map;
     let element = this.props.element;
 
-    if (!element) {
+    if (!map || !element) {
       return null;
     }
 
-    let title = 'Standard tile';
-    if (element.type === ViewerUtility.polygonLayerType) {
+    let title = null;
+    let buttons = [];
+
+    let user = this.props.user;
+    let mapAccessLevel = map.accessLevel;
+
+    if (element.type === ViewerUtility.standardTileLayerType ||
+      element.type === ViewerUtility.polygonLayerType ||
+      element.type === ViewerUtility.customPolygonTileLayerType) {
+
+      let analyseButton = null;
+      let geomessageButton = null;
+
+      if (mapAccessLevel >= ApiManager.accessLevels.aggregatedData) {
+        analyseButton = (
+          <Button 
+            key='analyse' 
+            variant='outlined' 
+            size='small' 
+            className='selection-pane-button'
+            onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.analyse)}
+          >
+            Analyse
+          </Button>
+        );
+      }
+
+      if (mapAccessLevel >= ApiManager.accessLevels.viewGeoMessages) {
+        geomessageButton = (
+          <Button 
+            key='geomessage' 
+            variant='outlined' 
+            size='small' 
+            className='selection-pane-button'
+            onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.geomessage)}
+          >
+            Geomessage
+          </Button>
+        );
+      }
+
+      buttons.push(
+        <div key='general_actions'>
+          {analyseButton}
+          {geomessageButton}
+        </div>
+      )
+    }
+
+    if (element.type === ViewerUtility.standardTileLayerType) {
+      title = 'Standard tile';
+    }
+    else if (element.type === ViewerUtility.polygonLayerType) {
       title = 'Polygon';
     }
     else if (element.type === ViewerUtility.customPolygonTileLayerType) {
       title = 'Custom polygon';
+
+      if (user && mapAccessLevel >= ApiManager.accessLevels.alterOrDeleteCustomPolygons) {
+        buttons.push(
+          <div key='specific_actions' className='specific-actions'>
+            <Button 
+              key='alter' 
+              variant='outlined' 
+              size='small' 
+              className='selection-pane-button'
+              onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.alterCustomPolygon)}
+            >
+              Alter
+            </Button>
+            <Button 
+              key='delete' 
+              variant='outlined' 
+              size='small' 
+              className='selection-pane-button'
+              onClick={() => this.onElementActionClick(DELETE_CUSTOM_POLYGON_ACTION)}
+            >
+              Delete
+            </Button>
+          </div>
+
+        );
+      }
     }
 
     let elementProperties = element.feature.properties;
@@ -68,16 +156,16 @@ class SelectionPane extends PureComponent {
       }
     }
 
-    debugger;
-
     return (
       <Card className='selection-pane'>
         <CardHeader
           className='card-header'
           title={
-            <Typography gutterBottom variant="h6" component="h2">
-              {title}
-            </Typography>
+            <Button>
+              <Typography variant="h6" component="h2" className='no-text-transform'>
+                {title}
+              </Typography>
+            </Button>
           }
           action={
             <IconButton
@@ -91,6 +179,9 @@ class SelectionPane extends PureComponent {
         <CardContent className={'card-content'}>
           {properties}
         </CardContent>
+        <CardActions className={'selection-pane-card-actions'}>
+          {buttons}
+        </CardActions>
       </Card>
     );
   }
