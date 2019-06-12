@@ -106,7 +106,14 @@ export class InfoPane extends Component {
     content.push(<h1 key='Classes'>Classes</h1>);
     if (data)
     {
-      content.push(<LineChart key ={'classesTimestamps' + filter} props={this.props} type='class' data={data.graphData} filter={filter}/>);
+      content.push(
+        <LineChart 
+          key ={'classesTimestamps' + filter} 
+          props={this.props} 
+          type='class' 
+          data={data.graphData} 
+          filter={filter}
+        />);
       content.push(<Table key='classTable' type={'class'} data={data.tableData}/>)
     }
     else

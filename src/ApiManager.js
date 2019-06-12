@@ -40,7 +40,14 @@ const ApiManager = {
 };
 
 async function apiManagerFetch(method, url, body, user) {
-  url = `${apiUrl}${url}`;
+
+  let a = apiUrl;
+
+  if (url === `/data/spectral/tile/timestamps`) {
+    a = 'https://api.ellipsis-earth.com';
+  }
+
+  url = `${a}${url}`;
 
   let headers = {};
 
@@ -70,10 +77,11 @@ async function apiManagerFetch(method, url, body, user) {
       gottenResponse = response;        
 
       let contentType = response.headers.get('Content-Type');
-      isJson = contentType.includes('application/json');
-      isText = contentType.includes('text/plain');
 
-      if (!isText) {
+      isText = contentType.includes('text');
+      isJson = contentType.includes('application/json');
+
+      if (isJson) {
         return response.json();
       }
       else if (isText) {

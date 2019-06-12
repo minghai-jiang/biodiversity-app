@@ -29,7 +29,7 @@ class SelectionPane extends PureComponent {
   }  
 
   componentDidUpdate(prevProps) {
-    if (!this.props.map) {
+    if (!this.props.map || prevProps.map !== this.props.map) {
       this.setState({ isOpen: false });
     }
     else if (!prevProps.element || prevProps.element.key !== this.props.element.key) {
@@ -42,7 +42,7 @@ class SelectionPane extends PureComponent {
   }
 
   onElementActionClick = (action) => {
-    debugger;
+    this.props.onDataPaneAction(action);
   }
 
   render() {
@@ -68,36 +68,31 @@ class SelectionPane extends PureComponent {
       element.type === ViewerUtility.polygonLayerType ||
       element.type === ViewerUtility.customPolygonTileLayerType) {
 
-      let analyseButton = null;
-      let geomessageButton = null;
-
-      if (mapAccessLevel >= ApiManager.accessLevels.aggregatedData) {
-        analyseButton = (
-          <Button 
-            key='analyse' 
-            variant='outlined' 
-            size='small' 
-            className='selection-pane-button'
-            onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.analyse)}
-          >
-            Analyse
-          </Button>
-        );
-      }
-
-      if (mapAccessLevel >= ApiManager.accessLevels.viewGeoMessages) {
-        geomessageButton = (
-          <Button 
-            key='geomessage' 
-            variant='outlined' 
-            size='small' 
-            className='selection-pane-button'
-            onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.geomessage)}
-          >
-            Geomessage
-          </Button>
-        );
-      }
+      let analyseButton = (
+        <Button 
+          key='analyse' 
+          variant='outlined' 
+          size='small' 
+          className='selection-pane-button'
+          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.analyse)}
+          disabled={mapAccessLevel < ApiManager.accessLevels.aggregatedData || !element.hasAggregatedData}
+        >
+          Analyse
+        </Button>
+      );
+      
+      let geomessageButton = (
+        <Button 
+          key='geomessage' 
+          variant='outlined' 
+          size='small' 
+          className='selection-pane-button'
+          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.geomessage)}
+          disabled={mapAccessLevel < ApiManager.accessLevels.viewGeoMessages}
+        >
+          Geomessage
+        </Button>
+      );
 
       buttons.push(
         <div key='general_actions'>
@@ -116,31 +111,30 @@ class SelectionPane extends PureComponent {
     else if (element.type === ViewerUtility.customPolygonTileLayerType) {
       title = 'Custom polygon';
 
-      if (user && mapAccessLevel >= ApiManager.accessLevels.alterOrDeleteCustomPolygons) {
-        buttons.push(
-          <div key='specific_actions' className='specific-actions'>
-            <Button 
-              key='alter' 
-              variant='outlined' 
-              size='small' 
-              className='selection-pane-button'
-              onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.alterCustomPolygon)}
-            >
-              Alter
-            </Button>
-            <Button 
-              key='delete' 
-              variant='outlined' 
-              size='small' 
-              className='selection-pane-button'
-              onClick={() => this.onElementActionClick(DELETE_CUSTOM_POLYGON_ACTION)}
-            >
-              Delete
-            </Button>
-          </div>
-
-        );
-      }
+      buttons.push(
+        <div key='specific_actions' className='specific-actions'>
+          <Button 
+            key='alter' 
+            variant='outlined' 
+            size='small' 
+            className='selection-pane-button'
+            onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.alterCustomPolygon)}
+            disabled={!user || mapAccessLevel < ApiManager.accessLevels.alterOrDeleteCustomPolygons}
+          >
+            Alter
+          </Button>
+          <Button 
+            key='delete' 
+            variant='outlined' 
+            size='small' 
+            className='selection-pane-button'
+            onClick={() => this.onElementActionClick(DELETE_CUSTOM_POLYGON_ACTION)}
+            disabled={!user || mapAccessLevel < ApiManager.accessLevels.alterOrDeleteCustomPolygons}
+          >
+            Delete
+          </Button>
+        </div>
+      );      
     }
 
     let elementProperties = element.feature.properties;

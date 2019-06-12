@@ -50,7 +50,7 @@ class Viewer extends PureComponent {
       leafletMapViewport: DEFAULT_VIEWPORT,
       isSmallWindow: isMobile,
 
-      panes: [MAP_PANE_NAME],
+      panes: isMobile ? [MAP_PANE_NAME] : [CONTROL_PANE_NAME, MAP_PANE_NAME],
 
       map: null,
       timestampRange: {
@@ -77,8 +77,8 @@ class Viewer extends PureComponent {
     if (!isMobile) {
       window.addEventListener('resize', this.onWindowResize);  
       this.onWindowResize(null, () => {
-        if (!this.state.isSmallWindow) {
-          this.setState({ panes: [CONTROL_PANE_NAME, MAP_PANE_NAME] });
+        if (this.state.isSmallWindow) {
+          this.setState({ panes: [MAP_PANE_NAME] }, () => this.leafletMap.current.leafletElement.invalidateSize());
         }
       });
     }
@@ -104,7 +104,7 @@ class Viewer extends PureComponent {
     );
   }
 
-  onWindowResize = (e, cb) => {
+  onWindowResize = (_, cb) => {
     let isSmallWindow = window.innerWidth <= 600;
     
     if (this.state.isSmallWindow !== isSmallWindow) {
@@ -186,14 +186,38 @@ class Viewer extends PureComponent {
     );
   }
 
-  onFeatureClick = (type, feature) => {
+  onFeatureClick = (type, feature, hasAggregatedData) => {
     let element = {
       key: Math.random(),
       type: type,
-      feature: feature
+      hasAggregatedData: hasAggregatedData,
+      feature: feature,
     };
 
     this.setState({ selectedElement: element });
+  }
+
+  onDataPaneAction = (action) => {
+    if (this.state.action !== action) {
+
+      let panes = this.state.panes;
+      let cb = null;
+      
+      if (!panes.includes(DATA_PANE_NAME)) {
+        panes = [...panes];
+
+        if (!isMobile) {
+          panes.push(DATA_PANE_NAME);
+        }
+        else {
+          panes = [DATA_PANE_NAME];
+        }
+        
+        cb = () => this.leafletMap.current.leafletElement.invalidateSize();
+      }
+
+      this.setState({ panes: panes, dataPaneAction: action }, cb);
+    }
   }
 
   render() {
@@ -246,6 +270,7 @@ class Viewer extends PureComponent {
               user={this.props.user}
               map={this.state.map}
               element={this.state.selectedElement}
+              onDataPaneAction={this.onDataPaneAction}
             />
             <Map 
               center={DEFAULT_VIEWPORT.center} 
@@ -262,6 +287,9 @@ class Viewer extends PureComponent {
           <DataPane
             user={this.props.user}
             isOpen={this.state.panes.includes(DATA_PANE_NAME)}
+            map={this.state.map}
+            action={this.state.dataPaneAction}
+            element={this.state.selectedElement}
           />
         </div>
 

@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
 
 import {
@@ -7,19 +7,21 @@ import {
   LayersControl,
   Marker,
   Popup
-} from "react-leaflet";
+} from 'react-leaflet';
 
-import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
 
-import "./DataPane.css";
+import './DataPane.css';
+import ViewerUtility from '../ViewerUtility';
+
+import AnalyseControl from './AnalyseControl/AnalyseControl';
 
 class DataPane extends PureComponent {
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      isOpen: false
     };
   }
 
@@ -31,10 +33,30 @@ class DataPane extends PureComponent {
     if (!this.props.isOpen) {
       style = { display: 'none' };
     }
+
+    if (!this.props.element) {
+      return (
+        <div className='viewer-pane data-pane' style={style}>
+          Please select an element on the map and an action first.
+        </div>
+      );
+    }
+
+    let actionControl = null;
+
+    if (this.props.action === ViewerUtility.dataPaneActions.analyse) {
+      actionControl = (
+        <AnalyseControl
+          user={this.props.user}
+          map={this.props.map}
+          element={this.props.element}          
+        />
+      );
+    }
     
     return (
       <div className='viewer-pane data-pane' style={style}>
-        Data Pane
+        {actionControl}
       </div>
     );
   }

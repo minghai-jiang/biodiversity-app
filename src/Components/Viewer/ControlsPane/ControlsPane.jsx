@@ -114,7 +114,7 @@ class ControlsPane extends PureComponent {
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.standardTileLayerType, layers)}
-          onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.standardTileLayerType, feature)}
+          onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.standardTileLayerType, feature, true)}
         />
 
         <PolygonLayersControl
@@ -123,7 +123,7 @@ class ControlsPane extends PureComponent {
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.polygonLayerType, layers)}
-          onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.polygonLayerType, feature)}
+          onFeatureClick={(feature, hasAggregatedData) => this.props.onFeatureClick(ViewerUtility.polygonLayerType, feature, hasAggregatedData)}
         />
 
         <CustomPolygonLayersControl
@@ -132,7 +132,7 @@ class ControlsPane extends PureComponent {
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.customPolygonTileLayerType, layers)}
-          onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.customPolygonTileLayerType, feature)}
+          onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.customPolygonTileLayerType, feature, true)}
         />
       </div>
     );

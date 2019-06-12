@@ -188,7 +188,7 @@ class PolygonLayersControl extends PureComponent {
               data={polygonsGeoJson}
               style={{ color: `#${polygonLayer.color}`, weight: 1, opacity: 0.3 }}
               zIndex={ViewerUtility.polygonLayerZIndex + i}
-              onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
+              onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature, polygonLayer.hasAggregatedData) })}
             />
           );        
         });
@@ -239,8 +239,8 @@ class PolygonLayersControl extends PureComponent {
     this.setState({ expanded: !this.state.expanded });
   }
 
-  onFeatureClick = (feature) => {
-    this.props.onFeatureClick(feature);
+  onFeatureClick = (feature, hasAggregatedData) => {
+    this.props.onFeatureClick(feature, hasAggregatedData);
   }
 
   render() {

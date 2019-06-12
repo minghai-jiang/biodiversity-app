@@ -42,6 +42,7 @@ div.content {
 }
 
 .viewer-pane {
+  position: relative;
   float: left;
   height: 100%;
   background-color: #f4f4f4;
@@ -117,14 +118,6 @@ div.content {
   bottom: 350px;
 }
 
-/* .leaflet-pane > .leaflet-layer[style*="z-index: 3"] {
-    z-index: 100 !important;
-}
-
-.leaflet-pane > leaflet-layer[style*="z-index: 4"] {
-    z-index: 200 !important;
-} */
-
 .indices-data-graph {
   position: absolute;
   width: 500px;
@@ -179,6 +172,14 @@ div.viewer-button {
   padding: 0.2em 0.7em;
 
   z-index: 100000;
+}
+
+div.loading-spinner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
 }
 
 @media only screen and (max-width: 600px) {
