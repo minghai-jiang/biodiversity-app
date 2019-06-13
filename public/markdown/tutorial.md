@@ -171,7 +171,7 @@ r =requests.post(url + '/account/login',
 print(r.text)
 ```
 
-    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1NDM4ODk5NiwiZXhwIjoxNTU0NDc1Mzk2fQ.wc-vRBHiawc39jQBRjb_wNnksH8zB_kiLNd-HZLRjj0"}
+    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MDQyMzc3NCwiZXhwIjoxNTYwNTEwMTc0fQ.xnDqNmz8s-G0kXV4C49KLZp-Sp4AbJaKlDqyKhEPIhk"}
 
 
 Our token is quite long, so let's save the token to a variable that we can send with our other requests.
@@ -190,7 +190,7 @@ token = 'Bearer ' + token
 print(token)
 ```
 
-    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU1NDM4ODk5NiwiZXhwIjoxNTU0NDc1Mzk2fQ.wc-vRBHiawc39jQBRjb_wNnksH8zB_kiLNd-HZLRjj0
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MDQyMzc3NCwiZXhwIjoxNTYwNTEwMTc0fQ.xnDqNmz8s-G0kXV4C49KLZp-Sp4AbJaKlDqyKhEPIhk
 
 
 To test whether our token is working, we send a get request with this token to the following authentication testing URL.
@@ -204,7 +204,7 @@ r = requests.get(url + '/account/validate',
 print(r)
 ```
 
-    <Response [200]>
+    <Response [404]>
 
 
 We get 200 as a response code, which means that our request was succesfull and therfore our token valid. The token we got will only remain valid for a limited amount of time, the expiration time of a token is currently set to 12 hours. After that you will need to request a new token via the same procedure.
@@ -221,7 +221,7 @@ Let's request a JSON and print all keys.
 
 
 ```python
-r = requests.get(url + '/account/myMaps')
+r = requests.get(url + '/account/myMaps',headers = {"Authorization":token})
 
 r = r.json()
 
@@ -232,17 +232,17 @@ map_names
 
 
 
-    ['PBL KPL farm',
+    ['Suriname',
      'Belgium Clouds',
-     'Cartagena',
-     'Netherlands plots',
-     'Suriname',
      'Chaco Demo',
-     'PBL forest Tanzania',
+     'Cartagena',
+     'LNV boomranden',
+     'LNV radar',
+     'verkeer Rotterdam',
+     'WNF biodiversiteitsmonitor',
+     'Insar Japan',
      'Gran Chaco',
-     'Yucatan Coast',
-     'Medellin',
-     'Santarem Sentinel2']
+     'LNV maai en oogst kaart']
 
 
 
@@ -287,16 +287,13 @@ r[1:4]
 
     [{'timestampNumber': 1,
       'dateFrom': '2018-02-01T00:00:00.000Z',
-      'dateTo': '2018-02-15T00:00:00.000Z',
-      'dataSourceId': 1},
+      'dateTo': '2018-02-15T00:00:00.000Z'},
      {'timestampNumber': 2,
       'dateFrom': '2018-03-01T00:00:00.000Z',
-      'dateTo': '2018-03-15T00:00:00.000Z',
-      'dataSourceId': 1},
+      'dateTo': '2018-03-15T00:00:00.000Z'},
      {'timestampNumber': 3,
       'dateFrom': '2018-04-01T00:00:00.000Z',
-      'dateTo': '2018-04-15T00:00:00.000Z',
-      'dataSourceId': 1}]
+      'dateTo': '2018-04-15T00:00:00.000Z'}]
 
 
 
@@ -317,18 +314,18 @@ r1[1:3]
 
 
 
-    [{'timestampNumber': 10,
+    [{'timestampNumber': 1,
       'modelVersion': 1,
-      'classes': [{'name': 'blanc', 'color': '00000000'},
-       {'name': 'no class', 'color': '00000000'},
+      'classes': [{'name': 'mask', 'color': 'ffffffff'},
        {'name': 'disturbance', 'color': 'ff0000ff'},
-       {'name': 'mask', 'color': 'ffffffff'}]},
-     {'timestampNumber': 9,
+       {'name': 'no class', 'color': '00000000'},
+       {'name': 'blanc', 'color': '00000000'}]},
+     {'timestampNumber': 2,
       'modelVersion': 1,
-      'classes': [{'name': 'blanc', 'color': '00000000'},
-       {'name': 'no class', 'color': '00000000'},
+      'classes': [{'name': 'mask', 'color': 'ffffffff'},
        {'name': 'disturbance', 'color': 'ff0000ff'},
-       {'name': 'mask', 'color': 'ffffffff'}]}]
+       {'name': 'no class', 'color': '00000000'},
+       {'name': 'blanc', 'color': '00000000'}]}]
 
 
 
@@ -365,7 +362,7 @@ print([ cl['name'] for cl in r1[0]['classes']])
 print([ index['name'] for index in r2[0]['indices']])
 ```
 
-    ['blanc', 'no class', 'disturbance', 'mask']
+    ['mask', 'disturbance', 'no class', 'blanc']
     ['NDVI', 'NDWI']
 
 
@@ -435,7 +432,7 @@ r
 
 
 
-    {'count': 7, 'ids': [4, 2, 1, 3, 5, 6, 7]}
+    {'count': 7, 'ids': [1, 2, 3, 4, 5, 6, 7]}
 
 
 
@@ -453,7 +450,7 @@ r
 
 
 
-    {'count': 2, 'ids': [4, 1]}
+    {'count': 2, 'ids': [1, 4]}
 
 
 
@@ -881,7 +878,7 @@ There are three queries available for land cover classes on predefined polygons 
 
 ```python
 r = requests.post(url + '/data/class/polygon/polygonIds',
-                 json = {"mapId":  mapId, 'timestamp':1, 'polygonIds': [1,5,4] })
+                 json = {"mapId":  mapId, 'timestamp':6, 'polygonIds': [1] })
 r = pd.read_csv(StringIO(r.text))
 r
 ```
@@ -920,28 +917,10 @@ r
       <th>0</th>
       <td>1</td>
       <td>0.0</td>
-      <td>3.582</td>
-      <td>19.941</td>
-      <td>15.135</td>
+      <td>7.779</td>
+      <td>0.591</td>
+      <td>30.288</td>
       <td>38.658</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>4</td>
-      <td>0.0</td>
-      <td>3.657</td>
-      <td>20.714</td>
-      <td>14.863</td>
-      <td>39.235</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>5</td>
-      <td>0.0</td>
-      <td>0.331</td>
-      <td>0.094</td>
-      <td>0.354</td>
-      <td>0.778</td>
     </tr>
   </tbody>
 </table>
@@ -958,7 +937,7 @@ Secondly, we can request all timestamps for a particular polygon.
 
 ```python
 r = requests.post(url + '/data/class/polygon/timestamps',
-                 json = {"mapId":  mapId, 'polygonId':4})
+                 json = {"mapId":  mapId, 'polygonId':3})
 r = pd.read_csv(StringIO(r.text))
 r
 ```
@@ -999,10 +978,10 @@ r
       <th>0</th>
       <td>0</td>
       <td>0.0</td>
-      <td>1.450</td>
-      <td>35.478</td>
-      <td>2.307</td>
-      <td>39.235</td>
+      <td>0.978</td>
+      <td>7.760</td>
+      <td>1.217</td>
+      <td>9.955</td>
       <td>2018-01-01</td>
       <td>2018-01-15</td>
     </tr>
@@ -1010,10 +989,10 @@ r
       <th>1</th>
       <td>1</td>
       <td>0.0</td>
-      <td>3.657</td>
-      <td>20.714</td>
-      <td>14.863</td>
-      <td>39.235</td>
+      <td>3.195</td>
+      <td>2.914</td>
+      <td>3.846</td>
+      <td>9.955</td>
       <td>2018-02-01</td>
       <td>2018-02-15</td>
     </tr>
@@ -1021,10 +1000,10 @@ r
       <th>2</th>
       <td>2</td>
       <td>0.0</td>
-      <td>3.657</td>
-      <td>20.574</td>
-      <td>15.004</td>
-      <td>39.235</td>
+      <td>3.200</td>
+      <td>2.701</td>
+      <td>4.055</td>
+      <td>9.955</td>
       <td>2018-03-01</td>
       <td>2018-03-15</td>
     </tr>
@@ -1032,10 +1011,10 @@ r
       <th>3</th>
       <td>3</td>
       <td>0.0</td>
-      <td>3.657</td>
-      <td>20.574</td>
-      <td>15.004</td>
-      <td>39.235</td>
+      <td>3.194</td>
+      <td>2.584</td>
+      <td>4.178</td>
+      <td>9.955</td>
       <td>2018-04-01</td>
       <td>2018-04-15</td>
     </tr>
@@ -1043,10 +1022,10 @@ r
       <th>4</th>
       <td>4</td>
       <td>0.0</td>
-      <td>3.657</td>
-      <td>20.574</td>
-      <td>15.004</td>
-      <td>39.235</td>
+      <td>3.367</td>
+      <td>1.879</td>
+      <td>4.709</td>
+      <td>9.955</td>
       <td>2018-05-01</td>
       <td>2018-05-15</td>
     </tr>
@@ -1054,10 +1033,10 @@ r
       <th>5</th>
       <td>5</td>
       <td>0.0</td>
-      <td>4.015</td>
-      <td>15.391</td>
-      <td>19.829</td>
-      <td>39.235</td>
+      <td>3.367</td>
+      <td>1.879</td>
+      <td>4.709</td>
+      <td>9.955</td>
       <td>2018-06-01</td>
       <td>2018-06-15</td>
     </tr>
@@ -1065,10 +1044,10 @@ r
       <th>6</th>
       <td>6</td>
       <td>0.0</td>
-      <td>5.569</td>
-      <td>1.304</td>
-      <td>32.362</td>
-      <td>39.235</td>
+      <td>3.787</td>
+      <td>0.320</td>
+      <td>5.848</td>
+      <td>9.955</td>
       <td>2018-07-01</td>
       <td>2018-07-15</td>
     </tr>
@@ -1076,10 +1055,10 @@ r
       <th>7</th>
       <td>7</td>
       <td>0.0</td>
-      <td>5.624</td>
-      <td>0.041</td>
-      <td>33.570</td>
-      <td>39.235</td>
+      <td>3.881</td>
+      <td>0.000</td>
+      <td>6.074</td>
+      <td>9.955</td>
       <td>2018-08-01</td>
       <td>2018-08-15</td>
     </tr>
@@ -1087,10 +1066,10 @@ r
       <th>8</th>
       <td>8</td>
       <td>0.0</td>
-      <td>5.759</td>
+      <td>3.687</td>
       <td>0.000</td>
-      <td>33.476</td>
-      <td>39.235</td>
+      <td>6.268</td>
+      <td>9.955</td>
       <td>2018-09-01</td>
       <td>2018-09-15</td>
     </tr>
@@ -1098,10 +1077,10 @@ r
       <th>9</th>
       <td>9</td>
       <td>0.0</td>
-      <td>6.076</td>
+      <td>3.848</td>
       <td>0.000</td>
-      <td>33.159</td>
-      <td>39.235</td>
+      <td>6.107</td>
+      <td>9.955</td>
       <td>2018-10-01</td>
       <td>2018-10-15</td>
     </tr>
@@ -1109,10 +1088,10 @@ r
       <th>10</th>
       <td>10</td>
       <td>0.0</td>
-      <td>6.298</td>
+      <td>3.956</td>
       <td>0.000</td>
-      <td>32.937</td>
-      <td>39.235</td>
+      <td>5.999</td>
+      <td>9.955</td>
       <td>2018-11-01</td>
       <td>2018-11-15</td>
     </tr>
@@ -1120,10 +1099,10 @@ r
       <th>11</th>
       <td>11</td>
       <td>0.0</td>
-      <td>6.219</td>
+      <td>3.758</td>
       <td>0.000</td>
-      <td>33.016</td>
-      <td>39.235</td>
+      <td>6.197</td>
+      <td>9.955</td>
       <td>2018-12-01</td>
       <td>2018-12-15</td>
     </tr>
@@ -1266,7 +1245,7 @@ There are two requests we can make for standard tiles. First off we can request 
 
 ```python
 r = requests.post(url + '/data/class/tile/tileIds',
-                 json = {"mapId":  mapId, 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959},{'tileX':5691,'tileY':7960, 'zoom':14},{'tileX':5692,'tileY':7959, 'zoom':14}]})
+                 json = {"mapId":  mapId, 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959, 'zoom':14},{'tileX':5691,'tileY':7960, 'zoom':14},{'tileX':5692,'tileY':7959, 'zoom':14}]})
 
 r = pd.read_csv(StringIO(r.text))
 r.head(10)
@@ -1836,7 +1815,7 @@ Let's start with requesting all spectral indices for some polygons at a certain 
 
 ```python
 r = requests.post(url + '/data/spectral/polygon/polygonIds',
-                 json = {"mapId":  mapId, 'timestamp':1, 'polygonIds': [1,5,4], 'class': 'disturbance' })
+                 json = {"mapId":  mapId, 'timestamp':4, 'polygonIds': [3,2], 'class': 'disturbance' })
 r = pd.read_csv(StringIO(r.text))
 r
 ```
@@ -1872,27 +1851,19 @@ r
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
-      <td>0.990</td>
-      <td>0.506</td>
-      <td>0.530</td>
-      <td>38.658</td>
+      <td>2</td>
+      <td>0.998</td>
+      <td>0.238</td>
+      <td>0.351</td>
+      <td>5.312</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>4</td>
-      <td>0.996</td>
-      <td>0.469</td>
-      <td>0.594</td>
-      <td>39.235</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>5</td>
-      <td>1.000</td>
-      <td>0.632</td>
-      <td>0.120</td>
-      <td>0.778</td>
+      <td>3</td>
+      <td>0.958</td>
+      <td>0.392</td>
+      <td>0.447</td>
+      <td>9.955</td>
     </tr>
   </tbody>
 </table>
@@ -2255,6 +2226,7 @@ r.head(10)
       <th>NDVI</th>
       <th>NDWI</th>
       <th>area</th>
+      <th>cloud_cover</th>
       <th>date_from</th>
       <th>date_to</th>
     </tr>
@@ -2266,6 +2238,7 @@ r.head(10)
       <td>1.0</td>
       <td>0.660</td>
       <td>5.902</td>
+      <td>0.24</td>
       <td>2018-02-01</td>
       <td>2018-02-15</td>
     </tr>
@@ -2275,6 +2248,7 @@ r.head(10)
       <td>1.0</td>
       <td>0.659</td>
       <td>5.902</td>
+      <td>0.71</td>
       <td>2018-03-01</td>
       <td>2018-03-15</td>
     </tr>
@@ -2284,6 +2258,7 @@ r.head(10)
       <td>1.0</td>
       <td>0.569</td>
       <td>5.902</td>
+      <td>0.00</td>
       <td>2018-08-01</td>
       <td>2018-08-15</td>
     </tr>
@@ -2293,6 +2268,7 @@ r.head(10)
       <td>1.0</td>
       <td>0.511</td>
       <td>5.902</td>
+      <td>0.04</td>
       <td>2018-10-01</td>
       <td>2018-10-15</td>
     </tr>
@@ -2302,6 +2278,7 @@ r.head(10)
       <td>1.0</td>
       <td>0.506</td>
       <td>5.902</td>
+      <td>0.49</td>
       <td>2018-11-01</td>
       <td>2018-11-15</td>
     </tr>
@@ -2395,7 +2372,7 @@ r.plot()
 
 
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f4c1261a3c8>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f13c6e50320>
 
 
 
@@ -2424,7 +2401,7 @@ plt.imshow(img)
 
 
 
-    <matplotlib.image.AxesImage at 0x7f4c15ea8a20>
+    <matplotlib.image.AxesImage at 0x7f31ce78bac8>
 
 
 

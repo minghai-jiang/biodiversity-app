@@ -47,10 +47,18 @@ mapId
 ```
 
 
+    ---------------------------------------------------------------------------
+
+    IndexError                                Traceback (most recent call last)
+
+    <ipython-input-3-bf54c3cc8f4a> in <module>
+          1 r = requests.get(url + 'account/myMaps')
+          2 r = r.json()
+    ----> 3 mapId = [map['uuid'] for map in r if map['name'] == 'Netherlands plots'][0]
+          4 mapId
 
 
-    '875b79be-4963-4602-9e46-b3a091f1335e'
-
+    IndexError: list index out of range
 
 
 Let's see what timestamps are available for this map.
@@ -63,18 +71,6 @@ r = requests.post(url + 'metadata/timestamps',
 r = r.json()
 r
 ```
-
-
-
-
-    [{'timestampNumber': 0,
-      'dateFrom': '2018-05-07T00:00:00.000Z',
-      'dateTo': '2018-05-12T00:00:00.000Z'},
-     {'timestampNumber': 1,
-      'dateFrom': '2018-05-27T00:00:00.000Z',
-      'dateTo': '2018-06-01T00:00:00.000Z'}]
-
-
 
 ## What plots have recently been mowed?
 
