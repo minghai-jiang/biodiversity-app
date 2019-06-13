@@ -1,15 +1,13 @@
 
-The Chaco in Paraguay is a large sparsely habited area of about 150.000 square kilometers. The vast amount of forests make the Chaco of enourmous ecological value. Unfortunately much of this forest is dissapearing in an unpresedented rate.
+The Chaco in Paraguay is a large sparsely habited area of about 150.000 square kilometers. The vast amount of forests make the Chaco of enourmous ecological value. Unfortunately much of this forest is dissapearing at an unpresedented rate.
 
-This notebook invastigates deforestation in northern Paraguay in recent years. Using the Ellipsis API it tackles some of the monitoring chalanges. We will be looking at deforestation within registered reserves, within permit areas and within areas for which no status is known.
+This notebook invastigates deforestation in northern Paraguay in recent years. Using the Ellipsis API it tackles some of the monitoring challanges. We will specifically be looking at deforestation that took place within reserves. That is to say deforestation taking place in areas where it is explicitely prohibited.
 
-The acquisition of the data has been paid for and made publicly available by IUCN the Netherlands comittee.
+The acquisition of the data has been paid for and made publicly available by IUCN the Netherlands comittee and Guyra Paraguay.
 
-## Setting things up
+## Programming a deforestation alert bot
 
-In this notebook we shall analyse the public 'Chaco Demo' map. This map contains 3 classes forest, natural shrubland and other. Furthermore it contains an NDVI index.
-
-Information has been aggregated to predefined polygons that can either be nature reserves or area designated for deforestation.
+Using python and the Ellipsis API we will write a bot program identifying all reserves that have suffered forest loss. The bot will request the total surface area of non-forest in all reserves at 1 july 2018 and flag all situations in which the total non-forest area seems suspicious.
 
 We will be requiring the following python packages
 
@@ -29,9 +27,7 @@ from io import BytesIO
 from io import StringIO
 ```
 
-Furthermore we are going to use some of the utility functions defined in the Appendix notebook.
-
-Now let's save the url that we need in a varialbe to shorten our code further on.
+Now let's save the url that we need in a variable to shorten our code at a later stage.
 
 
 ```python
@@ -44,93 +40,136 @@ Lastly we store the id of the chaco_demo map in a variable as well.
 ```python
 r = requests.get(url + 'account/myMaps')
 r = r.json()
-mapId = [map['uuid'] for map in r if map['name'] == 'Chaco Demo'][0]
+mapId = [map['uuid'] for map in r if map['name'] == 'Gran Chaco'][0]
 mapId
 ```
 
 
 
 
-    'f7f5ae51-1ff6-4e8b-98e0-37f5d0a97cb7'
+    '6b696129-659a-4cf4-8dd6-2cf0642f58db'
 
 
 
-## Deforestation in areas that have been marked as reserves
-
-Reserves are designated areas in which no deforestation may take place. To check if indeed no deforestation has taken place here we compare suface areas of the land cover clases of these polygons at two different tiemstamps. Say 7 and 26.
+Next we should request the available timestamps for this map.
 
 
 ```python
-t1 = 7
-t2 = 26
+r = requests.post(url + 'metadata/timestamps',
+                 json = {"mapId":  mapId })
+
+r = r.json()
+r
 ```
 
-Next we should request all id's of polygons in the 'reserve' layer.
+
+
+
+    [{'timestampNumber': 0,
+      'dateFrom': '2016-07-01T00:00:00.000Z',
+      'dateTo': '2016-07-31T00:00:00.000Z'},
+     {'timestampNumber': 1,
+      'dateFrom': '2016-11-01T00:00:00.000Z',
+      'dateTo': '2016-12-01T00:00:00.000Z'},
+     {'timestampNumber': 2,
+      'dateFrom': '2017-01-01T00:00:00.000Z',
+      'dateTo': '2017-01-31T00:00:00.000Z'},
+     {'timestampNumber': 3,
+      'dateFrom': '2017-04-01T00:00:00.000Z',
+      'dateTo': '2017-05-01T00:00:00.000Z'},
+     {'timestampNumber': 4,
+      'dateFrom': '2017-07-01T00:00:00.000Z',
+      'dateTo': '2017-07-31T00:00:00.000Z'},
+     {'timestampNumber': 5,
+      'dateFrom': '2017-10-01T00:00:00.000Z',
+      'dateTo': '2017-10-31T00:00:00.000Z'},
+     {'timestampNumber': 6,
+      'dateFrom': '2018-01-01T00:00:00.000Z',
+      'dateTo': '2018-01-31T00:00:00.000Z'},
+     {'timestampNumber': 7,
+      'dateFrom': '2018-04-01T00:00:00.000Z',
+      'dateTo': '2018-05-01T00:00:00.000Z'},
+     {'timestampNumber': 8,
+      'dateFrom': '2018-07-01T00:00:00.000Z',
+      'dateTo': '2018-07-31T00:00:00.000Z'}]
+
+
+
+Let save the highest, and therefore most recent, timestamp into a variable.
+
+
+```python
+max_timestamp = len(r)
+```
+
+Having done this, we request all the id's of reserves.
 
 
 ```python
 r = requests.post(url + 'metadata/polygons',
-                 json = {"mapId":  mapId, 'layer': 'reserve' })
+                 json = {"mapId":  mapId, 'layer': 'Areas bosque Paraguay' })
 
 ids = r.json()['ids']
 ```
 
-There is a max of 3000 polygons per request, so let's use the chunks function from the Appendix to split up the id array into chunks of no more than 3000.
+A long list of almost 80.000 polygons! There is a max of 3000 polygons per request, so we will need to use chunks to make this work. We shall be using the chunks function from the Appendix to do so.
+
+
+```python
+import math
+def chunks(l, n = 3000):
+    result = list()
+    for i in range(0, len(l), n):
+        result.append(l[i:i+n])
+    return(result)
+```
 
 
 ```python
 ids_chunks = chunks(ids, 3000)
 ```
 
-Now we are ready to request all data and geometries of the reserves using their id's.
+Now we are ready to obtain the total deforested surface area of all reserves. We will request the total deforested area for each reserve for all timestamps and take the minimum surface area as the value we were looking for. We do this as the model can make classification mistakes, by multilooking and taking the minimum we counter these one-off mistakes.
 
 
 ```python
-Data_t1 = list()
+Data = list()
 for ids_chunk in ids_chunks:
-    r = requests.post(url + 'data/class/polygon/polygonIds',
-                 json = {"mapId":  mapId, 'timestamp':t1, 'polygonIds': ids_chunk })
-    Data_t1.append(pd.read_csv(StringIO(r.text)))
-Data_t1 = pd.concat(Data_t1)
+    new_data = list()
+    for timestamp in np.arange(max_timestamp):
+        r = requests.post(url + 'data/class/polygon/polygonIds',
+                 json = {"mapId":  mapId, 'timestamp': int(timestamp), 'polygonIds': ids_chunk })
+        new_data.append(pd.read_csv(StringIO(r.text)))
         
-Data_t2 = list()
-for ids_chunk in ids_chunks:
-    r = requests.post(url + 'data/class/polygon/polygonIds',
-                 json = {"mapId":  mapId, 'timestamp':t2, 'polygonIds': ids_chunk })
-    Data_t2.append(pd.read_csv(StringIO(r.text)))
-Data_t2 = pd.concat(Data_t2)
-
-geometries = list()
-for ids_chunk in ids_chunks:
-    r = requests.post(url + 'geometry/polygons',
-                 json = {"mapId":  mapId, 'polygonIds':ids_chunk})
-
-    geometries.append(gpd.GeoDataFrame.from_features(r.json()['features']))
-geometries = pd.concat(geometries)
-
-Data = Data_t1.merge(Data_t2, on = 'id')
-reserves = geometries.merge(Data, on = 'id')
-
+    deforested = [x['no class'].values for x in new_data]
+    deforested = np.minimum.reduce(deforested)
+        
+    new_data = pd.DataFrame({'id':new_data[0]['id'].values, 'area':new_data[0]['area'].values, 'deforested':deforested})
+    
+    Data.append(new_data)
+Data = pd.concat(Data)
 ```
 
-We now subtract the amount of forestcover from the first and last timestamp to get the amount of deforestation. We create a table with a row for each reserve and as it's columns the polygon id and, the total and relative deforested area, toghether with some metadata.
+Now let's select all reserves in which more than 0.5 km2 is non-forest.
 
 
 ```python
-reserves['deforested'] = reserves['no class_x'].values - reserves['no class_y'].values 
-reserves['relative_deforestation'] = np.divide(reserves['deforested'].values, reserves['area_x'].values)
+Data_sub = Data.loc[Data['deforested'] > 0.5]
 ```
 
-    /home/daniel/.local/lib/python3.6/site-packages/ipykernel_launcher.py:2: RuntimeWarning: invalid value encountered in true_divide
-      
-
-
-Now let's have a look at the top fifteen reserves in which forest has dissapeard.
+Let's only consider cases in which the reserve area is larger than 5km2
 
 
 ```python
-reserves=reserves.sort_values(by = ['deforested'], ascending  = False)
-reserves[['id', 'deforested', 'relative_deforestation', 'area_x', 'owner']].head(n = 15)
+Data_sub = Data_sub.loc[Data_sub['area'] > 5 ]
+```
+
+Now let's have a loot at the resereves we are now left with.
+
+
+```python
+Data_sub['id'] = [int(id) for id in Data_sub['id'].values]
+Data_sub.sort_values(by = 'deforested', ascending  = False).head(30)
 ```
 
 
@@ -155,138 +194,228 @@ reserves[['id', 'deforested', 'relative_deforestation', 'area_x', 'owner']].head
     <tr style="text-align: right;">
       <th></th>
       <th>id</th>
+      <th>area</th>
       <th>deforested</th>
-      <th>relative_deforestation</th>
-      <th>area_x</th>
-      <th>owner</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>1314</th>
-      <td>30499</td>
-      <td>18.309929</td>
-      <td>0.567011</td>
-      <td>32.292</td>
-      <td>SEAM</td>
+      <th>2220</th>
+      <td>92200</td>
+      <td>45.132</td>
+      <td>33.263</td>
     </tr>
     <tr>
-      <th>4832</th>
-      <td>34017</td>
-      <td>16.697553</td>
-      <td>0.761784</td>
-      <td>21.919</td>
-      <td>ASEMIDEI</td>
+      <th>2033</th>
+      <td>59013</td>
+      <td>40.781</td>
+      <td>30.494</td>
     </tr>
     <tr>
-      <th>8012</th>
-      <td>37197</td>
-      <td>4.360079</td>
-      <td>0.690432</td>
-      <td>6.315</td>
-      <td>GLOPEZ</td>
+      <th>279</th>
+      <td>45259</td>
+      <td>52.877</td>
+      <td>29.376</td>
     </tr>
     <tr>
-      <th>5726</th>
-      <td>34911</td>
-      <td>4.093578</td>
-      <td>0.026805</td>
-      <td>152.716</td>
-      <td>JGONZALEZ</td>
+      <th>991</th>
+      <td>72971</td>
+      <td>45.647</td>
+      <td>27.502</td>
     </tr>
     <tr>
-      <th>1793</th>
-      <td>30978</td>
-      <td>3.799778</td>
-      <td>0.398008</td>
-      <td>9.547</td>
-      <td>WCABALLERO</td>
+      <th>705</th>
+      <td>87685</td>
+      <td>59.407</td>
+      <td>26.034</td>
     </tr>
     <tr>
-      <th>1824</th>
-      <td>31009</td>
-      <td>3.705251</td>
-      <td>0.666532</td>
-      <td>5.559</td>
-      <td>WCABALLERO</td>
+      <th>725</th>
+      <td>87705</td>
+      <td>59.407</td>
+      <td>26.034</td>
     </tr>
     <tr>
-      <th>3379</th>
-      <td>32564</td>
-      <td>3.449872</td>
-      <td>0.290540</td>
-      <td>11.874</td>
-      <td>ASEMIDEI</td>
+      <th>800</th>
+      <td>72780</td>
+      <td>39.197</td>
+      <td>25.805</td>
     </tr>
     <tr>
-      <th>3378</th>
-      <td>32563</td>
-      <td>2.891744</td>
-      <td>0.199817</td>
-      <td>14.472</td>
-      <td>ASEMIDEI</td>
+      <th>1788</th>
+      <td>115768</td>
+      <td>34.383</td>
+      <td>22.166</td>
     </tr>
     <tr>
-      <th>1755</th>
-      <td>30940</td>
-      <td>2.808007</td>
-      <td>0.852461</td>
-      <td>3.294</td>
-      <td>DINSFRAN</td>
+      <th>2451</th>
+      <td>68431</td>
+      <td>34.383</td>
+      <td>22.166</td>
     </tr>
     <tr>
-      <th>4031</th>
-      <td>33216</td>
-      <td>2.415253</td>
-      <td>0.239894</td>
-      <td>10.068</td>
-      <td>DINSFRAN</td>
+      <th>1854</th>
+      <td>55834</td>
+      <td>22.229</td>
+      <td>17.331</td>
     </tr>
     <tr>
-      <th>143</th>
-      <td>29328</td>
-      <td>2.285814</td>
-      <td>0.049057</td>
-      <td>46.595</td>
-      <td>GLOPEZ</td>
+      <th>1433</th>
+      <td>118413</td>
+      <td>36.178</td>
+      <td>16.958</td>
     </tr>
     <tr>
-      <th>112</th>
-      <td>29297</td>
-      <td>2.285814</td>
-      <td>0.049057</td>
-      <td>46.595</td>
-      <td>GLOPEZ</td>
+      <th>2003</th>
+      <td>91983</td>
+      <td>18.325</td>
+      <td>15.230</td>
     </tr>
     <tr>
-      <th>4604</th>
-      <td>33789</td>
-      <td>2.115028</td>
-      <td>0.859418</td>
-      <td>2.461</td>
-      <td>JGONZALEZ</td>
+      <th>456</th>
+      <td>93436</td>
+      <td>22.125</td>
+      <td>15.218</td>
     </tr>
     <tr>
-      <th>5703</th>
-      <td>34888</td>
-      <td>1.964400</td>
-      <td>0.019132</td>
-      <td>102.674</td>
-      <td>ARECALDE</td>
+      <th>2239</th>
+      <td>92219</td>
+      <td>19.734</td>
+      <td>15.031</td>
     </tr>
     <tr>
-      <th>7178</th>
-      <td>36363</td>
-      <td>1.876226</td>
-      <td>0.043072</td>
-      <td>43.560</td>
-      <td>CMARTINEZ</td>
+      <th>2351</th>
+      <td>92331</td>
+      <td>23.381</td>
+      <td>14.776</td>
+    </tr>
+    <tr>
+      <th>243</th>
+      <td>93223</td>
+      <td>24.285</td>
+      <td>14.214</td>
+    </tr>
+    <tr>
+      <th>1029</th>
+      <td>73009</td>
+      <td>18.452</td>
+      <td>13.590</td>
+    </tr>
+    <tr>
+      <th>356</th>
+      <td>114336</td>
+      <td>18.452</td>
+      <td>13.590</td>
+    </tr>
+    <tr>
+      <th>1305</th>
+      <td>58285</td>
+      <td>33.591</td>
+      <td>13.550</td>
+    </tr>
+    <tr>
+      <th>1603</th>
+      <td>94583</td>
+      <td>18.628</td>
+      <td>12.861</td>
+    </tr>
+    <tr>
+      <th>2009</th>
+      <td>91989</td>
+      <td>33.396</td>
+      <td>12.586</td>
+    </tr>
+    <tr>
+      <th>1346</th>
+      <td>79326</td>
+      <td>20.994</td>
+      <td>12.577</td>
+    </tr>
+    <tr>
+      <th>293</th>
+      <td>84273</td>
+      <td>26.191</td>
+      <td>12.350</td>
+    </tr>
+    <tr>
+      <th>2027</th>
+      <td>77007</td>
+      <td>26.191</td>
+      <td>12.350</td>
+    </tr>
+    <tr>
+      <th>177</th>
+      <td>108157</td>
+      <td>27.075</td>
+      <td>12.339</td>
+    </tr>
+    <tr>
+      <th>161</th>
+      <td>48141</td>
+      <td>38.709</td>
+      <td>12.164</td>
+    </tr>
+    <tr>
+      <th>2611</th>
+      <td>74591</td>
+      <td>26.902</td>
+      <td>12.044</td>
+    </tr>
+    <tr>
+      <th>1576</th>
+      <td>55556</td>
+      <td>20.706</td>
+      <td>11.854</td>
+    </tr>
+    <tr>
+      <th>1942</th>
+      <td>61922</td>
+      <td>24.145</td>
+      <td>11.200</td>
+    </tr>
+    <tr>
+      <th>2337</th>
+      <td>110317</td>
+      <td>31.271</td>
+      <td>10.782</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
+
+We found that about a 1000 of the 80.000 reserves seem to have sufered deforestation in some form. Let us now retrieve the polygons of these reserves to continue our analysis.
+
+
+```python
+r = requests.post(url + 'geometry/polygons',
+                 json = {"mapId":  mapId, 'polygonIds':list(Data_sub['id']) })
+r.json()
+r  = gpd.GeoDataFrame.from_features(r.json()['features'])
+```
+
+We finish by merging our deforestation data with this shape.
+
+
+```python
+r['id'] = [int(id) for id in r['id'].values]
+test = r.merge(Data_sub, on  = ['id'])
+test.plot()
+```
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f733bb9bc50>
+
+
+
+
+![png](output_28_1.png)
+
+
+## Looking at a specific case
 
 Let's focus on polygon 29236 and check what is going on here. First we retrieve it's geometry.
 
@@ -320,7 +449,7 @@ plt.imshow(img)
 
 
 
-![png](output_25_2.png)
+![png](output_33_2.png)
 
 
 
@@ -345,254 +474,7 @@ plt.imshow(img)
 
 
 
-![png](output_26_2.png)
+![png](output_34_2.png)
 
 
-Yes there has indeed been some deforestation in the lower right corner there. Let's now have a look when this occured. To this end we request a timeserie of this particular polygon.
-
-
-```python
-r = requests.post(url + 'data/class/polygon/timestamps',
-                 data = {"mapId":  mapId, 'polygonId':[polyId] })
-
-r = pd.read_csv(StringIO(r.text))
-r = r.loc[ (r['blanc'] + r['mask']) == 0 ]
-
-plt.plot(np.arange(r.shape[0]), (r['forest'].values + r['other'].values ) )
-plt.ylabel('forest cover')
-plt.xlabel('date')
-plt.xticks(np.arange(r.shape[0]), r['date_to'].values, rotation='vertical')
-plt.title('forest cover on polygon 29236')
-plt.show()
-```
-
-
-![png](output_28_0.png)
-
-
-It looks like the deforestation took place in august and september of 2016.
-
-## Tracking legal deforestation
-
-Now let's turn ou attention to the areas in which licences to cut down forest have been granted. In this example we will be analysing how much forest there is in these areas and at what rate it is dissapearing.
-
-To this end we compare the landcover of all permit polygons in october 2016 and 2018.
-
-
-```python
-t1= 5
-t2 = 20
-```
-
-First we request all landcover information and geometries of these polygons from the Ellipsis-API for both timestamps.
-
-
-```python
-r = requests.post(url + 'metadata/polygons',
-                 json = {"mapId":  mapId, 'layer': 'permited' })
-
-ids = r.json()['ids']
-
-ids_chunks = chunks(ids, 3000)
-
-Data_t1 = list()
-for ids_chunk in ids_chunks:
-    r = requests.post(url + 'data/class/polygon/polygonIds',
-                 json = {"mapId":  mapId, 'timestamp':t1, 'polygonIds': ids_chunk })
-    Data_t1.append(pd.read_csv(StringIO(r.text)))
-Data_t1 = pd.concat(Data_t1)
-        
-Data_t2 = list()
-for ids_chunk in ids_chunks:
-    r = requests.post(url + 'data/class/polygon/polygonIds',
-                 json = {"mapId":  mapId, 'timestamp':t2, 'polygonIds': ids_chunk })
-    Data_t2.append(pd.read_csv(StringIO(r.text)))
-Data_t2 = pd.concat(Data_t2)
-
-geometries = list()
-for ids_chunk in ids_chunks:
-    r = requests.post(url + 'geometry/polygons',
-                 json = {"mapId":  mapId, 'polygonIds':ids_chunk})
-
-    geometries.append(gpd.GeoDataFrame.from_features(r.json()['features']))
-geometries = pd.concat(geometries)
-
-Data = Data_t1.merge(Data_t2, on = 'id')
-permits = geometries.merge(Data, on = 'id')
-
-```
-
-Based on this information we make a pi-plot of the total landcover for both of these timestamps.
-
-
-```python
-# Data to plot
-labels = ['deforested', 'shrub savana', 'forest']
-sizes = [permits['no class_x'].sum(),permits['other_x'].sum(), permits['forest_x'].sum()]
-colors = ['red', 'lightgreen', 'green']
-explode = (0.05, 0.05, 0.05)
-# Plot
-plt.pie(sizes, labels=labels, explode = explode, colors=colors,autopct='%1.1f%%')
-plt.title('landcover of permit areas august 2016')
-plt.axis('equal')
-plt.show()
-
-
-# Data to plot
-labels = ['deforested', 'shrub savana', 'forest']
-sizes = [permits['no class_y'].sum(),permits['other_y'].sum(), permits['forest_y'].sum()]
-colors = ['red', 'lightgreen', 'green']
-explode = (0.05, 0.05, 0.05)
-# Plot
-plt.pie(sizes, labels=labels, explode = explode, colors=colors,autopct='%1.1f%%')
-plt.title('landcover of permit areas august 2017')
-plt.axis('equal')
-plt.show()
-
-```
-
-
-![png](output_36_0.png)
-
-
-
-![png](output_36_1.png)
-
-
-By the looks of it most forest in these areas is already cut down. Forest over the last year has droped somewhat but not staggering. Interesting is the fact that savana seems to be increasing. Maybe some of the deforested areas are getting overgrown by more natural vegetation.
-
-## Getting a grasp on how much forest is disappearing
-
-In this example we track the total amount of forest cover in the province Filadelfia from 2016 to 2019.
-
-
-```python
-poly_id = 6
-
-r = requests.post(url + 'data/class/polygon/timestamps',
-                 json = {"mapId":  mapId, 'polygonId': poly_id})
-
-r = pd.read_csv(StringIO(r.text))
-r = r.loc[ (r['blanc'] + r['mask']) == 0 ]
-
-plt.plot(np.arange(r.shape[0]), (r['forest'].values + r['other'].values  ))
-plt.ylabel('forest cover')
-plt.xlabel('date')
-plt.xticks(np.arange(r.shape[0]), r['date_to'].values, rotation='vertical')
-plt.title('forest cover in Filadelfia')
-plt.show()
-```
-
-
-![png](output_40_0.png)
-
-
-## Tracking unclear deforestation
-
-One of the big issues with monitoring deforestation in Paraguay is that of most areas there is no known regulation. Much of the natural areas are neither contained in a reserve nor within a permit area. Deforestatioin in these places is hard to interpret.
-
-In this section we have a look how much forest dissapears under unclear circumstances. We will compare the forest cover of the province Filadelfia in august 2016 and 2017.
-
-
-```python
-t1 = 7
-t2= 18
-polyId = 6
-```
-
-First we retrieve all standard tiles covering Filadelfia district for both august 2016 and 2017.
-
-
-```python
-r = requests.post(url + 'data/class/polygon/tiles',
-                 data = {"mapId":  mapId, 'polygonId':polyId, 'timestamp': t1 })
-filadelfia1 = pd.read_csv(StringIO(r.text))
-
-
-r = requests.post(url + 'data/class/polygon/tiles',
-                 data = {"mapId":  mapId, 'polygonId':polyId, 'timestamp': t2 })
-filadelfia2 = pd.read_csv(StringIO(r.text))
-
-filadelfia1 = filadelfia1.rename(columns = {'no class': 'no class 1', 'forest': 'forest 1', 'other': 'other 1'})
-filadelfia2 = filadelfia2.rename(columns = {'no class': 'no class 2', 'forest': 'forest 2', 'other': 'other 2'})
-
-filadelfia2 = filadelfia2[['tileX', 'tileY', 'no class 2', 'forest 2', 'other 2']]
-filadelfia = filadelfia1.merge(filadelfia2, on = ['tileX', 'tileY'])
-
-
-filadelfia = filadelfia[['tileX', 'tileY', 'forest 1', 'forest 2', 'other 1', 'other 2', 'no class 1', 'no class 2']]
-```
-
-By subtracting the landcover surface areas we get the deforestation. We filter out all tiles in which more than 2 square kilometers of forest has been cut down.
-
-
-```python
-filadelfia['deforested'] = filadelfia['no class 2'] - filadelfia['no class 1']
-filadelfia = filadelfia.sort_values('deforested', ascending = False)
-filadelfia = filadelfia.loc[filadelfia['deforested']> 2]
-```
-
-Let's retrieve the geometry of these tiles from the API and plot them on a background map.
-
-
-```python
-tiles = [dict( [('tileX', list(filadelfia['tileX'])[i]), ('tileY', list(filadelfia['tileY'])[i])] ) for i in np.arange(filadelfia.shape[0]) ]
-r = requests.post(url + 'geometry/tiles',
-                 json = {"mapId":  mapId, 'tileIds': tiles, 'timestamp':0})
-
-tiles  = gpd.GeoDataFrame.from_features(r.json()['features'])
-
-r = requests.post(url + 'visual/bounds',
-                 json = {"mapId":  mapId, 'timestampMin':1, 'timestampMax':5, 'layerName':'rgb', 'xMin': tiles.bounds.minx.min() ,'xMax':tiles.bounds.maxx.max(), 'yMin':tiles.bounds.miny.min(), 'yMax':tiles.bounds.maxy.max() })
-
-
-img = mpimg.imread(BytesIO(r.content))
-img = plotPolys(im = img, polys = tiles, xmin =  tiles.bounds.minx.min() ,xmax =  tiles.bounds.maxx.max(),ymin =  tiles.bounds.miny.min(),ymax =  tiles.bounds.maxy.max(), colors = [(1,0,0)])
-
-plt.figure(figsize=(10,10))
-plt.imshow(img)
-```
-
-
-
-
-    <matplotlib.image.AxesImage at 0x7f500ebbad30>
-
-
-
-
-![png](output_49_1.png)
-
-
-Now let's retrieve all areas from the API where deforestation was permited and overlay it with this map.
-
-
-```python
-r = requests.post(url + 'metadata/polygons',
-                 json = {"mapId":  mapId, 'layer': 'reserve','xMin': tiles.bounds.minx.min() ,'xMax':tiles.bounds.maxx.max(), 'yMin':tiles.bounds.miny.min(), 'yMax':tiles.bounds.maxy.max() })
-
-ids = r.json()['ids']
-
-r = requests.post(url + 'geometry/polygons',
-                 json = {"mapId":  mapId, 'polygonIds': ids})
-
-polys = gpd.GeoDataFrame.from_features(r.json()['features'])
-
-img = plotPolys(im = img, polys = polys, xmin =  tiles.bounds.minx.min() ,xmax =  tiles.bounds.maxx.max(),ymin =  tiles.bounds.miny.min(),ymax =  tiles.bounds.maxy.max(), colors = [(0,0,1)])
-
-plt.figure(figsize=(10,10))
-plt.imshow(img)
-```
-
-
-
-
-    <matplotlib.image.AxesImage at 0x7f500ebf6908>
-
-
-
-
-![png](output_51_1.png)
-
-
-As we can see most deforestation takes place under unclear circumstances.
+Yes there has indeed been some deforestation in the lower right corner there.

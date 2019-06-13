@@ -11,11 +11,11 @@ from rasterio.features import rasterize
 
 def plotPolys(polys, xmin,xmax,ymin,ymax, alpha = None, im = None, colors = [(0,0,1)] , column= None):
     polys.crs = {'init': 'epsg:4326'}
-    polys = polys.to_crs({'init': 'epsg:3395'})
+    polys = polys.to_crs({'init': 'epsg:3785'})
     
     bbox = gpd.GeoDataFrame( {'geometry': [Polygon([(xmin,ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])]} )
     bbox.crs = {'init': 'epsg:4326'}
-    bbox = bbox.to_crs({'init': 'epsg:3395'})
+    bbox = bbox.to_crs({'init': 'epsg:3785'})
 
     if str(type(im)) == "<class 'NoneType'>":
         im = np.zeros((1024,1024,4))
