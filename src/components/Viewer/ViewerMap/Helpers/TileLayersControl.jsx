@@ -16,7 +16,7 @@ import L from "leaflet";
 
 const imagesTileLayer = 'images';
 const labelsTileLayer = 'labels';
-const indicesTileLayer = 'indices';
+const images2TileLayer = 'images2';
 //const changesTileLayer = 'changes';
 
 const tileLayerTypes = [ 
@@ -33,8 +33,8 @@ const tileLayerTypes = [
     zIndex: 2000,
   },
   {
-    name: indicesTileLayer, 
-    checked: false,
+    name: images2TileLayer, 
+    checked: true,
     stacking: false,
     zIndex: 3000
   }
