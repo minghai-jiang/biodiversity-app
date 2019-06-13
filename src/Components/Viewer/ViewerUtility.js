@@ -13,11 +13,16 @@ const ViewerUtility = {
   customPolygonLayerZIndex: 1100,
   drawnPpolygonLayerZIndex: 1200,
 
-  dataPaneActions: {
+  dataPaneAction: {
     analyse: 'analyse',
     geomessage: 'geoMessage',
     alterCustomPolygon: 'alter_custom_polygon',
     feed: 'geomessage_feed'
+  },
+
+  dataGraphType: {
+    classes: 'classes',
+    spectralIndices: 'spectral_indices'
   }
 }
 

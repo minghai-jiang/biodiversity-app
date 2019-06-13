@@ -74,7 +74,7 @@ class SelectionPane extends PureComponent {
           variant='outlined' 
           size='small' 
           className='selection-pane-button'
-          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.analyse)}
+          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.analyse)}
           disabled={mapAccessLevel < ApiManager.accessLevels.aggregatedData || !element.hasAggregatedData}
         >
           Analyse
@@ -87,7 +87,7 @@ class SelectionPane extends PureComponent {
           variant='outlined' 
           size='small' 
           className='selection-pane-button'
-          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.geomessage)}
+          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.geomessage)}
           disabled={mapAccessLevel < ApiManager.accessLevels.viewGeoMessages}
         >
           Geomessage
@@ -118,7 +118,7 @@ class SelectionPane extends PureComponent {
             variant='outlined' 
             size='small' 
             className='selection-pane-button'
-            onClick={() => this.onElementActionClick(ViewerUtility.dataPaneActions.alterCustomPolygon)}
+            onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.alterCustomPolygon)}
             disabled={!user || mapAccessLevel < ApiManager.accessLevels.alterOrDeleteCustomPolygons}
           >
             Alter

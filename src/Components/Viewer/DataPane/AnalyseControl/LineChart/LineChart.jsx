@@ -13,71 +13,69 @@ import {
 
 import './react-vis-style.css';
 import './LineChart.css';
+import ViewerUtility from '../../../ViewerUtility';
 
-const NO_DATA_RESULT = 'no data';
-const GRAPH_COLUMN_EXCLUDES = [
-  'no class', 
-  'date_to', 
-  'date_from', 
-  'blanc', 
-  'timestamp', 
-  'area'
-];
+const NO_DATA_RESULT = 'no data\n';
 const DATE_COLUMN_NAME = 'date_to';
 const MASK_COLUMN_NAME = 'mask';
 const BLANC_COLUMN_NAME = 'blanc';
 const NO_CLASS_COLUMN_NAME = 'no class';
+
+const CLOUD_COVER_COLUMN_INFO = {
+  name: 'cloud_cover',
+  color: 'bababaff'
+};
 
 export class LineChart extends PureComponent {
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      classesGraph: null,
-      spectralIndicesGraph: null
+      data: null
     }
   };
 
   componentWillMount = () => {
-    let graphs = this.prepareGraphs();
-    this.setState({ classesGraph: graphs.classes, spectralIndicesGraph: graphs.spectralIndices });
+    let graph = this.prepareGraph();
+    this.setState({ graph: graph });
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.data !== prevProps.data) {
-      let graphs = this.prepareGraphs();
-      this.setState({ classesGraph: graphs.classes, spectralIndicesGraph: graphs.spectralIndices });
+    if (this.props.data !== prevProps.data || this.props.type !== prevProps.type) {
+      let graph = this.prepareGraph();
+      this.setState({ graph: graph });
     }
   }
 
-  prepareGraphs = () => {
-
+  prepareGraph = () => {
     let data = this.props.data;
+    let type = this.props.type;
 
-    if (!data) {
+    if (!data || !type) {
       return null;
     }
 
-    let mapClasses = getUniqueLabels(this.props.map.classes, 'classes');
-    let classColumnInfo = mapClasses.filter(x => x.name !== NO_CLASS_COLUMN_NAME && x.name !== BLANC_COLUMN_NAME);    
+    let isSpectralIndices = type === ViewerUtility.dataGraphType.spectralIndices;
 
-    let classesGraph = this.prepareGraphsAux(data.classes, classColumnInfo, false);
-    // let spectralIndicesGraph = this.prepareGraphsAux(data.spectralIndices);
-    let spectralIndicesGraph = null;
-    
-    return {
-      classes: classesGraph,
-      spectralIndices: spectralIndicesGraph
-    };    
-  }
-
-  prepareGraphsAux = (data, columnInfo, isSpectralIndices) => {
     if (data.raw === NO_DATA_RESULT) {
       return (
         <div>
-          No data.
+          No data
         </div>
       );
+    }
+
+    let columnInfo = null;
+
+    if (!isSpectralIndices) {
+      let mapClasses = getUniqueLabels(this.props.map.classes, 'classes');
+      columnInfo = mapClasses.filter(x => x.name !== NO_CLASS_COLUMN_NAME && x.name !== BLANC_COLUMN_NAME);    
+    }
+    else if (type === ViewerUtility.dataGraphType.spectralIndices) {
+      columnInfo = getUniqueLabels(this.props.map.spectralIndices, 'indices');
+    }
+    else {
+      return null;
     }
 
     let adjustedColumnInfo = [];
@@ -93,6 +91,10 @@ export class LineChart extends PureComponent {
         name: columnInfo[i].name,
         color: color
       });
+    }
+
+    if (isSpectralIndices) {
+      adjustedColumnInfo.push(CLOUD_COVER_COLUMN_INFO);
     }
 
     let parsedData = data.parsed;
@@ -123,15 +125,7 @@ export class LineChart extends PureComponent {
         });
       }
 
-      let color = null;
-      if (!isSpectralIndices) {
-        color = adjustedColumnInfo.find(y => y.name === columnName).color;
-      }
-      else {
-
-      }
-
-      color = `#${color}`;
+      let color = `#${adjustedColumnInfo.find(y => y.name === columnName).color}`;
 
       let seriesElement = (
         <LineMarkSeries
@@ -201,7 +195,6 @@ export class LineChart extends PureComponent {
         key={'plot'}
         height={200}
       >
-        {/* {[xAxis, yAxis, ...series]} */}
         {xAxis}
         {yAxis}
         {series}
@@ -209,27 +202,22 @@ export class LineChart extends PureComponent {
       </FlexibleXYPlot>
     );
 
-
-    return graph;    
+    return graph;
   }
 
   render() {
-    if (!this.state.classesGraph) {
-      return null;
-    }
-
-    return this.state.classesGraph;
+    return this.state.graph;
   }
 }
 
-function getUniqueLabels(timestampLabels, type) {
+function getUniqueLabels(timestampLabels, property) {
   let uniqueLabels = [];
 
   for (let i = 0; i < timestampLabels.length; i++) {
     let timestamp = timestampLabels[i];
 
-    for (let x = 0; x < timestamp[type].length; x++) {
-      let label = timestamp[type][x];
+    for (let x = 0; x < timestamp[property].length; x++) {
+      let label = timestamp[property][x];
 
       let uniqueLabel = uniqueLabels.find(y => y.name === label.name);
 

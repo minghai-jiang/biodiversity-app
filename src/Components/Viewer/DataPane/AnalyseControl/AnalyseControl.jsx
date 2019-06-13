@@ -3,15 +3,14 @@ import Papa from 'papaparse';
 import LineChart from './LineChart/LineChart';
 
 import { 
-  Card,
-  Checkbox,
+  Card,  
   CardHeader,
   CardContent,
-  Collapse,
-  IconButton,
   Typography,
   CircularProgress,
-  Button
+  Button,
+  Select,
+  MenuItem
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -50,7 +49,7 @@ class AnalyseControl extends PureComponent {
 
     let body = {
       mapId: this.props.map.id,
-      class: 'all classes'
+      class: 'forest'
     };
     let urlType = null;
 
@@ -83,7 +82,7 @@ class AnalyseControl extends PureComponent {
 
         let parseFunc = async () => {
           let classesParsed = Papa.parse(data.classes.raw, options);
-          let spectralIndicesParsed = Papa.parse(data.classes.raw, options);
+          let spectralIndicesParsed = Papa.parse(data.spectralIndices.raw, options);
 
           return [classesParsed, spectralIndicesParsed];
         };
@@ -112,23 +111,49 @@ class AnalyseControl extends PureComponent {
 
     let dataSection = null;
 
-    if (this.state.loading) {
+    if (this.state.loading ) {
       dataSection = (<CircularProgress className='loading-spinner'/>);
     }
     else if (this.state.data) {
       dataSection = (
-        <Card className='data-pane-card'>
-          <CardHeader
-            title={
-              <Typography variant="h6" component="h2" className='no-text-transform'>
-                Classes
-              </Typography>
-            }
-          />
-          <CardContent>
-            <LineChart map={this.props.map} data={this.state.data}/>
-          </CardContent>
-        </Card>
+        <div>
+          <Card className='data-pane-card'>
+            <CardHeader
+              title={
+                <Typography variant="h6" component="h2" className='no-text-transform'>
+                  Classes
+                </Typography>
+              }
+            />
+            <CardContent>
+              <LineChart 
+                map={this.props.map} 
+                data={this.state.data.classes} 
+                type={ViewerUtility.dataGraphType.classes}
+              />
+            </CardContent>
+            </Card>
+          <Card className='data-pane-card'>
+            <CardHeader
+              title={
+                <Typography variant="h6" component="h2" className='no-text-transform'>
+                  Spectral indices
+                </Typography>
+              }
+            />
+            <CardContent>
+              <Select value='default'>
+                <MenuItem value='default' disabled hidden>Select a class</MenuItem>
+              </Select>
+              <LineChart 
+                map={this.props.map} 
+                data={this.state.data.spectralIndices} 
+                type={ViewerUtility.dataGraphType.spectralIndices}
+              />
+            </CardContent>
+          </Card>
+        </div>
+        
       );
     }
 

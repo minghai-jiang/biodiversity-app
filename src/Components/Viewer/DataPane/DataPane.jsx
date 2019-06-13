@@ -44,7 +44,7 @@ class DataPane extends PureComponent {
 
     let actionControl = null;
 
-    if (this.props.action === ViewerUtility.dataPaneActions.analyse) {
+    if (this.props.action === ViewerUtility.dataPaneAction.analyse) {
       actionControl = (
         <AnalyseControl
           user={this.props.user}
