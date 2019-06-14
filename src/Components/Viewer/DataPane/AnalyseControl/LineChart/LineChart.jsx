@@ -17,9 +17,6 @@ import ViewerUtility from '../../../ViewerUtility';
 
 const NO_DATA_RESULT = 'no data\n';
 const DATE_COLUMN_NAME = 'date_to';
-const MASK_COLUMN_NAME = 'mask';
-const BLANC_COLUMN_NAME = 'blanc';
-const NO_CLASS_COLUMN_NAME = 'no class';
 
 const CLOUD_COVER_COLUMN_INFO = {
   name: 'cloud_cover',
@@ -56,8 +53,9 @@ export class LineChart extends PureComponent {
     }
 
     let isSpectralIndices = type === ViewerUtility.dataGraphType.spectralIndices;
+    let parsedData = data.parsed;
 
-    if (data.raw === NO_DATA_RESULT) {
+    if (data.raw === NO_DATA_RESULT || !parsedData || parsedData.data.length === 0) {
       return (
         <div>
           No data
@@ -69,7 +67,7 @@ export class LineChart extends PureComponent {
 
     if (!isSpectralIndices) {
       let mapClasses = getUniqueLabels(this.props.map.classes, 'classes');
-      columnInfo = mapClasses.filter(x => x.name !== NO_CLASS_COLUMN_NAME && x.name !== BLANC_COLUMN_NAME);    
+      columnInfo = mapClasses.filter(x => x.name !== ViewerUtility.specialClassNames.noClass && x.name !== ViewerUtility.specialClassNames.blanc);    
     }
     else if (type === ViewerUtility.dataGraphType.spectralIndices) {
       columnInfo = getUniqueLabels(this.props.map.spectralIndices, 'indices');
@@ -97,7 +95,6 @@ export class LineChart extends PureComponent {
       adjustedColumnInfo.push(CLOUD_COVER_COLUMN_INFO);
     }
 
-    let parsedData = data.parsed;
     let filteredColumnNames = parsedData.meta.fields.filter(x => adjustedColumnInfo.find(y => y.name === x));
 
     let series = [];    
@@ -115,8 +112,9 @@ export class LineChart extends PureComponent {
         let value = row[columnName];
         let date = Moment(row[DATE_COLUMN_NAME]).unix() * 1000;
 
-        if (!isSpectralIndices && columnName === MASK_COLUMN_NAME && row[BLANC_COLUMN_NAME]) {
-          value += row[BLANC_COLUMN_NAME];
+        if (!isSpectralIndices && columnName === ViewerUtility.specialClassNames.mask && 
+          row[ViewerUtility.specialClassNames.blanc]) {
+          value += row[ViewerUtility.specialClassNames.blanc];
         }
 
         seriesData.push({

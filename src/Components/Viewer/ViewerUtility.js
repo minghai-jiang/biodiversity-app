@@ -23,6 +23,13 @@ const ViewerUtility = {
   dataGraphType: {
     classes: 'classes',
     spectralIndices: 'spectral_indices'
+  },
+
+  specialClassNames: {
+    allClasses: 'all classes',
+    mask: 'mask',
+    blanc: 'blanc',
+    noClass: 'no class'
   }
 }
 

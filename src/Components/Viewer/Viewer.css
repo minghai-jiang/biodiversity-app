@@ -182,6 +182,14 @@ div.loading-spinner {
   left: calc(50% - 20px);
 }
 
+button.expand-icon {
+  padding: 6px;
+}
+
+.expanded {
+  transform: rotate(180deg);
+}
+
 @media only screen and (max-width: 600px) {
   .controls-pane {
     width: 100vw;

@@ -7,3 +7,14 @@
 .data-pane-card {
   margin-top: 1em;
 }
+
+div.data-pane-card-content {
+  position: relative;
+  padding-top: 0px;
+  min-height: 70px;
+}
+
+div.data-pane-card-content .loading-spinner {
+  top: 0px;
+}
+

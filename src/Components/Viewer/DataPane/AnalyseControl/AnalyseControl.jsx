@@ -10,7 +10,9 @@ import {
   CircularProgress,
   Button,
   Select,
-  MenuItem
+  MenuItem,
+  Collapse,
+  IconButton,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -20,36 +22,80 @@ import ViewerUtility from '../../ViewerUtility';
 import './AnalyseControl.css';
 import ApiManager from '../../../../ApiManager';
 
+const DEFAULT_SELECTED_CLASS = 'default';
+
 class AnalyseControl extends PureComponent {
 
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      loading: false,
+      classesLoading: false,
+      spectralIndicesLoading: false,
 
-      data: null
+      availableClasses: null,
+      selectedClass: DEFAULT_SELECTED_CLASS,
+
+      classesData: null,
+      spectralIndicesData: {},
+
+      classesExpanded: true,
+      spectralIndicesExpanded: true
     };
   }
 
   componentDidMount() {
-    this.setState({ loading: true }, this.getData);    
+    this.setState({ classesLoading: true }, () => {
+      this.getAvailableClasses();
+      this.getData(ViewerUtility.dataGraphType.classes);
+    });    
   }
 
   componentDidUpdate(prevProps) {
+    if (this.props.map !== prevProps.map) {
+      this.getAvailableClasses();
+    }
+
+    if (!this.props.element) {
+      this.setState({ classesData: null, spectralIndicesData: {} });
+      return;
+    }
+
     let differentElement = !prevProps.element || this.props.element.key !== prevProps.element.key;
 
     if (differentElement) {
-      this.setState({ loading: true }, this.getData);
+      this.setState({ classesLoading: true }, () => this.getData(ViewerUtility.dataGraphType.classes));
     }
   }
 
-  getData = () => {
+  getAvailableClasses = () => {
+    let availableClasses = [ViewerUtility.specialClassNames.allClasses];
+
+    for (let i = 0; i < this.props.map.classes.length; i++) {
+      let timestampClasses = this.props.map.classes[i];
+
+      for (let x = 0; x < timestampClasses.classes.length; x++) {
+        let className = timestampClasses.classes[x].name;
+
+        if (className === ViewerUtility.specialClassNames.blanc || className === ViewerUtility.specialClassNames.mask) {
+          continue;
+        }
+
+        if (!availableClasses.includes(className)) {
+          availableClasses.push(className);
+        }
+      }
+    }
+
+    this.setState({ availableClasses: availableClasses });
+  }
+
+  getData = (type, className) => {
     let element = this.props.element;
 
     let body = {
       mapId: this.props.map.id,
-      class: 'forest'
+      class: className
     };
     let urlType = null;
 
@@ -61,43 +107,92 @@ class AnalyseControl extends PureComponent {
       urlType = 'tile';
     }
 
-    let classesDataPromise = ApiManager.post(`/data/class/${urlType}/timestamps`, body, this.props.user);
-    let spectralIndicesDataPromise = ApiManager.post(`/data/spectral/${urlType}/timestamps`, body, this.props.user);
+    let dataPromise = null;
+    if (type === ViewerUtility.dataGraphType.classes) {
+      dataPromise = ApiManager.post(`/data/class/${urlType}/timestamps`, body, this.props.user);
+    }
+    else if (type === ViewerUtility.dataGraphType.spectralIndices) {
+      dataPromise = ApiManager.post(`/data/spectral/${urlType}/timestamps`, body, this.props.user);
+    }
+    else {
+      return;
+    }
+    
+    let data = {};
 
-    let data = {
-      classes: {},
-      spectralIndices: {}
-    };
-
-    Promise.all([classesDataPromise, spectralIndicesDataPromise])
-      .then(results => {
-        data.classes.raw = results[0];
-        data.spectralIndices.raw = results[1];
-
-        let options = {
-          dynamicTyping: true, 
-          skipEmptyLines: true, 
-          header: true
-        };
+    dataPromise
+      .then(result => {
+        data.raw = result;
 
         let parseFunc = async () => {
-          let classesParsed = Papa.parse(data.classes.raw, options);
-          let spectralIndicesParsed = Papa.parse(data.spectralIndices.raw, options);
+          let parsedData = Papa.parse(data.raw, {
+            dynamicTyping: true, 
+            skipEmptyLines: true, 
+            header: true
+          });
 
-          return [classesParsed, spectralIndicesParsed];
+          return parsedData;
         };
 
         return parseFunc();
       })
-      .then(results => {
-        data.classes.parsed = results[0];
-        data.spectralIndices.parsed = results[1];
+      .then(result => {
+        data.parsed = result;
 
-        this.setState({ data: data, loading: false });
+        if (type === ViewerUtility.dataGraphType.classes) {
+          this.setState({ classesData: data, classesLoading: false });          
+        }
+        else if (type === ViewerUtility.dataGraphType.spectralIndices) {
+          let newSpectralIndicesData = {
+            ...this.state.spectralIndicesData
+          };
+
+          newSpectralIndicesData[className] = data;
+
+          this.setState({ spectralIndicesData: newSpectralIndicesData, spectralIndicesLoading: false });                    
+        }
+        else {
+          return;
+        }
       })
       .catch(err => {
       });
+  }
 
+  renderClassOptions = () => {
+    let availableClasses = this.state.availableClasses;
+
+    if (!availableClasses) {
+      return null;
+    }
+
+    let classOptions = [];
+
+    for (let i = 0; i < availableClasses.length; i++) {
+      let className = availableClasses[i];
+
+      classOptions.push(
+        <MenuItem key={className} value={className}>{className}</MenuItem>
+      )
+    }
+
+    return classOptions;
+  }
+
+  onSelectClass = (e) => {
+    let selectedClass = e.target.value;
+
+    if (!this.state.spectralIndicesData[selectedClass]) {
+      this.setState({ 
+        selectedClass: selectedClass, 
+        spectralIndicesLoading: true 
+        }, 
+        () => this.getData(ViewerUtility.dataGraphType.spectralIndices, selectedClass)
+      );
+    }
+    else {
+      this.setState({ selectedClass: selectedClass });
+    }
   }
 
   render() {
@@ -107,55 +202,7 @@ class AnalyseControl extends PureComponent {
 
     if (element.type === ViewerUtility.standardTileLayerType) {
       idText = `${element.feature.properties.tileX}, ${element.feature.properties.tileY}, ${element.feature.properties.zoom}`;
-    }
-
-    let dataSection = null;
-
-    if (this.state.loading ) {
-      dataSection = (<CircularProgress className='loading-spinner'/>);
-    }
-    else if (this.state.data) {
-      dataSection = (
-        <div>
-          <Card className='data-pane-card'>
-            <CardHeader
-              title={
-                <Typography variant="h6" component="h2" className='no-text-transform'>
-                  Classes
-                </Typography>
-              }
-            />
-            <CardContent>
-              <LineChart 
-                map={this.props.map} 
-                data={this.state.data.classes} 
-                type={ViewerUtility.dataGraphType.classes}
-              />
-            </CardContent>
-            </Card>
-          <Card className='data-pane-card'>
-            <CardHeader
-              title={
-                <Typography variant="h6" component="h2" className='no-text-transform'>
-                  Spectral indices
-                </Typography>
-              }
-            />
-            <CardContent>
-              <Select value='default'>
-                <MenuItem value='default' disabled hidden>Select a class</MenuItem>
-              </Select>
-              <LineChart 
-                map={this.props.map} 
-                data={this.state.data.spectralIndices} 
-                type={ViewerUtility.dataGraphType.spectralIndices}
-              />
-            </CardContent>
-          </Card>
-        </div>
-        
-      );
-    }
+    }    
 
     return (
       <div>
@@ -171,7 +218,86 @@ class AnalyseControl extends PureComponent {
             subheader={idText}
           />
         </Card>
-        {dataSection}
+        <Card className='data-pane-card'>
+            <CardHeader
+              title={
+                <Typography variant="h6" component="h2" className='no-text-transform'>
+                  Classes
+                </Typography>
+              }
+              action={
+                <IconButton
+                  className={this.state.classesExpanded ? 'expand-icon expanded' : 'expand-icon'}
+                  onClick={() => this.setState({ classesExpanded: !this.state.classesExpanded })}
+                  aria-expanded={this.state.classesExpanded}
+                  aria-label='Show'
+                >
+                  <ExpandMoreIcon />
+                </IconButton>
+              }
+            />
+            <Collapse in={this.state.classesExpanded}>
+              <CardContent className='data-pane-card-content'>
+                {this.state.classesLoading ? <CircularProgress className='loading-spinner'/> : null}
+                {
+                  !this.state.classesLoading && this.state.classesData ?
+                    <LineChart 
+                      map={this.props.map} 
+                      data={this.state.classesData} 
+                      type={ViewerUtility.dataGraphType.classes}
+                    /> : null
+                } 
+              </CardContent>
+            </Collapse>
+          </Card>
+        <Card className='data-pane-card'>
+          <CardHeader
+            title={
+              <Typography variant="h6" component="h2" className='no-text-transform'>
+                Spectral indices
+              </Typography>
+            }
+            action={
+              <IconButton
+                className={this.state.spectralIndicesExpanded ? 'expand-icon expanded' : 'expand-icon'}
+                onClick={() => this.setState({ spectralIndicesExpanded: !this.state.spectralIndicesExpanded })}
+                aria-expanded={this.state.spectralIndicesExpanded}
+                aria-label='Show'
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            }
+          />
+          <Collapse in={this.state.spectralIndicesExpanded}>
+            <CardContent className='data-pane-card-content'>
+              {
+                this.state.availableClasses ?
+                  <Select 
+                    className='class-selector' 
+                    value={this.state.selectedClass} 
+                    onChange={this.onSelectClass}
+                    disabled={this.state.spectralIndicesLoading}>
+                    <MenuItem value={DEFAULT_SELECTED_CLASS} disabled hidden>Select a class</MenuItem>
+                    {this.renderClassOptions()}
+                  </Select> : null
+              }
+              {
+                !this.state.availableClasses || this.state.spectralIndicesLoading ? 
+                  <div style={{ position: 'relative', height: '50px' }}>
+                    <CircularProgress className='loading-spinner'/>
+                  </div> : null
+              }
+              {
+                !this.state.spectralIndicesLoading && this.state.spectralIndicesData[this.state.selectedClass] ?
+                  <LineChart 
+                    map={this.props.map} 
+                    data={this.state.spectralIndicesData[this.state.selectedClass]} 
+                    type={ViewerUtility.dataGraphType.spectralIndices}
+                  /> : null
+              }
+            </CardContent>
+          </Collapse>         
+        </Card>
       </div>
     )
   }

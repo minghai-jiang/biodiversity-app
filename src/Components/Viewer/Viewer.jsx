@@ -153,6 +153,7 @@ class Viewer extends PureComponent {
   onSelectMap = (map) => {
     this.setState({ 
       map: map,
+      selectedElement: null,
       timestampRange: {
         start: map.timestamps.length - 1,
         end: map.timestamps.length - 1
@@ -206,7 +207,7 @@ class Viewer extends PureComponent {
       if (!panes.includes(DATA_PANE_NAME)) {
         panes = [...panes];
 
-        if (!isMobile) {
+        if (!isMobile && !this.state.isSmallWindow) {
           panes.push(DATA_PANE_NAME);
         }
         else {
