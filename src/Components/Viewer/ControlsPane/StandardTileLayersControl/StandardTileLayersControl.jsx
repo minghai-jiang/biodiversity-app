@@ -213,7 +213,7 @@ class StandardTileLayersControl extends PureComponent {
 
   render() {
 
-    if (!this.props.map) {
+    if (!this.props.map || this.state.availableLayers.length === 0) {
       return null;
     }
 

@@ -18,6 +18,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
+import DataPaneUtility from '../DataPaneUtility';
 
 import './AnalyseControl.css';
 import ApiManager from '../../../../ApiManager';
@@ -52,7 +53,8 @@ class AnalyseControl extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.map !== prevProps.map) {
+    let differentMap = this.props.map !== prevProps.map;
+    if (differentMap) {
       this.getAvailableClasses();
     }
 
@@ -61,7 +63,7 @@ class AnalyseControl extends PureComponent {
       return;
     }
 
-    let differentElement = !prevProps.element || this.props.element.key !== prevProps.element.key;
+    let differentElement = differentMap || DataPaneUtility.isDifferentElement(prevProps.element, this.props.element);
 
     if (differentElement) {
       this.setState({ classesLoading: true }, () => this.getData(ViewerUtility.dataGraphType.classes));
@@ -105,6 +107,25 @@ class AnalyseControl extends PureComponent {
       body.zoom = element.feature.properties.zoom;
 
       urlType = 'tile';
+    }
+    else if (element.type === ViewerUtility.polygonLayerType) {
+      body.polygonId = element.feature.properties.id;
+
+      urlType = 'polygon';
+    }
+    else if (element.type === ViewerUtility.customPolygonTileLayerType) {
+      body.geometry = {
+        type: 'FeatureCollection',
+        count: 1,
+        features: [
+          element.feature
+        ]
+      };
+
+      urlType = 'customPolygon';
+    }
+    else {
+      return;
     }
 
     let dataPromise = null;
@@ -151,11 +172,18 @@ class AnalyseControl extends PureComponent {
 
           this.setState({ spectralIndicesData: newSpectralIndicesData, spectralIndicesLoading: false });                    
         }
-        else {
-          return;
-        }
       })
       .catch(err => {
+        if (type === ViewerUtility.dataGraphType.classes) {
+          this.setState({ classesData: null, classesLoading: false });          
+        }
+        else if (type === ViewerUtility.dataGraphType.spectralIndices) {
+          let newSpectralIndicesData = {
+            ...this.state.spectralIndicesData
+          };
+
+          this.setState({ spectralIndicesData: newSpectralIndicesData, spectralIndicesLoading: false });                    
+        }
       });
   }
 
@@ -196,60 +224,40 @@ class AnalyseControl extends PureComponent {
   }
 
   render() {
-
-    let element = this.props.element;
-    let idText = null;
-
-    if (element.type === ViewerUtility.standardTileLayerType) {
-      idText = `${element.feature.properties.tileX}, ${element.feature.properties.tileY}, ${element.feature.properties.zoom}`;
-    }    
-
     return (
       <div>
-        <Card>
+        <Card className='data-pane-card'>
           <CardHeader
             title={
-              <Button>
-                <Typography variant="h6" component="h2" className='no-text-transform'>
-                  Standard tile
-                </Typography>
-              </Button>
+              <Typography variant="h6" component="h2" className='no-text-transform'>
+                Classes
+              </Typography>
             }
-            subheader={idText}
+            action={
+              <IconButton
+                className={this.state.classesExpanded ? 'expand-icon expanded' : 'expand-icon'}
+                onClick={() => this.setState({ classesExpanded: !this.state.classesExpanded })}
+                aria-expanded={this.state.classesExpanded}
+                aria-label='Show'
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            }
           />
+          <Collapse in={this.state.classesExpanded}>
+            <CardContent className='data-pane-card-content'>
+              {this.state.classesLoading ? <CircularProgress className='loading-spinner'/> : null}
+              {
+                !this.state.classesLoading && this.state.classesData ?
+                  <LineChart 
+                    map={this.props.map} 
+                    data={this.state.classesData} 
+                    type={ViewerUtility.dataGraphType.classes}
+                  /> : null
+              } 
+            </CardContent>
+          </Collapse>
         </Card>
-        <Card className='data-pane-card'>
-            <CardHeader
-              title={
-                <Typography variant="h6" component="h2" className='no-text-transform'>
-                  Classes
-                </Typography>
-              }
-              action={
-                <IconButton
-                  className={this.state.classesExpanded ? 'expand-icon expanded' : 'expand-icon'}
-                  onClick={() => this.setState({ classesExpanded: !this.state.classesExpanded })}
-                  aria-expanded={this.state.classesExpanded}
-                  aria-label='Show'
-                >
-                  <ExpandMoreIcon />
-                </IconButton>
-              }
-            />
-            <Collapse in={this.state.classesExpanded}>
-              <CardContent className='data-pane-card-content'>
-                {this.state.classesLoading ? <CircularProgress className='loading-spinner'/> : null}
-                {
-                  !this.state.classesLoading && this.state.classesData ?
-                    <LineChart 
-                      map={this.props.map} 
-                      data={this.state.classesData} 
-                      type={ViewerUtility.dataGraphType.classes}
-                    /> : null
-                } 
-              </CardContent>
-            </Collapse>
-          </Card>
         <Card className='data-pane-card'>
           <CardHeader
             title={

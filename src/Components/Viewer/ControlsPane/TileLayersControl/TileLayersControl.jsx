@@ -23,6 +23,7 @@ import ApiManager from '../../../../ApiManager';
 const BASE_SATELLITE_LAYER_NAME = 'base';
 const IMAGES_TILE_LAYER_NAME = 'images';
 const LABELS_TILE_LAYER_NAME = 'labels';
+const IMAGES2_TILE_LAYER_NAME = 'images2';
 
 const BASE_SATELLITE_LAYER_TYPE = {
   name: BASE_SATELLITE_LAYER_NAME,
@@ -49,6 +50,12 @@ const tileLayerTypes = [
     defaultSelected: true,
     stacking: false,
     zIndex: ViewerUtility.tileLayerZIndex + 1 + 300,
+  },
+  {
+    name: IMAGES2_TILE_LAYER_NAME,
+    defaultSelected: true,
+    stacking: false,
+    zIndex: ViewerUtility.tileLayerZIndex + 1 + 400
   }
 ];
 
@@ -139,8 +146,9 @@ class TileLayersControl extends PureComponent {
 
     let imageLayers = availableLayersUnsorted.filter(x => x.type === IMAGES_TILE_LAYER_NAME);
     let labelLayers = availableLayersUnsorted.filter(x => x.type === LABELS_TILE_LAYER_NAME);
+    let images2Layers = availableLayersUnsorted.filter(x => x.type === IMAGES2_TILE_LAYER_NAME);
 
-    let availableLayers = [BASE_SATELLITE_AVAILABLE_LAYER, ...imageLayers, ...labelLayers];
+    let availableLayers = [BASE_SATELLITE_AVAILABLE_LAYER, ...imageLayers, ...labelLayers, ...images2Layers];
 
     return availableLayers;
   

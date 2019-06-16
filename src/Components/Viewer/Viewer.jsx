@@ -175,21 +175,19 @@ class Viewer extends PureComponent {
   onLeafletMapViewportChanged = (viewport) => {
     if (this.setNewViewportTimer) {
       clearTimeout(this.setNewViewportTimer);
-    }
-    
-    viewport.bounds = getLeafletMapBounds(this.leafletMap);    
+    }    
 
     this.setNewViewportTimer = setTimeout(
       () => {
+        viewport.bounds = getLeafletMapBounds(this.leafletMap);    
         this.setState({ leafletMapViewport: viewport })
       }, 
-      1000
+      500
     );
   }
 
   onFeatureClick = (type, feature, hasAggregatedData) => {
     let element = {
-      key: Math.random(),
       type: type,
       hasAggregatedData: hasAggregatedData,
       feature: feature,

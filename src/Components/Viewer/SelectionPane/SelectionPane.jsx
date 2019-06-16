@@ -29,12 +29,11 @@ class SelectionPane extends PureComponent {
   }  
 
   componentDidUpdate(prevProps) {
-    if (!this.props.map || prevProps.map !== this.props.map) {
+    if (!this.props.map || prevProps.map !== this.props.map || !this.props.element) {
       this.setState({ isOpen: false });
     }
-    else if (!prevProps.element || prevProps.element.key !== this.props.element.key) {
-      this.setState({ isOpen: true });
-    } 
+
+    this.setState({ isOpen: true });
   }
 
   onCloseClick = () => {

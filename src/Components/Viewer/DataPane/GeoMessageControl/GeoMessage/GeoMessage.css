@@ -1,0 +1,84 @@
+.geomessage-card {
+  margin: 12px 8px;
+  width: 70%;
+  text-align: left;
+}
+
+.geomessage-card-own {
+  margin-left: auto;
+}
+
+div.geomessage-card-header {
+  padding: 8px;
+}
+
+.geomessage-card-title {
+  font-size: 16px;
+  color: #026464;
+}
+
+.geomessage-card-subtitle {
+  font-size: 12px;
+}
+
+div.geomessage-card-content {
+  padding: 0px 8px 0px 8px;
+  font-size: 14px;
+  text-align: left;
+}
+
+div.geomessage-card-content:last-child {
+  padding-bottom: 8px;
+}
+
+.geomessage-card-thumbnail {
+  position: relative;
+  margin-top: 6px;
+  width: auto;
+}
+
+.geomessage-card-thumbnail img {
+  width: auto;
+  cursor: zoom-in;
+}
+
+div.geomessage-card-actions {
+  padding: 0px 8px 0px 8px;
+}
+
+button.geomessage-card-action-button {
+  padding: 8px;
+  margin-left: auto;
+}
+
+.geomessage-lightbox {
+	position: fixed;
+	width: 100vw;
+	height: 100%;
+	top: 0;
+	left: 0vw;
+	background: rgba(0, 0, 0, 0.75);
+  cursor: zoom-out;
+}
+
+.geomessage-lightbox-image {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 95%;
+  max-height: 95%;
+  width: auto;
+  margin: auto;
+  overflow: auto;
+}
+
+.geomessage-light-box-close-button {
+  position: fixed;
+  right: 0px;
+  margin-top: 18px;
+  margin-right: 18px;
+  width: 18px;
+  height: 18px;
+}
