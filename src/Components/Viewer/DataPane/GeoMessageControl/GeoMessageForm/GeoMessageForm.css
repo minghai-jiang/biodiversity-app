@@ -1,0 +1,15 @@
+div.geomessage-form-card {
+  height: 68px;
+}
+
+div.geomessage-form-card-expanded {
+  position: absolute;
+  height: auto;
+  width: calc(100% - 24px);
+  bottom: 12px; 
+}
+
+.geomessage-expanded-title {
+  font-size: 16px;
+  color: #026464;
+}

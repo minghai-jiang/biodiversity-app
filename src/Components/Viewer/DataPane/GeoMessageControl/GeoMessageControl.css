@@ -2,3 +2,12 @@ div.class-selector {
   width: 100%;
   margin-bottom: 16px;
 }
+
+.geomessage-control {
+  height: calc(100% - 85px);
+}
+
+div.geomessage-messages-card {
+  height: calc(100% - 76px);
+  overflow-y: auto;
+}

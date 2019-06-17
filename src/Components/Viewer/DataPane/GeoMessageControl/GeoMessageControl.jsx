@@ -23,11 +23,16 @@ import './GeoMessageControl.css';
 import ApiManager from '../../../../ApiManager';
 
 import GeoMessage from './GeoMessage/GeoMessage';
+import GeoMessageForm from './GeoMessageForm/GeoMessageForm';
 
 class GeoMessageControl extends PureComponent {
 
+  geomessagesContainerCard = null;
+
   constructor(props, context) {
     super(props, context);
+
+    this.geomessagesContainerCard = React.createRef();
 
     this.state = {
       loading: false,
@@ -123,7 +128,15 @@ class GeoMessageControl extends PureComponent {
           );
         };
 
-        this.setState({ loading: false, rawGeoMessages: rawGeoMessages, geoMessageElements: geoMessageElements });
+        this.setState({ 
+          loading: false, 
+          rawGeoMessages: rawGeoMessages, 
+          geoMessageElements: geoMessageElements 
+        },
+        () => {
+          let c = this.geomessagesContainerCard.current;
+          c.scrollTop = c.scrollHeight;
+        });
       })
       .catch(err => {
         this.setState({ loading: false, rawGeoMessages: null, geoMessageElements: null });
@@ -136,9 +149,16 @@ class GeoMessageControl extends PureComponent {
     }
 
     return (
-      <Card className='data-pane-card'>
-        {this.state.geoMessageElements}
-      </Card>
+      <div className='geomessage-control'>
+        <Card ref={this.geomessagesContainerCard} className='data-pane-card geomessage-messages-card'>
+          {this.state.geoMessageElements}
+        </Card>
+        <GeoMessageForm
+          user={this.props.user}
+          map={this.props.map}
+          element={this.props.element}
+        />
+      </div>
     );
   }
 }

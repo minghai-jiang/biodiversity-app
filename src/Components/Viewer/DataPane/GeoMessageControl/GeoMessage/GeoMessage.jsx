@@ -76,7 +76,7 @@ class GeoMessage extends PureComponent {
       mapId: this.props.map.id, 
       geoMessageId: this.props.message.id,
       type: this.props.type
-    };    
+    };
 
     return ApiManager.post('/geoMessage/image', body, this.props.user);
   }
@@ -88,7 +88,7 @@ class GeoMessage extends PureComponent {
   render() {
     let message = this.props.message;
 
-    let isOwnCard = this.props.user && message.user.toLowerCase() === this.props.user.name.toLowerCase();
+    let isOwnCard = this.props.user && message.user.toLowerCase() === this.props.user.username.toLowerCase();
     let mayDelete = isOwnCard || this.props.map.accessLevel >= ApiManager.accessLevels.deleteGeomessages;
 
     let cardClass = 'geomessage-card';

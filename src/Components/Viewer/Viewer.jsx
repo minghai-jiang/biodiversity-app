@@ -177,9 +177,10 @@ class Viewer extends PureComponent {
       clearTimeout(this.setNewViewportTimer);
     }    
 
+    viewport.bounds = getLeafletMapBounds(this.leafletMap);
+
     this.setNewViewportTimer = setTimeout(
       () => {
-        viewport.bounds = getLeafletMapBounds(this.leafletMap);    
         this.setState({ leafletMapViewport: viewport })
       }, 
       500

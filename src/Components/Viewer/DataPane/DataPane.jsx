@@ -85,19 +85,20 @@ class DataPane extends PureComponent {
     
     return (
       <div className='viewer-pane data-pane' style={style}>
-        <Card>
+        <Card className='data-pane-title-card'>
           <CardHeader
+            className='data-pane-title-header'
             title={
-              <Button>
-                <Typography variant="h6" component="h2" className='no-text-transform'>
-                  {title}
-                </Typography>
-              </Button>
+              <Typography variant="h6" component="h2" className='no-text-transform'>
+                {title}
+              </Typography>
             }
             subheader={
-              <div className='data-pane-title-card-subtitle'>
-                {idText}
-              </div>
+              <Button>
+                <div className='data-pane-title-card-subtitle'>
+                  {idText}
+                </div>
+              </Button>
             }
           />
         </Card>

@@ -1,11 +1,11 @@
 .data-pane {
   width: 25vw;
-  padding: 0.7em;
+  padding: 12px;
   overflow-y: auto;
 }
 
 .data-pane-card {
-  margin-top: 1em;
+  margin-top: 8px;
 }
 
 div.data-pane-card-content {
@@ -14,8 +14,17 @@ div.data-pane-card-content {
   min-height: 70px;
 }
 
+div.data-pane-title-card {
+  height: 77px;
+}
+
+div.data-pane-title-header {
+  padding: 4px;
+  padding-top: 8px;
+}
+
 div.data-pane-title-card-subtitle {
-  font-size: 14px;
+  font-size: 12px;
 }
 
 div.data-pane-card-content .loading-spinner {

@@ -59,6 +59,7 @@ button.geomessage-card-action-button {
 	left: 0vw;
 	background: rgba(0, 0, 0, 0.75);
   cursor: zoom-out;
+  z-index: 9999999;
 }
 
 .geomessage-lightbox-image {
