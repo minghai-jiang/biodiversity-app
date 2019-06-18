@@ -65,9 +65,9 @@ class MapManagement extends PureComponent {
   }
 
   onMapSelect = (e) => {
-    let selectedMap = this.state.maps.find(map => map.uuid === e.target.value);
+    let selectedMap = this.state.maps.find(map => map.id === e.target.value);
 
-    ApiManager.fetch('POST', '/settings/mapAccess', { mapId: selectedMap.uuid }, this.props.user)
+    ApiManager.fetch('POST', '/settings/mapAccess', { mapId: selectedMap.id }, this.props.user)
       .then(result => {
         for (let i = 1; i < result.groups.length + 1; i++) {
           result.groups[i - 1].id = i;
@@ -100,7 +100,7 @@ class MapManagement extends PureComponent {
 
     this.state.maps.forEach(map => {
       options.push(
-        <option value={map.uuid} key={key++} >{map.name}</option>
+        <option value={map.id} key={key++} >{map.name}</option>
       );
     });
 

@@ -52,10 +52,10 @@ let questions = this.state.questions
 questions.shift()
 let form = {"questions": questions}
 console.log(this.props.form["formname"])
-console.log(this.props.map.uuid)
+console.log(this.props.map.id)
 console.log(form["questions"])
 
-ApiManager.fetch('POST', '/geoMessage/alterForm', {"mapId": this.props.map.uuid, "newName":this.props.form["formname"], "oldName":this.props.form["formname"], "form": form}, this.props.user)
+ApiManager.fetch('POST', '/geoMessage/alterForm', {"mapId": this.props.map.id, "newName":this.props.form["formname"], "oldName":this.props.form["formname"], "form": form}, this.props.user)
   .then(() => {
     //redirect
   })

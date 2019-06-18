@@ -24,7 +24,7 @@ class FormManagment extends PureComponent {
   }
 
   componentDidMount() {
-    ApiManager.fetch('POST', '/geoMessage/getForms', {"mapId": this.props.map.uuid}, this.props.user)
+    ApiManager.fetch('POST', '/geoMessage/getForms', {"mapId": this.props.map.id}, this.props.user)
       .then((forms) => {
         forms = [{'formname': this.props.localization["new form"]}].concat(forms)
         this.setState({forms:forms });
@@ -43,7 +43,7 @@ class FormManagment extends PureComponent {
   }
 
   deleteFrom = (cellInfo) => {
-      ApiManager.fetch('POST', '/geoMessage/deleteForm', {"mapId": this.props.map.uuid, "formName":this.state.forms[cellInfo.index]['formname']}, this.props.user)
+      ApiManager.fetch('POST', '/geoMessage/deleteForm', {"mapId": this.props.map.id, "formName":this.state.forms[cellInfo.index]['formname']}, this.props.user)
         .then(() => {
           this.state.forms.splice(cellInfo.index,1)
         }).then(() => {
@@ -73,7 +73,7 @@ class FormManagment extends PureComponent {
           defaultValue={this.state.forms[cellInfo.index][cellInfo.column.id]}
           onBlur={e => {
             if(cellInfo.index> 0){
-            let body = {"mapId": this.props.map.uuid, "newName":e.target.value, "oldName":this.state.forms[cellInfo.index]["formname"], "form": this.state.forms[cellInfo.index]["form"]};
+            let body = {"mapId": this.props.map.id, "newName":e.target.value, "oldName":this.state.forms[cellInfo.index]["formname"], "form": this.state.forms[cellInfo.index]["form"]};
             ApiManager.fetch('POST', '/geoMessage/alterForm', body, this.props.user)
                           .then(() => {
                             this.state.forms[cellInfo.index][cellInfo.column.id] = body.newName;

@@ -179,7 +179,7 @@ async function getFeed(page)
 
   feed = await QueryUtil.postData(apiUrl + 'geoMessage/feed', 
     {
-      mapId: GeoMessageFeed_props.map.uuid,
+      mapId: GeoMessageFeed_props.map.id,
       page: page, 
       userGroups: userGroups,
     },
@@ -192,7 +192,7 @@ async function getFeed(page)
     for (let j = 0; j < feed.length; j++)
     {
       feed[j].apiUrl = GeoMessageFeed_props.apiUrl;
-      feed[j].mapId = GeoMessageFeed_props.map.uuid;
+      feed[j].mapId = GeoMessageFeed_props.map.id;
       feed[j].headers = headers;
 
       messages.push(

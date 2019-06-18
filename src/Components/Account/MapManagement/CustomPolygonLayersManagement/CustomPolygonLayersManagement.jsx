@@ -44,7 +44,7 @@ class CustomPolygonLayersManagement extends PureComponent {
   }
 
   getCustomPolygonLayers = (e) => {
-    ApiManager.fetch('POST', '/geoMessage/customPolygon/layers', { mapId: this.props.map.uuid }, this.props.user)
+    ApiManager.fetch('POST', '/geoMessage/customPolygon/layers', { mapId: this.props.map.id }, this.props.user)
       .then(result => {
         result.forEach(customPolygonLayer => {
           customPolygonLayer.properties = customPolygonLayer.properties.join(',');
@@ -79,7 +79,7 @@ class CustomPolygonLayersManagement extends PureComponent {
     });
 
     let body = {
-      mapId: this.props.map.uuid,
+      mapId: this.props.map.id,
       layerName: editedRow.name,
       color: editedRow.color,
       properties: properties
@@ -134,7 +134,7 @@ class CustomPolygonLayersManagement extends PureComponent {
       }
 
       let body = {
-        mapId: this.props.map.uuid,
+        mapId: this.props.map.id,
         layerName: originalRow.name
       };
 
@@ -173,7 +173,7 @@ class CustomPolygonLayersManagement extends PureComponent {
 
     if (confirmDelete) {
       let body = {
-        mapId: this.props.map.uuid,
+        mapId: this.props.map.id,
         layerName: originalRow.name
       };
 

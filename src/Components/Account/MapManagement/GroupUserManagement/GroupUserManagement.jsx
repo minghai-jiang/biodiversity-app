@@ -42,7 +42,7 @@ class GroupUserManagement extends PureComponent {
 
   getGroupUsers = (e) => {
     let body = {
-      mapId: this.props.map.uuid,
+      mapId: this.props.map.id,
       groupName: this.props.group.name
     };
 
@@ -72,7 +72,7 @@ class GroupUserManagement extends PureComponent {
     let userRow = cellInfo.original;
 
     let body = {
-      mapId: this.props.map.uuid,
+      mapId: this.props.map.id,
       groupName: this.props.group.name,
       username: userRow.username
     };
@@ -108,7 +108,7 @@ class GroupUserManagement extends PureComponent {
 
     if (confirmDelete) {
       let body = {
-        mapId: this.props.map.uuid,
+        mapId: this.props.map.id,
         groupName: this.props.group.name,
         username: userRow.username
       };

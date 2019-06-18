@@ -164,7 +164,7 @@ const CrowdLayersControl = {
         properties.spectral = spectral;
         properties.layerName = CrowdLayersControl_PopupContent.data.layerName;
         properties.hasAggregatedData = CrowdLayersControl_PopupContent.data.hasAggregatedData;
-        properties.uuid = props.map.uuid;
+        properties.uuid = props.map.id;
         properties.timestamp = props.timestampRange.end;
         properties.apiUrl = props.apiUrl;
         properties.type = CrowdLayersControl_PopupContent.geometry.type;
@@ -247,7 +247,7 @@ async function getPolygonsJson(props, bounds) {
     let geoJsonPromise = getPolygonsJsonAux(
       props.apiUrl,
       props.user, 
-      map.uuid, 
+      map.id, 
       props.timestampRange.end, 
       bounds, 
       map.crowdLayers[i].name,
@@ -457,7 +457,7 @@ async function deletePolygon(properties)
   let polygonDelete = await QueryUtil.postData(
     CrowdLayersControl_props.apiUrl + 'geoMessage/customPolygon/deletePolygon',
     {
-      mapId: CrowdLayersControl_props.map.uuid,
+      mapId: CrowdLayersControl_props.map.id,
       customPolygonId: properties.id,
     }, headers
   );

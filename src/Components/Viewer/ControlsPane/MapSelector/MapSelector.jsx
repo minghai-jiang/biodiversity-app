@@ -67,6 +67,10 @@ export class MapSelector extends PureComponent {
   };
 
   getMapMetadata = (map) => {
+    if (map.metadataLoaded) {
+      return;
+    }
+
     let body = {
       mapId: map.id
     };
@@ -79,6 +83,8 @@ export class MapSelector extends PureComponent {
     let classesPromise = ApiManager.post('/metadata/classes', body, this.props.user);
     let spectralIndicesPromise = ApiManager.post('/metadata/spectral', body, this.props.user);
 
+    let formsPromise = ApiManager.post('/geomessage/getForms', body, this.props.user);
+
     let promises = [
       timestampsPromise,
       tileLayersPromise, 
@@ -86,7 +92,9 @@ export class MapSelector extends PureComponent {
       customPolygonLayersPromise,
 
       classesPromise, 
-      spectralIndicesPromise
+      spectralIndicesPromise,
+
+      formsPromise
     ];
 
     return Promise.all(promises)
@@ -100,6 +108,10 @@ export class MapSelector extends PureComponent {
 
         map.classes = results[4];
         map.spectralIndices = results[5];
+
+        map.forms = results[6];
+
+        map.metadataLoaded = true;
       });
   }
 

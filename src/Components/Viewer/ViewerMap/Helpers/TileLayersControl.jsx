@@ -190,7 +190,7 @@ function tileLayersControl_prepareLayers (props) {
       for (let i = 0; i < mapTileLayerType.timestamps.length; i++) {
         let timestampNumber = mapTileLayerType.timestamps[i];
 
-        let url = `${props.apiUrl}tileService/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
+        let url = `${props.apiUrl}tileService/${map.id}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
         let zIndex = tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1);
 
         tileLayersOfType.timestampElements.push({

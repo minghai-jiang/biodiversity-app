@@ -160,7 +160,7 @@ const PolygonLayersControl = {
         properties.spectral = spectral;
         properties.layerName = polygonLayersControl_PopupContent.data.layerName;
         properties.hasAggregatedData = polygonLayersControl_PopupContent.data.hasAggregatedData;
-        properties.uuid = props.map.uuid;
+        properties.uuid = props.map.id;
         properties.timestamp = props.timestampRange.end;
         properties.apiUrl = props.apiUrl;
         properties.type = polygonLayersControl_PopupContent.geometry.type;
@@ -223,7 +223,7 @@ async function getPolygonsJson(props, bounds) {
         let geoJsonPromise = getPolygonsJsonAux(
           props.apiUrl,
           props.user, 
-          map.uuid, 
+          map.id, 
           props.timestampRange.end, 
           bounds, 
           map.polygonLayers[i].layers[j].name,

@@ -48,7 +48,7 @@ class CreateForm extends PureComponent {
     form.shift()
     form = {"questions": form}
     console.log(form)
-    ApiManager.fetch('POST', '/geoMessage/addForm', {"mapId": this.props.map.uuid, "formName":this.props.formName, "form": form}, this.props.user)
+    ApiManager.fetch('POST', '/geoMessage/addForm', {"mapId": this.props.map.id, "formName":this.props.formName, "form": form}, this.props.user)
       .then(() => {
         //redirect
       })

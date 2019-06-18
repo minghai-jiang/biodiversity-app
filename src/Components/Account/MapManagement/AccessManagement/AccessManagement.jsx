@@ -44,7 +44,7 @@ class AccessManagement extends PureComponent {
   }
 
   getMapAccess = (e) => {
-    ApiManager.fetch('POST', '/settings/mapAccess', { mapId: this.props.map.uuid }, this.props.user)
+    ApiManager.fetch('POST', '/settings/mapAccess', { mapId: this.props.map.id }, this.props.user)
       .then(result => {
         for (let i = 1; i < result.groups.length + 1; i++) {
           result.groups[i - 1].id = i;
@@ -78,7 +78,7 @@ class AccessManagement extends PureComponent {
     }
 
     let body = {
-      mapId: this.props.map.uuid,
+      mapId: this.props.map.id,
       newPublicAccessLevel: newPublicAccessLevel
     };
 
@@ -106,7 +106,7 @@ class AccessManagement extends PureComponent {
     }
 
     let body = {
-      mapId: this.props.map.uuid,
+      mapId: this.props.map.id,
       groupName: editedRow.name,
       accessLevel: editedRow.accessLevel
     };
@@ -156,7 +156,7 @@ class AccessManagement extends PureComponent {
       }
 
       let body = {
-        mapId: this.props.map.uuid,
+        mapId: this.props.map.id,
         groupName: originalRow.name,
         newGroupName: editedRow.name,
         newAccessLevel: editedRow.accessLevel
@@ -198,7 +198,7 @@ class AccessManagement extends PureComponent {
 
     if (confirmDelete) {
       let body = {
-        mapId: this.props.map.uuid,
+        mapId: this.props.map.id,
         groupName: originalRow.name
       };
 

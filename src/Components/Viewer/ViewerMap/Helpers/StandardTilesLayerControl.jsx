@@ -159,7 +159,7 @@ const StandardTilesLayer = {
       {
         properties.class = classes;
         properties.spectral = spectral;
-        properties.uuid = props.map.uuid;
+        properties.uuid = props.map.id;
         properties.timestamp = props.timestampRange.end;
         properties.apiUrl = props.apiUrl;
         properties.kind = 'tile';
@@ -216,7 +216,7 @@ async function getTilesJson(props, bounds) {
   let geoJsonPromise = getTilesJsonAux(
     props.apiUrl,
     props.user, 
-    map.uuid, 
+    map.id, 
     props.timestampRange.end, 
     bounds,
     map.zoom);

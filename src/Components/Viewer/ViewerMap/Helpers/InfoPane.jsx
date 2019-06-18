@@ -238,7 +238,7 @@ export class InfoPane extends Component {
     let rawGraphDataPromise;
 
     let body = {
-      mapId:  this.props.map.uuid,
+      mapId:  this.props.map.id,
     };
 
     if(type === 'spectral')
@@ -486,7 +486,7 @@ export class InfoPane extends Component {
     let addResult = await QueryUtil.postData(
       this.props.infoContent.properties.apiUrl + 'geoMessage/customPolygon/addPolygon',
       {
-        mapId:  this.props.map.uuid,
+        mapId:  this.props.map.id,
         timestamp: this.props.infoContent.properties.timestamp,
         geometry: geometry,
         features: {},
@@ -518,7 +518,7 @@ export class InfoPane extends Component {
     let result = await QueryUtil.postData(
       this.props.infoContent.properties.apiUrl + 'geoMessage/customPolygon/alterPolygon',
       {
-        mapId:  this.props.map.uuid,
+        mapId:  this.props.map.id,
         customPolygonId: info.id.id,
         newLayerName: newLayer,
         newProperties: properties
