@@ -97,6 +97,7 @@ class GeoMessageControl extends PureComponent {
 
     ApiManager.post(`/geoMessage/${urlType}/getMessages`, body, this.props.user)
       .then(result => {
+        debugger;
         let rawGeoMessages = null;
         let geoMessageElements = [];
 
@@ -115,6 +116,7 @@ class GeoMessageControl extends PureComponent {
                   map={this.props.map}
                   message={message}
                   type={element.type}
+                  onDeleteMessage={this.onDeleteMessage}
                 />
               );
             }
@@ -142,16 +144,25 @@ class GeoMessageControl extends PureComponent {
   onNewMessage = (newMessage) => {
     let newGeoMessageElement = (
       <GeoMessage
-        key={Math.random()}
+        key={newMessage.id}
         user={this.props.user}
         map={this.props.map}
         message={newMessage}
         type={this.props.element.type}
+        onDeleteMessage={this.onDeleteMessage}
       />
     );
 
     let newGeoMessageElements = [...this.state.geoMessageElements, newGeoMessageElement];
 
+    this.setState({ geoMessageElements: newGeoMessageElements }, this.scrollGeoMessagesToBottom);
+  }
+
+  onDeleteMessage = (deletedMessage) => {
+    let newGeoMessageElements = this.state.geoMessageElements.filter(
+      x => x.props.message.id !== deletedMessage.id
+    );
+    
     this.setState({ geoMessageElements: newGeoMessageElements }, this.scrollGeoMessagesToBottom);
   }
 

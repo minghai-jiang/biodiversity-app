@@ -115,7 +115,7 @@ class GeoMessageForm extends PureComponent {
     this.setState({ loading: true }, () => {
 
       let timestamp = this.props.map.timestamps[this.props.timestampRange.end];
-      
+
       let body = {
         mapId: this.props.map.id,
         timestamp: timestamp.timestampNumber,
@@ -151,6 +151,7 @@ class GeoMessageForm extends PureComponent {
       ApiManager.post(`/geomessage/${urlType}/addMessage`, body, this.props.user)
         .then(result => {
           let newMessage = {
+            id: result.id,
             user: this.props.user.username,
             message: this.state.messageText,
             thumbnail: this.uploadedImage,
@@ -161,7 +162,7 @@ class GeoMessageForm extends PureComponent {
           this.props.onNewMessage(newMessage);
 
           this.fileUploadRef.current.value = '';
-          this.setState({ expanded: false, loading: false, messageText: null });
+          this.setState({ expanded: false, loading: false, messageText: '' });
         })
         .catch(err => {
           alert('An error occurred while adding a GeoMessage.');
@@ -172,7 +173,7 @@ class GeoMessageForm extends PureComponent {
   }
 
   onMessageChange = (e) => {
-    this.messageText = e.target.value;
+    this.setState({ messageText: e.target.value });
   }
 
   render() {

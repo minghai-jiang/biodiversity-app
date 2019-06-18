@@ -103,6 +103,36 @@ class GeoMessage extends PureComponent {
     this.setState({ showImage: false });
   }
 
+  onDeleteMessage = () => {
+    if (!window.confirm('Are you sure you want to delete this message?')) {
+      return;
+    }
+
+    let body = {
+      mapId: this.props.map.id,
+      id: this.props.message.id
+    };
+
+    let urlType = null;
+    if (this.props.type === ViewerUtility.standardTileLayerType) {
+      urlType = 'tile';
+    }
+    else if (this.props.type === ViewerUtility.polygonLayerType) {
+      urlType = 'polygon';
+    }
+    else if (this.props.type === ViewerUtility.customPolygonTileLayerType) {
+      urlType = 'customPolygon';
+    }
+    else {
+      return;
+    }
+
+    ApiManager.post(`/geomessage/${urlType}/deleteMessage`, body, this.props.user)
+      .then(() => {
+        this.props.onDeleteMessage(this.props.message);
+      });
+  }
+
   render() {
     let message = this.props.message;
 
@@ -145,6 +175,7 @@ class GeoMessage extends PureComponent {
                   <IconButton 
                     className='geomessage-card-action-button' 
                     aria-label='Delete'
+                    onClick={this.onDeleteMessage}
                   >
                     <DeleteIcon/>
                   </IconButton>
