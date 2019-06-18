@@ -8,6 +8,6 @@ div.class-selector {
 }
 
 div.geomessage-messages-card {
-  height: calc(100% - 76px);
+  height: calc(100% - 60px);
   overflow-y: auto;
 }

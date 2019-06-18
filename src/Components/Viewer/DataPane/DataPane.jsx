@@ -77,6 +77,7 @@ class DataPane extends PureComponent {
         <GeoMessageControl
           user={this.props.user}
           map={this.props.map}
+          timestampRange={this.props.timestampRange}
           element={this.props.element}
           action={action}
         />

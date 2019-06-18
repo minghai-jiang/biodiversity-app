@@ -35,14 +35,27 @@ class GeoMessage extends PureComponent {
       showImage: false,
 
       loadingImage: false,
-      fullImage: null
+      fullImage: null,
+
+      fullImageAsThumbnail: false
     };
   }
 
   componentDidMount() {
+    if (this.props.message.fullImage && !this.state.fullImageAsThumbnail) {
+      this.setState({ fullImage: this.props.message.fullImage, fullImageAsThumbnail: true });
+    }
   }
 
   componentDidUpdate(prevProps) {
+    if (prevProps.message !== this.props.message) {
+      if (this.props.message.fullImage && !this.state.fullImageAsThumbnail) {
+        this.setState({ fullImage: this.props.message.fullImage, fullImageAsThumbnail: true });
+      }
+      else {
+        this.setState({ fullImage: null, fullImageAsThumbnail: false });
+      }
+    }
   }
 
   showImage = () => {
@@ -53,12 +66,17 @@ class GeoMessage extends PureComponent {
     if (!this.state.fullImage) {
       this.setState({ loadingImage: true}, () => {
         this.getImageData()
-          .then(fullImage => {
-            this.setState({ 
-              showImage: true, 
-              loadingImage: false, 
-              fullImage: fullImage 
-            });
+          .then(fullImageBlob => {
+            let reader = new FileReader();
+            reader.readAsDataURL(fullImageBlob); 
+            reader.onloadend = () => {
+                let fullImage = reader.result;
+                this.setState({ 
+                  showImage: true, 
+                  loadingImage: false, 
+                  fullImage: fullImage 
+                });
+            };
           })
           .catch(err => {
             this.setState({ loadingImage: false });
@@ -121,6 +139,17 @@ class GeoMessage extends PureComponent {
                 {Moment(message.date).format('YYYY-MM-DD')}
               </div>
             }
+            action={
+              mayDelete ? 
+                <CardActions className='geomessage-card-actions'>
+                  <IconButton 
+                    className='geomessage-card-action-button' 
+                    aria-label='Delete'
+                  >
+                    <DeleteIcon/>
+                  </IconButton>
+                </CardActions> : null
+            }
           />
           <CardContent className='geomessage-card-content'>
             <div>
@@ -128,32 +157,22 @@ class GeoMessage extends PureComponent {
             </div>
             {imageElement}
           </CardContent>
-          {
-            mayDelete ? 
-              <CardActions className='geomessage-card-actions'>
-                <IconButton 
-                  className='geomessage-card-action-button' 
-                  aria-label='Delete'
-                >
-                  <DeleteIcon/>
-                </IconButton>
-              </CardActions> : null
-          }
         </Card>
          {
-            this.state.fullImage && this.state.showImage ?
-              <div className='geomessage-lightbox' onClick={this.onLightboxClose}>
-                <div className='geomessage-lightbox-close-button'>
-                  <IconButton
-                    onClick={this.onLightboxClose}
-                    aria-label='Close'
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </div>
-                <img className='geomessage-lightbox-image' src={this.state.fullImage}></img>
-              </div> :
-              null
+          this.state.fullImage && this.state.showImage ?
+            <div className='geomessage-lightbox' onClick={this.onLightboxClose}>
+              <div className='geomessage-lightbox-close-button'>
+                <IconButton
+                  onClick={this.onLightboxClose}
+                  color='secondary'
+                  aria-label='Close'
+                >
+                  <ClearIcon />
+                </IconButton>
+              </div>
+              <img className='geomessage-lightbox-image' src={this.state.fullImage}></img>
+            </div> :
+            null
           }
       </div>
 

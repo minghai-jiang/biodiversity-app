@@ -132,15 +132,34 @@ class GeoMessageControl extends PureComponent {
           loading: false, 
           rawGeoMessages: rawGeoMessages, 
           geoMessageElements: geoMessageElements 
-        },
-        () => {
-          let c = this.geomessagesContainerCard.current;
-          c.scrollTop = c.scrollHeight;
-        });
+        }, this.scrollGeoMessagesToBottom);
       })
       .catch(err => {
         this.setState({ loading: false, rawGeoMessages: null, geoMessageElements: null });
       });
+  }
+
+  onNewMessage = (newMessage) => {
+    let newGeoMessageElement = (
+      <GeoMessage
+        key={Math.random()}
+        user={this.props.user}
+        map={this.props.map}
+        message={newMessage}
+        type={this.props.element.type}
+      />
+    );
+
+    let newGeoMessageElements = [...this.state.geoMessageElements, newGeoMessageElement];
+
+    this.setState({ geoMessageElements: newGeoMessageElements }, this.scrollGeoMessagesToBottom);
+  }
+
+  scrollGeoMessagesToBottom = () => {
+    setTimeout(() => {
+      let c = this.geomessagesContainerCard.current;
+      c.scrollTop = c.scrollHeight;
+    }, 10);
   }
 
   render() {
@@ -156,7 +175,9 @@ class GeoMessageControl extends PureComponent {
         <GeoMessageForm
           user={this.props.user}
           map={this.props.map}
+          timestampRange={this.props.timestampRange}
           element={this.props.element}
+          onNewMessage={this.onNewMessage}
         />
       </div>
     );

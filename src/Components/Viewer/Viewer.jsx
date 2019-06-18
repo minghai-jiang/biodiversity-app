@@ -288,6 +288,7 @@ class Viewer extends PureComponent {
             user={this.props.user}
             isOpen={this.state.panes.includes(DATA_PANE_NAME)}
             map={this.state.map}
+            timestampRange={this.state.timestampRange}
             action={this.state.dataPaneAction}
             element={this.state.selectedElement}
           />

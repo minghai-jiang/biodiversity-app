@@ -8,6 +8,7 @@ import { withRouter } from 'react-router';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import teal from '@material-ui/core/colors/teal';
+import grey from '@material-ui/core/colors/grey';
 
 import ApiManager from './ApiManager';
 import ErrorHandler from './ErrorHandler';
@@ -28,7 +29,12 @@ const localStorageUserItem = 'user';
 
 const theme = createMuiTheme({
   palette: {
-    primary: teal
+    primary: {
+      main: '#026464'
+    },
+    secondary: {
+      main: '#f5f5f5'
+    }
   },
 });
 

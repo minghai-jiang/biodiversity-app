@@ -1,5 +1,10 @@
 div.geomessage-form-card {
-  height: 68px;
+  height: 53px;
+  background-color: #e1e1e1;
+}
+
+div.geomessage-form-card-header {
+  padding: 8px;
 }
 
 div.geomessage-form-card-expanded {
@@ -9,7 +14,43 @@ div.geomessage-form-card-expanded {
   bottom: 12px; 
 }
 
+
 .geomessage-expanded-title {
   font-size: 16px;
   color: #026464;
+}
+
+button.geomessage-add-expand-button {
+  font-size: 14px;
+  color: #026464;
+}
+
+div.geomessage-text-input-form {
+  width: 100%;
+}
+
+div.geomessage-text-input {
+  font-family: monospace
+}
+
+div.geomessage-form-card-item {
+  margin-top: 8px;
+  text-align: left;
+}
+
+button.geomessage-submit-button {
+  display: block;
+  width: 50%;
+  margin-left: auto;
+}
+
+.geomessage-upload-image-label {
+  font-size: 15px;
+}
+
+
+@media only screen and (max-width: 930px) {
+  button.geomessage-add-expand-button {
+    font-size: 10px;
+  }
 }
