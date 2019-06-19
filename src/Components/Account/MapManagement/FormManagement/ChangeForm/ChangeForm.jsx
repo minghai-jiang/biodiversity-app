@@ -33,7 +33,7 @@ class ChangeForm extends PureComponent {
     let x = {"question": '', "type": '', "obligatory": ''}
     x["question"] = this.state.questions[0]["question"]
     x["type"] = this.state.questions[0]["type"]
-    x["obligatory"] = this.state.questions[0]["obligatory"]
+    x["obligatory"] = this.state.questions[0]["obligatory"] === 'yes';
 
     this.state.questions.splice(1,0,x)
 
@@ -51,11 +51,11 @@ class ChangeForm extends PureComponent {
 let questions = this.state.questions
 questions.shift()
 let form = {"questions": questions}
-console.log(this.props.form["formname"])
+console.log(this.props.form["formName"])
 console.log(this.props.map.id)
 console.log(form["questions"])
 
-ApiManager.fetch('POST', '/geoMessage/alterForm', {"mapId": this.props.map.id, "newName":this.props.form["formname"], "oldName":this.props.form["formname"], "form": form}, this.props.user)
+ApiManager.fetch('POST', '/geoMessage/alterForm', {"mapId": this.props.map.id, "newName":this.props.form["formName"], "oldName":this.props.form["formName"], "form": form}, this.props.user)
   .then(() => {
     //redirect
   })
@@ -185,7 +185,7 @@ ApiManager.fetch('POST', '/geoMessage/alterForm', {"mapId": this.props.map.id, "
 
     modeElement = (
       <div>
-      <h2> {this.props.localization["Altering"]} {this.props.form["formname"]} </h2>
+      <h2> {this.props.localization["Altering"]} {this.props.form["formName"]} </h2>
 
         <ReactTable
           key={Math.random()}

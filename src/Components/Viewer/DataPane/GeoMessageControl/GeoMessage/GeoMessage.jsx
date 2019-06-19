@@ -58,6 +58,30 @@ class GeoMessage extends PureComponent {
     }
   }
 
+  renderFormAnswers = () => {
+    let message = this.props.message;
+
+    if (!message.form || message.form.length === 0) {
+      return null;
+    }
+
+    let answers = [];
+
+    for (let i = 0; i < message.form.length; i++) {
+      let answer = message.form[i];
+
+      let answerElement = (
+        <div key={answer.question}>
+          {`${answer.question}: ${answer.answer}`}
+        </div>
+      );
+
+      answers.push(answerElement);
+    }
+
+    return answers;
+  }
+
   showImage = () => {
     if (this.state.loadingImage) {
       return;
@@ -185,6 +209,9 @@ class GeoMessage extends PureComponent {
           <CardContent className='geomessage-card-content'>
             <div>
               {message.message}
+            </div>
+            <div>
+              {this.renderFormAnswers()}
             </div>
             {imageElement}
           </CardContent>

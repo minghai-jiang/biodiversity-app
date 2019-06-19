@@ -25,12 +25,20 @@ const ViewerUtility = {
     spectralIndices: 'spectral_indices'
   },
 
-  specialClassNames: {
+  specialClassName: {
     allClasses: 'all classes',
     mask: 'mask',
     blanc: 'blanc',
     noClass: 'no class'
+  },
+
+  geomessageFormType: {
+    text: 'text',
+    numeric: 'numeric',
+    boolean: 'boolean'
   }
+
+
 }
 
 export default ViewerUtility;

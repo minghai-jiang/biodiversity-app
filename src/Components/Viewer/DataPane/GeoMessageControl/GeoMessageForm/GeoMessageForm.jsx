@@ -15,7 +15,7 @@ import {
   Collapse,
   IconButton,
   TextField,
-  Input
+  Checkbox
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -51,7 +51,11 @@ class GeoMessageForm extends PureComponent {
       loading: false,
 
       hasPermissions: false,
-      messageText: null
+      messageText: null,
+
+      selectedFormName: 'default',
+
+      formAnswers: []
     };
   }
 
@@ -59,6 +63,96 @@ class GeoMessageForm extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
+  }
+
+  renderFormSection = () => {
+    let mapForms = this.props.map.forms;
+
+    if (!mapForms || mapForms.length === 0) {
+      return null;
+    }
+
+    let formOptions = [
+    ];
+
+    for (let i = 0; i < mapForms.length; i++) {
+      let formName = mapForms[i].formName;
+
+      formOptions.push(
+        <MenuItem key={formName} value={formName}>
+          {formName}
+        </MenuItem>
+      );
+    }
+
+    let formSelect = (
+      <Select key='form-selector' className='selector' onChange={this.onSelectForm} value={this.state.selectedFormName}>
+        <MenuItem value='default' disabled hidden>(Optional) Select a form</MenuItem>
+        {formOptions}
+      </Select>
+    )
+
+    let formQuestions = [];
+    let selectedForm = mapForms.find(x => x.formName === this.state.selectedFormName);
+
+    if (selectedForm) {
+      let questions = selectedForm.form.questions;
+
+      for (let i = 0; i < questions.length; i++) {
+        let question = questions[i];
+
+        let questionElement = null;
+
+        if (question.type === ViewerUtility.geomessageFormType.text) {
+          questionElement = (
+            <TextField
+              className='geomessage-form-question geomessage-text-input-form'
+              label={question.question}
+              multiline
+              InputProps={{
+                className: 'geomessage-text-input'
+              }}
+              value={this.state.formAnswers[i]}
+              required={question.obligatory === 'yes'}
+              onChange={(e) => this.onFormAnswer(e, i, false)}
+            />
+          );
+        }
+        else if (question.type === ViewerUtility.geomessageFormType.numeric) {
+          questionElement = (
+            <TextField
+              className='geomessage-form-question geomessage-text-input-form'
+              label={question.question}
+              type='number'
+              InputProps={{
+                className: 'geomessage-text-input'
+              }}
+              value={this.state.formAnswers[i]}
+              required={question.obligatory === 'yes'}
+              onChange={(e) => this.onFormAnswer(e, i, false)}
+            />
+          )
+        }
+        else if (question.type === ViewerUtility.geomessageFormType.boolean) {
+          questionElement = (
+            <div className='geomessage-form-question geomessage-checkbox-question'>
+              {question.question}
+              <Checkbox
+                name={question.question}
+                color='primary'
+                required={question.obligatory === 'yes'}
+                onChange={(e) => this.onFormAnswer(e, i, true)}
+              />
+            </div>
+ 
+          )
+        }
+
+        formQuestions.push(questionElement);
+      }
+    }
+
+    return [formSelect, formQuestions];
   }
 
   toggleExpand = () => {
@@ -112,6 +206,22 @@ class GeoMessageForm extends PureComponent {
   }
 
   onGeoMessageSubmit = () => {
+    let selectedForm = null;
+
+    if (this.state.selectedFormName) {
+      selectedForm = this.props.map.forms.find(x => x.formName === this.state.selectedFormName);
+
+      if (selectedForm) {
+        for (let i = 0; i < selectedForm.form.questions.length; i++) {
+          if (selectedForm.form.questions[i].obligatory === 'yes' && 
+            (this.state.formAnswers[i] === undefined || this.state.formAnswers[i] === null)) {
+            alert('Not all mandatory fields are filled.');
+            return;
+          }
+        }
+      }
+    }
+
     this.setState({ loading: true }, () => {
 
       let timestamp = this.props.map.timestamps[this.props.timestampRange.end];
@@ -148,6 +258,26 @@ class GeoMessageForm extends PureComponent {
         return;
       }
 
+      if (selectedForm) {
+        let formAnswers = [];
+
+        for (let i = 0; i < selectedForm.form.questions.length; i++) {
+          let question = selectedForm.form.questions[i];
+
+          let answer = this.state.formAnswers[i];
+
+          let formAnswer = {
+            type: question.type,
+            question: question.question,
+            answer: answer === undefined ? null : answer
+          };
+
+          formAnswers.push(formAnswer);
+        }
+
+        body.form = formAnswers;
+      }
+
       ApiManager.post(`/geomessage/${urlType}/addMessage`, body, this.props.user)
         .then(result => {
           let newMessage = {
@@ -156,7 +286,8 @@ class GeoMessageForm extends PureComponent {
             message: this.state.messageText,
             thumbnail: this.uploadedImage,
             fullImage: this.uploadedImage,
-            date: Moment().format()
+            date: Moment().format(),
+            form: body.form
           };
 
           this.props.onNewMessage(newMessage);
@@ -174,6 +305,24 @@ class GeoMessageForm extends PureComponent {
 
   onMessageChange = (e) => {
     this.setState({ messageText: e.target.value });
+  }
+
+  onSelectForm = (e) => {
+    this.setState({ selectedFormName: e.target.value });
+  }
+
+  onFormAnswer = (e, answerIndex, isCheckbox) => {
+    let newAnswers = [...this.state.formAnswers];
+
+    if (!isCheckbox) {
+      newAnswers[answerIndex] = e.target.value;
+    }
+    else {
+      debugger;
+      newAnswers[answerIndex] = e.target.checked;
+    }
+
+    this.setState({ formAnswers: newAnswers });
   }
 
   render() {
@@ -253,15 +402,20 @@ class GeoMessageForm extends PureComponent {
                 : 'Insufficient permissions to add image'
             }
             </div>  
-            <Button 
-              className='geomessage-form-card-item geomessage-submit-button'
-              variant='contained' 
-              color='primary'
-              onClick={this.onGeoMessageSubmit}
-              disabled={this.state.loading}
-            >
-              Submit
-            </Button>
+            <div className='geomessage-form-section'>
+              {this.renderFormSection()}
+            </div>
+            <div className='geomessage-form-section'>
+              <Button 
+                className='geomessage-form-card-item geomessage-submit-button'
+                variant='contained' 
+                color='primary'
+                onClick={this.onGeoMessageSubmit}
+                disabled={this.state.loading}
+              >
+                Submit
+              </Button>
+            </div>
             { this.state.loading ? <CircularProgress className='loading-spinner'/> : null}
           </CardContent>
         </Collapse>

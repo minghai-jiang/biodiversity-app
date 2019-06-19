@@ -71,7 +71,7 @@ class AnalyseControl extends PureComponent {
   }
 
   getAvailableClasses = () => {
-    let availableClasses = [ViewerUtility.specialClassNames.allClasses];
+    let availableClasses = [ViewerUtility.specialClassName.allClasses];
 
     for (let i = 0; i < this.props.map.classes.length; i++) {
       let timestampClasses = this.props.map.classes[i];
@@ -79,7 +79,7 @@ class AnalyseControl extends PureComponent {
       for (let x = 0; x < timestampClasses.classes.length; x++) {
         let className = timestampClasses.classes[x].name;
 
-        if (className === ViewerUtility.specialClassNames.blanc || className === ViewerUtility.specialClassNames.mask) {
+        if (className === ViewerUtility.specialClassName.blanc || className === ViewerUtility.specialClassName.mask) {
           continue;
         }
 

@@ -83,8 +83,6 @@ export class MapSelector extends PureComponent {
     let classesPromise = ApiManager.post('/metadata/classes', body, this.props.user);
     let spectralIndicesPromise = ApiManager.post('/metadata/spectral', body, this.props.user);
 
-    let formsPromise = ApiManager.post('/geomessage/getForms', body, this.props.user);
-
     let promises = [
       timestampsPromise,
       tileLayersPromise, 
@@ -92,9 +90,7 @@ export class MapSelector extends PureComponent {
       customPolygonLayersPromise,
 
       classesPromise, 
-      spectralIndicesPromise,
-
-      formsPromise
+      spectralIndicesPromise
     ];
 
     return Promise.all(promises)
@@ -109,7 +105,15 @@ export class MapSelector extends PureComponent {
         map.classes = results[4];
         map.spectralIndices = results[5];
 
-        map.forms = results[6];
+        if (this.props.user && map.accessLevel >= ApiManager.accessLevels.addGeoMessages) {
+          return ApiManager.post('/geomessage/getForms', body, this.props.user);
+        }
+        else {
+          return null;
+        }
+      })      
+      .then(forms => {
+        map.forms = forms;
 
         map.metadataLoaded = true;
       });
@@ -133,7 +137,7 @@ export class MapSelector extends PureComponent {
 
   render() {
     return (
-      <Select key='map-selector' className='map-selector' onChange={this.selectMap} value={this.state.selectedMap.id}>
+      <Select key='map-selector' className='selector' onChange={this.selectMap} value={this.state.selectedMap.id}>
         <MenuItem value='default' disabled hidden>Select a Map</MenuItem>
         {this.renderMapOptions()}
       </Select>

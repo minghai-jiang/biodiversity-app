@@ -190,6 +190,10 @@ button.expand-icon {
   transform: rotate(180deg);
 }
 
+.selector {
+  width: 100%;
+}
+
 @media only screen and (max-width: 600px) {
   .controls-pane {
     width: 100vw;

@@ -67,7 +67,7 @@ export class LineChart extends PureComponent {
 
     if (!isSpectralIndices) {
       let mapClasses = getUniqueLabels(this.props.map.classes, 'classes');
-      columnInfo = mapClasses.filter(x => x.name !== ViewerUtility.specialClassNames.noClass && x.name !== ViewerUtility.specialClassNames.blanc);    
+      columnInfo = mapClasses.filter(x => x.name !== ViewerUtility.specialClassName.noClass && x.name !== ViewerUtility.specialClassName.blanc);    
     }
     else if (type === ViewerUtility.dataGraphType.spectralIndices) {
       columnInfo = getUniqueLabels(this.props.map.spectralIndices, 'indices');
@@ -112,9 +112,9 @@ export class LineChart extends PureComponent {
         let value = row[columnName];
         let date = Moment(row[DATE_COLUMN_NAME]).unix() * 1000;
 
-        if (!isSpectralIndices && columnName === ViewerUtility.specialClassNames.mask && 
-          row[ViewerUtility.specialClassNames.blanc]) {
-          value += row[ViewerUtility.specialClassNames.blanc];
+        if (!isSpectralIndices && columnName === ViewerUtility.specialClassName.mask && 
+          row[ViewerUtility.specialClassName.blanc]) {
+          value += row[ViewerUtility.specialClassName.blanc];
         }
 
         seriesData.push({

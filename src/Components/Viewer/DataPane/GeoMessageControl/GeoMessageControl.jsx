@@ -94,10 +94,8 @@ class GeoMessageControl extends PureComponent {
       return;
     }
 
-
     ApiManager.post(`/geoMessage/${urlType}/getMessages`, body, this.props.user)
       .then(result => {
-        debugger;
         let rawGeoMessages = null;
         let geoMessageElements = [];
 

@@ -26,7 +26,7 @@ class FormManagment extends PureComponent {
   componentDidMount() {
     ApiManager.fetch('POST', '/geoMessage/getForms', {"mapId": this.props.map.id}, this.props.user)
       .then((forms) => {
-        forms = [{'formname': this.props.localization["new form"]}].concat(forms)
+        forms = [{'formName': this.props.localization["new form"]}].concat(forms)
         this.setState({forms:forms });
       })
       .catch(err => {
@@ -43,7 +43,7 @@ class FormManagment extends PureComponent {
   }
 
   deleteFrom = (cellInfo) => {
-      ApiManager.fetch('POST', '/geoMessage/deleteForm', {"mapId": this.props.map.id, "formName":this.state.forms[cellInfo.index]['formname']}, this.props.user)
+      ApiManager.fetch('POST', '/geoMessage/deleteForm', {"mapId": this.props.map.id, "formName":this.state.forms[cellInfo.index]['foformNamermname']}, this.props.user)
         .then(() => {
           this.state.forms.splice(cellInfo.index,1)
         }).then(() => {
@@ -73,7 +73,7 @@ class FormManagment extends PureComponent {
           defaultValue={this.state.forms[cellInfo.index][cellInfo.column.id]}
           onBlur={e => {
             if(cellInfo.index> 0){
-            let body = {"mapId": this.props.map.id, "newName":e.target.value, "oldName":this.state.forms[cellInfo.index]["formname"], "form": this.state.forms[cellInfo.index]["form"]};
+            let body = {"mapId": this.props.map.id, "newName":e.target.value, "oldName":this.state.forms[cellInfo.index]["formName"], "form": this.state.forms[cellInfo.index]["form"]};
             ApiManager.fetch('POST', '/geoMessage/alterForm', body, this.props.user)
                           .then(() => {
                             this.state.forms[cellInfo.index][cellInfo.column.id] = body.newName;
@@ -82,7 +82,7 @@ class FormManagment extends PureComponent {
                           .catch(err => {
                             console.log(err);
                             this.props.showError(err);
-                            this.state.forms[cellInfo.index][cellInfo.column.id] = this.state.forms[cellInfo.index]["formname"];
+                            this.state.forms[cellInfo.index][cellInfo.column.id] = this.state.forms[cellInfo.index]["formName"];
                             let newForms = [...this.state.forms];
                             this.setState({forms:newForms})
                           });
@@ -133,7 +133,7 @@ class FormManagment extends PureComponent {
               columns={[
                 {
                   Header: this.props.localization["form"],
-                  accessor: 'formname',
+                  accessor: 'formName',
                   Cell: this.renderEditable
                 },
                 {
@@ -162,7 +162,7 @@ class FormManagment extends PureComponent {
             showError={this.props.showError}
             user={this.props.user}
             map={this.props.map}
-            formName = {this.state.forms[0]["formname"]}
+            formName = {this.state.forms[0]["formName"]}
           >
           </CreateForm>
         )

@@ -25,8 +25,17 @@ button.geomessage-add-expand-button {
   color: #026464;
 }
 
+div.geomessage-form-question {
+  margin-top: 8px;
+}
+
 div.geomessage-text-input-form {
   width: 100%;
+}
+
+.geomessage-checkbox-question {
+  font-size: 15px;
+  text-align: left;
 }
 
 div.geomessage-text-input {
@@ -47,6 +56,12 @@ button.geomessage-submit-button {
 .geomessage-upload-image-label {
   font-size: 15px;
 }
+
+.geomessage-form-section {
+  margin-top: 12px;
+}
+
+
 
 
 @media only screen and (max-width: 930px) {
