@@ -41,6 +41,8 @@ class Viewer extends PureComponent {
   leafletMap = null;
   setNewViewportTimer = null;
 
+  flyToBounds = null;
+
   constructor(props, context) {
     super(props, context);
 
@@ -104,6 +106,13 @@ class Viewer extends PureComponent {
     );
   }
 
+  attemptFlyTo = () => {
+    if (this.flyToBounds && this.state.panes.includes(MAP_PANE_NAME)) {
+      this.leafletMap.current.leafletElement.flyToBounds(this.flyToBounds);
+      this.flyToBounds = null;
+    }
+  }
+
   onWindowResize = (_, cb) => {
     let isSmallWindow = window.innerWidth <= 600;
     
@@ -146,6 +155,7 @@ class Viewer extends PureComponent {
       currentPanes = [...currentPanes];
       this.setState({ panes: currentPanes }, () => {
         this.leafletMap.current.leafletElement.invalidateSize();
+        this.attemptFlyTo();
       });
     }
   }
@@ -220,6 +230,12 @@ class Viewer extends PureComponent {
     }
   }
 
+  onFlyTo = (bounds) => {
+    this.flyToBounds = bounds;
+
+    this.attemptFlyTo();
+  }
+
   render() {
 
     let mapPaneStyle = {
@@ -250,14 +266,13 @@ class Viewer extends PureComponent {
           <ControlsPane
             user={this.props.user}
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
-            isSmallWindow={this.state.isSmallWindow}
-            leafletMap={this.leafletMap}
             leafletMapViewport={this.state.leafletMapViewport}
             timestampRange={this.state.timestampRange}
             geolocation={this.state.geolocation}
             onSelectMap={this.onSelectMap}
             onLayersChange={this.onLayersChange}
             onFeatureClick={this.onFeatureClick}
+            onFlyTo={this.onFlyTo}
           />
           
           <div className='viewer-pane map-pane' style={mapPaneStyle}>

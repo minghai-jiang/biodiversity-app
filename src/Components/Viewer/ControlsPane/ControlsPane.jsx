@@ -32,39 +32,12 @@ class ControlsPane extends PureComponent {
   }  
 
   componentDidUpdate(prevProps) {
-    // HACKY
-    // this.flyToBounds will be set if on mobile or on a small screen.
-    // In such a situation, having the controls pane open will hide the map, preventing the leaflet
-    // fly-to from working. So we delay the fly to after the controls pane closes.
-    // However, this does not work if the user opens the data pane and not the map pane.
-    if (!this.props.isOpen && prevProps.isOpen && this.flyToBounds) {
-      setTimeout(() => {
-        this.props.leafletMap.current.leafletElement.flyToBounds(this.flyToBounds);
-        this.flyToBounds = null;
-      }, 100);
-
-    }
   }
 
   onSelectMap = (map) => {
-    let leafletMap = this.props.leafletMap;
+    let bounds = L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax));
 
-    if (leafletMap) {
-      let leafletElement = leafletMap.current.leafletElement;
-
-      let bounds = L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax));
-
-      if (!isMobile && !this.props.isSmallWindow) {
-        leafletElement.flyToBounds(bounds);
-      }
-      else {
-        // let centerY = map.yMin + (map.yMax - map.yMin) / 2;
-        // let centerX = map.xMin + (map.xMax - map.xMin) / 2;
-
-        // leafletElement.setView(L.latLng(centerY, centerX), 8);
-        this.flyToBounds = bounds;
-      }
-    }
+    this.props.onFlyTo(bounds);
 
     this.setState({ map: map }, () => this.props.onSelectMap(map));
   }
@@ -110,7 +83,6 @@ class ControlsPane extends PureComponent {
 
         <StandardTileLayersControl
           map={this.state.map}
-          leafletMap={this.props.leafletMap}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.standardTileLayerType, layers)}
@@ -119,7 +91,6 @@ class ControlsPane extends PureComponent {
 
         <PolygonLayersControl
           map={this.state.map}
-          leafletMap={this.props.leafletMap}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.polygonLayerType, layers)}
@@ -128,7 +99,6 @@ class ControlsPane extends PureComponent {
 
         <CustomPolygonLayersControl
           map={this.state.map}
-          leafletMap={this.props.leafletMap}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.customPolygonTileLayerType, layers)}
