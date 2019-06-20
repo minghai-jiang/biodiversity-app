@@ -42,23 +42,15 @@ In this notebook we will study the Netherlands fields map. We fetch the id of th
 ```python
 r = requests.get(url + 'account/myMaps')
 r = r.json()
-mapId = [map['uuid'] for map in r if map['name'] == 'Netherlands plots'][0]
+mapId = [map['uuid'] for map in r if map['name'] == 'LNV maai en oogst kaart'][0]
 mapId
 ```
 
 
-    ---------------------------------------------------------------------------
-
-    IndexError                                Traceback (most recent call last)
-
-    <ipython-input-3-bf54c3cc8f4a> in <module>
-          1 r = requests.get(url + 'account/myMaps')
-          2 r = r.json()
-    ----> 3 mapId = [map['uuid'] for map in r if map['name'] == 'Netherlands plots'][0]
-          4 mapId
 
 
-    IndexError: list index out of range
+    'd9903b33-f5d1-4d57-992f-3d8172460126'
+
 
 
 Let's see what timestamps are available for this map.
@@ -539,9 +531,9 @@ plt.imshow(img)
 ![png](output_27_1.png)
 
 
-## Spectral indices analysis
+## Measurements analysis
 
-Besides class data, the API can also provide the average values of some spectral indices for each parcel. These indices get more meaningful when combined with information about the mowing regime, so we need to put the information we have gathered so far in a suitable form.
+Besides class data, the API can also provide the average values of some measurements for each parcel. These indices get more meaningful when combined with information about the mowing regime, so we need to put the information we have gathered so far in a suitable form.
 
 
 ```python
@@ -581,15 +573,15 @@ r_1.loc[r_1['not recently mowed'] > 0.3, 'status'] = 'not recently mowed'
 r_1 = r_1[['id','very recently mowed','recently mowed', 'not recently mowed', 'other', 'status']]
 ```
 
-Now we are ready to request the spectral data. Let's request both timestamps.
+Now we are ready to request the measurement data. Let's request both timestamps.
 
 
 ```python
-s_0 = requests.post(url + 'data/spectral/polygon/polygonIds',
+s_0 = requests.post(url + 'data/measurement/polygon/polygonIds',
                  json = {"mapId":  mapId, 'timestamp':0, 'polygonIds': parcels['id'].tolist(), 'class': 'all classes' })
 s_0 = pd.read_csv(StringIO(s_0.text))
 
-s_1 = requests.post(url + 'data/spectral/polygon/polygonIds',
+s_1 = requests.post(url + 'data/measurement/polygon/polygonIds',
                  json = {"mapId":  mapId, 'timestamp':1, 'polygonIds': parcels['id'].tolist(), 'class': 'all classes' })
 s_1 = pd.read_csv(StringIO(s_1.text))
 ```
