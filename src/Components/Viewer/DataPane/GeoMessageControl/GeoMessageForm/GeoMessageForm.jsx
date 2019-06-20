@@ -51,7 +51,7 @@ class GeoMessageForm extends PureComponent {
       loading: false,
 
       hasPermissions: false,
-      messageText: null,
+      messageText: '',
 
       selectedFormName: 'default',
 
@@ -87,7 +87,7 @@ class GeoMessageForm extends PureComponent {
 
     let formSelect = (
       <Select key='form-selector' className='selector' onChange={this.onSelectForm} value={this.state.selectedFormName}>
-        <MenuItem value='default' disabled hidden>(Optional) Select a form</MenuItem>
+        <MenuItem key='default' value='default' disabled hidden>(Optional) Select a form</MenuItem>
         {formOptions}
       </Select>
     )
@@ -275,7 +275,10 @@ class GeoMessageForm extends PureComponent {
           formAnswers.push(formAnswer);
         }
 
-        body.form = formAnswers;
+        body.form = {
+          formName: selectedForm.formName,
+          answers: formAnswers
+        };
       }
 
       ApiManager.post(`/geomessage/${urlType}/addMessage`, body, this.props.user)
@@ -318,7 +321,6 @@ class GeoMessageForm extends PureComponent {
       newAnswers[answerIndex] = e.target.value;
     }
     else {
-      debugger;
       newAnswers[answerIndex] = e.target.checked;
     }
 
@@ -351,7 +353,8 @@ class GeoMessageForm extends PureComponent {
             !this.state.expanded ? 
               <Button 
                 className='geomessage-add-expand-button'
-                variant='outlined' 
+                variant='contained'
+                color='primary'
                 onClick={this.toggleExpand} 
                 disabled={!hasAddPermission}
               >

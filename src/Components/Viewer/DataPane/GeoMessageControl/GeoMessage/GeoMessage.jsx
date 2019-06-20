@@ -17,6 +17,7 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ClearIcon from '@material-ui/icons/ClearOutlined';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 
 import Utility from '../../../../../Utility';
 import ViewerUtility from '../../../ViewerUtility';
@@ -33,6 +34,7 @@ class GeoMessage extends PureComponent {
 
     this.state = {
       showImage: false,
+      showForm: false,
 
       loadingImage: false,
       fullImage: null,
@@ -59,16 +61,19 @@ class GeoMessage extends PureComponent {
   }
 
   renderFormAnswers = () => {
+
     let message = this.props.message;
 
-    if (!message.form || message.form.length === 0) {
+    if (!message.form || message.form.length === 0 || !message.form.answers) {
       return null;
     }
 
-    let answers = [];
+    let answers = [
+      <h4>{message.form.formName}</h4>
+    ];
 
-    for (let i = 0; i < message.form.length; i++) {
-      let answer = message.form[i];
+    for (let i = 0; i < message.form.answers.length; i++) {
+      let answer = message.form.answers[i];
 
       let answerElement = (
         <div key={answer.question}>
@@ -106,11 +111,14 @@ class GeoMessage extends PureComponent {
             this.setState({ loadingImage: false });
           });
       });
-
     }
     else {
-      this.setState({ showImage: true });
+      this.setState({ showImage: !this.state.showImage });
     }
+  }
+
+  showForm = () => {
+    this.setState({ showForm: !this.state.showForm });
   }
 
   getImageData = () => {
@@ -121,10 +129,6 @@ class GeoMessage extends PureComponent {
     };
 
     return ApiManager.post('/geoMessage/image', body, this.props.user);
-  }
-
-  onLightboxClose = () => {
-    this.setState({ showImage: false });
   }
 
   onDeleteMessage = () => {
@@ -168,13 +172,32 @@ class GeoMessage extends PureComponent {
       cardClass += ' geomessage-card-own';
     }
 
-    let imageElement = null;
+    let imageAttachment = null;
+    let formAttachment = null;
+
     if (message.thumbnail) {
-      imageElement = (
-        <div className='geomessage-card-thumbnail' onClick={this.showImage}>
-          <img src={message.thumbnail}/>
-          {this.state.loadingImage ? <CircularProgress className='loading-spinner'/> : null}
-        </div>
+      imageAttachment = (
+          <Button 
+            className='geomessage-attachment-button geomessage-attachment-image-button' 
+            variant='outlined' 
+            disableRipple={true} 
+            onClick={this.showImage}
+          >
+            <img src={message.thumbnail}/>
+            {this.state.loadingImage ? <CircularProgress className='loading-spinner'/> : null}
+          </Button>
+      )
+    }
+
+    if (this.props.message.form) {
+      formAttachment = (
+        <Button 
+          className='geomessage-attachment-button geomessage-attachment-form-button' 
+          variant='outlined' 
+          onClick={this.showForm}
+        >
+          <AssignmentIcon className='geomessage-open-form-button-icon'/>
+        </Button>
       )
     }
 
@@ -201,7 +224,7 @@ class GeoMessage extends PureComponent {
                     aria-label='Delete'
                     onClick={this.onDeleteMessage}
                   >
-                    <DeleteIcon/>
+                    <DeleteIcon className='geomessage-delete-button'/>
                   </IconButton>
                 </CardActions> : null
             }
@@ -210,18 +233,22 @@ class GeoMessage extends PureComponent {
             <div>
               {message.message}
             </div>
-            <div>
-              {this.renderFormAnswers()}
-            </div>
-            {imageElement}
+            {
+              imageAttachment || formAttachment ?
+                <div className='geomessage-attachments'>
+                  {imageAttachment}
+                  {formAttachment}
+                </div> : null
+            }
+
           </CardContent>
         </Card>
          {
           this.state.fullImage && this.state.showImage ?
-            <div className='geomessage-lightbox' onClick={this.onLightboxClose}>
+            <div className='geomessage-lightbox' onClick={this.showImage}>
               <div className='geomessage-lightbox-close-button'>
                 <IconButton
-                  onClick={this.onLightboxClose}
+                  onClick={this.showImage}
                   color='secondary'
                   aria-label='Close'
                 >
@@ -229,11 +256,26 @@ class GeoMessage extends PureComponent {
                 </IconButton>
               </div>
               <img className='geomessage-lightbox-image' src={this.state.fullImage}></img>
-            </div> :
-            null
+            </div> : null
+          }
+          {
+            this.state.showForm ? 
+              <div className='geomessage-lightbox' onClick={this.showForm}>
+                <div className='geomessage-lightbox-close-button'>
+                  <IconButton
+                    onClick={this.showForm}
+                    color='secondary'
+                    aria-label='Close'
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                </div>
+                <div className='geomessage-lightbox-text'>
+                  {this.renderFormAnswers()}
+                </div>
+              </div> : null
           }
       </div>
-
     )
   }
 }
