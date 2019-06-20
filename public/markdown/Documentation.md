@@ -525,13 +525,13 @@ CSV with columns tileX, tileY, zoom, [columns of area per class] and total area.
 url = 'https://api.ellipsis-earth.com/data/spectral/customPolygon/timestamps'
 ```
 
-Request to obtain the mean indices of each index over a certain class for each timestamp for a certain custom polygon.(Access level: 200, credits 2000)<br/>
+Request to obtain the mean indices of each measurement over a certain class for each timestamp for a certain custom polygon.(Access level: 200, credits 2000)<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
 geometry: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
-CSV with columns timestamp, [columns of mean per index], total area, date from and date to.
+CSV with columns timestamp, [columns of mean per measurement], total area, date from and date to.
 
 #### Post tiles
 
@@ -540,14 +540,14 @@ CSV with columns timestamp, [columns of mean per index], total area, date from a
 url = 'https://api.ellipsis-earth.com/data/spectral/customPolygon/tiles'
 ```
 
-Request to obtain the mean indices of each index over a certain class for a certain timestamp of all tiles for a custom polygon.(Access level: 200, credits 1000)<br/>
+Request to obtain the mean indices of each measurement over a certain class for a certain timestamp of all tiles for a custom polygon.(Access level: 200, credits 1000)<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
 geometry: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, zoom, [columns of mean per index] and total area.
+CSV with columns tileX, tileY, zoom, [columns of mean per measurement] and total area.
 
 ### data/spectral/polygon
 <a id='data_index_polygon'></a>
@@ -565,7 +565,7 @@ timestamp: An integer identifying the timestamp.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
 ids: A list of polygon ids, cannot be longer than 3000. <br/>
 **Returns**<br/>
-CSV with columns polygon ids, [columns of mean per index] and total area.
+CSV with columns polygon ids, [columns of mean per measurement] and total area.
 
 #### Post timestamps
 
@@ -574,13 +574,13 @@ CSV with columns polygon ids, [columns of mean per index] and total area.
 url = 'https://api.ellipsis-earth.com/data/spectral/polygon/timestamps'
 ```
 
-Request to obtain the mean indices of each index over a certain classs for each timestamp for a certain polygon.(Access level: 200, creidts 500)<br/>
+Request to obtain the mean indices of each measurement over a certain classs for each timestamp for a certain polygon.(Access level: 200, creidts 500)<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 polygonId: An integer identifying the polygon.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
 **Returns**<br/>
-CSV with columns timestamp, [columns of mean per index], total area, date from and date to.
+CSV with columns timestamp, [columns of mean per measurement], total area, date from and date to.
 
 #### Post tiles
 
@@ -589,14 +589,14 @@ CSV with columns timestamp, [columns of mean per index], total area, date from a
 url = 'https://api.ellipsis-earth.com/data/spectral/polygons/tiles'
 ```
 
-Request to obtain the mean indices of each index over a certain class for each standard tile covering a polygon for a certain timestamp.(Access level: 200, credits 500)<br/>
+Request to obtain the mean measurements over a certain class for each standard tile covering a polygon for a certain timestamp.(Access level: 200, credits 500)<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 timestamp: An integer identifying the timestamp.<br/>
 polygonId: An integer identifying the polygon.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, zoom, [columns of mean per index] and total area.
+CSV with columns tileX, tileY, zoom, [columns of mean per measurement] and total area.
 
 ### data/spectral/tile
 <a id='data_index_tile'></a>
@@ -607,13 +607,13 @@ CSV with columns tileX, tileY, zoom, [columns of mean per index] and total area.
 url = 'https://api.ellipsis-earth.com/data/spectral/tile/tileIds'
 ```
 
-Request to obtain the mean indices of each index over a certain class for all tiles at a certain timestamp.(Access level: 200, credits 500)<br/>
+Request to obtain the mean indices of each measurement over a certain class for all tiles at a certain timestamp.(Access level: 200, credits 500)<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
 tileIds: List of key value pairs with key TileX, tileY and optionally zoom, cannot be longer than 3000.<br/>
 **Returns**<br/>
-CSV with columns polygon, [columns of mean per index] and total area.
+CSV with columns polygon, [columns of mean per measurement] and total area.
 
 #### Post timestamps
 
@@ -622,7 +622,7 @@ CSV with columns polygon, [columns of mean per index] and total area.
 url = 'https://api.ellipsis-earth.com/data/spectral/tile/timestamps'
 ```
 
-Request to obtain the mean indices of each index over a certain class for a standard tile for all timestamps.(Access level: 200, credits 500)<br/>
+Request to obtain the mean indices of each measurement over a certain class for a standard tile for all timestamps.(Access level: 200, credits 500)<br/>
 **Parameters**<br/>
 mapId: The uuid of the particular map.<br/>
 class: name of the class to take the mean over, in case means are not saved per class fill in all 'classes'<br/>
@@ -630,7 +630,7 @@ tileX: An integer identifying the x-location of the tile<br/>
 tileY: An integer identifying the y-location of the tile<br/>
 zoom: An integer indicating the zoomlevel of the tile <br/>
 **Returns**<br/>
-CSV with columns tileX, tileY, [columns of mean per index], total area, date from and date to.
+CSV with columns tileX, tileY, [columns of mean per measurement], total area, date from and date to.
 
 <a id='geometry'></a>
 # /geometry
