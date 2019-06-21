@@ -1,6 +1,10 @@
 import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
-
+import { 
+  Card,
+  CardContent,
+  Button
+} from '@material-ui/core';
 import L from 'leaflet';
 
 import MapSelector from './MapSelector/MapSelector';
@@ -12,6 +16,7 @@ import CustomPolygonLayersControl from './CustomPolygonLayersControl/CustomPolyg
 import ViewerUtility from '../ViewerUtility';
 
 import './ControlsPane.css';
+import ApiManager from '../../../ApiManager';
 
 
 class ControlsPane extends PureComponent {
@@ -68,12 +73,30 @@ class ControlsPane extends PureComponent {
       style = { display: 'none' };
     }
 
+    let hasGeoMessageAccess = this.state.map && this.state.map.accessLevel >= ApiManager.accessLevels.viewGeoMessages;
+
     return (
       <div className='viewer-pane controls-pane' style={style}>
         <MapSelector
           user={this.props.user}
           onSelectMap={this.onSelectMap}
         />
+
+        {
+          this.state.map ? (
+            <div className='controls-pane-block'>
+              <Button
+                className='geomessage-feed-button'
+                variant='contained'
+                color='primary'
+                disabled={!hasGeoMessageAccess}
+                onClick={this.props.onOpenGeoMessageFeed}
+              >
+                GeoMessage Feed
+              </Button>
+            </div>
+          ) : null
+        }
 
         <TileLayersControl
           map={this.state.map}

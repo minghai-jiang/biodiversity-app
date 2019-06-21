@@ -109,6 +109,14 @@ svg.geomessage-open-form-button-icon {
   font-size: 30px;
 }
 
+button.geomessage-feed-element-button {
+  padding: 0px;
+  color: rgba(0, 0, 0, 0.54);
+  text-transform: none;
+  font-size: 12px;
+  text-align: left;
+}
+
 .geomessage-lightbox-text {
   position: absolute;
   top: 50%;

@@ -15,7 +15,7 @@ const ViewerUtility = {
 
   dataPaneAction: {
     analyse: 'analyse',
-    geomessage: 'geoMessage',
+    geoMessage: 'geoMessage',
     alterCustomPolygon: 'alter_custom_polygon',
     feed: 'geomessage_feed'
   },

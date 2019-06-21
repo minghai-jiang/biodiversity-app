@@ -2,6 +2,10 @@ import ViewerUtility from '../ViewerUtility';
 
 const DataPaneUtility = {
   isDifferentElement: (prevElement, curElement) => {
+    if (!curElement) {
+      return false;
+    }
+
     let differentElement = !prevElement || prevElement.type !== curElement.type;
 
     if (!differentElement) {

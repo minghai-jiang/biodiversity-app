@@ -34,36 +34,39 @@ class DataPane extends PureComponent {
     }
 
     let element = this.props.element;
+    let action = this.props.action;
+    let title = null;
+    let idText = null;    
 
-
-    if (!element) {
+    if (!action) {
       return (
         <div className='viewer-pane data-pane' style={style}>
-          Please select an element on the map and an action first.
+          Please select an action first.
         </div>
       );
     }
-
-    let title = null;
-    let idText = null;
-
-    if (element.type === ViewerUtility.standardTileLayerType) {
-      title = 'Standard tile';
-      idText = `${element.feature.properties.tileX}, ${element.feature.properties.tileY}, ${element.feature.properties.zoom}`;
+    else if (action === ViewerUtility.dataPaneAction.feed) {
+      title = 'GeoMessage Feed';
+      idText = this.props.map.name;
+    }    
+    else {
+      if (element.type === ViewerUtility.standardTileLayerType) {
+        title = 'Standard tile';
+        idText = `${element.feature.properties.tileX}, ${element.feature.properties.tileY}, ${element.feature.properties.zoom}`;
+      }
+      else if (element.type === ViewerUtility.polygonLayerType) {
+        title = 'Polygon';
+        idText = element.feature.properties.id;
+      }
+      else if (element.type === ViewerUtility.customPolygonTileLayerType) {
+        title = 'Custom polygon';
+        idText = element.feature.properties.id;
+      }
     }
-    else if (element.type === ViewerUtility.polygonLayerType) {
-      title = 'Polygon';
-      idText = element.feature.properties.id;
-    }
-    else if (element.type === ViewerUtility.customPolygonTileLayerType) {
-      title = 'Custom polygon';
-      idText = element.feature.properties.id;
-    }
 
-    let action = this.props.action;
     let actionControl = null;
 
-    if (this.props.action === ViewerUtility.dataPaneAction.analyse) {
+    if (action === ViewerUtility.dataPaneAction.analyse) {
       actionControl = (
         <AnalyseControl
           user={this.props.user}
@@ -72,7 +75,8 @@ class DataPane extends PureComponent {
         />
       );
     }
-    else if (action === ViewerUtility.dataPaneAction.geomessage || action === ViewerUtility.dataPaneAction.feed) {
+    else if (action === ViewerUtility.dataPaneAction.geoMessage || 
+      action === ViewerUtility.dataPaneAction.feed) {
       actionControl = (
         <GeoMessageControl
           user={this.props.user}
@@ -95,11 +99,12 @@ class DataPane extends PureComponent {
               </Typography>
             }
             subheader={
-              <Button>
-                <div className='data-pane-title-card-subtitle'>
-                  {idText}
-                </div>
-              </Button>
+              idText ? 
+                <Button>
+                  <div className='data-pane-title-card-subtitle'>
+                    {idText}
+                  </div>
+                </Button> : null
             }
           />
         </Card>

@@ -25,6 +25,7 @@ import DataPaneUtility from '../../DataPaneUtility';
 
 import './GeoMessage.css';
 import ApiManager from '../../../../../ApiManager';
+import { element } from 'prop-types';
 
 
 class GeoMessage extends PureComponent {
@@ -125,7 +126,7 @@ class GeoMessage extends PureComponent {
     let body = { 
       mapId: this.props.map.id, 
       geoMessageId: this.props.message.id,
-      type: this.props.type
+      type: this.props.type === ViewerUtility.dataPaneAction.feed ? this.props.message.type : this.props.type
     };
 
     return ApiManager.post('/geoMessage/image', body, this.props.user);
@@ -142,17 +143,22 @@ class GeoMessage extends PureComponent {
     };
 
     let urlType = null;
-    if (this.props.type === ViewerUtility.standardTileLayerType) {
-      urlType = 'tile';
-    }
-    else if (this.props.type === ViewerUtility.polygonLayerType) {
-      urlType = 'polygon';
-    }
-    else if (this.props.type === ViewerUtility.customPolygonTileLayerType) {
-      urlType = 'customPolygon';
+    if (this.props.type === ViewerUtility.dataPaneAction.feed) {
+      urlType = this.props.message.type;
     }
     else {
-      return;
+      if (this.props.type === ViewerUtility.standardTileLayerType) {
+        urlType = 'tile';
+      }
+      else if (this.props.type === ViewerUtility.polygonLayerType) {
+        urlType = 'polygon';
+      }
+      else if (this.props.type === ViewerUtility.customPolygonTileLayerType) {
+        urlType = 'customPolygon';
+      }
+      else {
+        return;
+      }
     }
 
     ApiManager.post(`/geomessage/${urlType}/deleteMessage`, body, this.props.user)
@@ -201,6 +207,28 @@ class GeoMessage extends PureComponent {
       )
     }
 
+    let subheaderElementButton = null;
+
+    if (this.props.type === ViewerUtility.dataPaneAction.feed) {
+      let elementIdText = null;
+
+      if (message.type === ViewerUtility.standardTileLayerType) {
+        elementIdText = `standard tile: ${message.elementId.tileX}, ${message.elementId.tileY}, ${message.elementId.zoom}`;
+      }
+      else if (message.type === ViewerUtility.polygonLayerType) {
+        elementIdText = `polygon: ${message.elementId}`;
+      }
+      else if (message.type === ViewerUtility.customPolygonTileLayerType) {
+        elementIdText = `custom polygon: ${message.elementId}`;
+      }
+
+      subheaderElementButton = (
+        <Button className='geomessage-feed-element-button'>
+          {elementIdText}
+        </Button>
+      );
+    }
+
     return (
       <div>
         <Card className={cardClass}>
@@ -213,7 +241,10 @@ class GeoMessage extends PureComponent {
             }
             subheader={
               <div className='geomessage-card-subtitle'>
-                {Moment(message.date).format('YYYY-MM-DD')}
+                {subheaderElementButton}
+                <div>
+                  {Moment(message.date).format('YYYY-MM-DD HH:MM:SS')}
+                </div>
               </div>
             }
             action={

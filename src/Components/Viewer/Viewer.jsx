@@ -17,6 +17,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
 import './Viewer.css';
+import ViewerUtility from './ViewerUtility';
 
 // This block is purely to get the marker icon of Leaflet to work.
 // Taken somewhere from the web.
@@ -171,6 +172,10 @@ class Viewer extends PureComponent {
     });
   }
 
+  onOpenGeoMessageFeed = () => {
+    this.onDataPaneAction(ViewerUtility.dataPaneAction.feed);
+  }
+
   onLayersChange = (layers) => {
     this.setState({ leafletLayers: layers });
   }
@@ -270,6 +275,7 @@ class Viewer extends PureComponent {
             timestampRange={this.state.timestampRange}
             geolocation={this.state.geolocation}
             onSelectMap={this.onSelectMap}
+            onOpenGeoMessageFeed={this.onOpenGeoMessageFeed}
             onLayersChange={this.onLayersChange}
             onFeatureClick={this.onFeatureClick}
             onFlyTo={this.onFlyTo}

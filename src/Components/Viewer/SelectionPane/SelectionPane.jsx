@@ -81,13 +81,13 @@ class SelectionPane extends PureComponent {
         </Button>
       );
       
-      let geomessageButton = (
+      let geoMessageButton = (
         <Button 
-          key='geomessage' 
+          key='geoMessage' 
           variant='outlined' 
           size='small' 
           className='selection-pane-button'
-          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.geomessage)}
+          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.geoMessage)}
           disabled={mapAccessLevel < ApiManager.accessLevels.viewGeoMessages}
         >
           Geomessage
@@ -97,7 +97,7 @@ class SelectionPane extends PureComponent {
       buttons.push(
         <div key='general_actions'>
           {analyseButton}
-          {geomessageButton}
+          {geoMessageButton}
         </div>
       )
     }

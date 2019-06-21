@@ -33,7 +33,6 @@ export class MapSelector extends PureComponent {
   getMaps = async () => {
     ApiManager.get('/account/myMaps', null, this.props.user)
       .then(maps => {
-        maps = maps.filter(x => x.id !== 'ea53987e-842d-4467-91c3-9e23b3e5e2e8');
         this.setState({ maps: maps });
       })
       .catch(err => {
@@ -68,7 +67,7 @@ export class MapSelector extends PureComponent {
 
   getMapMetadata = (map) => {
     if (map.metadataLoaded) {
-      return;
+      return Promise.resolve();
     }
 
     let body = {
