@@ -31,7 +31,7 @@ Now let's save the url that we need in a variable to shorten our code at a later
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/'
+url = 'https://api.ellipsis-earth.com/v1'
 ```
 
 Lastly we store the id of the chaco_demo map in a variable as well.

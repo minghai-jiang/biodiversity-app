@@ -33,7 +33,7 @@ For convenience we store the base url in a variable
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/'
+url = 'https://api.ellipsis-earth.com/v1'
 ```
 
 In this notebook we will study the Netherlands fields map. We fetch the id of this map and store it in mapId.

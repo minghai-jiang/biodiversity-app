@@ -6,26 +6,27 @@ People wanting to use the API for analysis purposes can best visit the tutorial 
 # Contents
 
 0. <a href='#privileges'>**Access**</a>
-1. <a href='#account'>**/account**</a>
-2. <a href='#settings'>**/settings**</a>
-3. <a href='#metadata'>**/metadata**</a>
-4. <a href='#data'>**/data**</a> <br/>
-     4.1 <a href='#data_class'>*/data/class*</a> <br/>
-      4.1.1 <a href='#data_class_custom'>/data/class/customPolygon</a> <br/>
-      4.1.2 <a href='#data_class_polygon'>/data/class/polygon</a> <br/>
-      4.1.3 <a href='#data_class_tile'>/data/class/tile</a> <br/>
-     4.2 <a href='#data_index'>*/data/spectral*</a><br/>
-      4.2.1 <a href='#data_index'>/data/spectral/customPolygon</a> <br/>
-      4.2.2 <a href='#data_index'>/data/spectral/polygon</a> <br/>
-      4.2.3 <a href='#data_index'>/data/spectral/tile</a> <br/>
-5. <a href='#geometry'>**/geometry**</a><br/>
-6. <a href='#visual'>**/visual**</a>
-7. <a href='#tileService'>**/tileService**</a> 
-8. <a href='#geoMessage'>**/geoMessage**</a> <br/>
-     8.1 <a href='#forms'>*/geoMessage/forms*</a> <br/>
-     8.2 <a href='#message_tile'>*/geoMessage/tile*</a> <br/>
-     8.3 <a href='#message_polygon'>*/geoMessage/polygon*</a> <br/>
-     8.4 <a href='#message_customPolygon'>*/geoMessage/customPolygon*</a> <br/>    
+1. <a href='#Route'>**Route**</a> 
+2. <a href='#account'>**/account**</a>
+3. <a href='#settings'>**/settings**</a>
+4. <a href='#metadata'>**/metadata**</a>
+5. <a href='#data'>**/data**</a> <br/>
+      5.1 <a href='#data_class'>*/data/class*</a> <br/>
+      5.1.1 <a href='#data_class_custom'>/data/class/customPolygon</a> <br/>
+      5.1.2 <a href='#data_class_polygon'>/data/class/polygon</a> <br/>
+      5.1.3 <a href='#data_class_tile'>/data/class/tile</a> <br/>
+      5.2 <a href='#data_index'>*/data/spectral*</a><br/>
+      5.2.1 <a href='#data_index'>/data/spectral/customPolygon</a> <br/>
+      5.2.2 <a href='#data_index'>/data/spectral/polygon</a> <br/>
+      5.2.3 <a href='#data_index'>/data/spectral/tile</a> <br/>
+6. <a href='#geometry'>**/geometry**</a><br/>
+7. <a href='#visual'>**/visual**</a>
+8. <a href='#tileService'>**/tileService**</a> 
+9. <a href='#geoMessage'>**/geoMessage**</a> <br/>
+     9.1 <a href='#forms'>*/geoMessage/forms*</a> <br/>
+     9.2 <a href='#message_tile'>*/geoMessage/tile*</a> <br/>
+     9.3 <a href='#message_polygon'>*/geoMessage/polygon*</a> <br/>
+     9.4 <a href='#message_customPolygon'>*/geoMessage/customPolygon*</a> <br/>    
 
 <a id='privaliges'></a>
 # Access
@@ -52,13 +53,23 @@ The required access level is mentioned for each API call that requires them in t
 
 The API is throttled. Each user has a limited number of credits each minute. You can find the credit costs for each call in the documentation below. Credit is refilled each minute on the minute.
 
+<a id='Route'></a>
+# Routes
+All requests should be directed to the following base url followed by the metntioned extension.
+
+
+```python
+url = 'https://api.ellipsis-earth.com/v1/'
+```
+
+In case you want to use a previous version of the API pleas lower the number after the 'v' in the url.
 <a id='account'></a>
 # /account
 #### Post login
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/login'
+url = '/account/login'
 ```
 
 Request to obtain a token to access restricted information. (no access level, credits: 1)<br/>
@@ -72,7 +83,7 @@ JSON with token.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/myMaps'
+url = '/account/myMaps'
 ```
 
 Request to obtain all maps that a user has access to. (no access level, credits: 1)<br/>
@@ -85,7 +96,7 @@ JSON with all to the user available maps and metadata of these maps.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/register'
+url = '/account/register'
 ```
 
 Register a new account. Sents an email with a token that can be used to call /validateEmail to validate the new email. (no access level, credits 1000)<br/>
@@ -100,7 +111,7 @@ Status 200 if registration was succesful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/changePassword'
+url = '/account/changePassword'
 ```
 
 Change the password of a logged in user (No access level, requires login, credits 1).<br/>
@@ -113,7 +124,7 @@ Status 200 if password was changed.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/resetPassword'
+url = '/account/resetPassword'
 ```
 
 Resets a user's password. A new password is generated and sent to the email of the user along with a validation token. The new password is only active after calling /validateResetPassword with the token, or by following the link in the email. (No access level, requires login, credits 1)<br/>
@@ -126,7 +137,7 @@ Status 200 if a new password is generated and validation email sent.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/changeEmail'
+url = '/account/changeEmail'
 ```
 
 Change the email of a logged in user. Sents an email with a token that can be used to call /validateEmail to validate the new email. (No access level, requires login, credits 1)<br/>
@@ -139,7 +150,7 @@ Status 200 if email was updated.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/validateResetPassword?token=[token]'
+url = '/account/validateResetPassword?token=[token]'
 ```
 
 Request to validate a pasword change. (no access level, credits 1)<br/>
@@ -152,7 +163,7 @@ Status 200 if password got updated.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/validateEmail?token=[token]'
+url = '/account/validateEmail?token=[token]'
 ```
 
 Request to confirm an email address. (No access level, credits 1)<br/>
@@ -165,7 +176,7 @@ Status 200 if validation was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/account/validateLogin'
+url = '/account/validateLogin'
 ```
 
 Request check whether a login token is valid. (No acess level, credits 1)<br/>
@@ -180,7 +191,7 @@ Status 200 if your token is valid.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/settings/createGroup'
+url = '/settings/createGroup'
 ```
 
 Create a new group for a map. (Access level: 1000, credits 1)<br/>
@@ -195,7 +206,7 @@ Response 200 if the group has been added.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/settings/deleteGroup'
+url = '/settings/deleteGroup'
 ```
 
 Deletes a group (Access level: 1000, credits 1).<br/>
@@ -209,7 +220,7 @@ Response 200 if the group was deleted.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/settings/addUser'
+url = '/settings/addUser'
 ```
 
 Request to add a user to a group (Access level: 900 or 1000 if you are adding to a group with access level 1000, credits 1).<br/>
@@ -224,7 +235,7 @@ Response 200 if the user was added.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/settings/removeUser'
+url = '/settings/removeUser'
 ```
 
 Request to remove a user from a group (Access level: 900 or 1000 if you are adding to a group with access level 1000, credits 1).<br/>
@@ -239,7 +250,7 @@ Response 200 if the user was removed.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/settings/updateGroup'
+url = '/settings/updateGroup'
 ```
 
 Request to change a group (Access level: 1000, credits 1).<br/>
@@ -255,7 +266,7 @@ Response 200 if the group was updated.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/settings/updateMap'
+url = '/settings/updateMap'
 ```
 
 Request to change the public access level of a map. (Access level: 1000, credits 1)<br/>
@@ -269,7 +280,7 @@ Response 200 if the new public access level was changed.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/settings/users'
+url = '/settings/users'
 ```
 
 Request to get all users of a certain group. (Access level: 900, credits 10)<br/>
@@ -283,7 +294,7 @@ JSON with all users of the given group.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/settings/mapAccess'
+url = '/settings/mapAccess'
 ```
 
 Request to get the public access level of a map and the access level of all groups (Access level: 100, credits 1).<br/>
@@ -299,7 +310,7 @@ JSON with the access levels.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/timestamps'
+url = '/metadata/timestamps'
 ```
 
 Request to obtain all available timestamps of a map.  (Access level: 100, credits 1)<br/>
@@ -312,7 +323,7 @@ JSON with all timestamps for the given map.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/classes'
+url = '/metadata/classes'
 ```
 
 Request to obtain all metadata about the classes of a map. (Access level: 100, credits 1)<br/>
@@ -325,7 +336,7 @@ JSON with all classes for each timestamp of the given map.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/spectral'
+url = '/metadata/spectral'
 ```
 
 Request to obtain all metadata about the spectral indices of a map. (Access level: 100, credits 1)<br/>
@@ -338,7 +349,7 @@ JSON with all spectral indices for each timestamp of the given map.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/tileLayers'
+url = '/metadata/tileLayers'
 ```
 
 Request to obtain all available tilelayers. (Access level: 100, credits 1)<br/>
@@ -351,7 +362,7 @@ JSON with all tile layers for each timestamp of the given map.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/polygonLayers'
+url = '/metadata/polygonLayers'
 ```
 
 Request to obtain all layers of the shape a map is made with. (Access level: 100, credits 1)<br/>
@@ -364,7 +375,7 @@ JSON with all polygon layers of all timestamps of a given map.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/polygons'
+url = '/metadata/polygons'
 ```
 
 Request to obtain the id's of predefined polygons. (Access level: 100, credits 100)<br/>
@@ -384,7 +395,7 @@ JSON with a count of the number of polygons within the given bounds and list of 
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/metadata/tiles'
+url = '/metadata/tiles'
 ```
 
 Request to obtain the tiles of a map. (Access level: 100, credits 100)<br/>
@@ -411,7 +422,7 @@ The following requests require viewing privaliges on the maps. In case of non pu
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/class/customPolygon/timestamps'
+url = '/data/class/customPolygon/timestamps'
 ```
 
 Request to obtain the surface area of each class for each timestamp for a certain custom polygon.(Access level: 200, credits 2000)<br/>
@@ -425,7 +436,7 @@ CSV with columns timestamp, [columns of area per class], total area, date from a
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/class/custommPolygon/tiles'
+url = '/data/class/custommPolygon/tiles'
 ```
 
 Request to obtain the surface area of each class for each standard tile covering a custom polygon for a certain timestamp.(Access level: 200, credits 1000)<br/>
@@ -442,7 +453,7 @@ CSV with columns tileX, tileY, zoom, [columns of area per class], total area, da
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/class/polygon/polygonIds'
+url = '/data/class/polygon/polygonIds'
 ```
 
 Request to obtain the surface area of each class for each polygon for a certain timestamp.(Access level: 200, credits 1000)<br/>
@@ -457,7 +468,7 @@ CSV with columns polygon ids, [columns of area per class] and total area.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/class/polygon/timestamps'
+url = '/data/class/polygon/timestamps'
 ```
 
 Request to obtain the surface area of each classes for each timestamps for a certain polygon.(Access level: 200, credits 500)<br/>
@@ -471,7 +482,7 @@ A CSV with columns timestamp, [columns of area per class], total area, date from
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/class/polygon/tiles'
+url = '/data/class/polygon/tiles'
 ```
 
 Request to obtain the surface area of each class for each standard tile covering a polygon for a certain timestamp.(Access level: 200, credits 500)<br/>
@@ -488,7 +499,7 @@ CSV with columns tileX, tileY, zoom, [columns of area per class] and total area.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/class/tile/tileIds'
+url = '/data/class/tile/tileIds'
 ```
 
 Request to obtain the surface area of each class for each tile for a certain timestamp.(Access level: 200, credits 500)<br/>
@@ -502,7 +513,7 @@ CSV with columns tileX, tileY, zoom, [columns of area per class], total area dat
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/class/tile/timestamps'
+url = '/data/class/tile/timestamps'
 ```
 
 Request to obtain the surface area of each class for a standard tile for all timestamps.(Access level: 200, credits 500)<br/>
@@ -515,14 +526,14 @@ zoom: AN integer indicating the zoomlevel of the tile <br/>
 CSV with columns tileX, tileY, zoom, [columns of area per class] and total area.
 
 <a id='data_index'></a>
-## /data/spectral
+## /data/measurement
 <a id='data_index_custom'></a>
-### /data/spectral/customPolygon
+### /data/measurement/customPolygon
 #### Post timestamps
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/customPolygon/timestamps'
+url = '/data/measurement/customPolygon/timestamps'
 ```
 
 Request to obtain the mean indices of each measurement over a certain class for each timestamp for a certain custom polygon.(Access level: 200, credits 2000)<br/>
@@ -537,7 +548,7 @@ CSV with columns timestamp, [columns of mean per measurement], total area, date 
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/customPolygon/tiles'
+url = '/data/measurement/customPolygon/tiles'
 ```
 
 Request to obtain the mean indices of each measurement over a certain class for a certain timestamp of all tiles for a custom polygon.(Access level: 200, credits 1000)<br/>
@@ -549,13 +560,13 @@ geometry: A geoJSON describing the polygon.<br/>
 **Returns**<br/>
 CSV with columns tileX, tileY, zoom, [columns of mean per measurement] and total area.
 
-### data/spectral/polygon
+### data/measurement/polygon
 <a id='data_index_polygon'></a>
 #### Post polygonIds
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/polygon/polygonIds'
+url = '/data/measurement/polygon/polygonIds'
 ```
 
 Request to obtain the surface area of each class for each polygon for a certain timestamp.(Access level: 200, credits 1000)<br/>
@@ -571,7 +582,7 @@ CSV with columns polygon ids, [columns of mean per measurement] and total area.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/polygon/timestamps'
+url = '/data/measurement/polygon/timestamps'
 ```
 
 Request to obtain the mean indices of each measurement over a certain classs for each timestamp for a certain polygon.(Access level: 200, creidts 500)<br/>
@@ -586,7 +597,7 @@ CSV with columns timestamp, [columns of mean per measurement], total area, date 
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/polygons/tiles'
+url = '/data/measurement/polygons/tiles'
 ```
 
 Request to obtain the mean measurements over a certain class for each standard tile covering a polygon for a certain timestamp.(Access level: 200, credits 500)<br/>
@@ -598,13 +609,13 @@ class: name of the class to take the mean over, in case means are not saved per 
 **Returns**<br/>
 CSV with columns tileX, tileY, zoom, [columns of mean per measurement] and total area.
 
-### data/spectral/tile
+### data/measurement/tile
 <a id='data_index_tile'></a>
 #### Post tileIds
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/tile/tileIds'
+url = '/data/measurement/tile/tileIds'
 ```
 
 Request to obtain the mean indices of each measurement over a certain class for all tiles at a certain timestamp.(Access level: 200, credits 500)<br/>
@@ -619,7 +630,7 @@ CSV with columns polygon, [columns of mean per measurement] and total area.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/data/spectral/tile/timestamps'
+url = '/data/measurement/tile/timestamps'
 ```
 
 Request to obtain the mean indices of each measurement over a certain class for a standard tile for all timestamps.(Access level: 200, credits 500)<br/>
@@ -640,7 +651,7 @@ The following requests require viewing privaliges on the maps. In case of non pu
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geometry/polygons'
+url = '/geometry/polygons'
 ```
 
 Request to obtain all polygons by a list of id's.(Access level: 100, credits 500)<br/>
@@ -655,7 +666,7 @@ GeoJSON of polygons.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geometry/tiles'
+url = '/geometry/tiles'
 ```
 
 Request to obtain all standard tiles by a list of id's.(Access level: 100, credits 500)<br/>
@@ -674,7 +685,7 @@ The following requests require viewing privaliges on the maps. In case of non pu
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geometry/visual/bounds'
+url = '/geometry/visual/bounds'
 ```
 
 Request to obtain an image of a certain layer within a bounding box.(Access level: 200, credits 2000)<br/>
@@ -692,7 +703,7 @@ The following requests require viewing privaliges on the maps. In case of non pu
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/tileService/[mapUuid]/[timestamp]/[layerName]/[tileZoom]/[tileX]/[tileY]'
+url = '/tileService/[mapUuid]/[timestamp]/[layerName]/[tileZoom]/[tileX]/[tileY]'
 ```
 
 Request to obtain a png image of tile layer [layerName] of standard tile [tileX], [tileY] at zoom level [tileZoom] for a certain timestamp [timestamp].(Access level: 100, credits 5)<br/>
@@ -716,7 +727,7 @@ As this is a standard way of working, you can quickly visualise the tile layer a
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/feed'
+url = '/geoMessage/feed'
 ```
 
 Gets all geoMessages of a certain page. (Access level: 300, credits 10)<br/>
@@ -731,7 +742,7 @@ JSON with all geomessages on that page.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/userMessages'
+url = '/geoMessage/userMessages'
 ```
 
 Gets all geoMessages of a user of a certain page. (Access level: 300, credits 10)<br/>
@@ -746,7 +757,7 @@ JSON with all geomessages on that page.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/image'
+url = '/geoMessage/image'
 ```
 
 Gets the image of a certain geoMessage. (Access level: 300, credits 10)<br/>
@@ -763,7 +774,7 @@ Image in base64 format of the geoMessage.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/forms/addForm'
+url = '/geoMessage/forms/addForm'
 ```
 
 Creates a new form. (Access level: 750, credits 10)<br/>
@@ -780,7 +791,7 @@ status 200 if form was added.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/forms/deleteForm'
+url = '/geoMessage/forms/deleteForm'
 ```
 
 Deletes an excisting form. (Access level: 750, credits 10)<br/>
@@ -794,7 +805,7 @@ status 200 if form was deleted.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/forms/alterForm'
+url = '/geoMessage/forms/alterForm'
 ```
 
 Alters an excisting form. (Access level: 750, credits 10)<br/>
@@ -811,7 +822,7 @@ status 200 if form was deleted.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/forms/getForms'
+url = '/geoMessage/forms/getForms'
 ```
 
 Retrieves all excisting forms of a map with properties. (Access level: 400, credits 10)<br/>
@@ -826,7 +837,7 @@ Returns a JSON with form names and properties.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/tile/addMessage'
+url = '/geoMessage/tile/addMessage'
 ```
 
 Adds a message for a certain standard tile.(Access level: 400, credits 10)<br/>
@@ -848,7 +859,7 @@ Status 200 if the submission was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/tile/deleteMessage'
+url = '/geoMessage/tile/deleteMessage'
 ```
 
 Deletes a specific tile message. (Access level: 600, or 400 when deleting a user's own message, credits 10)<br/>
@@ -862,7 +873,7 @@ Status 200 if the removal was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/tile/ids'
+url = '/geoMessage/tile/ids'
 ```
 
 Gets tile ids for which there are messages.(Access level: 300, credits 10)<br/>
@@ -884,7 +895,7 @@ Json with a count and list of tile ids. In case the number of ids exceeds the li
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/tile/getMessages'
+url = '/geoMessage/tile/getMessages'
 ```
 
 Gets the tile messages with the given ids.(Access level: 300, credits 10)<br/>
@@ -900,7 +911,7 @@ Json with all the messages.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/polygon/addMessage'
+url = '/geoMessage/polygon/addMessage'
 ```
 
 Adds a message for a certain polygon.(Access level: 400, credits 10)<br/>
@@ -920,7 +931,7 @@ Status 200 if the submission was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/polygon/deleteMessage'
+url = '/geoMessage/polygon/deleteMessage'
 ```
 
 Deletes a message of a polygon. (Access level: 600, or 400 when deleting a user's own message, credits 10)<br/>
@@ -934,7 +945,7 @@ Status 200 if the removal was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/polygon/ids'
+url = '/geoMessage/polygon/ids'
 ```
 
 Gets the polygon ids for which there are messages. (Access level: 300, credits 10)<br/>
@@ -954,7 +965,7 @@ Json with a count and list of polygon ids. In case the number of ids exceeds the
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/polygon/getMessages'
+url = '/geoMessage/polygon/getMessages'
 ```
 
 Gets all messages of the polygons with the given ids.(Access level: 300, credits 10)<br/>
@@ -970,7 +981,7 @@ Json with all reports.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/layers'
+url = '/geoMessage/customPolygon/layers'
 ```
 
 Requests the custom polygon layers of a certain map.(Access level: 300, credits 10)<br/>
@@ -983,7 +994,7 @@ JSON with layer names, colors and the available polygon properties for each laye
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/addPolygon'
+url = '/geoMessage/customPolygon/addPolygon'
 ```
 
 Submits a certain customly defined polygon. (Access level: 500, credits 10)<br/>
@@ -999,7 +1010,7 @@ Status 200 if the submission was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/addMessage'
+url = '/geoMessage/customPolygon/addMessage'
 ```
 
 Adds a message for a certain custom polygon. (Access level: 400, credits 10)<br/>
@@ -1019,7 +1030,7 @@ Status 200 if the submission was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/deleteMessage'
+url = '/geoMessage/customPolygon/deleteMessage'
 ```
 
 Deletes a message of a custom polygon. (Access level: 600, or 400 when deleting a user's own message, credits 10)<br/>
@@ -1033,7 +1044,7 @@ Status 200 if the removal was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/deletePolygon'
+url = '/geoMessage/customPolygon/deletePolygon'
 ```
 
 Deletes a custom polygon. (Access level: 700, credits 10)<br/>
@@ -1047,7 +1058,7 @@ Status 200 if the removeal was successful.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/ids'
+url = '/geoMessage/customPolygon/ids'
 ```
 
 Gets the custom polygon ids for which there are messages. (Access level: 300, credits 100)<br/>
@@ -1067,7 +1078,7 @@ Json with a count and list of ids. In case the number of ids exceeds the limit, 
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/geometries'
+url = '/geoMessage/customPolygon/geometries'
 ```
 
 Returns the custom polygons with the given ids in GeoJSON format. (Access level: 300,, credits 100)<br/>
@@ -1081,7 +1092,7 @@ GeoJSON of the custom polygons.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/getMessages'
+url = '/geoMessage/customPolygon/getMessages'
 ```
 
 Gets all reports of the customPolygons with the given ids. (Access level: 300, credits 10)<br/>
@@ -1095,7 +1106,7 @@ Json with all messages.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/alterLayer'
+url = '/geoMessage/customPolygon/alterLayer'
 ```
 
 Alters a custom polygon layer. (Access level: 800, credits 10)<br/>
@@ -1111,7 +1122,7 @@ Status 200 of the layer has been altered.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/addLayer'
+url = '/geoMessage/customPolygon/addLayer'
 ```
 
 Adds a custom polygon layer. (Access level: 800, credits 10)<br/>
@@ -1127,7 +1138,7 @@ Status 200 of the layer has been added.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/deleteLayer'
+url = '/geoMessage/customPolygon/deleteLayer'
 ```
 
 Deletes a customPolygonLayer. (Access level: 800, credits 10)<br/>
@@ -1141,7 +1152,7 @@ Status 200 of the layer has been deleted. 401 if not.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/alterPolygon'
+url = '/geoMessage/customPolygon/alterPolygon'
 ```
 
 Alters the properies and/or the layer of a customPolygon. (Access level: 700, credits 10)<br/>
@@ -1157,7 +1168,7 @@ Status 200 if the custom polygon was altered.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/addProperty'
+url = '/geoMessage/customPolygon/addProperty'
 ```
 
 Adds a property to a custom polygon layer (Access level: 800, credits 10)<br/>
@@ -1172,7 +1183,7 @@ Status 200 if property was added.
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/geoMessage/customPolygon/deleteProperty'
+url = '/geoMessage/customPolygon/deleteProperty'
 ```
 
 Deletes an existing property from a custom polygon layer. (Access level: 800, credits 10)<br/>

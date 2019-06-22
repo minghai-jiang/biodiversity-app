@@ -90,7 +90,7 @@ All requests to the Ellipsis API should be sent to the following webadress, that
 
 
 ```python
-url = 'https://api.ellipsis-earth.com'
+url = 'https://api.ellipsis-earth.com/v1'
 ```
 
 <a id='requests'></a>
