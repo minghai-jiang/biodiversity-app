@@ -36,6 +36,15 @@ const ViewerUtility = {
     text: 'text',
     numeric: 'numeric',
     boolean: 'boolean'
+  },
+
+  flyToType: {
+    map: 'map',
+    currentLocation: 'current_location',
+    location: 'location',
+    standardTile: 'standard_tile',
+    polygon: 'polygon',
+    customPolygon: 'custom_polygon'
   }
 
 

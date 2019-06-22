@@ -42,7 +42,10 @@ class ControlsPane extends PureComponent {
   onSelectMap = (map) => {
     let bounds = L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax));
 
-    this.props.onFlyTo(bounds);
+    this.props.onFlyTo({
+      type: ViewerUtility.flyToType.map,
+      target: bounds
+    });
 
     this.setState({ map: map }, () => this.props.onSelectMap(map));
   }

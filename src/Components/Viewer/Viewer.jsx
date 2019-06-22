@@ -42,7 +42,7 @@ class Viewer extends PureComponent {
   leafletMap = null;
   setNewViewportTimer = null;
 
-  flyToBounds = null;
+  flyToInfo = null;
 
   constructor(props, context) {
     super(props, context);
@@ -108,9 +108,16 @@ class Viewer extends PureComponent {
   }
 
   attemptFlyTo = () => {
-    if (this.flyToBounds && this.state.panes.includes(MAP_PANE_NAME)) {
-      this.leafletMap.current.leafletElement.flyToBounds(this.flyToBounds);
-      this.flyToBounds = null;
+    if (this.flyToInfo && this.state.panes.includes(MAP_PANE_NAME)) {
+
+      if (this.flyToInfo === ViewerUtility.flyToType.map) {
+        this.leafletMap.current.leafletElement.flyToBounds(this.flyToInfo.target);
+      }
+      else {
+        this.leafletMap.current.leafletElement.flyTo(this.flyToInfo.target);
+      }
+
+      this.flyToInfo = null;
     }
   }
 
@@ -235,8 +242,8 @@ class Viewer extends PureComponent {
     }
   }
 
-  onFlyTo = (bounds) => {
-    this.flyToBounds = bounds;
+  onFlyTo = (flyToInfo) => {
+    this.flyToInfo = flyToInfo;
 
     this.attemptFlyTo();
   }
@@ -312,6 +319,7 @@ class Viewer extends PureComponent {
             timestampRange={this.state.timestampRange}
             action={this.state.dataPaneAction}
             element={this.state.selectedElement}
+            onFlyTo={this.onFlyTo}
           />
         </div>
 
