@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { Redirect } from 'react-router-dom';
+
 /*import {
     Route
 } from "react-router-dom";*/
@@ -17,9 +19,9 @@ export class Gallery extends Component {
   }
 
   onAppChange = e => {
-    let itemValue = e.target.value;
-    //redirect
+    window.open(e.target.value, '_blank');
   }
+
 
 
   onMonitoringServiceChange = e => {
