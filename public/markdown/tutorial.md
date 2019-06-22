@@ -17,7 +17,7 @@ Some of the for analysis lesser relevant API calls in the documentation are skip
      6.1.1 <a href='#data/class/custom'> for custom polygons</a> <br/>
      6.1.2 <a href='#data/class/polygon'> for predefined polygons</a> <br/>
      6.1.3 <a href='#data/class/tile'> for standard tiles</a> <br/>
-    6.2 <a href='#data/index'> *Data for indices*</a><br/>
+    6.2 <a href='#data/index'> *Data for measurements*</a><br/>
      6.2.1 <a href='#data/index/custom'> for custom polygons</a> <br/>
      6.2.2 <a href='#data/index/polygon'> for predefined polygons</a> <br/>
      6.2.3 <a href='#data/index/tile'> for standard tiles</a> <br/>
@@ -37,17 +37,17 @@ On top of these standard tiles each map can have specific predined polygons. The
 
 ## Aggregation
 
-Data is always both aggregated to standard tiles as well as to predefined polygons. That is to say spectral indices and the areas of land cover types are always saved for all polygons and tiles. 
+Data is always both aggregated to standard tiles as well as to predefined polygons. That is to say measurements and the areas of land cover types are always saved for all polygons and tiles. 
 
 In case of predefined polygons the data is actually saved per tile per polygon. This means that in larger polygons you also have a sense of 'where' something occured.
 
-In case of land cover classes,  aggregations are made by taking the total surface area of each class within the aggregated region. In case of spectral indices, means are taken over the whole area.
+In case of land cover classes,  aggregations are made by taking the total surface area of each class within the aggregated region. In case of measurements, means are taken over the whole area.
 
 ## Map layers
 All timestamps of a map consist of map layers. Each layer contains a certain type of visualization of the timestamp. There are four types of layers:
 
 1.	**Images**: Visualizations of the raw satellite data, for example, RGB, false color or infrared.
-2.	**Indices**: Heatmaps of the spectral indices.
+2.	**Measurements**: Heatmaps of the measurements.
 3.	**Labels**: Maps in which each land cover type has a certain color.
 4.	**Changes**: Maps in which each pixel that underwent a certain type of change is colored red.
 
@@ -59,7 +59,7 @@ Ellipsis supports a large number of requests to our API. We categorise them in t
 1. <a href='#login'>**account**</a>: All requests regarding accesing information.<br/>
 2. <a href='#metadata'>**metadata**</a>: All requests that gather information about what data is available in a certain map.<br/>
 3. <a href='#data/class'>**data/class**</a>: All requests that gather surface areas of land cover classes<br/>
-4. <a href='#data/index'>**data/index**</a>: All requests that gather mean spectral indices<br/>
+4. <a href='#data/measurement'>**data/measurement**</a>: All requests that gather mean measurements<br/>
 5. <a href='#geometry'>**geometries**</a>: All requests for obtaining geometries of predefined polygons or tiles.
 6. <a href='#visual'>**visual**</a>: All requests for obtaining visualisations.<br/>
 
@@ -90,7 +90,7 @@ All requests to the Ellipsis API should be sent to the following webadress, that
 
 
 ```python
-url = 'https://api.ellipsis-earth.com'
+url = 'https://api.ellipsis-earth.com/v1'
 ```
 
 <a id='requests'></a>
@@ -171,7 +171,7 @@ r =requests.post(url + '/account/login',
 print(r.text)
 ```
 
-    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MDQyMzc3NCwiZXhwIjoxNTYwNTEwMTc0fQ.xnDqNmz8s-G0kXV4C49KLZp-Sp4AbJaKlDqyKhEPIhk"}
+    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MDQzODIzNCwiZXhwIjoxNTYwNTI0NjM0fQ.uUJiEaG-9OyMSLRknqRRcXStWM4ku1ewQ-kwauMBldg"}
 
 
 Our token is quite long, so let's save the token to a variable that we can send with our other requests.
@@ -190,7 +190,7 @@ token = 'Bearer ' + token
 print(token)
 ```
 
-    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MDQyMzc3NCwiZXhwIjoxNTYwNTEwMTc0fQ.xnDqNmz8s-G0kXV4C49KLZp-Sp4AbJaKlDqyKhEPIhk
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MDQzODIzNCwiZXhwIjoxNTYwNTI0NjM0fQ.uUJiEaG-9OyMSLRknqRRcXStWM4ku1ewQ-kwauMBldg
 
 
 To test whether our token is working, we send a get request with this token to the following authentication testing URL.
@@ -242,7 +242,8 @@ map_names
      'WNF biodiversiteitsmonitor',
      'Insar Japan',
      'Gran Chaco',
-     'LNV maai en oogst kaart']
+     'LNV maai en oogst kaart',
+     'Verzakking Groningen']
 
 
 
@@ -250,14 +251,14 @@ Seems there are quite some maps available. Lets have a look at the Suriname map.
 
 
 ```python
-mapId = [map['uuid'] for map in r if map['name'] == 'Suriname'][0]
+mapId = [map['uuid'] for map in r if map['name'] == 'Verzakking Groningen'][0]
 mapId
 ```
 
 
 
 
-    '810b31c3-6335-45fe-8120-972e2d1c7da8'
+    'bceac3e8-40a1-4476-bd30-c3d901448c2e'
 
 
 
@@ -329,11 +330,11 @@ r1[1:3]
 
 
 
-#### metadata/spectral
+#### metadata/measurements
 
 
 ```python
-r2 = requests.post(url + '/metadata/spectral',
+r2 = requests.post(url + '/metadata/measurements',
                  json = {"mapId":  mapId })
 
 r2 = r2.json()
@@ -354,7 +355,7 @@ r2[1:3]
 
 For each timestamp we are given the classes or indices that have been measured. We are also given the model version under which conclusions have been drawn and the legend color in the Ellpsis-Earth Viewer.
 
-As classes and spectral indices usually do not change from timstamp to timestamp it makes sense to just print the classes of the first timestamp.
+As classes and measurements usually do not change from timstamp to timestamp it makes sense to just print the classes of the first timestamp.
 
 
 ```python
@@ -520,7 +521,7 @@ So we have the following tile layers available:
 <a id='data'></a>
 # Acquiring data
 
-Now we know what data is available in our map we can start requesting actual information from it. In this section we have a look at retrieving tabular data concerining both the classes and the spectral indices. This tabular data is always returned in CSV format.
+Now we know what data is available in our map we can start requesting actual information from it. In this section we have a look at retrieving tabular data concerining both the classes and the measurements. This tabular data is always returned in CSV format.
 
 We can request tabular data for custom polygons defined by the user, predefined polygons and standard tiles.
 
@@ -1484,10 +1485,10 @@ r.head(10)
 
 
 <a id='data/index'></a>
-## For data of spectral indices
-In the same way as for the classes we can obtain data concerning spectral indices based on custom polygons, predefined polygons or standard tiles. The situation this time is however a little bit more nuanced. An aggregated spectral index is always the mean spectral index of all pixels of a certain land cover class within a given geometry that were not covered by clouds.
+## For data of measurements
+In the same way as for the classes we can obtain data concerning measurements based on custom polygons, predefined polygons or standard tiles. The situation this time is however a little bit more nuanced. An aggregated measurement is always the mean measurements of all pixels of a certain land cover class within a given geometry that were not covered by clouds.
 
-For this reason you always need to specify the class over which you want to have the mean spectral indices. (For example you can restrict to the class forest or agriculture). In some maps indices are not save per class, in this case you should specify the class parameters as 'all classes'.
+For this reason you always need to specify the class over which you want to have the mean measurements. (For example you can restrict to the class forest or agriculture). In some maps indices are not save per class, in this case you should specify the class parameters as 'all classes'.
 
 As all clouded pixels are simply discarded there is always a cloudcover column in the table that represtents the percentatge of pixels that have been left out.
 
@@ -1502,13 +1503,13 @@ geometry = {"type": "FeatureCollection", "features":[{ "properties":{"id":0}, "g
     "coordinates": [[[-55,4.1], [-55.5,4.2], [-55.2,4.2],[-52.3,5.15], [-52,5]]]} }]}
 ```
 
-Now let's request the mean of all spectral indices of the standard tiles intersecting our polygon.
+Now let's request the mean of all measurements of the standard tiles intersecting our polygon.
 
-#### data/spectral/customPolygon/timestamps
+#### data/measurement/customPolygon/timestamps
 
 
 ```python
-r = requests.post(url + '/data/spectral/customPolygon/timestamps',
+r = requests.post(url + '/data/measurement/customPolygon/timestamps',
                  json = {"mapId":  mapId, 'class': 'disturbance', 'geometry': geometry })
 
 r = pd.read_csv(StringIO(r.text))
@@ -1652,13 +1653,13 @@ r.head(10)
 
 
 
-Next we request the spectral indices for all tiles intersecting with our polygon for a certain fixed timestamp.
+Next we request the measurements for all tiles intersecting with our polygon for a certain fixed timestamp.
 
-#### data/spectral/customPolygon/tiles
+#### data/measurement/customPolygon/tiles
 
 
 ```python
-r = requests.post(url + '/data/spectral/customPolygon/tiles',
+r = requests.post(url + '/data/measurement/customPolygon/tiles',
                  json = {"mapId":  mapId, 'timestamp': 1, 'class': 'disturbance', 'geometry': geometry })
 
 r = pd.read_csv(StringIO(r.text))
@@ -1809,12 +1810,12 @@ Similar to the case of the classes there are three requests we can make in case 
 
 Again see <a href='#geometry'>**geometry section**</a> in case you would like to retrieve the geometries of these polygons. 
 
-Let's start with requesting all spectral indices for some polygons at a certain timestamp.
-#### data/spectral/polygon/polygonIds
+Let's start with requesting all measurements for some polygons at a certain timestamp.
+#### data/measurement/polygon/polygonIds
 
 
 ```python
-r = requests.post(url + '/data/spectral/polygon/polygonIds',
+r = requests.post(url + '/data/measurement/polygon/polygonIds',
                  json = {"mapId":  mapId, 'timestamp':4, 'polygonIds': [3,2], 'class': 'disturbance' })
 r = pd.read_csv(StringIO(r.text))
 r
@@ -1873,11 +1874,11 @@ r
 
 In the same manner we can request all timestamps for some particular polygon.
 
-#### data/spectral/polygon/timestamps
+#### data/measurement/polygon/timestamps
 
 
 ```python
-r = requests.post(url + '/data/spectral/polygon/timestamps',
+r = requests.post(url + '/data/measurement/polygon/timestamps',
                  json = {"mapId":  mapId, 'polygonId': 4, 'class': 'disturbance'})
 
 r = pd.read_csv(StringIO(r.text))
@@ -2024,11 +2025,11 @@ r.head(10)
 We get highly similar information, only this time per timestamp for the particular polygon.
 
 Lastly we can retrieve the information per standard tile.
-#### data/spectral/polygon/tiles
+#### data/measurement/polygon/tiles
 
 
 ```python
-r = requests.post(url + '/data/spectral/polygon/tiles',
+r = requests.post(url + '/data/measurement/polygon/tiles',
                  json = {"mapId":  mapId, 'timestamp':2, 'polygonId': 1, 'class': 'disturbance'})
 
 r = pd.read_csv(StringIO(r.text))
@@ -2111,11 +2112,11 @@ Predefined polygons can vary from map to map. But data is always aggregated to t
 In case you are intersted in the geometry of these tiles, have a look at the <a href='#geometry'>**geometry section.**</a>.
 
 There are two queries available to retrieve data about these tiles. First off we can simply request all tiles for a certain timestamp.
-#### data/spectral/tile/tileIds
+#### data/measurement/tile/tileIds
 
 
 ```python
-r = requests.post(url + '/data/spectral/tile/tileIds',
+r = requests.post(url + '/data/measurement/tile/tileIds',
                  json = {"mapId":  mapId,  'class': 'disturbance', 'timestamp':3, 'tileIds': [{'tileX':5691, 'tileY':7959},{'tileX':5691,'tileY':7960, 'zoom':14},{'tileX':5692,'tileY':7959, 'zoom':14}]})
 
 r = pd.read_csv(StringIO(r.text))
@@ -2190,11 +2191,11 @@ r.head(10)
 
 
 Of course we can also request all timestamps for a specific tile.
-#### data/spectral/tile/timestamps
+#### data/measurement/tile/timestamps
 
 
 ```python
-r = requests.post(url + '/data/spectral/tile/timestamps',
+r = requests.post(url + '/data/measurement/tile/timestamps',
                  json = {"mapId":  mapId, 'tileX': 5659, 'tileY':7974, 'zoom':14, 'class': 'disturbance' })
 
 r = pd.read_csv(StringIO(r.text))
