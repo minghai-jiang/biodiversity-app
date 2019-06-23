@@ -1,9 +1,14 @@
+const TILE = 'tile';
+const STANDARD_TILE = 'standard_tile';
+const POLYGON = 'polygon';
+const CUSTOM_POLYGON = 'custom_polygon'
+
 const ViewerUtility = {
 
-  tileLayerType: 'tile',
-  standardTileLayerType: 'standard_tile',
-  polygonLayerType: 'polygon',
-  customPolygonTileLayerType: 'custom_polygon',
+  tileLayerType: TILE,
+  standardTileLayerType: STANDARD_TILE,
+  polygonLayerType: POLYGON,
+  customPolygonTileLayerType: CUSTOM_POLYGON,
 
   drawnPolygonlayerType: 'drawn_polygon',
 
@@ -41,10 +46,12 @@ const ViewerUtility = {
   flyToType: {
     map: 'map',
     currentLocation: 'current_location',
+    currentElement : 'current_element',
+
     location: 'location',
-    standardTile: 'standard_tile',
-    polygon: 'polygon',
-    customPolygon: 'custom_polygon'
+    standardTile: STANDARD_TILE,
+    polygon: POLYGON,
+    customPolygon: CUSTOM_POLYGON
   }
 
 

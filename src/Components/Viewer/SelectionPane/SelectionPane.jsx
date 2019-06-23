@@ -155,7 +155,11 @@ class SelectionPane extends PureComponent {
         <CardHeader
           className='card-header'
           title={
-            <Button>
+            <Button
+              onClick={() => this.props.onFlyTo({
+                type: ViewerUtility.flyToType.currentElement
+              })}
+            >
               <Typography variant="h6" component="h2" className='no-text-transform'>
                 {title}
               </Typography>

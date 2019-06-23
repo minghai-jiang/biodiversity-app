@@ -8,6 +8,7 @@ import {
 import L from 'leaflet';
 
 import MapSelector from './MapSelector/MapSelector';
+import FlyToControl from './FlyToControl/FlyToControl'
 import TileLayersControl from './TileLayersControl/TileLayersControl';
 import StandardTileLayersControl from './StandardTileLayersControl/StandardTileLayersControl';
 import PolygonLayersControl from './PolygonLayersControl/PolygonLayersControl';
@@ -26,10 +27,18 @@ class ControlsPane extends PureComponent {
   polygonLayers = []
   customPolygonLayers = []
 
+  standardTileLayersControl = null
+  polygonLayersControl = null
+  customPolygonlayersControl = null;
+
   flyToBounds = null
 
   constructor(props, context) {
     super(props, context);
+
+    this.standardTileLayersControl = React.createRef();
+    this.polygonLayersControl = React.createRef();
+    this.customPolygonlayersControl = React.createRef();
 
     this.state = {
       map: null
@@ -39,14 +48,20 @@ class ControlsPane extends PureComponent {
   componentDidUpdate(prevProps) {
   }
 
+  selectLayer = (type, layer) => {
+    debugger;
+    if (type === ViewerUtility.standardTileLayerType) {
+      this.standardTileLayersControl.current.selectLayer(layer);
+    }
+    else if (type === ViewerUtility.polygonLayerType) {
+      this.polygonLayersControl.current.selectLayer(layer);
+    }
+    else if (type === ViewerUtility.customPolygonTileLayerType) {
+      this.customPolygonlayersControl.current.selectLayer(layer);
+    }
+  }
+
   onSelectMap = (map) => {
-    let bounds = L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax));
-
-    this.props.onFlyTo({
-      type: ViewerUtility.flyToType.map,
-      target: bounds
-    });
-
     this.setState({ map: map }, () => this.props.onSelectMap(map));
   }
 
@@ -101,6 +116,11 @@ class ControlsPane extends PureComponent {
           ) : null
         }
 
+        <FlyToControl
+          map={this.state.map}
+          onFlyTo={this.props.onFlyTo}
+        />
+
         <TileLayersControl
           map={this.state.map}
           timestampRange={this.props.timestampRange}
@@ -108,6 +128,7 @@ class ControlsPane extends PureComponent {
         />
 
         <StandardTileLayersControl
+          ref={this.standardTileLayersControl}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
@@ -116,6 +137,7 @@ class ControlsPane extends PureComponent {
         />
 
         <PolygonLayersControl
+          ref={this.polygonLayersControl}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
@@ -124,6 +146,7 @@ class ControlsPane extends PureComponent {
         />
 
         <CustomPolygonLayersControl
+          ref={this.customPolygonLayersControl}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}

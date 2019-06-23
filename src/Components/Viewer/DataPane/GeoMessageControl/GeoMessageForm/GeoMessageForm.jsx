@@ -296,7 +296,13 @@ class GeoMessageForm extends PureComponent {
           this.props.onNewMessage(newMessage);
 
           this.fileUploadRef.current.value = '';
-          this.setState({ expanded: false, loading: false, messageText: '' });
+          this.uploadedImage = null;
+          this.setState({ 
+            expanded: false, 
+            loading: false, 
+            messageText: '',
+            formAnswers: [] 
+          });
         })
         .catch(err => {
           alert('An error occurred while adding a GeoMessage.');

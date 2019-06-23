@@ -87,6 +87,14 @@ class StandardTileLayersControl extends PureComponent {
     }
   }
 
+  selectLayer = (layer) => {
+    if (layer === ViewerUtility.standardTileLayerType && 
+      !this.state.selectedLayers.includes[STANDARD_TILES_LAYER]
+      ) {
+      this.setState({ selectedLayers: [STANDARD_TILES_LAYER] });
+    }
+  }
+
   createLayerCheckboxes = () => {
     let options = [];
 

@@ -5,7 +5,11 @@ import { Map, Marker } from 'react-leaflet';
 import 'leaflet-draw';
 import L from 'leaflet';
 
+import ApiManager from '../../ApiManager';
+
 import Utility from '../../Utility';
+import ViewerUtility from './ViewerUtility';
+
 
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 
@@ -17,7 +21,6 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
 import './Viewer.css';
-import ViewerUtility from './ViewerUtility';
 
 // This block is purely to get the marker icon of Leaflet to work.
 // Taken somewhere from the web.
@@ -39,6 +42,7 @@ const DEFAULT_VIEWPORT = {
 
 class Viewer extends PureComponent {
 
+  controlsPane = null;
   leafletMap = null;
   setNewViewportTimer = null;
 
@@ -48,6 +52,7 @@ class Viewer extends PureComponent {
     super(props, context);
 
     this.leafletMap = React.createRef();
+    this.controlsPane = React.createRef();
 
     this.state = {
       leafletMapViewport: DEFAULT_VIEWPORT,
@@ -107,20 +112,6 @@ class Viewer extends PureComponent {
     );
   }
 
-  attemptFlyTo = () => {
-    if (this.flyToInfo && this.state.panes.includes(MAP_PANE_NAME)) {
-
-      if (this.flyToInfo === ViewerUtility.flyToType.map) {
-        this.leafletMap.current.leafletElement.flyToBounds(this.flyToInfo.target);
-      }
-      else {
-        this.leafletMap.current.leafletElement.flyTo(this.flyToInfo.target);
-      }
-
-      this.flyToInfo = null;
-    }
-  }
-
   onWindowResize = (_, cb) => {
     let isSmallWindow = window.innerWidth <= 600;
     
@@ -176,6 +167,8 @@ class Viewer extends PureComponent {
         start: map.timestamps.length - 1,
         end: map.timestamps.length - 1
       }
+    }, () => {
+      this.onFlyTo({ type: ViewerUtility.flyToType.map });
     });
   }
 
@@ -244,8 +237,105 @@ class Viewer extends PureComponent {
 
   onFlyTo = (flyToInfo) => {
     this.flyToInfo = flyToInfo;
+    let type = flyToInfo.type;
+
+    if (type === ViewerUtility.flyToType.map) {
+      let map = this.state.map;
+      this.flyToInfo.target = L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax));
+    }
+    else if (type === ViewerUtility.flyToType.currentLocation) {
+      this.flyToInfo.target = this.state.geolocation;
+    }
+    else if (type === ViewerUtility.flyToType.currentElement && this.state.selectedElement) {
+      let element = this.state.selectedElement;
+
+      let geoJsonLayer = L.geoJSON({
+        type: 'FeatureCollection',
+        count: 1,
+        features: [
+          element.feature
+        ]
+      });
+
+      this.flyToInfo.target = geoJsonLayer.getBounds();
+      this.flyToInfo.layerType = element.type;
+
+      if (element.type === ViewerUtility.flyToType.standardTile) {
+        this.flyToInfo.layer = ViewerUtility.standardTileLayerType;
+      }
+      else {
+        this.flyToInfo.layer = element.feature.properties.layer;
+      }
+    }
+    else {
+      this.getElementGeoJson()
+        .then(geoJson => {
+          let geoJsonLayer = L.geoJSON(geoJson);
+          let bounds = geoJsonLayer.getBounds();
+          
+          this.flyToInfo.target = bounds;
+          this.flyToInfo.layerType = this.flyToInfo.type;
+
+          if (type === ViewerUtility.flyToType.standardTile) {
+            this.flyToInfo.layer = ViewerUtility.standardTileLayerType;
+          }
+          else {
+            this.flyToInfo.layer = geoJson.features[0].properties.layer;
+          }
+
+          this.attemptFlyTo();
+        });
+    }
 
     this.attemptFlyTo();
+  }
+
+  getElementGeoJson = () => {
+    let map = this.state.map;
+    let body = {
+      mapId: map.id,
+      timestamp: map.timestamps[this.state.timestampRange.end].timestampNumber
+    };
+
+    let type = this.flyToInfo.type;
+    let url = null;
+
+    if (type === ViewerUtility.flyToType.standardTile) {
+      body.tileIds = [{...this.flyToInfo.elementId, zoom: map.zoom }];
+      url = '/geometry/tiles';
+    }
+    else if (type === ViewerUtility.flyToType.polygon) {
+      body.polygonIds = [this.flyToInfo.elementId];
+      url = '/geometry/polygons';
+    }
+    else if (type === ViewerUtility.flyToType.polygon) {
+      body.polygonIds = [this.flyToInfo.elementId];
+      url = '/geoMessage/customPolygon/geometries';
+    }
+
+    return ApiManager.post(url, body, this.props.user);
+  }
+
+  attemptFlyTo = () => {
+    if (!this.flyToInfo || !this.flyToInfo.target) {
+      return;
+    }
+
+    if (this.state.panes.includes(MAP_PANE_NAME)) {
+
+      if (this.flyToInfo.type === ViewerUtility.flyToType.currentLocation) {
+        this.leafletMap.current.leafletElement.flyTo(this.flyToInfo.target);
+      }
+      else {
+        this.leafletMap.current.leafletElement.flyToBounds(this.flyToInfo.target);
+      }
+
+      if (this.flyToInfo.layer) {
+        this.controlsPane.current.selectLayer(this.flyToInfo.layerType, this.flyToInfo.layer);
+      }
+
+      this.flyToInfo = null;
+    }
   }
 
   render() {
@@ -276,6 +366,7 @@ class Viewer extends PureComponent {
         
         <div className='viewer-main-container'>
           <ControlsPane
+            ref={this.controlsPane}
             user={this.props.user}
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
             leafletMapViewport={this.state.leafletMapViewport}
@@ -299,6 +390,7 @@ class Viewer extends PureComponent {
               map={this.state.map}
               element={this.state.selectedElement}
               onDataPaneAction={this.onDataPaneAction}
+              onFlyTo={this.onFlyTo}
             />
             <Map 
               center={DEFAULT_VIEWPORT.center} 

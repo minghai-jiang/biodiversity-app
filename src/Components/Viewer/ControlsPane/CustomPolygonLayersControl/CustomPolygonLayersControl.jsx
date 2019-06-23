@@ -81,6 +81,13 @@ class CustomPolygonLayersControl extends PureComponent {
     }
   }
 
+  selectLayer = (layer) => {
+    let availableLayer = this.state.availableLayers.find(x => x.name === layer);
+    if (availableLayer && !this.state.selectedLayers.find(x => x.name === layer)) {
+      this.setState({ selectedLayers: [...this.state.selectedLayers, availableLayer] });
+    }
+  }
+
   getAvailableLayers = (map) => {
     let availableLayers = [];
 

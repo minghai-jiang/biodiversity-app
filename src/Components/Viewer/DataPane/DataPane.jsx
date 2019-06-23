@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
+
 import { 
   Card,  
   CardHeader,
@@ -25,6 +26,17 @@ class DataPane extends PureComponent {
   }
 
   componentDidMount() {
+  }
+
+  onFlyTo = () => {
+    let action = this.props.action;
+
+    if (action === ViewerUtility.dataPaneAction.feed) {
+      this.props.onFlyTo({ type: ViewerUtility.flyToType.map });      
+    }
+    else {
+      this.props.onFlyTo({ type: ViewerUtility.flyToType.currentElement });
+    }
   }
 
   render() {
@@ -100,7 +112,9 @@ class DataPane extends PureComponent {
             }
             subheader={
               idText ? 
-                <Button>
+                <Button
+                  onClick={this.onFlyTo}
+                >
                   <div className='data-pane-title-card-subtitle'>
                     {idText}
                   </div>
