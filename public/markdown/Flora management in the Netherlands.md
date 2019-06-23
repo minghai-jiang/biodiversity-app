@@ -33,7 +33,7 @@ For convenience we store the base url in a variable
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/v1'
+url = 'https://api.ellipsis-earth.com/v1/'
 ```
 
 In this notebook we will study the Netherlands fields map. We fetch the id of this map and store it in mapId.
@@ -998,13 +998,6 @@ Using these id's per tile we can now request all relevant data for these polygon
 
 
 ```python
-import pickle
-file = open('temp', 'rb')
-result = pickle.load(file)
-```
-
-
-```python
 def request(s,ids):
     try:
         if len(ids) == 0:
@@ -1074,5 +1067,5 @@ plt.imshow(im)
 
 
 
-![png](output_65_1.png)
+![png](output_64_1.png)
 
