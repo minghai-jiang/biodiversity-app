@@ -55,23 +55,23 @@ export class MainMenu extends Component {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/viewer" className="main-menu-item">
-              {this.props.localization['Viewer']}
-            </NavLink>
-          </li>
-          <li>
             <NavLink to="/products" className="main-menu-item">
               {this.props.localization['Products']}
             </NavLink>
           </li>
           <li>
-            <NavLink to="/sectors" className="main-menu-item">
-              {this.props.localization['Sectors']}
+            <NavLink to="/viewer" className="main-menu-item">
+              {this.props.localization['Viewer']}
             </NavLink>
           </li>
           <li>
             <NavLink to="/gallery" className="main-menu-item">
               {this.props.localization['Gallery']}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/sectors" className="main-menu-item">
+              {this.props.localization['Sectors']}
             </NavLink>
           </li>
           <li>

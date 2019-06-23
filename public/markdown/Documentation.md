@@ -847,8 +847,6 @@ timestamp: The number of the timestamp.<br/>
 tileX: The x of the tile in web mercator projection.<br/>
 tileY: The y of the tile in web mercator projection<br/>
 zoom: The zoom level of the tile.<br/>
-isMask: If true, indicates that the message mask related.<br/>
-isClassification: If true, indicates that the error is classification related.<br/>
 message: A custom message.<br/>
 form: (opitional) A JSON with submitted form.<br/>
 photo: (optional) A photo.<br/>
@@ -919,8 +917,6 @@ Adds a message for a certain polygon.(Access level: 400, credits 10)<br/>
 mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 polygonId: Id of the polygon.<br/>
-isMask: If true, indicates that the message mask related.<br/>
-isClassification: If true, indicates that the error is classification related.<br/>
 message: A custom message.<br/>
 form: (opitional) A JSON with submitted form.<br/>
 photo: (optional) A photo.<br/>
@@ -1018,8 +1014,6 @@ Adds a message for a certain custom polygon. (Access level: 400, credits 10)<br/
 mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 customPolygonId: Id of the custom polygon.<br/>
-isMask: If true, indicates that the message mask related.<br/>
-isClassification: If true, indicates that the error is classification related.<br/>
 message: A custom message.<br/>
 form: (opitional) A JSON with submitted form.<br/>
 photo: (optional) A photo.<br/>
