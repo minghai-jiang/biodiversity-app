@@ -31,7 +31,7 @@ Now let's save the url that we need in a variable to shorten our code at a later
 
 
 ```python
-url = 'https://api.ellipsis-earth.com/v1'
+url = 'https://api.ellipsis-earth.com/v1/'
 ```
 
 Lastly we store the id of the chaco_demo map in a variable as well.
@@ -113,16 +113,6 @@ ids = r.json()['ids']
 ```
 
 A long list of almost 80.000 polygons! There is a max of 3000 polygons per request, so we will need to use chunks to make this work. We shall be using the chunks function from the Appendix to do so.
-
-
-```python
-import math
-def chunks(l, n = 3000):
-    result = list()
-    for i in range(0, len(l), n):
-        result.append(l[i:i+n])
-    return(result)
-```
 
 
 ```python
@@ -412,7 +402,7 @@ test.plot()
 
 
 
-![png](output_28_1.png)
+![png](output_27_1.png)
 
 
 ## Looking at a specific case
@@ -422,7 +412,7 @@ Let's focus on polygon 29236 and check what is going on here. First we retrieve 
 
 ```python
 id = 29236
-poly = reserves[reserves['id'] == id]
+poly = r[r['id'] == id]
 ```
 
 We can retrieve a visualisation of both timestamps from the API to see the situatioin before and after. We use the polys_on_image function from the Appendix to include the polygon on the image.
@@ -449,7 +439,7 @@ plt.imshow(img)
 
 
 
-![png](output_33_2.png)
+![png](output_32_2.png)
 
 
 
@@ -474,7 +464,7 @@ plt.imshow(img)
 
 
 
-![png](output_34_2.png)
+![png](output_33_2.png)
 
 
 Yes there has indeed been some deforestation in the lower right corner there.
