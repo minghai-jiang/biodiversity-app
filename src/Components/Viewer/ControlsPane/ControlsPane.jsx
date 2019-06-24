@@ -49,7 +49,6 @@ class ControlsPane extends PureComponent {
   }
 
   selectLayer = (type, layer) => {
-    debugger;
     if (type === ViewerUtility.standardTileLayerType) {
       this.standardTileLayersControl.current.selectLayer(layer);
     }

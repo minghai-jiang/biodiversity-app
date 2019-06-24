@@ -60,7 +60,6 @@ class GeoMessageControl extends PureComponent {
     if (this.props.action === ViewerUtility.dataPaneAction.feed) {
       update = differentMap;
       if (update) {
-        debugger;
         this.feedPage = 1;
         this.noMoreFeedMessages = false;
       }
@@ -72,8 +71,9 @@ class GeoMessageControl extends PureComponent {
       }
 
       let differentElement = DataPaneUtility.isDifferentElement(prevProps.element, this.props.element);
+      let differentAction = prevProps.action !== this.props.action;
 
-      update = differentMap || differentElement;
+      update = differentMap || differentElement || differentAction;
     }
 
     if (update) {
@@ -210,31 +210,18 @@ class GeoMessageControl extends PureComponent {
   }
 
   createGeomessageElement = (message, feedMode) => {
-    if (!feedMode) {
-      return (
-        <GeoMessage
-          key={message.id}
-          user={this.props.user}
-          map={this.props.map}
-          message={message}
-          type={this.props.element.type}
-          onDeleteMessage={this.onDeleteMessage}
-        />
-      );
-    }
-    else {
-      return (
-        <GeoMessage
-          key={message.id}
-          user={this.props.user}
-          map={this.props.map}
-          message={message}
-          type={ViewerUtility.dataPaneAction.feed}
-          onDeleteMessage={this.onDeleteMessage}
-        />
-      );
-    }
-
+    return (
+      <GeoMessage
+        key={message.id}
+        user={this.props.user}
+        map={this.props.map}
+        message={message}
+        type={feedMode ? message.type : this.props.element.type}
+        isFeed={feedMode}
+        onDeleteMessage={this.onDeleteMessage}
+        onFlyTo={this.props.onFlyTo}
+      />
+    );
   }
 
   onNewMessage = (newMessage) => {

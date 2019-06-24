@@ -96,6 +96,7 @@ class DataPane extends PureComponent {
           timestampRange={this.props.timestampRange}
           element={this.props.element}
           action={action}
+          onFlyTo={this.props.onFlyTo}
         />
       );
     }

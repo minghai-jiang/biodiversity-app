@@ -126,7 +126,7 @@ class GeoMessage extends PureComponent {
     let body = { 
       mapId: this.props.map.id, 
       geoMessageId: this.props.message.id,
-      type: this.props.type === ViewerUtility.dataPaneAction.feed ? this.props.message.type : this.props.type
+      type: this.props.type
     };
 
     return ApiManager.post('/geoMessage/image', body, this.props.user);
@@ -143,28 +143,31 @@ class GeoMessage extends PureComponent {
     };
 
     let urlType = null;
-    if (this.props.type === ViewerUtility.dataPaneAction.feed) {
-      urlType = this.props.message.type;
+    let type = this.props.type;
+    if (type === ViewerUtility.standardTileLayerType) {
+      urlType = 'tile';
+    }
+    else if (type === ViewerUtility.polygonLayerType) {
+      urlType = 'polygon';
+    }
+    else if (type === ViewerUtility.customPolygonTileLayerType) {
+      urlType = 'customPolygon';
     }
     else {
-      if (this.props.type === ViewerUtility.standardTileLayerType) {
-        urlType = 'tile';
-      }
-      else if (this.props.type === ViewerUtility.polygonLayerType) {
-        urlType = 'polygon';
-      }
-      else if (this.props.type === ViewerUtility.customPolygonTileLayerType) {
-        urlType = 'customPolygon';
-      }
-      else {
-        return;
-      }
+      return;
     }
 
     ApiManager.post(`/geomessage/${urlType}/deleteMessage`, body, this.props.user)
       .then(() => {
         this.props.onDeleteMessage(this.props.message);
       });
+  }
+
+  onFlyTo = () => {
+    this.props.onFlyTo({
+      type: this.props.type,
+      elementId: this.props.message.elementId
+    });
   }
 
   render() {
@@ -209,21 +212,25 @@ class GeoMessage extends PureComponent {
 
     let subheaderElementButton = null;
 
-    if (this.props.type === ViewerUtility.dataPaneAction.feed) {
+    if (this.props.isFeed) {
       let elementIdText = null;
+      let type = this.props.type;
 
-      if (message.type === ViewerUtility.standardTileLayerType) {
+      if (type === ViewerUtility.standardTileLayerType) {
         elementIdText = `standard tile: ${message.elementId.tileX}, ${message.elementId.tileY}, ${message.elementId.zoom}`;
       }
-      else if (message.type === ViewerUtility.polygonLayerType) {
+      else if (type === ViewerUtility.polygonLayerType) {
         elementIdText = `polygon: ${message.elementId}`;
       }
-      else if (message.type === ViewerUtility.customPolygonTileLayerType) {
+      else if (type === ViewerUtility.customPolygonTileLayerType) {
         elementIdText = `custom polygon: ${message.elementId}`;
       }
 
       subheaderElementButton = (
-        <Button className='geomessage-feed-element-button'>
+        <Button 
+          className='geomessage-feed-element-button'
+          onClick={this.onFlyTo}
+        >
           {elementIdText}
         </Button>
       );
