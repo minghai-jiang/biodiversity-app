@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import { Map, Marker } from 'react-leaflet';
+import { Map, Marker, GeoJSON } from 'react-leaflet';
 import 'leaflet-draw';
 import L from 'leaflet';
 
@@ -177,7 +177,8 @@ class Viewer extends PureComponent {
   }
 
   onLayersChange = (layers) => {
-    this.setState({ leafletLayers: layers });
+    let allLayers = [...layers, this.state.selectedElementLayer];
+    this.setState({ allLayers: allLayers, leafletLayers: layers });
   }
 
   onSelectTimestamp = (timestampRange) => {
@@ -202,14 +203,37 @@ class Viewer extends PureComponent {
     );
   }
 
-  onFeatureClick = (type, feature, hasAggregatedData) => {
+  selectFeature = (type, feature, hasAggregatedData) => {
     let element = {
       type: type,
       hasAggregatedData: hasAggregatedData,
       feature: feature,
     };
 
-    this.setState({ selectedElement: element });
+    let geoJson = {
+      type: 'FeatureCollection',
+      count: 1,
+      features: [
+        element.feature
+      ]
+    };
+
+    let selectedElementLayer = (
+      <GeoJSON
+        key={Math.random()}
+        data={geoJson}
+        style={'#00ffff'}
+        zIndex={ViewerUtility.selectedElementLayerZIndex}
+      />
+    );
+
+    let allLayers = [...this.state.leafletLayers, selectedElementLayer];
+
+    this.setState({ 
+      allLayers: allLayers, 
+      selectedElement: element, 
+      selectedElementLayer: selectedElementLayer 
+    });
   }
 
   onDataPaneAction = (action) => {
@@ -276,13 +300,30 @@ class Viewer extends PureComponent {
           this.flyToInfo.target = bounds;
           this.flyToInfo.layerType = this.flyToInfo.type;
 
+          let feature = geoJson.features[0];
+          let hasAggregatedData = true;
+
           if (type === ViewerUtility.flyToType.standardTile) {
             this.flyToInfo.layer = ViewerUtility.standardTileLayerType;
           }
           else {
-            this.flyToInfo.layer = geoJson.features[0].properties.layer;
+            this.flyToInfo.layer = feature.properties.layer;
+
+            if (this.flyToInfo.type === ViewerUtility.polygonLayerType) {
+              let mapPolygonlayers = this.state.map.layers.polygon;
+
+              for (let i = 0; i < mapPolygonlayers.length; i++) {
+                let timestampPolygonLayers = mapPolygonlayers[i].layers;
+                hasAggregatedData = timestampPolygonLayers.find(x => x.hasAggregatedData) ? true : false;
+                debugger;
+                if (hasAggregatedData) {
+                  break;
+                }
+              }
+            }
           }
 
+          this.selectFeature(this.flyToInfo.type, feature, hasAggregatedData);
           this.attemptFlyTo();
         });
     }
@@ -375,7 +416,7 @@ class Viewer extends PureComponent {
             onSelectMap={this.onSelectMap}
             onOpenGeoMessageFeed={this.onOpenGeoMessageFeed}
             onLayersChange={this.onLayersChange}
-            onFeatureClick={this.onFeatureClick}
+            onFeatureClick={this.selectFeature}
             onFlyTo={this.onFlyTo}
           />
           
@@ -399,7 +440,7 @@ class Viewer extends PureComponent {
               maxZoom={19}
               onViewportChanged={this.onLeafletMapViewportChanged}
             >
-              {this.state.leafletLayers}
+              {this.state.allLayers}
               {this.state.geolocation ? <Marker position={this.state.geolocation}/> : null}
             </Map>
           </div>

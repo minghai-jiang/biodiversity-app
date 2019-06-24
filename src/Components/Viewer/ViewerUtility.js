@@ -16,7 +16,8 @@ const ViewerUtility = {
   standardTileLayerZIndex: 1000,
   polygonLayerZIndex: 1001,
   customPolygonLayerZIndex: 1100,
-  drawnPpolygonLayerZIndex: 1200,
+  selectedElementLayerZIndex: 1150,
+  drawnPpolygonLayerZIndex: 1151,
 
   dataPaneAction: {
     analyse: 'analyse',
