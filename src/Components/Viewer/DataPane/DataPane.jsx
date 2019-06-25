@@ -74,6 +74,10 @@ class DataPane extends PureComponent {
         title = 'Custom polygon';
         idText = element.feature.properties.id;
       }
+      else if (element.type === ViewerUtility.drawnPolygonlayerType) {
+        title = 'Drawn polygon';
+        idText = 'Drawn polygon';
+      }
     }
 
     let actionControl = null;

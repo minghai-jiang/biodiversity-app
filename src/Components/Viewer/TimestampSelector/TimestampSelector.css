@@ -1,7 +1,11 @@
 .timestamp-selector {
+  width: 75%;
+  left: 0px;
+  right: 0px;
+  margin-left: auto;
+  margin-right: auto;
   position: absolute;
   top: 18px;
-  width: 100%;
   z-index: 5000;
   font-size: 11pt;
   color: white
@@ -59,8 +63,7 @@
   z-index: 10000001;
 }
 
-.time-range-selector
-{
+.time-range-selector {
   opacity: 0.25;
   -webkit-transition: opacity 0.25s; /* Safari */
   transition: opacity 0.25s;

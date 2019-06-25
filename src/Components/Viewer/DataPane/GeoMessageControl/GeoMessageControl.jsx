@@ -298,22 +298,32 @@ class GeoMessageControl extends PureComponent {
       return <CircularProgress className='loading-spinner'/>;
     }
 
+    let isFeed = this.props.action === ViewerUtility.dataPaneAction.feed;
+    let className = 'data-pane-card geomessage-messages-card';
+    if (isFeed) {
+      className += ' geomessage-messages-card-feed';
+    }
+
     return (
       <div className='geomessage-control'>
         <Card 
           ref={this.geomessagesContainerCard} 
-          className='data-pane-card geomessage-messages-card'
+          className={className}
           onScroll={this.onGeoMessagesScroll}
         >
           {this.state.geoMessageElements}
         </Card>
-        <GeoMessageForm
-          user={this.props.user}
-          map={this.props.map}
-          timestampRange={this.props.timestampRange}
-          element={this.props.element}
-          onNewMessage={this.onNewMessage}
-        />
+        {
+          !isFeed ? 
+            <GeoMessageForm
+              user={this.props.user}
+              map={this.props.map}
+              timestampRange={this.props.timestampRange}
+              element={this.props.element}
+              onNewMessage={this.onNewMessage}
+            /> : null
+        }
+
       </div>
     );
   }

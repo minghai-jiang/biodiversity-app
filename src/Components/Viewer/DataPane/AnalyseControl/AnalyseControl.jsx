@@ -113,7 +113,8 @@ class AnalyseControl extends PureComponent {
 
       urlType = 'polygon';
     }
-    else if (element.type === ViewerUtility.customPolygonTileLayerType) {
+    else if (element.type === ViewerUtility.customPolygonTileLayerType ||
+      element.type === ViewerUtility.drawnPolygonlayerType) {
       body.geometry = {
         type: 'FeatureCollection',
         count: 1,

@@ -64,24 +64,24 @@ class SelectionPane extends PureComponent {
     let user = this.props.user;
     let mapAccessLevel = map.accessLevel;
 
-    if (element.type === ViewerUtility.standardTileLayerType ||
-      element.type === ViewerUtility.polygonLayerType ||
-      element.type === ViewerUtility.customPolygonTileLayerType) {
+    let firstRowButtons = [];
+    let secondRowButtons = [];
 
-      let analyseButton = (
-        <Button 
-          key='analyse' 
-          variant='outlined' 
-          size='small' 
-          className='selection-pane-button'
-          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.analyse)}
-          disabled={mapAccessLevel < ApiManager.accessLevels.aggregatedData || !element.hasAggregatedData}
-        >
-          Analyse
-        </Button>
-      );
-      
-      let geoMessageButton = (
+    firstRowButtons.push(
+      <Button 
+        key='analyse' 
+        variant='outlined' 
+        size='small' 
+        className='selection-pane-button'
+        onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.analyse)}
+        disabled={mapAccessLevel < ApiManager.accessLevels.aggregatedData || !element.hasAggregatedData}
+      >
+        Analyse
+      </Button>
+    );
+
+    if (element.type !== ViewerUtility.drawnPolygonlayerType) {
+      firstRowButtons.push((
         <Button 
           key='geoMessage' 
           variant='outlined' 
@@ -92,15 +92,9 @@ class SelectionPane extends PureComponent {
         >
           Geomessage
         </Button>
-      );
-
-      buttons.push(
-        <div key='general_actions'>
-          {analyseButton}
-          {geoMessageButton}
-        </div>
-      )
+      ));
     }
+
 
     if (element.type === ViewerUtility.standardTileLayerType) {
       title = 'Standard tile';
@@ -111,36 +105,55 @@ class SelectionPane extends PureComponent {
     else if (element.type === ViewerUtility.customPolygonTileLayerType) {
       title = 'Custom polygon';
 
-      buttons.push(
-        <div key='specific_actions' className='specific-actions'>
-          <Button 
-            key='alter' 
-            variant='outlined' 
-            size='small' 
-            className='selection-pane-button'
-            onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.alterCustomPolygon)}
-            disabled={!user || mapAccessLevel < ApiManager.accessLevels.alterOrDeleteCustomPolygons}
-          >
-            Alter
-          </Button>
-          <Button 
-            key='delete' 
-            variant='outlined' 
-            size='small' 
-            className='selection-pane-button'
-            onClick={() => this.onElementActionClick(DELETE_CUSTOM_POLYGON_ACTION)}
-            disabled={!user || mapAccessLevel < ApiManager.accessLevels.alterOrDeleteCustomPolygons}
-          >
-            Delete
-          </Button>
-        </div>
-      );      
+      secondRowButtons.push(
+        <Button 
+          key='alter' 
+          variant='outlined' 
+          size='small' 
+          className='selection-pane-button'
+          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.alterCustomPolygon)}
+          disabled={!user || mapAccessLevel < ApiManager.accessLevels.alterOrDeleteCustomPolygons}
+        >
+          Alter
+        </Button>,
+        <Button 
+          key='delete' 
+          variant='outlined' 
+          size='small' 
+          className='selection-pane-button'
+          onClick={() => this.onElementActionClick(DELETE_CUSTOM_POLYGON_ACTION)}
+          disabled={!user || mapAccessLevel < ApiManager.accessLevels.alterOrDeleteCustomPolygons}
+        >
+          Delete
+        </Button>
+      );
+    }
+    else if (element.type === ViewerUtility.drawnPolygonlayerType) {
+      title = 'Drawn polygon';
+
+      firstRowButtons.push(
+        <Button 
+          key='add' 
+          variant='outlined' 
+          size='small' 
+          className='selection-pane-button'
+          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.createCustomPolygon)}
+          disabled={!user || mapAccessLevel < ApiManager.accessLevels.addCustomPolygons}
+        >
+          Add
+        </Button>
+      );     
     }
 
     let elementProperties = element.feature.properties;
     let properties = [];
-    
+
     for (let property in elementProperties) {
+
+      if (element.type === ViewerUtility.drawnPolygonlayerType && property === 'id') {
+        continue;
+      }
+
       if (elementProperties.hasOwnProperty(property)) {
         properties.push((
           <div key={property}>
@@ -178,7 +191,12 @@ class SelectionPane extends PureComponent {
           {properties}
         </CardContent>
         <CardActions className={'selection-pane-card-actions'}>
-          {buttons}
+          <div key='first_row_buttons'>
+            {firstRowButtons}
+          </div>
+          <div key='secont_row_buttons' style={ {marginLeft: '0px' }}>
+            {secondRowButtons}
+          </div>
         </CardActions>
       </Card>
     );

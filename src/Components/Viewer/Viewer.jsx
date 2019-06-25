@@ -10,7 +10,6 @@ import ApiManager from '../../ApiManager';
 import Utility from '../../Utility';
 import ViewerUtility from './ViewerUtility';
 
-
 import TimestampSelector from './TimestampSelector/TimestampSelector';
 
 import ControlsPane from './ControlsPane/ControlsPane';
@@ -45,6 +44,7 @@ class Viewer extends PureComponent {
   controlsPane = null;
   leafletMap = null;
   setNewViewportTimer = null;
+  drawnPolygonGeoJson = null;
 
   flyToInfo = null;
 
@@ -73,6 +73,61 @@ class Viewer extends PureComponent {
     };
   }
 
+  initializeDrawingControl = () => {
+    let map = this.leafletMap.current.leafletElement;
+  
+    let drawControl = new L.Control.Draw({
+      draw: {
+        polygon: true,
+        rectangle: false,
+        marker: false,
+        polyline: false,
+        circle: false,
+        circlemarker: false
+      },
+      edit: false
+    });
+    
+    map.addControl(drawControl);
+    map.on(L.Draw.Event.CREATED, this.onShapeDrawnClosure);
+
+  }
+
+  onShapeDrawnClosure = (e) => {
+    let layer = e.layer;
+    
+    let geoJson = layer.toGeoJSON();
+    geoJson.geometry.type = 'MultiPolygon';
+    geoJson.geometry.coordinates = [geoJson.geometry.coordinates];
+    geoJson.properties.id = Math.random();
+
+    let selectDrawnPolygon = () => {
+      if (!this.state.map) {
+        return;
+      }
+
+      this.selectFeature(ViewerUtility.drawnPolygonlayerType, geoJson, true);    
+    }
+
+    let drawnPolygonLayer = (
+      <GeoJSON
+        key={Math.random()}
+        data={geoJson}
+        style={'#00ffff'}
+        zIndex={ViewerUtility.drawnPolygonLayerZIndex}
+        onEachFeature={(_, layer) => layer.on({ click: selectDrawnPolygon })}
+      />
+    );
+
+    let allLayers = [...this.state.leafletLayers, this.state.selectedElementLayer, drawnPolygonLayer];
+
+    this.drawnPolygonGeoJson = geoJson;
+    this.setState({ allLayers: allLayers, drawnPolygonLayer: drawnPolygonLayer }, () => {
+      selectDrawnPolygon();
+    });
+    
+  }  
+
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(
       this.setLocation, 
@@ -90,6 +145,8 @@ class Viewer extends PureComponent {
         }
       });
     }
+
+    this.initializeDrawingControl();
   }
 
   setLocation = (position) => {
@@ -128,7 +185,7 @@ class Viewer extends PureComponent {
     }
   }
 
-  onViewerMenuClick = (paneName) => {
+  openPane = (paneName) => {
     let currentPanes = this.state.panes;
 
     let changed = false;
@@ -160,9 +217,12 @@ class Viewer extends PureComponent {
   }
 
   onSelectMap = (map) => {
+    this.drawnPolygonGeoJson = null;
+
     this.setState({ 
       map: map,
       selectedElement: null,
+      drawnPolygonLayer: null,
       timestampRange: {
         start: map.timestamps.length - 1,
         end: map.timestamps.length - 1
@@ -177,7 +237,7 @@ class Viewer extends PureComponent {
   }
 
   onLayersChange = (layers) => {
-    let allLayers = [...layers, this.state.selectedElementLayer];
+    let allLayers = [...layers, this.state.selectedElementLayer, this.state.drawnPolygonLayer];
     this.setState({ allLayers: allLayers, leafletLayers: layers });
   }
 
@@ -218,16 +278,22 @@ class Viewer extends PureComponent {
       ]
     };
 
+    let markerPane = this.leafletMap.current.leafletElement.getPane('markerPane');
+
     let selectedElementLayer = (
       <GeoJSON
         key={Math.random()}
         data={geoJson}
         style={'#00ffff'}
-        zIndex={ViewerUtility.selectedElementLayerZIndex}
+        pane={markerPane}
       />
     );
 
-    let allLayers = [...this.state.leafletLayers, selectedElementLayer];
+    let allLayers = [
+      ...this.state.leafletLayers, 
+      selectedElementLayer,
+      this.state.drawnPolygonLayer
+    ];
 
     this.setState({ 
       allLayers: allLayers, 
@@ -315,7 +381,6 @@ class Viewer extends PureComponent {
               for (let i = 0; i < mapPolygonlayers.length; i++) {
                 let timestampPolygonLayers = mapPolygonlayers[i].layers;
                 hasAggregatedData = timestampPolygonLayers.find(x => x.hasAggregatedData) ? true : false;
-                debugger;
                 if (hasAggregatedData) {
                   break;
                 }
@@ -328,7 +393,12 @@ class Viewer extends PureComponent {
         });
     }
 
-    this.attemptFlyTo();
+    if (isMobile && !this.state.panes.includes(DATA_PANE_NAME)) {
+      this.openPane(DATA_PANE_NAME);
+    }
+    else {
+      this.attemptFlyTo();
+    }
   }
 
   getElementGeoJson = () => {
@@ -424,7 +494,6 @@ class Viewer extends PureComponent {
             <TimestampSelector
               map={this.state.map}
               onSelectTimestamp={this.onSelectTimestamp}
-              width={mapPaneStyle.width}
             />
             <SelectionPane
               user={this.props.user}
@@ -457,17 +526,17 @@ class Viewer extends PureComponent {
         </div>
 
         <div className='viewer-menu'>
-          <div className='button viewer-menu-button' onClick={() => this.onViewerMenuClick(CONTROL_PANE_NAME)}>
+          <div className='button viewer-menu-button' onClick={() => this.openPane(CONTROL_PANE_NAME)}>
             <div className='viewer-menu-button-content'>
               {this.props.localization['ViewerControlsPane']}
             </div>
           </div>
-          <div className='button viewer-menu-button' onClick={() => this.onViewerMenuClick(MAP_PANE_NAME)}>
+          <div className='button viewer-menu-button' onClick={() => this.openPane(MAP_PANE_NAME)}>
             <div className='viewer-menu-button-content'>
               {this.props.localization['ViewerMapPane']}           
             </div>
           </div>
-          <div className='button viewer-menu-button' onClick={() => this.onViewerMenuClick(DATA_PANE_NAME)}>
+          <div className='button viewer-menu-button' onClick={() => this.openPane(DATA_PANE_NAME)}>
             <div className='viewer-menu-button-content'>
               {this.props.localization['ViewerDataPane']}        
             </div>

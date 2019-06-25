@@ -11,3 +11,7 @@ div.geomessage-messages-card {
   height: calc(100% - 60px);
   overflow-y: auto;
 }
+
+div.geomessage-messages-card-feed {
+  height: 100%;
+}

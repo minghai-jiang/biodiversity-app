@@ -17,11 +17,12 @@ const ViewerUtility = {
   polygonLayerZIndex: 1001,
   customPolygonLayerZIndex: 1100,
   selectedElementLayerZIndex: 1150,
-  drawnPpolygonLayerZIndex: 1151,
+  drawnPolygonLayerZIndex: 1151,
 
   dataPaneAction: {
     analyse: 'analyse',
     geoMessage: 'geoMessage',
+    createCustomPolygon: 'create_custom_polygon',
     alterCustomPolygon: 'alter_custom_polygon',
     feed: 'geomessage_feed'
   },

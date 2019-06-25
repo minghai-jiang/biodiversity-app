@@ -13,7 +13,6 @@ import {
 import L from "leaflet";
 import "leaflet-draw";
 
-
 import "./ViewerMap.css";
 
 import MapInfo from './MapInfo';
