@@ -43,8 +43,7 @@ class GeoMessageControl extends PureComponent {
       loading: false,
 
       rawGeoMessages: null,
-      geoMessageElements: null,
-      
+      geoMessageElements: null      
     };
   }
 
@@ -57,7 +56,7 @@ class GeoMessageControl extends PureComponent {
 
     let update = false;
 
-    if (this.props.action === ViewerUtility.dataPaneAction.feed) {
+    if (this.props.isFeed) {
       update = differentMap;
       if (update) {
         this.feedPage = 1;
@@ -71,7 +70,7 @@ class GeoMessageControl extends PureComponent {
       }
 
       let differentElement = DataPaneUtility.isDifferentElement(prevProps.element, this.props.element);
-      let differentAction = prevProps.action !== this.props.action;
+      let differentAction = prevProps.isFeed !== this.props.isFeed;
 
       update = differentMap || differentElement || differentAction;
     }
@@ -84,14 +83,11 @@ class GeoMessageControl extends PureComponent {
   getGeoMessages = () => {
     let geoMessagesPromise = null;
 
-    if (this.props.action === ViewerUtility.dataPaneAction.geoMessage) {
+    if (!this.props.isFeed) {
       geoMessagesPromise = this.getElementMessages();
     }
-    else if (this.props.action === ViewerUtility.dataPaneAction.feed) {
-      geoMessagesPromise = this.getFeedMessages();
-    }
     else {
-      return;
+      geoMessagesPromise = this.getFeedMessages();
     }
 
     geoMessagesPromise
@@ -101,7 +97,7 @@ class GeoMessageControl extends PureComponent {
           rawGeoMessages: results.rawGeoMessages, 
           geoMessageElements: results.geoMessageElements 
         }, () => {
-          if (this.props.action !== ViewerUtility.dataPaneAction.feed) {
+          if (!this.props.isFeed) {
             this.scrollGeoMessagesToBottom();
           }
         });
@@ -248,33 +244,22 @@ class GeoMessageControl extends PureComponent {
   }
 
   onGeoMessagesScroll = () => {
-    if (this.props.action !== ViewerUtility.dataPaneAction.feed) {
+    if (!this.props.isFeed || this.noMoreFeedMessages || this.state.loading 
+      || this.feedScrollLoading) {
       return;
     }
 
-    if (this.noMoreFeedMessages) {
-      return;
-    }
+    let messagesContainer = this.geomessagesContainerCard.current;
 
-    if (this.state.loading) {
-      return;
-    }
-
-    let c = this.geomessagesContainerCard.current;
-
-    let diff = c.scrollHeight - c.scrollTop;
+    let diff = messagesContainer.scrollHeight - messagesContainer.scrollTop;
 
     if (diff > SCROLL_LOAD_THRESHOLD) {
       return;
     }
 
-    if (this.feedScrollLoading) {
-      return;
-    }
-
     this.feedScrollLoading = true;    
 
-    let oldScrollHeight = c.scrollHeight;
+    let oldScrollHeight = messagesContainer.scrollHeight;
 
     this.getFeedMessages()
       .then(results => {
@@ -283,7 +268,7 @@ class GeoMessageControl extends PureComponent {
           rawGeoMessages: [...this.state.rawGeoMessages, ...results.rawGeoMessages], 
           geoMessageElements: [...this.state.geoMessageElements, ...results.geoMessageElements] 
         }, () => {
-          setTimeout(c.scrollTop = oldScrollHeight, 100);
+          setTimeout(messagesContainer.scrollTop = oldScrollHeight, 100);
           this.feedScrollLoading = false;
         });
       })
@@ -298,7 +283,7 @@ class GeoMessageControl extends PureComponent {
       return <CircularProgress className='loading-spinner'/>;
     }
 
-    let isFeed = this.props.action === ViewerUtility.dataPaneAction.feed;
+    let isFeed = this.props.isFeed;
     let className = 'data-pane-card geomessage-messages-card';
     if (isFeed) {
       className += ' geomessage-messages-card-feed';

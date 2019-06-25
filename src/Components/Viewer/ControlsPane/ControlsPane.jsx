@@ -38,7 +38,7 @@ class ControlsPane extends PureComponent {
 
     this.standardTileLayersControl = React.createRef();
     this.polygonLayersControl = React.createRef();
-    this.customPolygonlayersControl = React.createRef();
+    this.customPolygonLayersControl = React.createRef();
 
     this.state = {
       map: null
@@ -56,8 +56,12 @@ class ControlsPane extends PureComponent {
       this.polygonLayersControl.current.selectLayer(layer);
     }
     else if (type === ViewerUtility.customPolygonTileLayerType) {
-      this.customPolygonlayersControl.current.selectLayer(layer);
+      this.customPolygonLayersControl.current.selectLayer(layer);
     }
+  }
+
+  updateCustomPolygons = () => {
+    this.customPolygonLayersControl.current.refresh();
   }
 
   onSelectMap = (map) => {

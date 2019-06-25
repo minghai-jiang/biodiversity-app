@@ -140,6 +140,15 @@ class CustomPolygonLayersControl extends PureComponent {
     return options;
   }
 
+  refresh = () => {
+    this.prepareLayers(
+      this.props.map, this.props.timestampRange, this.state.availableLayers, this.state.selectedLayers
+    )
+      .then(leafletLayers => {
+        this.props.onLayersChange(leafletLayers);
+      });
+  }
+
   prepareLayers = async (map, timestampRange, availableLayers, selectedLayers) => {
     let promises = [];
     

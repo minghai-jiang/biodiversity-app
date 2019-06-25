@@ -16,6 +16,7 @@ import ViewerUtility from '../ViewerUtility';
 
 import AnalyseControl from './AnalyseControl/AnalyseControl';
 import GeoMessageControl from './GeoMessageControl/GeoMessageControl';
+import CustomPolygonControl from './CustomPolygonControl/CustomPolygonControl';
 
 class DataPane extends PureComponent {
   constructor(props, context) {
@@ -74,7 +75,7 @@ class DataPane extends PureComponent {
         title = 'Custom polygon';
         idText = element.feature.properties.id;
       }
-      else if (element.type === ViewerUtility.drawnPolygonlayerType) {
+      else if (element.type === ViewerUtility.drawnPolygonLayerType) {
         title = 'Drawn polygon';
         idText = 'Drawn polygon';
       }
@@ -99,11 +100,25 @@ class DataPane extends PureComponent {
           map={this.props.map}
           timestampRange={this.props.timestampRange}
           element={this.props.element}
-          action={action}
+          isFeed={action === ViewerUtility.dataPaneAction.feed}
           onFlyTo={this.props.onFlyTo}
         />
       );
     }
+    else if (action === ViewerUtility.dataPaneAction.createCustomPolygon ||
+      action === ViewerUtility.dataPaneAction.editCustomPolygon) {
+        actionControl = (
+          <CustomPolygonControl
+            user={this.props.user}
+            map={this.props.map}
+            timestampRange={this.props.timestampRange}
+            element={this.props.element}
+            isEdit ={action === ViewerUtility.dataPaneAction.editCustomPolygon}
+            onFlyTo={this.props.onFlyTo}
+            onAddCustomPolygon={this.props.onAddCustomPolygon}
+          />
+        )
+      }
     
     return (
       <div className='viewer-pane data-pane' style={style}>

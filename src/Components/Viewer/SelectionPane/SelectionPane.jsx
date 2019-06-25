@@ -7,7 +7,8 @@ import {
   CardContent,
   CardActions,
   IconButton,
-  Typography
+  Typography,
+  CircularProgress
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 
@@ -24,7 +25,8 @@ class SelectionPane extends PureComponent {
     super(props, context);
 
     this.state = {
-      isOpen: false
+      isOpen: false,
+      loading: false
     };
   }  
 
@@ -37,12 +39,46 @@ class SelectionPane extends PureComponent {
     }
   }
 
+  open = () => {
+    this.setState({ isOpen: true });
+  }
+
+  deleteCustomPolygon = () => {
+    this.setState({ loading: true }, () => {
+      let body = {
+        mapId: this.props.map.id,
+        customPolygonId: this.props.element.feature.properties.id
+      };
+  
+      ApiManager.post('/geomessage/customPolygon/deletePolygon', body, this.props.user)
+        .then(() => {
+          this.props.onDeselect();
+          this.props.onDeleteCustomPolygon();
+          this.setState({ isOpen: false, loading: false });
+        })
+        .catch(err => {
+          console.log(err);
+          this.setState({ loading: false });
+        });
+    });
+
+  }
+
   onCloseClick = () => {
+    if (this.props.element.type === ViewerUtility.drawnPolygonLayerType) {
+      this.props.onDeselectDrawnPolygon();
+    }
+    
     this.setState({ isOpen: false });
   }
 
   onElementActionClick = (action) => {
-    this.props.onDataPaneAction(action);
+    if (action === DELETE_CUSTOM_POLYGON_ACTION) {
+      this.deleteCustomPolygon();
+    }
+    else {
+      this.props.onDataPaneAction(action);
+    }
   }
 
   render() {
@@ -59,7 +95,6 @@ class SelectionPane extends PureComponent {
     }
 
     let title = null;
-    let buttons = [];
 
     let user = this.props.user;
     let mapAccessLevel = map.accessLevel;
@@ -80,7 +115,7 @@ class SelectionPane extends PureComponent {
       </Button>
     );
 
-    if (element.type !== ViewerUtility.drawnPolygonlayerType) {
+    if (element.type !== ViewerUtility.drawnPolygonLayerType) {
       firstRowButtons.push((
         <Button 
           key='geoMessage' 
@@ -90,7 +125,7 @@ class SelectionPane extends PureComponent {
           onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.geoMessage)}
           disabled={mapAccessLevel < ApiManager.accessLevels.viewGeoMessages}
         >
-          Geomessage
+          GeoMessage
         </Button>
       ));
     }
@@ -107,14 +142,14 @@ class SelectionPane extends PureComponent {
 
       secondRowButtons.push(
         <Button 
-          key='alter' 
+          key='edit' 
           variant='outlined' 
           size='small' 
           className='selection-pane-button'
-          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.alterCustomPolygon)}
-          disabled={!user || mapAccessLevel < ApiManager.accessLevels.alterOrDeleteCustomPolygons}
+          onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.editCustomPolygon)}
+          disabled={!user || mapAccessLevel < ApiManager.accessLevels.editOrDeleteCustomPolygons}
         >
-          Alter
+          Edit
         </Button>,
         <Button 
           key='delete' 
@@ -128,7 +163,7 @@ class SelectionPane extends PureComponent {
         </Button>
       );
     }
-    else if (element.type === ViewerUtility.drawnPolygonlayerType) {
+    else if (element.type === ViewerUtility.drawnPolygonLayerType) {
       title = 'Drawn polygon';
 
       firstRowButtons.push(
@@ -138,7 +173,11 @@ class SelectionPane extends PureComponent {
           size='small' 
           className='selection-pane-button'
           onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.createCustomPolygon)}
-          disabled={!user || mapAccessLevel < ApiManager.accessLevels.addCustomPolygons}
+          disabled={
+            !user || 
+            mapAccessLevel < ApiManager.accessLevels.addCustomPolygons ||
+            map.layers.customPolygon.length === 0
+          }
         >
           Add
         </Button>
@@ -150,7 +189,7 @@ class SelectionPane extends PureComponent {
 
     for (let property in elementProperties) {
 
-      if (element.type === ViewerUtility.drawnPolygonlayerType && property === 'id') {
+      if (element.type === ViewerUtility.drawnPolygonLayerType && property === 'id') {
         continue;
       }
 
@@ -189,6 +228,7 @@ class SelectionPane extends PureComponent {
         />
         <CardContent className={'card-content'}>
           {properties}
+          { this.state.loading ? <CircularProgress className='loading-spinner'/> : null}
         </CardContent>
         <CardActions className={'selection-pane-card-actions'}>
           <div key='first_row_buttons'>

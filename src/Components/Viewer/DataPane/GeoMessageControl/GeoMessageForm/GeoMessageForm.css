@@ -28,28 +28,13 @@ div.geomessage-form-question {
   margin-top: 8px;
 }
 
-div.geomessage-text-input-form {
-  width: 100%;
-}
-
 .geomessage-checkbox-question {
   font-size: 15px;
   text-align: left;
 }
 
-div.geomessage-text-input {
-  font-family: monospace
-}
-
 div.geomessage-form-card-item {
-  margin-top: 8px;
   text-align: left;
-}
-
-button.geomessage-submit-button {
-  display: block;
-  width: 50%;
-  margin-left: auto;
 }
 
 .geomessage-upload-image-label {
@@ -59,9 +44,6 @@ button.geomessage-submit-button {
 .geomessage-form-section {
   margin-top: 12px;
 }
-
-
-
 
 @media only screen and (max-width: 930px) {
   button.geomessage-add-expand-button {

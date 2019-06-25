@@ -10,7 +10,7 @@ const ViewerUtility = {
   polygonLayerType: POLYGON,
   customPolygonTileLayerType: CUSTOM_POLYGON,
 
-  drawnPolygonlayerType: 'drawn_polygon',
+  drawnPolygonLayerType: 'drawn_polygon',
 
   tileLayerZIndex: 200,
   standardTileLayerZIndex: 1000,
@@ -23,7 +23,7 @@ const ViewerUtility = {
     analyse: 'analyse',
     geoMessage: 'geoMessage',
     createCustomPolygon: 'create_custom_polygon',
-    alterCustomPolygon: 'alter_custom_polygon',
+    editCustomPolygon: 'edit_custom_polygon',
     feed: 'geomessage_feed'
   },
 

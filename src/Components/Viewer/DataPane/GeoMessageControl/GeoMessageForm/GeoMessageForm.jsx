@@ -106,12 +106,9 @@ class GeoMessageForm extends PureComponent {
         if (question.type === ViewerUtility.geomessageFormType.text) {
           questionElement = (
             <TextField
-              className='geomessage-form-question geomessage-text-input-form'
+              className='data-pane-text-field geomessage-form-question geomessage-text-input-form'
               label={question.question}
               multiline
-              InputProps={{
-                className: 'geomessage-text-input'
-              }}
               value={this.state.formAnswers[i]}
               required={question.obligatory === 'yes'}
               onChange={(e) => this.onFormAnswer(e, i, false)}
@@ -121,12 +118,9 @@ class GeoMessageForm extends PureComponent {
         else if (question.type === ViewerUtility.geomessageFormType.numeric) {
           questionElement = (
             <TextField
-              className='geomessage-form-question geomessage-text-input-form'
+              className='data-pane-text-field geomessage-form-question geomessage-text-input-form'
               label={question.question}
               type='number'
-              InputProps={{
-                className: 'geomessage-text-input'
-              }}
               value={this.state.formAnswers[i]}
               required={question.obligatory === 'yes'}
               onChange={(e) => this.onFormAnswer(e, i, false)}
@@ -385,16 +379,13 @@ class GeoMessageForm extends PureComponent {
         <Collapse in={this.state.expanded}>
           <CardContent className='data-pane-card-content'>
             <TextField
-              className='geomessage-text-input-form'
+              className='data-pane-text-field'
               label='Message'
               multiline
-              InputProps={{
-                className: 'geomessage-text-input'
-              }}
               value={this.state.messageText}
               onChange={this.onMessageChange}
             />
-            <div className='geomessage-form-card-item'>
+            <div className='card-content-item geomessage-form-card-item'>
             {
               hasAddImagePermission ?
                 <div>
@@ -416,7 +407,7 @@ class GeoMessageForm extends PureComponent {
             </div>
             <div className='geomessage-form-section'>
               <Button 
-                className='geomessage-form-card-item geomessage-submit-button'
+                className='card-content-item geomessage-form-card-item card-submit-button'
                 variant='contained' 
                 color='primary'
                 onClick={this.onGeoMessageSubmit}

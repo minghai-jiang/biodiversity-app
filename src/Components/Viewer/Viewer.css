@@ -186,6 +186,16 @@ button.expand-icon {
   padding: 6px;
 }
 
+div.card-content-item {
+  margin-top: 8px;
+}
+
+button.card-submit-button {
+  display: block;
+  width: 50%;
+  margin-left: auto;
+}
+
 .expanded {
   transform: rotate(180deg);
 }

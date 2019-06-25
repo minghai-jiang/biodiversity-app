@@ -42,7 +42,14 @@ const DEFAULT_VIEWPORT = {
 class Viewer extends PureComponent {
 
   controlsPane = null;
+  selectionPane = null;
+
   leafletMap = null;
+
+  leafletLayers = null;
+  selectedElementLayer = null;
+  drawnPolygonLayer = null;
+
   setNewViewportTimer = null;
   drawnPolygonGeoJson = null;
 
@@ -53,6 +60,7 @@ class Viewer extends PureComponent {
 
     this.leafletMap = React.createRef();
     this.controlsPane = React.createRef();
+    this.selectionPane = React.createRef();
 
     this.state = {
       leafletMapViewport: DEFAULT_VIEWPORT,
@@ -66,7 +74,6 @@ class Viewer extends PureComponent {
         end: 0
       },
 
-      leafletLayers: [],
       selectedElement: null,
 
       geolocation: null,
@@ -92,41 +99,6 @@ class Viewer extends PureComponent {
     map.on(L.Draw.Event.CREATED, this.onShapeDrawnClosure);
 
   }
-
-  onShapeDrawnClosure = (e) => {
-    let layer = e.layer;
-    
-    let geoJson = layer.toGeoJSON();
-    geoJson.geometry.type = 'MultiPolygon';
-    geoJson.geometry.coordinates = [geoJson.geometry.coordinates];
-    geoJson.properties.id = Math.random();
-
-    let selectDrawnPolygon = () => {
-      if (!this.state.map) {
-        return;
-      }
-
-      this.selectFeature(ViewerUtility.drawnPolygonlayerType, geoJson, true);    
-    }
-
-    let drawnPolygonLayer = (
-      <GeoJSON
-        key={Math.random()}
-        data={geoJson}
-        style={'#00ffff'}
-        zIndex={ViewerUtility.drawnPolygonLayerZIndex}
-        onEachFeature={(_, layer) => layer.on({ click: selectDrawnPolygon })}
-      />
-    );
-
-    let allLayers = [...this.state.leafletLayers, this.state.selectedElementLayer, drawnPolygonLayer];
-
-    this.drawnPolygonGeoJson = geoJson;
-    this.setState({ allLayers: allLayers, drawnPolygonLayer: drawnPolygonLayer }, () => {
-      selectDrawnPolygon();
-    });
-    
-  }  
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(
@@ -185,6 +157,39 @@ class Viewer extends PureComponent {
     }
   }
 
+  onShapeDrawnClosure = (e) => {
+    let layer = e.layer;
+    
+    let geoJson = layer.toGeoJSON();
+    geoJson.geometry.type = 'MultiPolygon';
+    geoJson.geometry.coordinates = [geoJson.geometry.coordinates];
+    geoJson.properties.id = Math.random();
+
+    let selectDrawnPolygon = () => {
+      if (!this.state.map) {
+        return;
+      }
+
+      this.selectFeature(ViewerUtility.drawnPolygonLayerType, geoJson, true);    
+    }
+
+    let drawnPolygonLayer = (
+      <GeoJSON
+        key={Math.random()}
+        data={geoJson}
+        style={'#00ffff'}
+        zIndex={ViewerUtility.drawnPolygonLayerZIndex}
+        onEachFeature={(_, layer) => layer.on({ click: selectDrawnPolygon })}
+      />
+    );
+
+    this.drawnPolygonGeoJson = geoJson;
+    this.setState({ drawnPolygonLayer: drawnPolygonLayer }, () => {
+      this.rebuildAllLayers();
+      selectDrawnPolygon();
+    });    
+  }  
+
   openPane = (paneName) => {
     let currentPanes = this.state.panes;
 
@@ -217,12 +222,14 @@ class Viewer extends PureComponent {
   }
 
   onSelectMap = (map) => {
+
+    this.selectedElementLayer = null;
+    this.drawnPolygonLayer = null;
     this.drawnPolygonGeoJson = null;
 
     this.setState({ 
       map: map,
       selectedElement: null,
-      drawnPolygonLayer: null,
       timestampRange: {
         start: map.timestamps.length - 1,
         end: map.timestamps.length - 1
@@ -237,8 +244,8 @@ class Viewer extends PureComponent {
   }
 
   onLayersChange = (layers) => {
-    let allLayers = [...layers, this.state.selectedElementLayer, this.state.drawnPolygonLayer];
-    this.setState({ allLayers: allLayers, leafletLayers: layers });
+    this.leafletLayers = layers;
+    this.rebuildAllLayers();
   }
 
   onSelectTimestamp = (timestampRange) => {
@@ -286,20 +293,50 @@ class Viewer extends PureComponent {
         data={geoJson}
         style={'#00ffff'}
         pane={markerPane}
+        onEachFeature={(_, layer) => layer.on({ click: () => this.selectionPane.current.open() })}
       />
     );
 
-    let allLayers = [
-      ...this.state.leafletLayers, 
-      selectedElementLayer,
-      this.state.drawnPolygonLayer
-    ];
+    this.selectedElementLayer = selectedElementLayer;
 
-    this.setState({ 
-      allLayers: allLayers, 
-      selectedElement: element, 
-      selectedElementLayer: selectedElementLayer 
-    });
+    this.setState({ selectedElement: element }, this.rebuildAllLayers);
+  }
+
+  deselectCurrentElement = () => {
+    this.selectedElementLayer = null;
+    let dataPaneAction = this.state.dataPaneAction;
+    if (this.state.dataPaneAction !== ViewerUtility.dataPaneAction.feed) {
+      dataPaneAction = null;
+    }
+    this.setState({ selectedElement: null, dataPaneAction: dataPaneAction }, this.rebuildAllLayers);
+  }
+
+  removeDrawnPolygon = () => {
+    this.drawnPolygonLayer = null;
+    this.drawnPolygonGeoJson = null;
+
+    let selectedElement = this.state.selectedElement;
+
+    if (selectedElement && selectedElement.type === ViewerUtility.drawnPolygonLayerType) {
+        this.deselectCurrentElement();
+    }
+    else {
+      this.rebuildAllLayers();
+    }
+  }
+
+  rebuildAllLayers = () => {
+    let allLayers = [
+      this.leafletLayers, 
+      this.selectedElementLayer, 
+      this.drawnPolygonLayer
+    ]
+    
+    this.setState({ allLayers: allLayers });
+  }
+
+  updateCustomPolygons = () => {
+    this.controlsPane.current.updateCustomPolygons();
   }
 
   onDataPaneAction = (action) => {
@@ -496,11 +533,15 @@ class Viewer extends PureComponent {
               onSelectTimestamp={this.onSelectTimestamp}
             />
             <SelectionPane
+              ref={this.selectionPane}
               user={this.props.user}
               map={this.state.map}
               element={this.state.selectedElement}
               onDataPaneAction={this.onDataPaneAction}
               onFlyTo={this.onFlyTo}
+              onDeselect={this.deselectCurrentElement}
+              onDeselectDrawnPolygon={this.removeDrawnPolygon}
+              onDeleteCustomPolygon={this.updateCustomPolygons}
             />
             <Map 
               center={DEFAULT_VIEWPORT.center} 
@@ -522,6 +563,7 @@ class Viewer extends PureComponent {
             action={this.state.dataPaneAction}
             element={this.state.selectedElement}
             onFlyTo={this.onFlyTo}
+            onAddCustomPolygon={() => { this.removeDrawnPolygon(); this.updateCustomPolygons(); }}
           />
         </div>
 
