@@ -3,5 +3,4 @@
 rm -r build build.tar
 npm run build
 tar -czf ./build.tar ./build
-gcloud compute scp ./build.tar penguin:~/
-
+gcloud compute scp ./build.tar dev-penguin:~/

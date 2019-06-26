@@ -113,8 +113,8 @@ export class PopupForm extends Component {
     let body = {
       mapId:  props.uuid,
       timestamp: props.timestamp,
-      isMask: this.state.clouds,
-      isClassification: this.state.classification,
+      isMask: false,
+      isClassification: false,
       message: this.state.text,
     }
 
@@ -184,24 +184,14 @@ export class PopupForm extends Component {
     
     return (
       <div id='formDiv'>
+        <div key={id + 'notification' + this.state.notification.text} className={this.state.notification.type}>{this.state.notification.text}</div>
         <form key={id} id='popupForm' onSubmit={this.handleSubmit}>
           <label>
             <h3>Type a GeoMessage</h3>
             <textarea name="text" value={this.state.text} onChange={this.handleChange} placeholder='GeoMessage' maxLength='3000'/>
           </label><br/>
-          <h4>Is there something wrong?</h4>
-          <p>There is a problem with:</p>
-          <label>
-            <input type="checkbox" name="clouds" checked={this.state.clouds} onChange={this.handleChange}/>
-              Clouds
-            <br/>
-          </label>
-          <label>
-            <input type="checkbox" name="classification" checked={this.state.classification} onChange={this.handleChange}/>
-              Classification
-            <br/>
-          </label>
-          <div>
+          <div style={{ marginBottom: '1.2em' }}>
+            <span style={{ fontSize: '70%', marginRight: '0.5em'}}>Upload image:</span>
             <input type="file" accept='image/*' onChange={(e)=>this.handleImageChange(e)} />
           </div>
           <div>
@@ -213,7 +203,6 @@ export class PopupForm extends Component {
             }
           </div>
         </form>
-        <div key={id + 'notification' + this.state.notification.text} className={this.state.notification.type}>{this.state.notification.text}</div>
       </div>
     );
   }

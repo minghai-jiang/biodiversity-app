@@ -20,26 +20,6 @@ let GeoMessageFeed_list;
 let returnFeed = (value) => {};
 let loadMore = () => {};
 
-
-/*let flyToControl_map = null;
-let flyToControl_mapRef = null;
-let flyToElements = [];
-let flyToType = 'middle';
-let flyToID = 0;
-let flyToIdTile = {
-  tileX: 0,
-  tileY: 0,
-  zoom: 14
-}
-let flyToMiddle = {
-  longitude: 0,
-  latitude: 0,
-  zoom: 14
-}
-let flyToControl_maxZoom = 18;
-let flyToProps = {};
-let returnChecked = (value) => {};*/
-
 const GeoMessageFeed = {
   getElement: () => {
 
@@ -132,10 +112,10 @@ async function feedLoop(page)
     if (page !== 'group_change') {
       let mapGroups = GeoMessageFeed_props.map.groups;
 
-      // Adding admin group as filtering option.
+      // Adding 'no group' group as filtering option.
       // It is not included as API response due to it being a special group.
-      if (!mapGroups.includes('admin')) {
-        mapGroups.push('admin'); 
+      if (!mapGroups.includes('no group')) {
+        mapGroups.push('no group'); 
       }
 
       GeoMessageFeed_groups = [];
@@ -195,16 +175,17 @@ async function getFeed(page)
     GeoMessageFeed_selectedGroups.forEach(option => {
       userGroups.push(option.value);
     });
-
-    feed = await QueryUtil.postData(apiUrl + 'geoMessage/feed', 
-      {
-        mapId: GeoMessageFeed_props.map.uuid,
-        page: page, 
-        userGroups: userGroups,
-      },
-      headers
-    );
   }
+
+  feed = await QueryUtil.postData(apiUrl + 'geoMessage/feed', 
+    {
+      mapId: GeoMessageFeed_props.map.uuid,
+      page: page, 
+      userGroups: userGroups,
+    },
+    headers
+  );
+  
   
   if (feed && feed.length > 0)
   {
@@ -214,7 +195,9 @@ async function getFeed(page)
       feed[j].mapId = GeoMessageFeed_props.map.uuid;
       feed[j].headers = headers;
 
-      messages.push(<Message key={feed[j].uuid} info={feed[j]} user={GeoMessageFeed_props.user} trigger={buttonClick}/>);
+      messages.push(
+        <Message key={feed[j].uuid} info={feed[j]} map={GeoMessageFeed_props.map} user={GeoMessageFeed_props.user} trigger={buttonClick}/>
+      );
     }
 
     return({type:'page', pageNumber: page, messages: messages});

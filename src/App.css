@@ -31,6 +31,7 @@
   bottom: 0;
   height: calc(100% - 3.5em);
   width: 100%;
+  overflow-x: hidden
 }
 
 .main-content {
@@ -140,6 +141,11 @@
   cursor: pointer;
 }
 
+.button:hover {
+  background-color: #00a3a3;
+  color: #ffffff;
+}
+
 .button:hover:enabled {
     background-color: #00a3a3;
     color: #ffffff;
@@ -190,7 +196,11 @@
 }
 
 @media only screen and (max-device-width : 640px) {
-    .main-block-header {    
-        font-size: 22pt;
-    }
+  .main-block-header {    
+      font-size: 22pt;
+  }
+
+  .main-block-single-button {
+    width: 100%;
+  }
 }

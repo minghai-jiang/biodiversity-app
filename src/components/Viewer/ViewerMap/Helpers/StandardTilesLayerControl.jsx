@@ -29,7 +29,7 @@ let StandardTiles_highlight = {};
 let StandardTiles_highlightCenter = [];
 let StandardTiles_refresh = () => {};
 let StandardTiles_shouldRefresh = false;
-
+let StandardTiles_onFeatureClick = null;
 
 const StandardTilesLayer = {
   getElement: () => {
@@ -39,7 +39,7 @@ const StandardTilesLayer = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons, map) => {
+  initialize: async (props, bounds, maxPolygons, map, onFeatureClick) => {
     StandardTilesControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -56,6 +56,8 @@ const StandardTilesLayer = {
 
     StandardTiles_map = props.map;
     StandardTiles_mapRef = map;
+
+    StandardTiles_onFeatureClick = onFeatureClick;
   },
 
   update: async (props, bounds) => {
@@ -173,9 +175,16 @@ const StandardTilesLayer = {
 
         merged = {...properties, ...StandardTiles_PopupContent.properties};
 
-        let analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
-        let report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
+        let analyse;
+        let report;
         
+        if (props.map.accessLevel >= 200) {
+          analyse = <a className="noselect" onClick={() => {handleTile('analyse', contentFunction, id, merged, Math.random())} }>Analyse</a>
+        }
+
+        if (props.map.accessLevel >= 300) {
+          report =  <a className="noselect" onClick={() => {handleTile('report', contentFunction, id, merged, Math.random())} }>GeoMessage</a>
+        }
 
         StandardTiles_PopupContent.click = false;
         return (
@@ -404,10 +413,11 @@ function onEachFeature(feature, layer)
 
   layer.on({
     click: function(e){
-      StandardTiles_mapRef.closePopup();
+      // StandardTiles_mapRef.closePopup();
       feature.e = e;
       feature.click = true;
       StandardTiles_PopupContent = feature;
+      StandardTiles_onFeatureClick();
       //StandardTiles_refresh();
     }
   });

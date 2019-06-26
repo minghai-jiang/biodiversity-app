@@ -30,6 +30,7 @@ let CrowdLayersControl_highlight = -1;
 let CrowdLayersControl_highlightCenter = [];
 let CrowdLayersControl_refresh = () => {};
 let CrowdLayersControl_shouldRefresh = false;
+let CrowdLayersControl_onFeatureClick = null;
 
 let CrowdLayersControl_deleted = -1;
 
@@ -41,7 +42,7 @@ const CrowdLayersControl = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons, map, refresh) => {
+  initialize: async (props, bounds, maxPolygons, map, refresh, onFeatureClick) => {
     CrowdLayersControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -61,6 +62,7 @@ const CrowdLayersControl = {
     CrowdLayersControl_props = props;
 
     CrowdLayersControl_refresh = refresh;
+    CrowdLayersControl_onFeatureClick = onFeatureClick;
   },
 
   update: async (props, bounds, refresh) => {
@@ -181,21 +183,28 @@ const CrowdLayersControl = {
         }
       }
 
-      let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
-      let report = <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+      let analyse; 
+      let report; 
       let updateButton;
       let deleteButton;
 
-      if (props.user)
-      {
-        let updateInfo = {
-          refresh: CrowdLayersControl_refresh,
-          ...popup
-        };
+      let updateInfo = {
+        refresh: CrowdLayersControl_refresh,
+        ...popup
+      };
 
+      if (props.map.accessLevel >= 200) {
+        analyse = <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>;
+      }
+
+      if (props.map.accessLevel >= 300) {
+        report = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
+      }
+
+      if (props.user && props.map.accessLevel >= 700) {
         updateButton =  <a className="noselect" onClick={() => {handlePolygon('update', contentFunction, updateInfo, properties, Math.random())} }>Update</a>;
         deleteButton =  <a className="noselect" onClick={() => {deletePolygon(properties)} }>Delete</a>;
-      }
+      }      
 
       let popupContent;
       if (id !== CrowdLayersControl_deleted)
@@ -417,9 +426,10 @@ function onEachFeature(feature, layer) {
 
   layer.on({
     click: function(e){
-      CrowdLayersControl_mapRef.closePopup();
+      // CrowdLayersControl_mapRef.closePopup();
       feature.e = e;
       addFeatureData(feature, layer);
+      CrowdLayersControl_onFeatureClick();
       //CrowdLayersControl_refresh();
     }
   });

@@ -24,7 +24,7 @@ const localStorageUserItem = 'user';
 const apiUrl = "https://api.ellipsis-earth.com/";
 const publicFilesUrl = "https://public.ellipsis-earth.com/";
 
-//const apiUrl = "https://dev.api.ellipsis-earth.com/";
+// const apiUrl = "https://dev.api.ellipsis-earth.com/";
 // const publicFilesUrl = "https://dev.public.ellipsis-earth.com/";
 
 // const apiUrl = "http://localhost:7552/";
@@ -73,6 +73,10 @@ class App extends Component {
       )
       .then(response => {
         if (response.ok) {
+          if (user.username) {
+            user.username = user.username.toLowerCase();
+          }
+          
           this.setState({ user: user, init: true });
         }
         else {

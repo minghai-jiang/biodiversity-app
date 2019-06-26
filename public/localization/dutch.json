@@ -52,7 +52,7 @@
 
   "Success": "Gelukt!",
   "RegisterSuccessMessage1": "We hebben een email naar u verzonden ter validatie. Volg de insturcites in deze mail.",
-  "RegisterSuccessMessage2": "U kunt nu inloggen met uw gegevens.",
+  "RegisterSuccessMessage2": "U moet uw email eerst valideren voordat u kunt inloggen.",
   "ChangeEmailSuccessMessage": "We hebben een email naar u verzonden ter validatie. Volg de insturcites in deze mail.",
   "ChangePasswordSuccessMessage": "U kunt nu inloggen met uw nieuwe wachtwoord.",
   "ResetPasswordSuccessMessage1": "We hebben een emal verzonden naar uw adres.",

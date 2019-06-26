@@ -23,6 +23,8 @@ let flyToMiddle = {
 let flyToControl_maxZoom = 18;
 let flyToProps = {};
 let flyTo_geolocation = null;
+let flyTo_watchId = null;
+let flyTo_onFlyTo = null;
 let returnChecked = (value) => {};
 
 const FlyToControl = {
@@ -45,22 +47,23 @@ const FlyToControl = {
     )
   },
 
-  initialize: (props, map, checkedFunction) => {
+  initialize: (props, map, checkedFunction, onFlyTo) => {
     flyToProps = props;
     flyToControl_map = props.map;
     flyToControl_mapRef = map;
     flyToControl_maxZoom = flyToControl_mapRef.getMaxZoom();
+    flyTo_onFlyTo = onFlyTo;
 
     returnChecked = checkedFunction;
     createOptions();
 
     if (navigator.geolocation) {
-      navigator.geolocation.watchPosition((position) => {
+      flyTo_watchId = navigator.geolocation.watchPosition((position) => {
         let lat = position.coords.latitude;
         let long = position.coords.longitude;
 
         flyTo_geolocation = [lat, long];
-      })
+      }, null, { enableHighAccuracy: true });
     }
 
     return(flyToElements);
@@ -105,8 +108,11 @@ const FlyToControl = {
     flyToControl_maxZoom = 18;
     flyToProps = {};
   },
+
   flyTo: (type, id) =>
   {
+    let oldFlyToType = flyToType;
+
     flyToType = type + 's';
     if (type === 'custom polygon')
     {
@@ -122,7 +128,9 @@ const FlyToControl = {
       flyToID = id;
     }
 
-    handleSubmit()
+    handleSubmit();
+
+    flyToType = oldFlyToType;
   }
 }
 
@@ -143,7 +151,7 @@ function createOptions()
 
     formElements.push(
       <label key={flyToControl_map.uuid + 'typeSelectLabel'}>
-        Select id type: 
+        Select type: 
         <br/>
         <select defaultValue="my_location" key={flyToControl_map.uuid + 'typeSelect'} onChange={onOptionChange}>
           {select}
@@ -151,7 +159,7 @@ function createOptions()
       </label>
     );
 
-    formElements.push(<div key={flyToControl_map.uuid + 'centerPointContainer'} className='optionContainer center'>
+    formElements.push(<div key={flyToControl_map.uuid + 'centerPointContainer'} className='optionContainer center hidden'>
                         <label key={flyToControl_map.uuid + 'latitudeInputLabel'}>Latitude: <br/>
                           <input key={flyToControl_map.uuid + 'latitudeInput'} type='number' pattern="(\-)?(\d+)((\.|\,|\d){1,5})?" step='0.0001' placeholder={flyToMiddle.latitude} min='-90' max='90' onChange={onIdChange} id='latitude'/>
                         </label>
@@ -263,8 +271,27 @@ function handleSubmit(e = null)
   }
 
   if (flyToType === 'my_location') {
-    if (flyTo_geolocation) {
+    if (!flyTo_geolocation) {
+      navigator.geolocation.clearWatch(flyTo_watchId);
+      flyTo_watchId = navigator.geolocation.watchPosition((position) => {
+        let lat = position.coords.latitude;
+        let long = position.coords.longitude;
+  
+        flyTo_geolocation = [lat, long];
+      }, null, { enableHighAccuracy: true });
+
+      flyTo_geolocation = navigator.geolocation.getCurrentPosition((position) => {
+        let lat = position.coords.latitude;
+        let long = position.coords.longitude;
+  
+        flyTo_geolocation = [lat, long];
+        flyToControl_mapRef.flyTo(flyTo_geolocation, flyToControl_map.zoom);
+        flyTo_onFlyTo(flyTo_geolocation);
+      }, null, { enableHighAccuracy: true });
+    }    
+    else {
       flyToControl_mapRef.flyTo(flyTo_geolocation, flyToControl_map.zoom);
+      flyTo_onFlyTo(flyTo_geolocation);
     }
   }
   else if (flyToType === 'center')

@@ -22,7 +22,8 @@ export class TimestampSelector extends PureComponent {
   componentWillReceiveProps = (nextProps) => {
     if (this.props.timestamps !== nextProps.timestamps)
     {
-      this.setState({ start: 0, end: 0 });
+      let lastTimestamp = Math.max(0, nextProps.timestamps.length - 1);
+      this.setState({ start: lastTimestamp, end: lastTimestamp });
     }
   }
 
@@ -42,8 +43,7 @@ export class TimestampSelector extends PureComponent {
     }
   }
 
-  render() {
-    
+  render() {    
     if (this.props.timestamps)
     {
       let timestamps = this.props.timestamps;

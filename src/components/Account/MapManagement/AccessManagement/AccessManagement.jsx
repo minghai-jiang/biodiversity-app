@@ -53,11 +53,13 @@ class AccessManagement extends PureComponent {
 
         let groupsData = cloneDeep(result.groups);
 
-        groupsData.unshift({
-          id: 0,
-          name: this.props.localization["new group"],
-          accessLevel: 500
-        });
+        if (this.props.map.accessLevel >= 1000) {
+          groupsData.unshift({
+            id: 0,
+            name: this.props.localization["new group"],
+            accessLevel: 500
+          });
+        }
 
         this.setState({ mapAccess: result, groupsData: groupsData });
       })
@@ -123,9 +125,11 @@ class AccessManagement extends PureComponent {
         this.state.mapAccess.groups.push(newGroup);
         this.state.groupsData.push(newGroupClone);
 
-        let newGroupData = this.state.groupsData.find(group => group.id === 0);
-        newGroupData.name = 'new group';
-        newGroupData.accessLevel = 500;
+        if (this.props.map.accessLevel >= 1000) {
+          let newGroupData = this.state.groupsData.find(group => group.id === 0);
+          newGroupData.name = 'new group';
+          newGroupData.accessLevel = 500;
+        }
         
         let groupsData = [...this.state.groupsData];
 
@@ -218,6 +222,8 @@ class AccessManagement extends PureComponent {
   }
 
   renderEditable = (cellInfo) => {
+    let isOwner = this.props.map.accessLevel >= 1000;
+
     return (
       <div style={{ backgroundColor: "#fafafa" }}>
         <input
@@ -226,13 +232,17 @@ class AccessManagement extends PureComponent {
           onBlur={e => {
             this.state.groupsData[cellInfo.index][cellInfo.column.id] = e.target.value;
           }}
+          disabled={!isOwner}
         />
       </div>
     );
   }
 
   renderActionButtons = (cellInfo) => {
-    if (cellInfo.index === 0) {
+    let isOwner = this.props.map.accessLevel >= 1000;
+    let isUserManager = this.props.map.accessLevel >= 900;
+
+    if (cellInfo.original.id === 0) {
       return (
         <div
           style={{ backgroundColor: "#fafafa" }}
@@ -246,9 +256,9 @@ class AccessManagement extends PureComponent {
         <div
           style={{ backgroundColor: "#fafafa" }}
         >
-          <button onClick={() => this.saveGroup(cellInfo)}>{this.props.localization['Save']}</button>
-          <button onClick={() => this.onGroupEditUsers(cellInfo)}>{this.props.localization["Edit users"]}</button>
-          <button onClick={() => this.deleteGroup(cellInfo)}>{this.props.localization["Delete"]}</button>
+          <button onClick={() => this.saveGroup(cellInfo)} disabled={!isOwner}>{this.props.localization['Save']}</button>
+          <button onClick={() => this.onGroupEditUsers(cellInfo)} disabled={!isUserManager}>{this.props.localization["Edit users"]}</button>
+          <button onClick={() => this.deleteGroup(cellInfo)} disabled={!isOwner}>{this.props.localization["Delete"]}</button>
         </div>
       );
     }
@@ -257,7 +267,7 @@ class AccessManagement extends PureComponent {
 
   render() {
     if (this.state.mapAccess) {
-      let disable = this.props.accessLevel < 1000;
+      let disable = this.props.map.accessLevel < 1000;
 
       return (
         <div>
@@ -268,6 +278,7 @@ class AccessManagement extends PureComponent {
             className='login-input' 
             type='text'
             ref='publicAccessLevelInput'
+            style={{ marginBottom: '20px' }}
             defaultValue={this.state.mapAccess.publicAccessLevel}
             onBlur={this.updatePublicAccessLevel.bind(this)}
             disabled={disable}

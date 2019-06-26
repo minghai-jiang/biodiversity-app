@@ -7,8 +7,6 @@ const ApiManager = {
 
     url = `${apiUrl}${url}`;
 
-    console.log(url);
-
     let headers = {};
 
     if (body) {
@@ -20,6 +18,7 @@ const ApiManager = {
     }
 
     let gottenResponse = null;
+    let isJson = false;
     let isText = false;
 
     let options = {
@@ -33,16 +32,20 @@ const ApiManager = {
 
     return await fetch(url, options)
       .then(response => {
-        gottenResponse = response;
+        gottenResponse = response;        
 
         let contentType = response.headers.get('Content-Type');
+        isJson = contentType.includes('application/json');
         isText = contentType.includes('text/plain');
 
-        if (!isText) {
+        if (isJson) {
           return response.json();
         }
-        else {
+        else if (isText) {
           return response.text();
+        }
+        else {
+          return response.blob();
         }
       })
       .then(result => {

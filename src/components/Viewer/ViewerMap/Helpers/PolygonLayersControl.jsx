@@ -36,6 +36,8 @@ let polygonLayersControl_highlightCenter = [];
 let polygonLayersControl_refresh = () => {};
 let polygonLayersControl_shouldRefresh = false;
 
+let polygonLayersControl_onFeatureClick = null;
+
 const PolygonLayersControl = {
   getElement: () => {
     return { 
@@ -44,7 +46,7 @@ const PolygonLayersControl = {
     };
   },
 
-  initialize: async (props, bounds, maxPolygons, map) => {
+  initialize: async (props, bounds, maxPolygons, map, onFeatureClick) => {
     polygonLayersControl_maxPolygon = maxPolygons;
 
     if (!props.map || !props.timestampRange) {
@@ -60,6 +62,8 @@ const PolygonLayersControl = {
 
     polygonLayersControl_map = props.map;
     polygonLayersControl_mapRef = map;
+
+    polygonLayersControl_onFeatureClick = onFeatureClick;
   },
 
   update: async (props, bounds) => {
@@ -173,8 +177,16 @@ const PolygonLayersControl = {
         }
       }
 
-      let analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
-      let report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>      
+      let analyse;
+      let report;
+
+      if (props.map.accessLevel >= 200) {
+        analyse = <a className="noselect" onClick={() => {handlePolygon('analyse', contentFunction, id, properties, Math.random())} }>Analyse</a>
+      }
+
+      if (props.map.accessLevel >= 300) {
+        report =  <a className="noselect" onClick={() => {handlePolygon('report', contentFunction, id, properties, Math.random())} }>GeoMessage</a>      
+      }
 
       polygonLayersControl_PopupContent.data.click = false;
       return (
@@ -444,9 +456,10 @@ function onEachFeature(feature, layer) {
 
   layer.on({
     click: function(e){
-      polygonLayersControl_mapRef.closePopup();
+      // polygonLayersControl_mapRef.closePopup();
       feature.e = e;
       addFeatureData(feature, layer);
+      polygonLayersControl_onFeatureClick();
       //polygonLayersControl_refresh();
     }
   });

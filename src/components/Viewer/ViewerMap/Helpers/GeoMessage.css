@@ -2,7 +2,7 @@ div.slide-pane__content div.messageContainer
 {
   background-color: #b3b3b3;
   border-radius: 5px 5px 0 5px;
-  width: 75%;
+  width: 60%;
   color: #e6e6e6;
   font-weight: 400;
   margin-top: 0.5em;
@@ -13,24 +13,26 @@ div.slide-pane__content div.messageContainer
 div.slide-pane__content div.messageContainer.own
 {
   background-color: #00a3a3;
-  margin-left: 0;
   border-radius: 5px 5px 5px 0;
 }
 
 div.slide-pane__content div.messageContainer.other
 {
+  margin-left: 0;
   color: #fafafa;
 }
 
 div.slide-pane__content div.messageContainer .GeoDelete
 {
+  margin-top: 0.4em;
   display: block;
 }
 
-div.slide-pane__content div.messageContainer .GeoGetImage
+div.slide-pane__content div.messageContainer div.GeoGetImage
 {
-  display: block;
-  margin-top: 1em;
+  display: inline-block;
+  margin-top: 0.2em;
+  width: auto;
 }
 
 div.slide-pane__content div.messageContainer .GeoImage
@@ -40,68 +42,54 @@ div.slide-pane__content div.messageContainer .GeoImage
 }
 
 
-div.slide-pane__content div.messageContainer .GeoDelete button
-{
-  margin-top: 1em;
-}
-
-div.slide-pane__content div.messageContainer.other .GeoDelete button
-{
-  background-color: #737373;
-  border: 3px solid #737373;
-  color: #f5f5f5;
-}
-
-div.slide-pane__content div.messageContainer.other .GeoDelete button:hover
-{
-  border-color: #4d4d4d;
-}
-
-div.slide-pane__content div.messageContainer.other ul li.GeoDelete
-{
-  text-align: right;
-  width: 100%;
-}
-
 div.slide-pane__content div.messageContainer.other button:hover
 {
   background-color: #4d4d4d;
 }
 
-div.slide-pane__content div.messageContainer ul
+
+div.slide-pane__content div.messageContainer div.GeoMessage
 {
   margin: 0;
   list-style: none;
-  padding: 0.5em 1em;
+  padding: 0.3em 0.4em;
 }
 
-div.slide-pane__content div.messageContainer ul li
+div.slide-pane__content div.messageContainer div.GeoMessage div
 {
   display: inline-block;
   font-size: 90%;
   width: 50%;
 }
 
-div.slide-pane__content div.messageContainer ul li.GeoMessage
+div.slide-pane__content div.messageContainer div.GeoMessage div.GeoName
+{
+  font-weight: bold;
+  display: inline-block;
+}
+
+div.slide-pane__content div.messageContainer div.GeoMessage div.GeoUserGroup
+{
+  display: inline-block;
+  text-align: right;
+  font-size: 70%;
+}
+
+div.slide-pane__content div.messageContainer div.GeoMessage div.GeoMessage
 {
   width: 100%;
-  font-size: 100%;
-  padding-top: 0.25em;
+  font-size: 80%;
   color: white;
   font-weight: 200;  
+  padding: 0px;
 }
 
-div.slide-pane__content div.messageContainer ul li.GeoUserGroup
+div.slide-pane__content div.messageContainer div.GeoMessage div.GeoDate
 {
+  display: block;
   text-align: right;
-}
-
-div.slide-pane__content div.messageContainer ul li.GeoLayer, div.slide-pane__content div.messageContainer ul li.GeoDate
-{
-  text-align: right;
-  font-size: 75%;
-  width: 100%;
-  font-weight: 200;
+  font-size: 100%;
+  width: auto
 }
 
 div.slide-pane__content div.messageContainer ul li.GeoLayer
@@ -180,7 +168,6 @@ div.slide-pane__content .GeoMessageContainer
   /* max-height: calc(50vh - 2.25em - 32px); */
   overflow: auto;
   padding: 1em;
-  padding-top: 3em;
 }
 
 div.slide-pane__content .GeoMessageContainer.feed
@@ -195,7 +182,6 @@ div.slide-pane__content .GeoMessageContainer.feed>button
 
 div.slide-pane__content #formDiv
 {
-  max-height: calc(50vh - 2.25em - 32px);
   padding: 1em;
 }
 
@@ -216,7 +202,7 @@ div.slide-pane__content .GeoMessageContainer::-webkit-scrollbar-thumb:hover
   background: #999999;
 }
 
-li#lightbox {
+div#lightbox {
 	width: 100vw;
 	height: 100%;
 	top: 0;
@@ -225,7 +211,7 @@ li#lightbox {
 	background: rgba(0, 0, 0, 0.75);
 }
 
-li#lightbox img {
+div#lightbox img {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -239,14 +225,14 @@ li#lightbox img {
 }
 
 div.select-groups {
-  position: fixed;
+  position: static;
 	width: 100%;
 	padding: 0.5em 1em;
 }
 
 @media only screen and (max-device-width : 860px)
 {
-  li#lightbox {
+  div#lightbox {
     left: -10vw;
   }
 }

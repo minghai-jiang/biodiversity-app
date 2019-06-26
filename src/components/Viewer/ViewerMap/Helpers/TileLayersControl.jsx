@@ -16,7 +16,7 @@ import L from "leaflet";
 
 const imagesTileLayer = 'images';
 const labelsTileLayer = 'labels';
-const indicesTileLayer = 'indices';
+const images2TileLayer = 'images2';
 //const changesTileLayer = 'changes';
 
 const tileLayerTypes = [ 
@@ -24,26 +24,20 @@ const tileLayerTypes = [
     name: imagesTileLayer, 
     checked: true,
     stacking: true,
-    zIndex: 100
+    zIndex: 1000
   },
   {
     name: labelsTileLayer, 
     checked: true,
     stacking: false,
-    zIndex: 200,
+    zIndex: 2000,
   },
   {
-    name: indicesTileLayer, 
-    checked: false,
+    name: images2TileLayer, 
+    checked: true,
     stacking: false,
-    zIndex: 300
+    zIndex: 3000
   }
-/*  {
-    name: changesTileLayer,
-    checked: false,
-    stacking: true,
-    zIndex: 400
-  }*/
 ];
 
 const mapParams = {
@@ -60,7 +54,7 @@ const baseSatelliteOverlay = (
       url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
       attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
       noWrap={true}
-      zIndex={0}
+      zIndex={100}
       maxZoom={19}
     />
   </LayersControl.Overlay>
@@ -107,12 +101,31 @@ const TileLayersControl = {
 
     tileLayersControl_map = props.map;
     tileLayersControl_timestampRange = props.timestampRange;
+
+    let limitZoom = tileLayersControl_checkedLayers.length > 1 || 
+    (tileLayersControl_checkedLayers.length > 0 && tileLayersControl_checkedLayers[0] !== 'Base satellite');
+
+    return limitZoom;
   },
 
   onOverlayAdd: (e) => {
-    if (!tileLayersControl_checkedLayers.includes(e.name)) {
+    let tileLayer = null;
+    for (let i = 0; i < tileLayersControl_preparedtileLayers.length; i++) {
+      tileLayer = tileLayersControl_preparedtileLayers[i].layers.find(x => x.name === e.name);
+
+      if (tileLayer) {
+        break;
+      }
+    }
+
+    if (!tileLayersControl_checkedLayers.includes(e.name) && tileLayer) {
       tileLayersControl_checkedLayers.push(e.name);
     }
+
+    let limitZoom = tileLayersControl_checkedLayers.length > 1 || 
+      (tileLayersControl_checkedLayers.length > 0 && tileLayersControl_checkedLayers[0] !== 'Base satellite');
+
+    return limitZoom;
   },
 
   onOverlayRemove: (e) => {    
@@ -120,6 +133,11 @@ const TileLayersControl = {
     if (index > -1) {
       tileLayersControl_checkedLayers.splice(index, 1);
     }
+
+    let limitZoom = tileLayersControl_checkedLayers.length > 1 || 
+      (tileLayersControl_checkedLayers.length > 0 && tileLayersControl_checkedLayers[0] !== 'Base satellite');
+
+    return limitZoom;
   },
 
   clear: (e) => {
@@ -169,8 +187,11 @@ function tileLayersControl_prepareLayers (props) {
         tileLayersOfTypes.push(tileLayersOfType);
       }
 
-      mapTileLayerType.timestamps.forEach(timestampNumber => {
+      for (let i = 0; i < mapTileLayerType.timestamps.length; i++) {
+        let timestampNumber = mapTileLayerType.timestamps[i];
+
         let url = `${props.apiUrl}tileService/${map.uuid}/${timestampNumber}/${tileLayerName}/{z}/{x}/{y}`;
+        let zIndex = tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1);
 
         tileLayersOfType.timestampElements.push({
           timestampNumber: timestampNumber,
@@ -178,16 +199,16 @@ function tileLayersControl_prepareLayers (props) {
             url={url}
             tileSize={mapParams.tileSize}
             noWrap={mapParams.noWrap}
-            maxZoom={mapParams.maxZoom}
+            maxZoom={map.zoom}
             attribution={mapParams.attribution}
             format={mapParams.format}
-            zIndex={tileLayerType.zIndex + (tileLayersOfType.timestampElements.length + 1)}
+            zIndex={zIndex}
             key={timestampNumber + '.' + j}
             errorTileUrl={props.publicFilesUrl + 'images/dummy_tile.png'}
             bounds = {L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax))}
           />)
         });
-      })
+      }
     }
 
     preparedtileLayers.push({
@@ -225,7 +246,6 @@ function prepareTileLayersOverlays (props) {
       let layerElements = [];
 
       for (let j = timestampStart; j <= timestampRange.end; j++) {
-
         let timestampNumber = map.timestamps[j].timestampNumber;
         let timestampElement = layer.timestampElements.find(x => x.timestampNumber === timestampNumber);
 
