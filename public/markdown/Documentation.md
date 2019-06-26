@@ -37,6 +37,9 @@ level 200: The right to access aggregated data of a map<br/>
 level 300: The right to view geoMessages<br/>
 level 400: The right to add geoMessages<br/>
 level 410: The right to include photos in geoMessages<br/>
+level 420: The right to add private geoMessages<br/>
+level 430: The right to add private geoMessages with photos<br/>
+level 440: The right to view private geoMessages<br/>
 level 500: The right to add custom polygons <br/>
 level 600: The right to delete geoMessages<br/>
 level 700: The right to alter or delete custom polygons<br/>
@@ -848,6 +851,7 @@ tileX: The x of the tile in web mercator projection.<br/>
 tileY: The y of the tile in web mercator projection<br/>
 zoom: The zoom level of the tile.<br/>
 message: A custom message.<br/>
+private: Wether the message is public or private.<br/>
 form: (opitional) A JSON with submitted form.<br/>
 photo: (optional) A photo.<br/>
 **Returns**<br/>
@@ -918,6 +922,7 @@ mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 polygonId: Id of the polygon.<br/>
 message: A custom message.<br/>
+private: Wether the message is public or private.<br/>
 form: (opitional) A JSON with submitted form.<br/>
 photo: (optional) A photo.<br/>
 **Returns**<br/>
@@ -999,6 +1004,7 @@ mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 geometry: GeoJSON of the polygon to be added. The feature must be of type 'MultiPolygon'.<br/>
 layer: the name of the layer to which to add the polygon.<br/>
+private: Wether the message is public or private.<br/>
 **Returns**<br/>
 Status 200 if the submission was successful.
 
@@ -1015,6 +1021,7 @@ mapId: The id of the map.<br/>
 timestamp: The number of the timestamp.<br/>
 customPolygonId: Id of the custom polygon.<br/>
 message: A custom message.<br/>
+private: Wether the message is public or private.<br/>
 form: (opitional) A JSON with submitted form.<br/>
 photo: (optional) A photo.<br/>
 **Returns**<br/>
