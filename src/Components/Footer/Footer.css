@@ -1,0 +1,14 @@
+.footer {
+	padding: 1em 3em;
+
+    height: 100%;
+
+    text-align: right;
+
+    background-color: #026464;
+    color: #ffffff;
+}
+
+.footer-logo {
+    width: 4.8em;
+}

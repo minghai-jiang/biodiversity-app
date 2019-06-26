@@ -1,0 +1,215 @@
+div.content {
+    margin-bottom: 0em;
+}
+
+.viewer {
+    height: 100%;
+    width: 100vw;
+    position: relative;
+}
+
+.viewer-main-container {
+  height: 92%;
+}
+
+.viewer-menu {
+  width: 100vw;
+  height: 8%;
+}
+
+.viewer-menu > .viewer-menu-button {
+  padding: 0px
+}
+
+.viewer-menu-button-content {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%); 
+}
+
+.viewer-menu > div {
+  display: inline-block;
+  width: 33.33333vw;
+  height: 100%;
+}
+
+.viewer-menu > .button {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-left-width: 1.4px;
+  border-right-width: 1.4px;
+}
+
+.viewer-pane {
+  position: relative;
+  float: left;
+  height: 100%;
+  background-color: #f4f4f4;
+}
+
+.map-pane {
+  width: 100vw;
+  position: relative;
+  background-color: #f4f4f4;
+}
+
+.leaflet-container
+{
+  height: 100%;
+  position: relative;
+}
+
+.leaflet-control
+{
+  font-size: 12pt;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.map-selector-div {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  z-index: 999;
+  top: 10px;
+}
+
+.map-selector-div > * {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+.time-range-selector {
+  position: absolute;
+  margin: 1em 25vw;
+  text-align: center;
+  z-index: 650;
+  top: 40px;
+}
+
+#loading-label-div {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    z-index: 999;
+    top: 110px;
+}
+
+#loading-label
+{
+    padding: 3px;
+    width: 40%;
+    background-color: #EEEEEE;
+    border: #ee7405;
+    border-width: 2px;
+    border-style: solid;
+}
+
+.classes-data-graph {
+  position: absolute;
+  width: 500px;
+  text-align: left;
+  z-index: 999;
+  bottom: 350px;
+}
+
+.indices-data-graph {
+  position: absolute;
+  width: 500px;
+  text-align: left;
+  z-index: 999;
+  bottom: 50px;
+}
+
+.max-masked-slider-div {
+    position: absolute;
+    width: 500px;
+    height: 50px;
+    text-align: left;
+    z-index: 999;
+    bottom: 0px;
+    left: 0px;
+}
+
+.sidebar {
+  position: absolute;
+  display: inline-block;
+  left: 0;
+  max-height: 320px;
+  height: 100%;
+  width: 320px;
+  padding: 10px 10px 10px 10px;
+  top: 190px;
+  z-index: 999;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.leaflet-map {
+  display: inline-block;
+}
+
+.leaflet-control-layers {
+  text-align: left
+}
+
+.leaflet-control-layers-expanded
+{
+  min-height: 48px;
+  min-width: 48px;
+}
+
+div.viewer-button {
+  position: absolute;
+  /* top: 40vh; */
+  right: 0px;
+  width: 150px;
+  padding: 0.2em 0.7em;
+
+  z-index: 100000;
+}
+
+div.loading-spinner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
+}
+
+button.expand-icon {
+  padding: 6px;
+}
+
+div.card-content-item {
+  margin-top: 8px;
+}
+
+button.card-submit-button {
+  display: block;
+  width: 50%;
+  margin-left: auto;
+}
+
+.expanded {
+  transform: rotate(180deg);
+}
+
+.selector {
+  width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+  .controls-pane {
+    width: 100vw;
+  }
+  
+  .data-pane {
+    width: 100vw;
+  }
+}
