@@ -57,7 +57,7 @@ class GeoMessageControl extends PureComponent {
     let update = false;
 
     if (this.props.isFeed) {
-      update = differentMap;
+      update = !prevProps.isFeed || differentMap;
       if (update) {
         this.feedPage = 1;
         this.noMoreFeedMessages = false;

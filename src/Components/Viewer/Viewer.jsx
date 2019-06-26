@@ -184,7 +184,15 @@ class Viewer extends PureComponent {
     );
 
     this.drawnPolygonGeoJson = geoJson;
-    this.setState({ drawnPolygonLayer: drawnPolygonLayer }, () => {
+    let dataPaneAction = this.state.dataPaneAction;
+    if (dataPaneAction !== ViewerUtility.dataPaneAction.createCustomPolygon) {
+      dataPaneAction = null;
+    }
+
+    this.setState({ 
+      drawnPolygonLayer: drawnPolygonLayer ,
+      dataPaneAction: dataPaneAction
+    }, () => {
       this.rebuildAllLayers();
       selectDrawnPolygon();
     });    
@@ -308,17 +316,23 @@ class Viewer extends PureComponent {
     if (this.state.dataPaneAction !== ViewerUtility.dataPaneAction.feed) {
       dataPaneAction = null;
     }
+
+    let selectedElement = this.state.selectedElement;
+    if (selectedElement && selectedElement.type === ViewerUtility.drawnPolygonLayerType) {
+      this.removeDrawnPolygon(false)
+    }
+
     this.setState({ selectedElement: null, dataPaneAction: dataPaneAction }, this.rebuildAllLayers);
   }
 
-  removeDrawnPolygon = () => {
+  removeDrawnPolygon = (deselect) => {
     this.drawnPolygonLayer = null;
     this.drawnPolygonGeoJson = null;
 
     let selectedElement = this.state.selectedElement;
 
-    if (selectedElement && selectedElement.type === ViewerUtility.drawnPolygonLayerType) {
-        this.deselectCurrentElement();
+    if (deselect && selectedElement && selectedElement.type === ViewerUtility.drawnPolygonLayerType) {
+      this.deselectCurrentElement();
     }
     else {
       this.rebuildAllLayers();
@@ -456,12 +470,34 @@ class Viewer extends PureComponent {
       body.polygonIds = [this.flyToInfo.elementId];
       url = '/geometry/polygons';
     }
-    else if (type === ViewerUtility.flyToType.polygon) {
-      body.polygonIds = [this.flyToInfo.elementId];
+    else if (type === ViewerUtility.flyToType.customPolygon) {
+      body.customPolygonIds = [this.flyToInfo.elementId];
       url = '/geoMessage/customPolygon/geometries';
     }
 
     return ApiManager.post(url, body, this.props.user);
+  }
+
+  onCustomPolygonChange = (removeDrawnPolygon, updateSelection, newProperties) => {
+    if (removeDrawnPolygon) {
+      this.removeDrawnPolygon(); 
+    }
+
+    if (updateSelection) {
+      let selectedElement = this.state.selectedElement;
+      let oldProperties = selectedElement.feature.properties;
+
+      let properties = {
+        ...oldProperties,
+        ...newProperties
+      };
+
+      this.state.selectedElement.feature.properties = properties;
+
+      this.selectionPane.current.refresh();
+    }
+
+    this.updateCustomPolygons();
   }
 
   attemptFlyTo = () => {
@@ -540,7 +576,6 @@ class Viewer extends PureComponent {
               onDataPaneAction={this.onDataPaneAction}
               onFlyTo={this.onFlyTo}
               onDeselect={this.deselectCurrentElement}
-              onDeselectDrawnPolygon={this.removeDrawnPolygon}
               onDeleteCustomPolygon={this.updateCustomPolygons}
             />
             <Map 
@@ -563,7 +598,7 @@ class Viewer extends PureComponent {
             action={this.state.dataPaneAction}
             element={this.state.selectedElement}
             onFlyTo={this.onFlyTo}
-            onAddCustomPolygon={() => { this.removeDrawnPolygon(); this.updateCustomPolygons(); }}
+            onCustomPolygonChange={this.onCustomPolygonChange}            
           />
         </div>
 

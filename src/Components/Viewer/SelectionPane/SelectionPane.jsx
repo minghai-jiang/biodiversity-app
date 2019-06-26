@@ -43,6 +43,11 @@ class SelectionPane extends PureComponent {
     this.setState({ isOpen: true });
   }
 
+  refresh = () => {
+    debugger;
+    this.forceUpdate();
+  }
+
   deleteCustomPolygon = () => {
     this.setState({ loading: true }, () => {
       let body = {
@@ -53,7 +58,6 @@ class SelectionPane extends PureComponent {
       ApiManager.post('/geomessage/customPolygon/deletePolygon', body, this.props.user)
         .then(() => {
           this.props.onDeselect();
-          this.props.onDeleteCustomPolygon();
           this.setState({ isOpen: false, loading: false });
         })
         .catch(err => {
@@ -65,9 +69,7 @@ class SelectionPane extends PureComponent {
   }
 
   onCloseClick = () => {
-    if (this.props.element.type === ViewerUtility.drawnPolygonLayerType) {
-      this.props.onDeselectDrawnPolygon();
-    }
+    this.props.onDeselect();
     
     this.setState({ isOpen: false });
   }
@@ -82,6 +84,8 @@ class SelectionPane extends PureComponent {
   }
 
   render() {
+
+    debugger;
 
     if (!this.state.isOpen) {
       return null;

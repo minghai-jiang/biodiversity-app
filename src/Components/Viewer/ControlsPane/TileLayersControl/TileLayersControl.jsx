@@ -335,7 +335,7 @@ class TileLayersControl extends PureComponent {
           className='card-header'
           title={
             <Typography gutterBottom variant="h6" component="h2">
-              Tiles
+              Layers
             </Typography>
           }
           action={

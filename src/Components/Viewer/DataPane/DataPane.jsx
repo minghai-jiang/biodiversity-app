@@ -113,11 +113,11 @@ class DataPane extends PureComponent {
             map={this.props.map}
             timestampRange={this.props.timestampRange}
             element={this.props.element}
-            isEdit ={action === ViewerUtility.dataPaneAction.editCustomPolygon}
+            isEdit={action === ViewerUtility.dataPaneAction.editCustomPolygon}
             onFlyTo={this.props.onFlyTo}
-            onAddCustomPolygon={this.props.onAddCustomPolygon}
+            onCustomPolygonChange={this.props.onCustomPolygonChange}
           />
-        )
+        );
       }
     
     return (

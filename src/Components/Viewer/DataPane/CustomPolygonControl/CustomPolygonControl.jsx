@@ -31,11 +31,12 @@ class CustomPolygonControl extends PureComponent {
       loading: false,
 
       selectedLayer: 'default',
-      propertyValues: {}
+      propertyValues: {},
     };
   }
 
   componentDidMount() {
+    this.initialize();
   }
 
   componentDidUpdate(prevProps) {
@@ -63,9 +64,30 @@ class CustomPolygonControl extends PureComponent {
       differentElement = prevId !== curId;
     }
 
-    if (differentElement) {
+    if (differentElement || prevProps.isEdit !== this.props.isEdit) {
+      this.initialize();
+    }
+  }
+
+  initialize = () => {
+    if (!this.props.isEdit) {
       this.setState({
+        selectedLayer: 'default',
         propertyValues: {}
+      });
+    }
+    else {
+      let properties = {
+        ...this.props.element.feature.properties
+      }
+
+      let layer = properties.layer;
+      delete properties.id;
+      delete properties.layer;
+
+      this.setState({
+        selectedLayer: layer,
+        propertyValues: properties
       });
     }
   }
@@ -75,47 +97,85 @@ class CustomPolygonControl extends PureComponent {
   }
 
   onPropertyValueChange = (e, property) => {
-    let newPropertyValues = this.state.propertyValues;
+    let newPropertyValues = {
+      ...this.state.propertyValues
+    };
     newPropertyValues[property] = e.target.value;
 
     this.setState({ propertyValues: newPropertyValues });
   }
 
-  onSubmit = (e) => {
+  onSubmit = () => {
     this.setState({ loading: true }, () => {
-      let layer = this.state.selectedLayer;
 
-      let feature = this.props.element.feature;
-      feature.properties = this.state.propertyValues;
+      if (!this.props.isEdit) {
+        this.addCustomPolygon();
+      }
+      else {
+        this.editCustomPolygon();
+      }
 
-      let geoJson = {
-        type: 'FeatureCollection',
-        count: 1,
-        features: [feature]
-      };
-
-      let timestampNumber = this.props.map.timestamps[this.props.timestampRange.end].timestampNumber;
-
-      let body = {
-        mapId: this.props.map.id,
-        timestamp: timestampNumber,
-        layer: layer,
-        geometry: geoJson
-      };
-
-      ApiManager.post('/geomessage/customPolygon/addPolygon', body, this.props.user)
-        .then(() => {
-          this.props.onAddCustomPolygon();
-          this.setState({
-            loading: false,
-            propertyValues: {}
-          });
-        })
-        .catch(err => {
-          console.log(err);
-          this.setState({ loading: false });
-        });
     });
+  }
+
+  addCustomPolygon = () => {
+    let layer = this.state.selectedLayer;
+
+    let feature = this.props.element.feature;
+    feature.properties = this.state.propertyValues;
+
+    let geoJson = {
+      type: 'FeatureCollection',
+      count: 1,
+      features: [feature]
+    };
+
+    let timestampNumber = this.props.map.timestamps[this.props.timestampRange.end].timestampNumber;
+
+    let body = {
+      mapId: this.props.map.id,
+      timestamp: timestampNumber,
+      layer: layer,
+      geometry: geoJson
+    };
+
+    ApiManager.post('/geomessage/customPolygon/addPolygon', body, this.props.user)
+      .then(() => {
+        this.props.onCustomPolygonChange(true, false);        
+        this.setState({
+          loading: false,
+          propertyValues: {}
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({ loading: false });
+      });
+  }
+
+  editCustomPolygon = () => {
+
+    let layer = this.state.selectedLayer;
+    let properties = this.state.propertyValues;
+
+    let body = {
+      mapId: this.props.map.id,
+      customPolygonId: this.props.element.feature.properties.id,
+      newLayerName: layer,
+      newProperties: properties
+    };
+
+    ApiManager.post('/geomessage/customPolygon/alterPolygon', body, this.props.user)
+      .then(() => {
+        this.props.onCustomPolygonChange(false, true, properties);
+        this.setState({
+          loading: false
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        this.setState({ loading: false });
+      });
   }
 
   render() {
