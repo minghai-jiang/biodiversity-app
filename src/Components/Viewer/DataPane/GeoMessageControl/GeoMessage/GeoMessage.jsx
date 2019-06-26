@@ -75,6 +75,9 @@ class GeoMessage extends PureComponent {
 
     for (let i = 0; i < message.form.answers.length; i++) {
       let answer = message.form.answers[i];
+      if (!answer.answer) {
+        answer.answer = '';
+      }
 
       let answerElement = (
         <div key={answer.question}>
@@ -186,15 +189,15 @@ class GeoMessage extends PureComponent {
 
     if (message.thumbnail) {
       imageAttachment = (
-          <Button 
-            className='geomessage-attachment-button geomessage-attachment-image-button' 
-            variant='outlined' 
-            disableRipple={true} 
-            onClick={this.showImage}
-          >
-            <img src={message.thumbnail}/>
-            {this.state.loadingImage ? <CircularProgress className='loading-spinner'/> : null}
-          </Button>
+        <Button 
+          className='geomessage-attachment-button geomessage-attachment-image-button' 
+          variant='outlined' 
+          disableRipple={true} 
+          onClick={this.showImage}
+        >
+          <img src={message.thumbnail}/>
+          {this.state.loadingImage ? <CircularProgress className='loading-spinner'/> : null}
+        </Button>
       )
     }
 

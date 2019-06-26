@@ -44,7 +44,6 @@ class SelectionPane extends PureComponent {
   }
 
   refresh = () => {
-    debugger;
     this.forceUpdate();
   }
 
@@ -84,9 +83,6 @@ class SelectionPane extends PureComponent {
   }
 
   render() {
-
-    debugger;
-
     if (!this.state.isOpen) {
       return null;
     }
@@ -113,7 +109,7 @@ class SelectionPane extends PureComponent {
         size='small' 
         className='selection-pane-button'
         onClick={() => this.onElementActionClick(ViewerUtility.dataPaneAction.analyse)}
-        disabled={mapAccessLevel < ApiManager.accessLevels.aggregatedData || !element.hasAggregatedData}
+        disabled={mapAccessLevel < ApiManager.accessLevels.aggregatedData}
       >
         Analyse
       </Button>
