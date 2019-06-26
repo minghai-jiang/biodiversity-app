@@ -44,13 +44,12 @@
 #main-menu > ul > li a.main-menu-logo-item {
   height: 100%;
   width: 100%;
-  text-align: left;
   display: block;
   color: white;
-  text-align: center;
+  text-align: left;
   text-decoration: none;
   margin-right: 2em;
-  margin-left: 3vw;
+  padding-left: 3vw;
 }
 
 #main-menu > ul > li .main-menu-item {
@@ -182,13 +181,6 @@
     width: 3.5em;
     padding: 30%;
   } 
-
-  #main-menu > ul > li a.main-menu-logo-item {        
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    text-align: left;
-  }
 
   /* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. 
   This class makes the topnav look good on small screens (display the links vertically instead of horizontally) */   

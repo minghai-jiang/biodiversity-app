@@ -5,11 +5,10 @@
 
 #banner-logo {
     position: relative;
-    top: 80px;
+    top: 9vh;
     font-size: 14pt;
-
-    width: 40em;
-    max-width: 80vw;
+    width: auto;
+    max-height: 50vh;
 }
 
 .home-main-block-content-table {

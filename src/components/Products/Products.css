@@ -24,8 +24,8 @@ div.product-block-accented {
     margin: 0.2em;
 }
 
-.product-end-paragraph {
-    margin-bottom: 2em;
+.product-paragraph {
+    margin-top: -0.5em;
 }
 
 a.product-single-button {
@@ -36,9 +36,22 @@ a.product-double-button {
     display: inline-block;
 }
 
-#iAm
+.productButton
 {
+    margin-top: 1.5em;
     margin-bottom: 4em;
+}
+
+.productButtonLast
+{
+    margin-bottom: 2em;
+}
+
+.productButton a
+{
+    margin: 0;
+    padding: 0.6em 1em;
+    width: 35%
 }
 
 select
@@ -48,32 +61,10 @@ select
     font-size: inherit;
 }
 
-@media screen and (max-width: 840px) {
-    a.product-double-button
-    {
-       padding: 0.6em 1em;
-       margin: auto 0.8em;
-    }
-}
+@media screen and (max-width: 755px) {
 
-@media screen and (max-width: 720px) {
-
-    a.product-double-button
-    {
-        width: 35%;
-        margin: 0.5em;
-    }
-}
-
-@media screen and (max-width: 600px) {
-    a.product-single-button {
-        width: 70%;
-    }
-
-    a.product-double-button
+    .productButton a
     {
     	width: 70%;
-        display: block;
-		margin: 0.5em auto 0.5em auto;
     }
 }

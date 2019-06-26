@@ -9,6 +9,8 @@ import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 
 import { Footer } from "../footer/footer";
 
+import "./Gallery.css";
+
 export class Gallery extends Component {
     constructor(props) {
     super(props);
@@ -44,10 +46,22 @@ export class Gallery extends Component {
         <div className="main-block">
           <div className="main-block-content main-block-content-left">
           <h1>{this.props.localization['Apps']}</h1>
-          <select defaultValue="default" onChange={this.onAppChange}>
-            <option value="default" disabled hidden>{this.props.localization['ChoosePrompt']}</option>
-            <option value="https://ellipsis-earth.com/viewer" >{this.props.localization['Ellipsis Viewer']}</option>
-          </select>
+          <div className="galleryItem">
+            <h2>Ellipsis Viewer</h2>
+            <a href='https://ellipsis-earth.com/viewer'><img src="/images/GalleryScreen.jpg"/></a>
+            <div className="buttonContainer">
+              <a href="https://ellipsis-earth.com/viewer" target="_blank" className="button-a">
+                <div className="button button-accented main-block-single-button">
+                  Ellipsis Viewer
+                </div>
+              </a>
+              <a href="https://github.com/ellipsis-earth/ellipsis-app" target="_blank" className="button-a">
+                <div className="button button-accented main-block-single-button">
+                  Source code
+                </div>
+              </a>
+            </div>
+          </div>
 
 
             <h1>{this.props.localization['Analysis']}</h1>
