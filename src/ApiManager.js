@@ -1,5 +1,5 @@
-// const apiUrl = "https://api.ellipsis-earth.com";
-const apiUrl = "https://dev.api.ellipsis-earth.com";
+const apiUrl = "https://api.ellipsis-earth.com";
+// const apiUrl = "https://dev.api.ellipsis-earth.com";
 // const apiUrl = "http://localhost:7552";
 
 const ApiManager = {
