@@ -50,7 +50,10 @@ class FlyToControl extends PureComponent {
     let type = e.target.value;
 
     if (type === ViewerUtility.flyToType.standardTile) {
-      elementIdReset = {};
+      elementIdReset = {
+        tileX: '',
+        tileY: ''
+      };
     }
 
     this.setState({ 

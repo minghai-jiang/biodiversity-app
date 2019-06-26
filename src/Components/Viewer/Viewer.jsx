@@ -51,6 +51,8 @@ class Viewer extends PureComponent {
   drawnPolygonLayer = null;
 
   setNewViewportTimer = null;
+  selectTimestampTimer = null;
+
   drawnPolygonGeoJson = null;
 
   flyToInfo = null;
@@ -230,7 +232,6 @@ class Viewer extends PureComponent {
   }
 
   onSelectMap = (map) => {
-
     this.selectedElementLayer = null;
     this.drawnPolygonLayer = null;
     this.drawnPolygonGeoJson = null;
@@ -243,7 +244,7 @@ class Viewer extends PureComponent {
         end: map.timestamps.length - 1
       }
     }, () => {
-      this.onFlyTo({ type: ViewerUtility.flyToType.map });
+      this.onFlyTo({ type: ViewerUtility.flyToType.map, delay: true });
     });
   }
 
@@ -259,7 +260,12 @@ class Viewer extends PureComponent {
   onSelectTimestamp = (timestampRange) => {
     if (this.state.timestampRange.start !== timestampRange.start || 
       this.state.timestampRange.end !== timestampRange.end) {
-      this.setState({ timestampRange: timestampRange });
+
+      if (this.selectTimestampTimer) {
+        clearTimeout(this.selectTimestampTimer);
+      }
+
+      this.selectTimestampTimer = setTimeout(() => this.setState({ timestampRange: timestampRange }), 100);
     }
   }
 
@@ -274,7 +280,7 @@ class Viewer extends PureComponent {
       () => {
         this.setState({ leafletMapViewport: viewport })
       }, 
-      500
+      200
     );
   }
 
@@ -411,6 +417,11 @@ class Viewer extends PureComponent {
     else {
       this.getElementGeoJson()
         .then(geoJson => {
+          if (!geoJson || !geoJson.features || geoJson.features.length === 0) {
+            this.flyToInfo = null;
+            return;
+          }
+
           let geoJsonLayer = L.geoJSON(geoJson);
           let bounds = geoJsonLayer.getBounds();
           
@@ -440,12 +451,18 @@ class Viewer extends PureComponent {
           }
 
           this.selectFeature(this.flyToInfo.type, feature, hasAggregatedData);
-          this.attemptFlyTo();
+
+          if (!this.flyToInfo.delay && isMobile && !this.state.panes.includes(MAP_PANE_NAME)) {
+            this.openPane(MAP_PANE_NAME);
+          }
+          else {
+            this.attemptFlyTo();
+          }
         });
     }
 
-    if (isMobile && !this.state.panes.includes(DATA_PANE_NAME)) {
-      this.openPane(DATA_PANE_NAME);
+    if (!this.flyToInfo.delay && isMobile && !this.state.panes.includes(MAP_PANE_NAME)) {
+      this.openPane(MAP_PANE_NAME);
     }
     else {
       this.attemptFlyTo();
