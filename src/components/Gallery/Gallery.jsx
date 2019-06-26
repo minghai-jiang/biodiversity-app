@@ -48,7 +48,7 @@ export class Gallery extends Component {
           <h1>{this.props.localization['Apps']}</h1>
           <div className="galleryItem">
             <h2>Ellipsis Viewer</h2>
-            <a href='https://ellipsis-earth.com/viewer'><img src="/images/GalleryScreen.jpg"/></a>
+            <a href='https://ellipsis-earth.com/viewer' target="_blank"><img src="/images/GalleryScreen.jpg"/></a>
             <div className="buttonContainer">
               <a href="https://ellipsis-earth.com/viewer" target="_blank" className="button-a">
                 <div className="button button-accented main-block-single-button">
