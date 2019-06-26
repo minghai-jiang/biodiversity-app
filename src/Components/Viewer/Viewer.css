@@ -3,22 +3,23 @@ div.content {
 }
 
 .viewer {
-    height: 100%;
-    width: 100vw;
-    position: relative;
+  width: 100vw;
+  height: 100%;
+  position: relative;
 }
 
 .viewer-main-container {
-  height: 92%;
+  height: calc(100% - 48px);
 }
 
 .viewer-menu {
   width: 100vw;
-  height: 8%;
+  height: 48px;
 }
 
 .viewer-menu > .viewer-menu-button {
-  padding: 0px
+  padding: 0px;
+  height: 100%;
 }
 
 .viewer-menu-button-content {
