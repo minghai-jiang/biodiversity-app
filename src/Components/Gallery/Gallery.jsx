@@ -7,7 +7,7 @@ import { Redirect } from 'react-router-dom';
 
 import LoadUpdateUtil from '../Utilities/LoadUpdateUtil';
 
-import { Footer } from "../footer/footer";
+import { Footer } from "../Footer/Footer";
 
 import "./Gallery.css";
 
