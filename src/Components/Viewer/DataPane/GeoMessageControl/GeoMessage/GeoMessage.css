@@ -139,8 +139,13 @@ button.geomessage-feed-element-button {
   position: fixed;
   top: 50px;
   right: 60px;
-  margin-top: 18px;
-  margin-right: 18px;
   width: 50px;
   height: 50px;
+}
+
+@media only screen and (max-width: 600px) {
+  .geomessage-lightbox-close-button {
+    top: 20px;
+    right: 20px;
+  }
 }

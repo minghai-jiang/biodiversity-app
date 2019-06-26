@@ -218,8 +218,12 @@ class Viewer extends PureComponent {
     else {
       if (!currentPanes.includes(paneName)) {
         currentPanes = [paneName];
-        changed = true;
       }
+      else {
+        currentPanes = [MAP_PANE_NAME];
+      }
+
+      changed = true;
     }
 
     if (changed) {
