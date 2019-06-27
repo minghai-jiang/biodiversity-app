@@ -68,7 +68,7 @@ class TileLayersControl extends PureComponent {
     <TileLayer
       key='base-layer'
       url='https://www.google.com/maps/vt?lyrs=y@189&x={x}&y={y}&z={z}'
-      attribution='Base satellite: <a href="https://www.maps.google.com">Google Maps</a>'
+      attribution='Base satellite: <a href="https://maps.google.com">Google Maps</a>'
       zIndex={1}
       noWrap={true}
     />)
