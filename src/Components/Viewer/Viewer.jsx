@@ -240,8 +240,14 @@ class Viewer extends PureComponent {
     this.drawnPolygonLayer = null;
     this.drawnPolygonGeoJson = null;
 
+    let dataPaneAction = this.state.dataPaneAction;
+    if (dataPaneAction !== ViewerUtility.dataPaneAction.feed) {
+      dataPaneAction = null;
+    }
+
     this.setState({ 
       map: map,
+      dataPaneAction: dataPaneAction,
       selectedElement: null,
       timestampRange: {
         start: map.timestamps.length - 1,

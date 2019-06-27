@@ -205,6 +205,10 @@ button.card-submit-button {
   width: 100%;
 }
 
+div.selector-single {
+  padding-top: 0px;
+}
+
 @media only screen and (max-width: 600px) {
   .controls-pane {
     width: 100vw;

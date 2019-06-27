@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { 
   Card,  
@@ -11,6 +12,11 @@ import {
   MenuItem,
   Collapse,
   IconButton,
+  Input,
+  Checkbox,
+  ListItemText,
+  InputLabel,
+  FormControl
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -25,6 +31,7 @@ import GeoMessage from './GeoMessage/GeoMessage';
 import GeoMessageForm from './GeoMessageForm/GeoMessageForm';
 
 const SCROLL_LOAD_THRESHOLD = 1000;
+const NO_GROUP_NAME = 'no group';
 
 class GeoMessageControl extends PureComponent {
 
@@ -43,16 +50,29 @@ class GeoMessageControl extends PureComponent {
       loading: false,
 
       rawGeoMessages: null,
-      geoMessageElements: null      
+      geoMessageElements: null,
+      
+      availableGroups: [],
+      selectedGroups: []
     };
   }
 
   componentDidMount() {
-    this.setState({ loading: true }, this.getGeoMessages);
+    this.setState({ 
+      loading: true,
+      availableGroups: [...this.props.map.groups, NO_GROUP_NAME]
+    }, this.getGeoMessages);
   }
 
   componentDidUpdate(prevProps) {
     let differentMap = this.props.map !== prevProps.map;
+
+    if (differentMap) {
+      this.setState({ 
+        availableGroups: [...this.props.map.groups, NO_GROUP_NAME], 
+        selectedGroups: []
+      });
+    }
 
     let update = false;
 
@@ -175,7 +195,8 @@ class GeoMessageControl extends PureComponent {
   getFeedMessages = () => {
     let body = {
       mapId: this.props.map.id,
-      page: this.feedPage
+      page: this.feedPage,
+      userGroups: this.state.selectedGroups
     };
 
     this.feedPage = this.feedPage + 1;
@@ -278,10 +299,38 @@ class GeoMessageControl extends PureComponent {
       });
   }
 
-  render() {
-    if (this.state.loading) {
-      return <CircularProgress className='loading-spinner'/>;
+  onSelectGroup = (e) => {
+    let selectedGroups = e.target.value;
+    this.setState({ selectedGroups: selectedGroups });
+
+    if (this.getFeedMessagesTimer) {
+      clearTimeout(this.getFeedMessagesTimer);
     }
+
+    this.getFeedMessagesTimer = setTimeout(() => {
+      this.feedPage = 1;
+      this.noMoreFeedMessages = false;
+      this.setState({ loading: true }, () => {
+        this.getFeedMessages()
+          .then(results => {
+            this.setState({ 
+              loading: false, 
+              rawGeoMessages: [results.rawGeoMessages], 
+              geoMessageElements: [results.geoMessageElements] 
+            });
+          })
+          .catch(err => {
+            console.error(err);
+            this.setState({ loading: false, rawGeoMessages: null, geoMessageElements: null });
+          });;
+      })
+    }, 1000)
+  }
+
+  render() {
+    // if (this.state.loading) {
+    //   return <CircularProgress className='loading-spinner'/>;
+    // }
 
     let isFeed = this.props.isFeed;
     let className = 'data-pane-card geomessage-messages-card';
@@ -291,12 +340,41 @@ class GeoMessageControl extends PureComponent {
 
     return (
       <div className='geomessage-control'>
+        {
+          isFeed ? 
+            <Card className='data-pane-card groups-filter-card'>
+              <CardContent>
+                <FormControl className='card-form-control selector-single'>
+                  <InputLabel htmlFor='select-multiple-checkbox'>Groups filter</InputLabel>
+                  <Select
+                    className='selector'
+                    multiple
+                    value={this.state.selectedGroups}
+                    onChange={this.onSelectGroup}
+                    input={<Input id='select-multiple-checkbox' />}
+                    renderValue={selected => selected.join(', ')}
+                  >
+                    {this.state.availableGroups.map(name => (
+                      <MenuItem key={name} value={name}>
+                        <Checkbox checked={this.state.selectedGroups.includes(name)} />
+                        <ListItemText primary={name} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </CardContent>
+            </Card> : null
+        }
         <Card 
           ref={this.geomessagesContainerCard} 
           className={className}
           onScroll={this.onGeoMessagesScroll}
         >
-          {this.state.geoMessageElements}
+          {
+            this.state.loading ?
+              <CircularProgress className='loading-spinner'/> : 
+              this.state.geoMessageElements
+          }
         </Card>
         {
           !isFeed ? 

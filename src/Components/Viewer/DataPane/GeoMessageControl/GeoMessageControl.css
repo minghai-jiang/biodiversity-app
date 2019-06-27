@@ -7,6 +7,14 @@ div.class-selector {
   height: calc(100% - 85px);
 }
 
+div.card-form-control {
+  width: 100%;
+}
+
+div.groups-filter-card {
+  height: 74px;
+}
+
 div.geomessage-messages-card {
   height: calc(100% - 60px);
   overflow-y: auto;
