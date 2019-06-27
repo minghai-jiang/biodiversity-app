@@ -290,7 +290,7 @@ class Viewer extends PureComponent {
       () => {
         this.setState({ leafletMapViewport: viewport })
       }, 
-      200
+      400
     );
   }
 

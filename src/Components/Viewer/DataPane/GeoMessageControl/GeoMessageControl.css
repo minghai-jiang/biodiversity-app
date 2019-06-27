@@ -21,5 +21,5 @@ div.geomessage-messages-card {
 }
 
 div.geomessage-messages-card-feed {
-  height: 100%;
+  height: calc(100% - 80px);
 }
