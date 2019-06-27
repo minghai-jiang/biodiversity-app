@@ -1,0 +1,37 @@
+.controls-pane {
+  width: 25vw;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.controls-pane-block {
+  margin-top: 18px;
+}
+
+button.geomessage-feed-button {
+  width: 100%;
+}
+
+.layers-contol {
+  text-align: left;
+  font-size: 12pt;
+  margin-top: 18px;
+  /* border: 1px solid black; */
+}
+
+span.layers-control-checkbox {
+  padding: 5px;
+}
+
+div.card-header {
+  padding-bottom: 6px;
+}
+
+div.card-content {
+  padding-top: 0px;
+}
+
+div.card-content:last-child {
+  padding-bottom: 16px;
+}
+

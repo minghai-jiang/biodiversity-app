@@ -1,39 +1,47 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
     Route
-} from "react-router-dom";
+} from 'react-router-dom';
 import Modal from 'react-modal';
 import { withRouter } from 'react-router';
 
-import MainMenu from "./components/MainMenu/MainMenu";
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import teal from '@material-ui/core/colors/teal';
+import grey from '@material-ui/core/colors/grey';
 
-import Viewer from './components/Viewer/Viewer';
-import Home from "./components/Home/Home";
-import About from "./components/About/About";
-import Contact from "./components/contact/contact";
-import Products from "./components/Products/Products";
-import Login from './components/Login/Login';
-import Sector from './components/Sectors/Sectors';
-import Gallery from './components/Gallery/Gallery';
-import Account from './components/Account/Account';
+import ApiManager from './ApiManager';
+import ErrorHandler from './ErrorHandler';
 
-import "./App.css";
+import MainMenu from './Components/MainMenu/MainMenu';
+import Viewer from './Components/Viewer/Viewer';
+import Home from './Components/Home/Home';
+import About from './Components/About/About';
+import Products from './Components/Products/Products';
+import Login from './Components/Login/Login';
+import Sector from './Components/Sectors/Sectors';
+import Gallery from './Components/Gallery/Gallery';
+import Account from './Components/Account/Account';
+
+import './App.css';
 
 const localStorageUserItem = 'user';
 
-const apiUrl = "https://api.ellipsis-earth.com/";
-const publicFilesUrl = "https://public.ellipsis-earth.com/";
-
-// const apiUrl = "https://dev.api.ellipsis-earth.com/";
-// const publicFilesUrl = "https://dev.public.ellipsis-earth.com/";
-
-// const apiUrl = "http://localhost:7552/";
-// const publicFilesUrl = "http://localhost:3000/";
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#026464'
+    },
+    secondary: {
+      main: '#f5f5f5'
+    }
+  },
+});
 
 class App extends Component {
   constructor(props, context) {
     super(props, context)
-    document.title = "Ellipsis Earth Intelligence";
+    document.title = 'Ellipsis Earth Intelligence';
 
     this.state = {
       init: false,
@@ -51,47 +59,33 @@ class App extends Component {
   }
 
   closeMenu = () => {
-    var x = document.getElementById("main-menu");
-    x.className = "";
+    var x = document.getElementById('main-menu');
+    x.className = '';
   }
 
   retrieveUser = async () => {
     let user = null;
     let userJson = localStorage.getItem(localStorageUserItem);
 
-    if (userJson) {
-      user = JSON.parse(userJson);
+    if (!userJson) {
+      this.setState({ init: true });
+      return;
+    }
 
-      fetch(
-        `${apiUrl}account/validateLogin`,
-        {
-          method: 'GET',
-          headers: {
-            "Authorization": "Bearer " + user.token
-          }
+    user = JSON.parse(userJson);
+
+    ApiManager.get(`/account/validateLogin`, null, user)
+      .then(() => {
+        if (user.username) {
+          user.username = user.username.toLowerCase();
         }
-      )
-      .then(response => {
-        if (response.ok) {
-          if (user.username) {
-            user.username = user.username.toLowerCase();
-          }
-          
-          this.setState({ user: user, init: true });
-        }
-        else {
-          this.setState({ init: true });
-          localStorage.removeItem(localStorageUserItem);
-        }
+        
+        this.setState({ user: user, init: true });
       })
-      .catch(error => {
+      .catch(() => {
         this.setState({ init: true });
         localStorage.removeItem(localStorageUserItem);
-      });
-    }
-    else {
-      this.setState({ init: true });
-    }
+      });    
   }
 
   retrieveLanguage = async () => {
@@ -118,7 +112,7 @@ class App extends Component {
         });
       })
       .catch(err => {
-        alert(err);
+        ErrorHandler.alert(err);
       });
   }
 
@@ -143,91 +137,90 @@ class App extends Component {
   render() {
     if (this.state.init) {
       return (
-        <div className="App" onClick={this.closeMenu}>
-          <MainMenu
-            user={this.state.user}
-            language={this.state.language}
-            localization={this.state.localization}
-            onLanguageChange={this.onLanguageChange}
-          />
-          <div className="content" ref={ref => this.el = ref}>
-            <Route exact path="/"
-              render={() =>
-                <Home
-                  language={this.state.language}
-                />
+        <div className='App' onClick={this.closeMenu}>
+          <ThemeProvider theme={theme}>
+            <MainMenu
+              user={this.state.user}
+              language={this.state.language}
+              localization={this.state.localization}
+              onLanguageChange={this.onLanguageChange}
+            />
+            <div className='content' ref={ref => this.el = ref}>
+              <Route exact path='/'
+                render={() =>
+                  <Home
+                    language={this.state.language}
+                  />
+                }
+              />
+              <Route
+                path='/viewer'
+                render={() =>
+                  <Viewer 
+                    user={this.state.user}
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route path='/products'
+                render={() =>
+                  <Products
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route
+                path='/sectors'
+                render={() =>
+                  <Sector
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route
+                path='/gallery'
+                render={() =>
+                  <Gallery
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route
+                path='/about'
+                render={() =>
+                  <About
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
               }
-            />
-            <Route
-              path="/viewer"
-              render={() =>
-                <Viewer apiUrl={apiUrl} user={this.state.user}/>
-              }
-            />
-            <Route path="/products"
-              render={() =>
-                <Products
-                  publicFilesUrl={publicFilesUrl}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path="/sectors"
-              render={() =>
-                <Sector
-                  publicFilesUrl={publicFilesUrl}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path="/gallery"
-              render={() =>
-                <Gallery
-                  publicFilesUrl={publicFilesUrl}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path="/about"
-              render={() =>
-                <About
-                  publicFilesUrl={publicFilesUrl}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-            }
-            />
-            <Route path="/contact" component={Contact} />
-            <Route
-              path="/login"
-              render={() =>
-                <Login
-                  apiUrl={apiUrl}
-                  onLogin={this.onLogin}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path="/account"
-              render={() =>
-                <Account
-                  apiUrl={apiUrl}
-                  user={this.state.user}
-                  language={this.state.language}
-                  localization={this.state.localization}
-                  onLogout={this.onLogout}
-                />
-              }
-            />
-          </div>
+              />
+              <Route
+                path='/login'
+                render={() =>
+                  <Login
+                    onLogin={this.onLogin}
+                    language={this.state.language}
+                    localization={this.state.localization}
+                  />
+                }
+              />
+              <Route
+                path='/account'
+                render={() =>
+                  <Account
+                    user={this.state.user}
+                    language={this.state.language}
+                    localization={this.state.localization}
+                    onLogout={this.onLogout}
+                  />
+                }
+              />
+            </div>
+          </ThemeProvider>          
         </div>
       );
     }
