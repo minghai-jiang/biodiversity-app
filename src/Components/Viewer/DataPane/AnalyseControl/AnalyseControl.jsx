@@ -242,7 +242,7 @@ class AnalyseControl extends PureComponent {
       <div>
         <Card className='data-pane-card'>
           <CardContent>
-            <div>Max masked: {this.state.maxMask}</div>
+            <div>Max masked: {Math.round(this.state.maxMask * 100)}%</div>
             <Single
               dots={false}
               step={0.01}
