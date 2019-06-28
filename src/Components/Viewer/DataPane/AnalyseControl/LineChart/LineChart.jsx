@@ -33,15 +33,15 @@ export class LineChart extends PureComponent {
   };
 
   componentWillMount = () => {
-    let graph = this.prepareGraph();
-    this.setState({ graph: graph });
+    let graphElements = this.prepareGraph();
+    this.setState({ graphElements: graphElements });
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.data !== prevProps.data || this.props.type !== prevProps.type ||
       this.props.maxMask !== prevProps.maxMask) {
-      let graph = this.prepareGraph();
-      this.setState({ graph: graph });
+      let graphElements = this.prepareGraph();
+      this.setState({ graphElements: graphElements });
     }
   }
 
@@ -234,23 +234,69 @@ export class LineChart extends PureComponent {
       />
     );
 
+    let chartDrawArea = this.state.chartDrawArea;
+
     let graph = (
       <FlexibleXYPlot
         key={'plot'}
         height={200}
+        xDomain={
+          chartDrawArea && [
+            chartDrawArea.left,
+            chartDrawArea.right
+          ]
+        }
+        yDomain={
+          chartDrawArea && [
+            chartDrawArea.top,
+            chartDrawArea.bottom
+          ]
+        }
       >
         {xAxis}
         {yAxis}
         {series}
         {legend}
+        <Highlight
+          onBrushEnd={ area => this.setState({ chartDrawArea: area }) }
+        />
       </FlexibleXYPlot>
     );
 
-    return graph;
+    return [xAxis, yAxis, series, legend];
   }
 
   render() {
-    return this.state.graph;
+    if (!this.state.graphElements) {
+      return null;
+    }
+
+    let chartDrawArea = this.state.chartDrawArea;
+
+    return (
+      <FlexibleXYPlot
+        key={'plot'}
+        height={200}
+        xDomain={
+          chartDrawArea && [
+            chartDrawArea.left,
+            chartDrawArea.right
+          ]
+        }
+        yDomain={
+          chartDrawArea && [
+            chartDrawArea.bottom,
+            chartDrawArea.top
+          ]
+        }
+      >
+        {this.state.graphElements}
+
+        <Highlight
+          onBrushEnd={ area => this.setState({ chartDrawArea: area }) }
+        />
+      </FlexibleXYPlot>
+    );
   }
 }
 
