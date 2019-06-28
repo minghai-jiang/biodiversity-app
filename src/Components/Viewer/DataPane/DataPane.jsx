@@ -202,7 +202,8 @@ class DataPane extends PureComponent {
             }
           />
         </Card>
-        {home ? homeElement : actionControl}
+        {homeElement}
+        {actionControl}
       </div>
     );
   }
