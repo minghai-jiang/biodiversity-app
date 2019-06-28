@@ -23,6 +23,14 @@ div.data-pane-title-header {
   padding-top: 8px;
 }
 
+div.data-pane-title-actions {
+  position: absolute;
+}
+
+div.data-pane-title-actions-right {
+  right: 12px;
+}
+
 div.data-pane-title-card-subtitle {
   font-size: 12px;
 }
@@ -31,7 +39,10 @@ div.data-pane-card-content .loading-spinner {
   top: 0px;
 }
 
-
+button.geomessage-feed-button {
+  margin-top: 8px;
+  width: 100%;
+}
 
 div.data-pane-text-field {
   width: 100%;

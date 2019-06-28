@@ -234,6 +234,9 @@ class AnalyseControl extends PureComponent {
   }
 
   render() {
+    if (this.props.home) {
+      return null;
+    }
 
     return (
       <div>

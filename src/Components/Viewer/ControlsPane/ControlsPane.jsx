@@ -93,31 +93,13 @@ class ControlsPane extends PureComponent {
     if (!this.props.isOpen) {
       style = { display: 'none' };
     }
-
-    let hasGeoMessageAccess = this.state.map && this.state.map.accessLevel >= ApiManager.accessLevels.viewGeoMessages;
-
+    
     return (
       <div className='viewer-pane controls-pane' style={style}>
         <MapSelector
           user={this.props.user}
           onSelectMap={this.onSelectMap}
         />
-
-        {
-          this.state.map ? (
-            <div className='controls-pane-block'>
-              <Button
-                className='geomessage-feed-button'
-                variant='contained'
-                color='primary'
-                disabled={!hasGeoMessageAccess}
-                onClick={this.props.onOpenGeoMessageFeed}
-              >
-                GeoMessage Feed
-              </Button>
-            </div>
-          ) : null
-        }
 
         <FlyToControl
           map={this.state.map}

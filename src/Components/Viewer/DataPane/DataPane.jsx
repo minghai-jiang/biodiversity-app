@@ -4,9 +4,13 @@ import { isMobile } from 'react-device-detect';
 import { 
   Card,  
   CardHeader,
+  CardActions,
   Typography,
-  Button
+  Button,
+  IconButton
 } from '@material-ui/core';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -18,15 +22,30 @@ import AnalyseControl from './AnalyseControl/AnalyseControl';
 import GeoMessageControl from './GeoMessageControl/GeoMessageControl';
 import CustomPolygonControl from './CustomPolygonControl/CustomPolygonControl';
 
+import ApiManager from '../../../ApiManager';
+
 class DataPane extends PureComponent {
   constructor(props, context) {
     super(props, context);
 
     this.state = {
+      home: true
     };
   }
 
   componentDidMount() {
+  }
+
+  componentDidUpdate(prevProps) {
+    let differentAction = this.props.action && prevProps.action !== this.props.action;
+
+    if (differentAction) {
+      this.setState({ home: false });
+    }
+  }
+
+  goToAction = () => {
+    this.setState({ home: false });
   }
 
   onFlyTo = () => {
@@ -46,17 +65,43 @@ class DataPane extends PureComponent {
       style = { display: 'none' };
     }
 
+    let home = this.state.home;
+
     let element = this.props.element;
     let action = this.props.action;
     let title = null;
     let idText = null;    
+    let homeElement = null;
+    let actionControl = null;
 
-    if (!action) {
-      return (
-        <div className='viewer-pane data-pane' style={style}>
-          Please select an action first.
-        </div>
-      );
+    if (home) {
+      title = 'Map';
+      let map = this.props.map; 
+
+      if (map) {
+        idText = map.name;
+
+        let hasGeoMessageAccess = map && map.accessLevel >= ApiManager.accessLevels.viewGeoMessages;
+
+        homeElement = (
+          <Button
+            className='geomessage-feed-button'
+            variant='contained'
+            color='primary'
+            disabled={!hasGeoMessageAccess}
+            onClick={() => this.props.onDataPaneAction(ViewerUtility.dataPaneAction.feed)}
+          >
+            GeoMessage Feed
+          </Button>
+        );
+      }
+      else {
+        return (
+          <div className='viewer-pane data-pane' style={style}>
+            Please select a map first.
+          </div>
+        )
+      }
     }
     else if (action === ViewerUtility.dataPaneAction.feed) {
       title = 'GeoMessage Feed';
@@ -81,14 +126,13 @@ class DataPane extends PureComponent {
       }
     }
 
-    let actionControl = null;
-
     if (action === ViewerUtility.dataPaneAction.analyse) {
       actionControl = (
         <AnalyseControl
           user={this.props.user}
           map={this.props.map}
-          element={this.props.element}          
+          element={this.props.element}    
+          home={home}
         />
       );
     }
@@ -101,6 +145,7 @@ class DataPane extends PureComponent {
           timestampRange={this.props.timestampRange}
           element={this.props.element}
           isFeed={action === ViewerUtility.dataPaneAction.feed}
+          home={home}
           onFlyTo={this.props.onFlyTo}
         />
       );
@@ -114,15 +159,30 @@ class DataPane extends PureComponent {
             timestampRange={this.props.timestampRange}
             element={this.props.element}
             isEdit={action === ViewerUtility.dataPaneAction.editCustomPolygon}
+            home={home}
             onFlyTo={this.props.onFlyTo}
             onCustomPolygonChange={this.props.onCustomPolygonChange}
           />
         );
-      }
+    }
+
+    let actionsClassName = 'data-pane-title-actions';
+    if (home) {
+      actionsClassName += ' data-pane-title-actions-right'
+    }
     
     return (
       <div className='viewer-pane data-pane' style={style}>
+
         <Card className='data-pane-title-card'>
+          <CardActions className={actionsClassName}>
+            <IconButton
+              aria-label='Home'
+              onClick={() => this.setState({ home: !home })}
+            >
+              {home && action ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+            </IconButton>
+          </CardActions>
           <CardHeader
             className='data-pane-title-header'
             title={
@@ -142,7 +202,7 @@ class DataPane extends PureComponent {
             }
           />
         </Card>
-        {actionControl}
+        {home ? homeElement : actionControl}
       </div>
     );
   }

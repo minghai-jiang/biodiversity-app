@@ -179,6 +179,10 @@ class CustomPolygonControl extends PureComponent {
   }
 
   render() {
+    if (this.props.home) {
+      return null;
+    }
+
     let title = 'Add';
     if (this.props.isEdit) {
       title = 'Edit';

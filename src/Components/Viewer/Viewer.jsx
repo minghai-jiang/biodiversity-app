@@ -42,6 +42,7 @@ const DEFAULT_VIEWPORT = {
 class Viewer extends PureComponent {
 
   controlsPane = null;
+  dataPane = null;
   selectionPane = null;
 
   leafletMap = null;
@@ -62,6 +63,7 @@ class Viewer extends PureComponent {
 
     this.leafletMap = React.createRef();
     this.controlsPane = React.createRef();
+    this.dataPane = React.createRef();
     this.selectionPane = React.createRef();
 
     this.state = {
@@ -258,10 +260,6 @@ class Viewer extends PureComponent {
     });
   }
 
-  onOpenGeoMessageFeed = () => {
-    this.onDataPaneAction(ViewerUtility.dataPaneAction.feed);
-  }
-
   onLayersChange = (layers) => {
     this.leafletLayers = layers;
     this.rebuildAllLayers();
@@ -370,7 +368,7 @@ class Viewer extends PureComponent {
   }
 
   onDataPaneAction = (action) => {
-    if (this.state.action !== action) {
+    if (this.state.dataPaneAction !== action) {
 
       let panes = this.state.panes;
       let cb = null;
@@ -389,6 +387,9 @@ class Viewer extends PureComponent {
       }
 
       this.setState({ panes: panes, dataPaneAction: action }, cb);
+    }
+    else {
+      this.dataPane.current.goToAction();
     }
   }
 
@@ -584,7 +585,7 @@ class Viewer extends PureComponent {
             timestampRange={this.state.timestampRange}
             geolocation={this.state.geolocation}
             onSelectMap={this.onSelectMap}
-            onOpenGeoMessageFeed={this.onOpenGeoMessageFeed}
+            onDataPaneAction={this.onDataPaneAction}
             onLayersChange={this.onLayersChange}
             onFeatureClick={this.selectFeature}
             onFlyTo={this.onFlyTo}
@@ -618,12 +619,14 @@ class Viewer extends PureComponent {
           </div>
 
           <DataPane
+            ref={this.dataPane}
             user={this.props.user}
             isOpen={this.state.panes.includes(DATA_PANE_NAME)}
             map={this.state.map}
             timestampRange={this.state.timestampRange}
             action={this.state.dataPaneAction}
             element={this.state.selectedElement}
+            onDataPaneAction={this.onDataPaneAction}
             onFlyTo={this.onFlyTo}
             onCustomPolygonChange={this.onCustomPolygonChange}            
           />

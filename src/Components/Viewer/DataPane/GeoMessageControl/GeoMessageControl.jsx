@@ -328,9 +328,9 @@ class GeoMessageControl extends PureComponent {
   }
 
   render() {
-    // if (this.state.loading) {
-    //   return <CircularProgress className='loading-spinner'/>;
-    // }
+    if (this.props.home) {
+      return null;
+    }
 
     let isFeed = this.props.isFeed;
     let className = 'data-pane-card geomessage-messages-card';
