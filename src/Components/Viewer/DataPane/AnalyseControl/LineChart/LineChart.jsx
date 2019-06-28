@@ -38,7 +38,8 @@ export class LineChart extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.data !== prevProps.data || this.props.type !== prevProps.type) {
+    if (this.props.data !== prevProps.data || this.props.type !== prevProps.type ||
+      this.props.maxMask !== prevProps.maxMask) {
       let graph = this.prepareGraph();
       this.setState({ graph: graph });
     }
@@ -97,13 +98,15 @@ export class LineChart extends PureComponent {
 
     let filteredColumnNames = parsedData.meta.fields.filter(x => adjustedColumnInfo.find(y => y.name === x));
 
-    let series = [];    
+    let series = [];
+    let seriesData = [];
+    let dates = [];
 
     for (let i = 0; i < filteredColumnNames.length; i++ ) {
 
       let columnName = filteredColumnNames[i];
 
-      let seriesData = [];
+      let singleSeriesData = [];
 
       for (let x = 0; x < parsedData.data.length; x++) {
 
@@ -117,26 +120,69 @@ export class LineChart extends PureComponent {
           value += row[ViewerUtility.specialClassName.blanc];
         }
 
-        seriesData.push({
+        singleSeriesData.push({
           x: date,
           y: value
         });
+
+        if (!dates.includes(date)) {
+          dates.push(date);
+        }
       }
 
       let color = `#${adjustedColumnInfo.find(y => y.name === columnName).color}`;
 
-      let seriesElement = (
+      seriesData.push({
+        column: columnName,
+        color: color,
+        data: singleSeriesData
+      });
+    }
+
+    for (let i = 0; i < dates.length; i++) {
+      let date = dates[i];
+
+      let totalValue = 0;
+      let maskValue = 0;
+
+      for (let y = 0; y < seriesData.length; y++) {
+        let singleSeriesData = seriesData[y];
+
+
+        let dateData = singleSeriesData.data.find(x => x.x === date);
+
+        if (dateData) {
+          totalValue += dateData.y;
+        }
+
+        if (singleSeriesData.column === ViewerUtility.specialClassName.mask ||
+          singleSeriesData.column === ViewerUtility.specialClassName.cloudCover) {
+          maskValue = dateData.y
+        }
+      }
+
+
+      if (totalValue > 0 && (maskValue / totalValue) > this.props.maxMask) {
+        for (let y = 0; y < seriesData.length; y++) {
+          let singleSeriesData = seriesData[y];
+          singleSeriesData.data = singleSeriesData.data.filter(x => x.x !== date);
+        }
+      }
+    }
+
+    for (let i = 0; i < seriesData.length; i++) {
+      let singleSeriesData = seriesData[i];
+
+      series.push(
         <LineMarkSeries
-          key={columnName}
-          name={columnName}
+          key={singleSeriesData.column}
+          name={singleSeriesData.column}
           curve={'curveMonotoneX'}
-          data={seriesData}
-          color={color}
+          data={singleSeriesData.data}
+          color={singleSeriesData.color}
           size={3}
         />
       );
-
-      series.push(seriesElement);
     }
 
     let axisStyle = {

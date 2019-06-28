@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import Papa from 'papaparse';
 import LineChart from './LineChart/LineChart';
+import Slider from 'rc-slider';
 
 import { 
   Card,  
@@ -23,6 +24,8 @@ import DataPaneUtility from '../DataPaneUtility';
 import './AnalyseControl.css';
 import ApiManager from '../../../../ApiManager';
 
+const Single = Slider.createSliderWithTooltip(Slider);
+
 const DEFAULT_SELECTED_CLASS = 'default';
 
 class AnalyseControl extends PureComponent {
@@ -41,7 +44,9 @@ class AnalyseControl extends PureComponent {
       spectralIndicesData: {},
 
       classesExpanded: true,
-      spectralIndicesExpanded: true
+      spectralIndicesExpanded: true,
+
+      maxMask: 1
     };
   }
 
@@ -224,9 +229,31 @@ class AnalyseControl extends PureComponent {
     }
   }
 
+  onMaxMaskChange = (value) => {
+    this.setState({ maxMask: value });
+  }
+
   render() {
+
     return (
       <div>
+        <Card className='data-pane-card'>
+          <CardContent>
+            <div>Max masked: {this.state.maxMask}</div>
+            <Single
+              dots={false}
+              step={0.01}
+              defaultValue={this.state.maxMask}
+              value={this.state.maxMask}
+              min={0}
+              max={1}
+              included={false}
+              onChange={(value) => this.onMaxMaskChange(value)}
+              tipFormatter={v => Math.round(v*100) + '%'}              
+            />
+          </CardContent>
+        </Card>
+
         <Card className='data-pane-card'>
           <CardHeader
             title={
@@ -254,6 +281,7 @@ class AnalyseControl extends PureComponent {
                     map={this.props.map} 
                     data={this.state.classesData} 
                     type={ViewerUtility.dataGraphType.classes}
+                    maxMask={this.state.maxMask}
                   /> : null
               } 
             </CardContent>
@@ -302,6 +330,7 @@ class AnalyseControl extends PureComponent {
                     map={this.props.map} 
                     data={this.state.spectralIndicesData[this.state.selectedClass]} 
                     type={ViewerUtility.dataGraphType.spectralIndices}
+                    maxMask={this.state.maxMask}
                   /> : null
               }
             </CardContent>

@@ -36,7 +36,8 @@ const ViewerUtility = {
     allClasses: 'all classes',
     mask: 'mask',
     blanc: 'blanc',
-    noClass: 'no class'
+    noClass: 'no class',
+    cloudCover: 'cloud_cover'
   },
 
   geomessageFormType: {
