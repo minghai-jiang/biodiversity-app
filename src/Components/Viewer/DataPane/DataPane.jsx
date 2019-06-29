@@ -39,8 +39,11 @@ class DataPane extends PureComponent {
   componentDidUpdate(prevProps) {
     let differentAction = this.props.action && prevProps.action !== this.props.action;
 
-    if (differentAction) {
+    if (differentAction && this.state.home) {
       this.setState({ home: false });
+    }
+    else if (prevProps.action && !this.props.action && !this.state.home) {
+      this.setState({ home: true });
     }
   }
 
@@ -107,7 +110,7 @@ class DataPane extends PureComponent {
       title = 'GeoMessage Feed';
       idText = this.props.map.name;
     }    
-    else {
+    else if (element) {
       if (element.type === ViewerUtility.standardTileLayerType) {
         title = 'Standard tile';
         idText = `${element.feature.properties.tileX}, ${element.feature.properties.tileY}, ${element.feature.properties.zoom}`;
