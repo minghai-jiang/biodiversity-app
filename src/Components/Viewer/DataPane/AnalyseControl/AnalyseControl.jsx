@@ -71,7 +71,15 @@ class AnalyseControl extends PureComponent {
     let differentElement = differentMap || DataPaneUtility.isDifferentElement(prevProps.element, this.props.element);
 
     if (differentElement) {
-      this.setState({ classesLoading: true }, () => this.getData(ViewerUtility.dataGraphType.classes));
+      this.setState({ 
+          classesData: null,
+          spectralIndicesData: {},
+          classesLoading: true, 
+          spectralIndicesLoading: true,  
+        }, () => {
+          this.getData(ViewerUtility.dataGraphType.classes);
+          this.getData(ViewerUtility.dataGraphType.spectralIndices, this.state.selectedClass)
+      });
     }
   }
 
@@ -97,7 +105,7 @@ class AnalyseControl extends PureComponent {
     this.setState({ availableClasses: availableClasses });
   }
 
-  getData = (type, className) => {
+  getData = async (type, className) => {
     let element = this.props.element;
 
     let body = {
@@ -138,10 +146,17 @@ class AnalyseControl extends PureComponent {
     if (type === ViewerUtility.dataGraphType.classes) {
       dataPromise = ApiManager.post(`/data/class/${urlType}/timestamps`, body, this.props.user);
     }
-    else if (type === ViewerUtility.dataGraphType.spectralIndices) {
+    else if (type === ViewerUtility.dataGraphType.spectralIndices && className !== 'default') {
       dataPromise = ApiManager.post(`/data/spectral/${urlType}/timestamps`, body, this.props.user);
     }
     else {
+      if (type === ViewerUtility.dataGraphType.classes) {
+        this.setState({ classesLoading: false });                    
+      }
+      else {
+        this.setState({ spectralIndicesLoading: false });                    
+      }
+
       return;
     }
     
