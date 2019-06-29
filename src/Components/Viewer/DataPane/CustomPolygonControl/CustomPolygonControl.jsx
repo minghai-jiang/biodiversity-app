@@ -234,26 +234,26 @@ class CustomPolygonControl extends PureComponent {
             value={this.state.propertyValues[property]}
             onChange={(e) => this.onPropertyValueChange(e, property)}
           />
-        );
-
-        propertyInputs = (
-          <div>
-            {inputs}
-            <div className='card-content-item'>
-              <Button 
-                className='card-submit-button'
-                variant='contained' 
-                color='primary'
-                onClick={this.onSubmit}
-                disabled={this.state.loading}
-              >
-                Submit
-              </Button>
-            </div>
-
-          </div>
-        );        
+        ); 
       }
+
+      propertyInputs = (
+        <div>
+          {inputs}
+          <div className='card-content-item'>
+            <Button 
+              className='card-submit-button'
+              variant='contained' 
+              color='primary'
+              onClick={this.onSubmit}
+              disabled={this.state.loading}
+            >
+              Submit
+            </Button>
+          </div>
+
+        </div>
+      );       
     }
 
     return (
