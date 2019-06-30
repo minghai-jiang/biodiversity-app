@@ -56,6 +56,7 @@ class SelectionPane extends PureComponent {
   
       ApiManager.post('/geomessage/customPolygon/deletePolygon', body, this.props.user)
         .then(() => {
+          this.props.onDeleteCustomPolygon();
           this.props.onDeselect();
           this.setState({ isOpen: false, loading: false });
         })

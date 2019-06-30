@@ -97,7 +97,10 @@ async function apiManagerFetch(method, url, body, user) {
       }
       else {  
         if (!isText) {
-          throw result;
+          throw {
+            status: gottenResponse.status,
+            message: result.message
+          };
         }        
         else {
           throw {

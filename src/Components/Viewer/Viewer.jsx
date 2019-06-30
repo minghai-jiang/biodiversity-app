@@ -508,7 +508,7 @@ class Viewer extends PureComponent {
 
   onCustomPolygonChange = (removeDrawnPolygon, updateSelection, newProperties) => {
     if (removeDrawnPolygon) {
-      this.removeDrawnPolygon(); 
+      this.removeDrawnPolygon(true); 
     }
 
     if (updateSelection) {
@@ -628,7 +628,7 @@ class Viewer extends PureComponent {
             element={this.state.selectedElement}
             onDataPaneAction={this.onDataPaneAction}
             onFlyTo={this.onFlyTo}
-            onCustomPolygonChange={this.onCustomPolygonChange}            
+            onCustomPolygonChange={this.onCustomPolygonChange}          
           />
         </div>
 
