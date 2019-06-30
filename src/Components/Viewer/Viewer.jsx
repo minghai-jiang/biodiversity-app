@@ -89,7 +89,9 @@ class Viewer extends PureComponent {
   
     let drawControl = new L.Control.Draw({
       draw: {
-        polygon: true,
+        polygon: {
+          allowIntersection: false
+        },
         rectangle: false,
         marker: false,
         polyline: false,
