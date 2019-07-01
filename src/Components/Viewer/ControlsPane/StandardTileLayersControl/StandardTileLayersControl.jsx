@@ -38,7 +38,9 @@ class StandardTileLayersControl extends PureComponent {
 
       options: [],
 
-      expanded: true
+      expanded: true,
+
+      count: null
     };
   }
 
@@ -76,7 +78,8 @@ class StandardTileLayersControl extends PureComponent {
 
         this.setState({ 
           availableLayers: availableLayers, 
-          selectedLayers: selectedLayers
+          selectedLayers: selectedLayers,
+          count: null
         });
       }
       
@@ -106,6 +109,23 @@ class StandardTileLayersControl extends PureComponent {
       let availableLayer = availableLayers[i];
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
+      let counter = null;
+      if (checked && this.state.count !== null) {
+        let className = '';
+
+        if (this.state.count > MAX_TILES) {
+          className = 'geometry-limit-exceeded';
+        }
+
+        counter = (
+          <span className='geometry-counter'>
+            &nbsp;
+            <span className={className}>{this.state.count}</span>
+            <span>/{MAX_TILES}</span>
+          </span>
+        )
+      }
+
       let option = (
         <div key={availableLayer.name}>
           <Checkbox 
@@ -117,7 +137,10 @@ class StandardTileLayersControl extends PureComponent {
             onChange={this.onLayerChange}
             checked={checked}
           />
-          {availableLayer.name}
+          <span>
+            {availableLayer.name}
+          </span>
+          {counter}
         </div>
       )
 
@@ -147,6 +170,8 @@ class StandardTileLayersControl extends PureComponent {
 
     let leafletGeojsonLayer = await ApiManager.post('/metadata/tiles', body, this.props.user)
       .then(standardTileIds => {
+        this.setState({ count: standardTileIds.count });
+
         if (!standardTileIds || standardTileIds.count === 0 || standardTileIds.count > MAX_TILES) {
           return null;
         }
@@ -161,7 +186,7 @@ class StandardTileLayersControl extends PureComponent {
       })
       .then(standardTilesGeoJson => {
         if (!standardTilesGeoJson) {
-          return [];
+          return null;
         }
 
         return (

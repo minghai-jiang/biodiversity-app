@@ -31,3 +31,11 @@ div.card-content:last-child {
   padding-bottom: 16px;
 }
 
+.geometry-counter {
+  float: right
+}
+
+.geometry-limit-exceeded {
+  color: #ff0000;
+}
+

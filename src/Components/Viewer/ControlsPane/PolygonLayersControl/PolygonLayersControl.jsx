@@ -33,7 +33,9 @@ class PolygonLayersControl extends PureComponent {
 
       options: [],
 
-      expanded: true
+      expanded: true,
+
+      count: {}
     };
   }
 
@@ -70,7 +72,8 @@ class PolygonLayersControl extends PureComponent {
 
         this.setState({ 
           availableLayers: availableLayers, 
-          selectedLayers: selectedLayers
+          selectedLayers: selectedLayers,
+          count: {}
         });
       }
 
@@ -124,6 +127,24 @@ class PolygonLayersControl extends PureComponent {
       let availableLayer = availableLayers[i];
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
+      let counter = null;
+      let count = this.state.count[availableLayer.name];
+      if (checked && count !== undefined) {
+        let className = '';
+
+        if (count > MAX_POLYGONS) {
+          className = 'geometry-limit-exceeded';
+        }
+
+        counter = (
+          <span className='geometry-counter'>
+            &nbsp;
+            <span className={className}>{count}</span>
+            <span>/{MAX_POLYGONS}</span>
+          </span>
+        )
+      }
+
       let option = (
         <div key={availableLayer.name}>
           <Checkbox 
@@ -135,7 +156,10 @@ class PolygonLayersControl extends PureComponent {
             onChange={this.onLayerChange}
             checked={checked}
           />
-          {availableLayer.name}
+          <span>
+            {availableLayer.name}
+          </span>
+          {counter}
         </div>
       )
 
@@ -172,6 +196,13 @@ class PolygonLayersControl extends PureComponent {
 
       let leafletGeojsonLayerPromise = ApiManager.post('/metadata/polygons', body, this.props.user)
         .then(polygonIds => {
+          let count = {
+            ...this.state.count,
+          };
+          count[polygonLayer.name] = polygonIds.count;
+
+          this.setState({ count: count });
+
           if (!polygonIds || polygonIds.count === 0 || polygonIds.count > MAX_POLYGONS) {
             return null;
           }
@@ -186,7 +217,7 @@ class PolygonLayersControl extends PureComponent {
         })
         .then(polygonsGeoJson => {
           if (!polygonsGeoJson) {
-            return [];
+            return null
           }
 
           return (

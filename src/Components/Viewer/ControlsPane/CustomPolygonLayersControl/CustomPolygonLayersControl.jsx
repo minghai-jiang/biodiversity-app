@@ -33,7 +33,9 @@ class CustomPolygonLayersControl extends PureComponent {
 
       options: [],
 
-      expanded: true
+      expanded: true,
+
+      count: {}
     };
   }
 
@@ -70,7 +72,8 @@ class CustomPolygonLayersControl extends PureComponent {
 
         this.setState({ 
           availableLayers: availableLayers, 
-          selectedLayers: selectedLayers
+          selectedLayers: selectedLayers,
+          count: {}
         });
       }
 
@@ -119,6 +122,25 @@ class CustomPolygonLayersControl extends PureComponent {
       let availableLayer = availableLayers[i];
       let checked = selectedLayers.find(x => x === availableLayer) ? true : false;
 
+      let counter = null;
+      let c = this.state.count;
+      let count = this.state.count[availableLayer.name];
+      if (checked && count !== undefined) {
+        let className = '';
+
+        if (count > MAX_CUSTOM_POLYGONS) {
+          className = 'geometry-limit-exceeded';
+        }
+
+        counter = (
+          <span className='geometry-counter'>
+            &nbsp;
+            <span className={className}>{count}</span>
+            <span>/{MAX_CUSTOM_POLYGONS}</span>
+          </span>
+        )
+      }
+
       let option = (
         <div key={availableLayer.name}>
           <Checkbox 
@@ -130,7 +152,10 @@ class CustomPolygonLayersControl extends PureComponent {
             onChange={this.onLayerChange}
             checked={checked}
           />
-          {availableLayer.name}
+          <span>
+            {availableLayer.name}
+          </span>
+          {counter}
         </div>
       )
 
@@ -176,6 +201,13 @@ class CustomPolygonLayersControl extends PureComponent {
 
       let leafletGeojsonLayerPromise = ApiManager.post('/geoMessage/customPolygon/ids', body, this.props.user)
         .then(customPolygonIds => {
+          let count = {
+            ...this.state.count,
+          };
+          count[customPolygonLayer.name] = customPolygonIds.count;
+
+          this.setState({ count: count });
+
           if (!customPolygonIds || customPolygonIds.count === 0 || customPolygonIds.count > MAX_CUSTOM_POLYGONS) {
             return null;
           }
@@ -190,7 +222,7 @@ class CustomPolygonLayersControl extends PureComponent {
         })
         .then(customPolygonsGeoJson => {
           if (!customPolygonsGeoJson) {
-            return [];
+            return null;
           }
 
           return (
