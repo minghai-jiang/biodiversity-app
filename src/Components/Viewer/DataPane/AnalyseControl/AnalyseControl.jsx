@@ -4,9 +4,10 @@ import LineChart from './LineChart/LineChart';
 import Slider from 'rc-slider';
 
 import { 
-  Card,  
+  Card,
   CardHeader,
   CardContent,
+  CardActions,
   Typography,
   CircularProgress,
   Button,
@@ -16,6 +17,8 @@ import {
   IconButton,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+
 
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
@@ -248,6 +251,62 @@ class AnalyseControl extends PureComponent {
     this.setState({ maxMask: value });
   }
 
+  onDownloadData = (isSpectralIndices) => {
+    let csvData = null;
+
+    if (!isSpectralIndices && this.state.classesData) {
+      csvData = this.state.classesData.raw;
+    }
+    else if (this.state.spectralIndicesData[this.state.selectedClass]) {
+      csvData = this.state.spectralIndicesData[this.state.selectedClass].raw;
+    }
+
+    let nameComponents = [this.props.map.name];
+
+    let element = this.props.element;
+    let elementProperties = element.feature.properties;
+
+    if (element.type === ViewerUtility.standardTileLayerType) {
+      nameComponents.push(
+        'tile',
+        elementProperties.tileX,
+        elementProperties.tileY,
+        elementProperties.zoom
+      );
+    }
+    else if (element.type === ViewerUtility.polygonLayerType) {
+      nameComponents.push(
+        'polygon',
+        elementProperties.id
+      );
+    }
+    else if (element.type === ViewerUtility.customPolygonTileLayerType) {
+      nameComponents.push(
+        'customPolygon',
+        elementProperties.id
+      );
+    } 
+    if (element.type === ViewerUtility.drawnPolygonLayerType) {
+      nameComponents.push(
+        'drawnPolygon'
+      );
+    }
+
+    if (!isSpectralIndices) {
+      nameComponents.push('classes');
+    }
+    else {
+      nameComponents.push(
+        'measurements',
+        this.state.selectedClass
+      );
+    }
+
+    let fileName = nameComponents.join('_') + '.csv';
+
+    downloadCsv(fileName, csvData)
+  }
+
   render() {
     if (this.props.home) {
       return null;
@@ -303,6 +362,17 @@ class AnalyseControl extends PureComponent {
                   /> : null
               } 
             </CardContent>
+            {
+              !this.state.classesLoading && this.state.classesData ?
+                <CardActions className='analyse-card-actions'>
+                  <IconButton
+                    onClick={() => this.onDownloadData(false)}
+                    aria-label='Download data'
+                  >
+                    <SaveAlt />
+                  </IconButton>
+                </CardActions> : null
+            }
           </Collapse>
         </Card>
         <Card className='data-pane-card'>
@@ -324,7 +394,7 @@ class AnalyseControl extends PureComponent {
             }
           />
           <Collapse in={this.state.spectralIndicesExpanded}>
-            <CardContent className='data-pane-card-content'>
+            <CardContent className='data-pane-card-content analyse-card-content'>
               {
                 this.state.availableClasses ?
                   <Select 
@@ -352,6 +422,17 @@ class AnalyseControl extends PureComponent {
                   /> : null
               }
             </CardContent>
+            {
+              !this.state.spectralIndicesLoading && this.state.spectralIndicesData[this.state.selectedClass] ?
+                <CardActions className='analyse-card-actions'>
+                  <IconButton
+                    onClick={() => this.onDownloadData(true)}
+                    aria-label='Download data'
+                  >
+                    <SaveAlt />
+                  </IconButton>
+                </CardActions> : null
+            }
           </Collapse>         
         </Card>
       </div>
@@ -359,6 +440,17 @@ class AnalyseControl extends PureComponent {
   }
 }
 
+function downloadCsv(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
 
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
 
 export default AnalyseControl;
