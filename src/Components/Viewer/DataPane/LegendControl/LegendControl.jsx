@@ -91,7 +91,7 @@ class LegendControl extends PureComponent {
       for (let i = 0; i < collection.length; i++) {
         let type = collection[i];
         legendElements.push(
-          <div className='legend-line'>
+          <div key={legendElements.length} className='legend-line'>
             <span>{type.name}</span>
             <span className='legend-label' style={{ backgroundColor: `#${type.color}`}}></span>
           </div>
@@ -100,19 +100,19 @@ class LegendControl extends PureComponent {
     }
 
     if (availableClasses.length > 0) {
-      legendElements.push(<div className='legend-line legend-line-header'>Classes</div>)
+      legendElements.push(<div key='classes' className='legend-line legend-line-header'>Classes</div>)
       createLegendLines(availableClasses);
     }
     if (availableMeasurements.length > 0) {
-      legendElements.push(<div className='legend-line legend-line-header'>Measurements</div>)
+      legendElements.push(<div key='measurements' className='legend-line legend-line-header'>Measurements</div>)
       createLegendLines(availableMeasurements);
     }
     if (availablePolygonLayers.length > 0) {
-      legendElements.push(<div className='legend-line legend-line-header'>Polygon layers</div>);
+      legendElements.push(<div key='polygon_layers' className='legend-line legend-line-header'>Polygon layers</div>);
       createLegendLines(availablePolygonLayers);
     }
     if (availableCustomPolygonLayers.length > 0) {
-      legendElements.push(<div className='legend-line legend-line-header'>Custom polygon layers</div>);
+      legendElements.push(<div key='custom_polygon_layers' className='legend-line legend-line-header'>Custom polygon layers</div>);
       createLegendLines(availableCustomPolygonLayers);
     }
 

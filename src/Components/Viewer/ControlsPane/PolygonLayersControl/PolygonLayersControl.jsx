@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { GeoJSON } from 'react-leaflet';
-import L from 'leaflet';
 
 import { 
   Card,
@@ -12,6 +11,7 @@ import {
   Typography
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SaveAlt from '@material-ui/icons/SaveAlt';
 
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
@@ -23,6 +23,8 @@ import ApiManager from '../../../../ApiManager';
 const MAX_POLYGONS = 500;
 
 class PolygonLayersControl extends PureComponent {
+
+  layerGeoJsons = {}
 
   constructor(props, context) {
     super(props, context);
@@ -69,6 +71,7 @@ class PolygonLayersControl extends PureComponent {
       if (differentMap) {
         availableLayers = this.getAvailableLayers(this.props.map);
         selectedLayers = [];
+        this.layerGeoJsons = {};
 
         this.setState({ 
           availableLayers: availableLayers, 
@@ -131,14 +134,25 @@ class PolygonLayersControl extends PureComponent {
       let count = this.state.count[availableLayer.name];
       if (checked && count !== undefined) {
         let className = '';
+        let downloadButton = null;
 
         if (count > MAX_POLYGONS) {
           className = 'geometry-limit-exceeded';
         }
+        else {
+          downloadButton = (
+            <IconButton 
+              className='download-geometry-button'
+              onClick={() => this.onDownload(availableLayer.name)}
+            >
+              <SaveAlt className='download-geometry-button-icon'/>
+            </IconButton>
+          );
+        }
 
         counter = (
           <span className='geometry-counter'>
-            &nbsp;
+            {downloadButton}
             <span className={className}>{count}</span>
             <span>/{MAX_POLYGONS}</span>
           </span>
@@ -146,7 +160,7 @@ class PolygonLayersControl extends PureComponent {
       }
 
       let option = (
-        <div key={availableLayer.name}>
+        <div key={availableLayer.name} className='layer-checkboxes'>
           <Checkbox 
             key={availableLayer.name} 
             classes={{ root: 'layers-control-checkbox' }}
@@ -204,6 +218,7 @@ class PolygonLayersControl extends PureComponent {
           this.setState({ count: count });
 
           if (!polygonIds || polygonIds.count === 0 || polygonIds.count > MAX_POLYGONS) {
+            this.layerGeoJsons[polygonLayer.name] = null;
             return null;
           }
 
@@ -217,8 +232,14 @@ class PolygonLayersControl extends PureComponent {
         })
         .then(polygonsGeoJson => {
           if (!polygonsGeoJson) {
-            return null
+            this.layerGeoJsons[polygonLayer.name] = null;
+            return null;
           }
+
+          this.layerGeoJsons[polygonLayer.name] = { 
+            geoJson: polygonsGeoJson, 
+            bounds: bounds 
+          };
 
           return (
             <GeoJSON
@@ -279,6 +300,32 @@ class PolygonLayersControl extends PureComponent {
 
   onFeatureClick = (feature, hasAggregatedData) => {
     this.props.onFeatureClick(feature, hasAggregatedData);
+  }
+
+  onDownload = (layerName) => {
+    let data = this.layerGeoJsons[layerName];
+
+    if (!data) {
+      return;
+    }
+
+    let bounds = data.bounds;
+
+    let decimals = 4;
+
+    let nameComponents = [
+      this.props.map.name,
+      'polygons',
+      layerName,
+      bounds.xMin.toFixed(decimals),
+      bounds.xMax.toFixed(decimals),
+      bounds.yMin.toFixed(decimals),
+      bounds.yMax.toFixed(decimals)
+    ];
+
+    let fileName = nameComponents.join('_').replace(' ', '_') + '.json';
+
+    ViewerUtility.download(fileName, JSON.stringify(data.geoJson), 'application/json');
   }
 
   render() {

@@ -12,6 +12,7 @@ import {
   Typography
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SaveAlt from '@material-ui/icons/SaveAlt';
 
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
@@ -23,6 +24,8 @@ import ApiManager from '../../../../ApiManager';
 const MAX_CUSTOM_POLYGONS = 500;
 
 class CustomPolygonLayersControl extends PureComponent {
+
+  layerGeoJsons = {};
 
   constructor(props, context) {
     super(props, context);
@@ -69,6 +72,7 @@ class CustomPolygonLayersControl extends PureComponent {
       if (differentMap) {
         availableLayers = this.getAvailableLayers(this.props.map);
         selectedLayers = [];
+        this.layerGeoJsons = {};
 
         this.setState({ 
           availableLayers: availableLayers, 
@@ -127,14 +131,25 @@ class CustomPolygonLayersControl extends PureComponent {
       let count = this.state.count[availableLayer.name];
       if (checked && count !== undefined) {
         let className = '';
+        let downloadButton = null;
 
         if (count > MAX_CUSTOM_POLYGONS) {
           className = 'geometry-limit-exceeded';
         }
+        else {
+          downloadButton = (
+            <IconButton 
+              className='download-geometry-button'
+              onClick={() => this.onDownload(availableLayer.name)}
+            >
+              <SaveAlt className='download-geometry-button-icon'/>
+            </IconButton>
+          );
+        }
 
         counter = (
           <span className='geometry-counter'>
-            &nbsp;
+            {downloadButton}
             <span className={className}>{count}</span>
             <span>/{MAX_CUSTOM_POLYGONS}</span>
           </span>
@@ -142,7 +157,7 @@ class CustomPolygonLayersControl extends PureComponent {
       }
 
       let option = (
-        <div key={availableLayer.name}>
+        <div key={availableLayer.name} className='layer-checkboxes'>
           <Checkbox 
             key={availableLayer.name} 
             classes={{ root: 'layers-control-checkbox' }}
@@ -209,6 +224,7 @@ class CustomPolygonLayersControl extends PureComponent {
           this.setState({ count: count });
 
           if (!customPolygonIds || customPolygonIds.count === 0 || customPolygonIds.count > MAX_CUSTOM_POLYGONS) {
+            this.layerGeoJsons[customPolygonLayer.name] = null;
             return null;
           }
 
@@ -222,8 +238,14 @@ class CustomPolygonLayersControl extends PureComponent {
         })
         .then(customPolygonsGeoJson => {
           if (!customPolygonsGeoJson) {
+            this.layerGeoJsons[customPolygonLayer.name] = null;
             return null;
           }
+
+          this.layerGeoJsons[customPolygonLayer.name] = {
+            geoJson: customPolygonsGeoJson,
+            bounds: bounds
+          };
 
           return (
             <GeoJSON
@@ -284,6 +306,32 @@ class CustomPolygonLayersControl extends PureComponent {
 
   onFeatureClick = (feature) => {
     this.props.onFeatureClick(feature);
+  }
+
+  onDownload = (layerName) => {
+    let data = this.layerGeoJsons[layerName];
+
+    if (!data) {
+      return;
+    }
+
+    let bounds = data.bounds;
+
+    let decimals = 4;
+
+    let nameComponents = [
+      this.props.map.name,
+      'customPolygons',
+      layerName,
+      bounds.xMin.toFixed(decimals),
+      bounds.xMax.toFixed(decimals),
+      bounds.yMin.toFixed(decimals),
+      bounds.yMax.toFixed(decimals)
+    ];
+
+    let fileName = nameComponents.join('_').replace(' ', '_') + '.json';
+
+    ViewerUtility.download(fileName, JSON.stringify(data.geoJson), 'application/json');
   }
 
   render() {

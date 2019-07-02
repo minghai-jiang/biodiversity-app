@@ -11,6 +11,7 @@ import {
   Typography
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SaveAlt from '@material-ui/icons/SaveAlt';
 
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
@@ -28,6 +29,8 @@ const STANDARD_TILES_LAYER = {
 const MAX_TILES = 500;
 
 class StandardTileLayersControl extends PureComponent {
+
+  standardTilesGeoJson = null
 
   constructor(props, context) {
     super(props, context);
@@ -76,6 +79,7 @@ class StandardTileLayersControl extends PureComponent {
         availableLayers = [STANDARD_TILES_LAYER];
         selectedLayers = [];
 
+        this.standardTilesGeoJson = null;
         this.setState({ 
           availableLayers: availableLayers, 
           selectedLayers: selectedLayers,
@@ -112,14 +116,25 @@ class StandardTileLayersControl extends PureComponent {
       let counter = null;
       if (checked && this.state.count !== null) {
         let className = '';
+        let downloadButton = null;
 
         if (this.state.count > MAX_TILES) {
           className = 'geometry-limit-exceeded';
         }
+        else {
+          downloadButton = (
+            <IconButton 
+              className='download-geometry-button'
+              onClick={() => this.onDownload()}
+            >
+              <SaveAlt className='download-geometry-button-icon'/>
+            </IconButton>
+          );
+        }
 
         counter = (
           <span className='geometry-counter'>
-            &nbsp;
+            {downloadButton}
             <span className={className}>{this.state.count}</span>
             <span>/{MAX_TILES}</span>
           </span>
@@ -127,7 +142,7 @@ class StandardTileLayersControl extends PureComponent {
       }
 
       let option = (
-        <div key={availableLayer.name}>
+        <div key={availableLayer.name} className='layer-checkboxes'>
           <Checkbox 
             key={availableLayer.name} 
             classes={{ root: 'layers-control-checkbox' }}
@@ -173,6 +188,7 @@ class StandardTileLayersControl extends PureComponent {
         this.setState({ count: standardTileIds.count });
 
         if (!standardTileIds || standardTileIds.count === 0 || standardTileIds.count > MAX_TILES) {
+          this.standardTilesGeoJson = null;
           return null;
         }
 
@@ -186,8 +202,14 @@ class StandardTileLayersControl extends PureComponent {
       })
       .then(standardTilesGeoJson => {
         if (!standardTilesGeoJson) {
+          this.standardTilesGeoJson = null;
           return null;
         }
+
+        this.standardTilesGeoJson = {
+          geoJson: standardTilesGeoJson,
+          bounds: bounds
+        };
 
         return (
           <GeoJSON
@@ -244,8 +266,30 @@ class StandardTileLayersControl extends PureComponent {
     this.props.onFeatureClick(feature);
   }
 
-  render() {
+  onDownload = () => {
+    if (!this.standardTilesGeoJson) {
+      return;
+    }
 
+    let bounds = this.standardTilesGeoJson.bounds;
+
+    let decimals = 4;
+
+    let nameComponents = [
+      this.props.map.name,
+      'tiles',
+      bounds.xMin.toFixed(decimals),
+      bounds.xMax.toFixed(decimals),
+      bounds.yMin.toFixed(decimals),
+      bounds.yMax.toFixed(decimals)
+    ];
+
+    let fileName = nameComponents.join('_') + '.json';
+
+    ViewerUtility.download(fileName, JSON.stringify(this.standardTilesGeoJson.geoJson), 'application/json');
+  }
+
+  render() {
     if (!this.props.map || this.state.availableLayers.length === 0) {
       return null;
     }
