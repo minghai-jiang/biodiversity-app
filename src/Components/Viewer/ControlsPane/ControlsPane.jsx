@@ -102,11 +102,13 @@ class ControlsPane extends PureComponent {
         />
 
         <FlyToControl
+          user={this.props.user}
           map={this.state.map}
           onFlyTo={this.props.onFlyTo}
         />
 
         <TileLayersControl
+          user={this.props.user}
           map={this.state.map}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.tileLayerType, layers)}
@@ -114,6 +116,7 @@ class ControlsPane extends PureComponent {
 
         <StandardTileLayersControl
           ref={this.standardTileLayersControl}
+          user={this.props.user}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
@@ -123,6 +126,7 @@ class ControlsPane extends PureComponent {
 
         <PolygonLayersControl
           ref={this.polygonLayersControl}
+          user={this.props.user}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
@@ -132,6 +136,7 @@ class ControlsPane extends PureComponent {
 
         <CustomPolygonLayersControl
           ref={this.customPolygonLayersControl}
+          user={this.props.user}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
