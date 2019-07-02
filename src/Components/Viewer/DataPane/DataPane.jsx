@@ -7,7 +7,8 @@ import {
   CardActions,
   Typography,
   Button,
-  IconButton
+  IconButton,
+  CardContent
 } from '@material-ui/core';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
@@ -18,6 +19,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import './DataPane.css';
 import ViewerUtility from '../ViewerUtility';
 
+import LegendControl from './LegendControl/LegendControl';
 import AnalyseControl from './AnalyseControl/AnalyseControl';
 import GeoMessageControl from './GeoMessageControl/GeoMessageControl';
 import CustomPolygonControl from './CustomPolygonControl/CustomPolygonControl';
@@ -87,15 +89,21 @@ class DataPane extends PureComponent {
         let hasGeoMessageAccess = map && map.accessLevel >= ApiManager.accessLevels.viewGeoMessages;
 
         homeElement = (
-          <Button
-            className='geomessage-feed-button'
-            variant='contained'
-            color='primary'
-            disabled={!hasGeoMessageAccess}
-            onClick={() => this.props.onDataPaneAction(ViewerUtility.dataPaneAction.feed)}
-          >
-            GeoMessage Feed
-          </Button>
+          <div>
+            <Button
+              className='geomessage-feed-button'
+              variant='contained'
+              color='primary'
+              disabled={!hasGeoMessageAccess}
+              onClick={() => this.props.onDataPaneAction(ViewerUtility.dataPaneAction.feed)}
+            >
+              GeoMessage Feed
+            </Button>
+            <LegendControl
+              map={this.props.map}
+            />
+          </div>
+
         );
       }
       else {

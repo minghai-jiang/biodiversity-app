@@ -379,7 +379,7 @@ class AnalyseControl extends PureComponent {
           <CardHeader
             title={
               <Typography variant="h6" component="h2" className='no-text-transform'>
-                Spectral indices
+                Measurements
               </Typography>
             }
             action={
