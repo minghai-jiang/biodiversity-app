@@ -74,14 +74,17 @@ class GeoMessage extends PureComponent {
     ];
 
     for (let i = 0; i < message.form.answers.length; i++) {
-      let answer = message.form.answers[i];
-      if (!answer.answer) {
-        answer.answer = '';
+      let answerObject = message.form.answers[i];
+      let answer = answerObject.answer;
+      let question = answerObject.question;
+
+      if (answer === undefined || answer === null) {
+        answer = '';
       }
 
       let answerElement = (
-        <div key={answer.question}>
-          {`${answer.question}: ${answer.answer}`}
+        <div key={question}>
+          {`${question}: ${answer}`}
         </div>
       );
 

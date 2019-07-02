@@ -131,10 +131,11 @@ class GeoMessageForm extends PureComponent {
           questionElement = (
             <div className='geomessage-form-question geomessage-checkbox-question'>
               {question.question}
+              {question.obligatory === 'yes' ? '*' : null}
               <Checkbox
                 name={question.question}
                 color='primary'
-                required={question.obligatory === 'yes'}
+                checked={this.state.formAnswers[i]}
                 onChange={(e) => this.onFormAnswer(e, i, true)}
               />
             </div>
@@ -207,8 +208,10 @@ class GeoMessageForm extends PureComponent {
 
       if (selectedForm) {
         for (let i = 0; i < selectedForm.form.questions.length; i++) {
-          if (selectedForm.form.questions[i].obligatory === 'yes' && 
-            (this.state.formAnswers[i] === undefined || this.state.formAnswers[i] === null)) {
+          let question = selectedForm.form.questions[i];
+          let answer = this.state.formAnswers[i];
+
+          if (question.obligatory === 'yes' && (answer === undefined || answer === null || answer === '')) {
             alert('Not all mandatory fields are filled.');
             return;
           }
@@ -291,11 +294,12 @@ class GeoMessageForm extends PureComponent {
 
           this.fileUploadRef.current.value = '';
           this.uploadedImage = null;
+          let formAnswers = this.createEmptyFormAnswers(selectedForm);
           this.setState({ 
             expanded: false, 
             loading: false, 
             messageText: '',
-            formAnswers: [] 
+            formAnswers: formAnswers
           });
         })
         .catch(err => {
@@ -306,12 +310,37 @@ class GeoMessageForm extends PureComponent {
     });
   }
 
+  createEmptyFormAnswers = (selectedForm) => {
+    let formAnswers = [];
+
+    for (let i = 0; i < selectedForm.form.questions.length; i++) {
+      if (selectedForm.form.questions[i].type === ViewerUtility.geomessageFormType.boolean) {
+        formAnswers[i] = false;
+      }
+      else {
+        formAnswers[i] = '';
+      }
+    }
+
+    return formAnswers
+
+  }
+
   onMessageChange = (e) => {
     this.setState({ messageText: e.target.value });
   }
 
   onSelectForm = (e) => {
-    this.setState({ selectedFormName: e.target.value });
+    let selectedFormName = e.target.value;
+    let selectedForm = this.props.map.forms.find(x => x.formName === selectedFormName);
+
+    if (!selectedForm) {
+      return;
+    }
+
+    let formAnswers = this.createEmptyFormAnswers(selectedForm);
+
+    this.setState({ selectedFormName: selectedFormName, formAnswers: formAnswers });
   }
 
   onFormAnswer = (e, answerIndex, isCheckbox) => {
