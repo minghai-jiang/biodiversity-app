@@ -284,7 +284,7 @@ class StandardTileLayersControl extends PureComponent {
       bounds.yMax.toFixed(decimals)
     ];
 
-    let fileName = nameComponents.join('_') + '.json';
+    let fileName = nameComponents.join('_') + '.geojson';
 
     ViewerUtility.download(fileName, JSON.stringify(this.standardTilesGeoJson.geoJson), 'application/json');
   }

@@ -11,6 +11,7 @@ import {
   CircularProgress
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
+import SaveAlt from '@material-ui/icons/SaveAlt';
 
 import ViewerUtility from '../ViewerUtility';
 
@@ -81,6 +82,32 @@ class SelectionPane extends PureComponent {
     else {
       this.props.onDataPaneAction(action);
     }
+  }
+
+  onDownload = (layerName) => {
+    let data = this.layerGeoJsons[layerName];
+
+    if (!data) {
+      return;
+    }
+
+    let bounds = data.bounds;
+
+    let decimals = 4;
+
+    let nameComponents = [
+      this.props.map.name,
+      'customPolygons',
+      layerName,
+      bounds.xMin.toFixed(decimals),
+      bounds.xMax.toFixed(decimals),
+      bounds.yMin.toFixed(decimals),
+      bounds.yMax.toFixed(decimals)
+    ];
+
+    let fileName = nameComponents.join('_').replace(' ', '_') + '.geojson';
+
+    ViewerUtility.download(fileName, JSON.stringify(data.geoJson), 'application/json');
   }
 
   render() {

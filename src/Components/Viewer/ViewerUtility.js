@@ -1,3 +1,5 @@
+import FileSaver from 'file-saver';
+
 const TILE = 'tile';
 const STANDARD_TILE = 'standard_tile';
 const POLYGON = 'polygon';
@@ -58,16 +60,8 @@ const ViewerUtility = {
   },
 
   download: (filename, text, mime) => {
-    var element = document.createElement('a');
-    element.setAttribute('href', `data:${mime};charset=utf-8,` + encodeURIComponent(text));
-    element.setAttribute('download', filename);
-  
-    element.style.display = 'none';
-    document.body.appendChild(element);
-  
-    element.click();
-  
-    document.body.removeChild(element);
+    let blob = new Blob([text], {type: `${mime};charset=utf-8`});
+    FileSaver.saveAs(blob, filename);
   }
 
 

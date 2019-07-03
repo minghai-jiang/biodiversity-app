@@ -323,7 +323,7 @@ class PolygonLayersControl extends PureComponent {
       bounds.yMax.toFixed(decimals)
     ];
 
-    let fileName = nameComponents.join('_').replace(' ', '_') + '.json';
+    let fileName = nameComponents.join('_').replace(' ', '_') + '.geojson';
 
     ViewerUtility.download(fileName, JSON.stringify(data.geoJson), 'application/json');
   }
