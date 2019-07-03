@@ -38,16 +38,16 @@ class AnalyseControl extends PureComponent {
 
     this.state = {
       classesLoading: false,
-      spectralIndicesLoading: false,
+      measurementsLoading: false,
 
       availableClasses: null,
       selectedClass: DEFAULT_SELECTED_CLASS,
 
       classesData: null,
-      spectralIndicesData: {},
+      measurementsData: {},
 
       classesExpanded: true,
-      spectralIndicesExpanded: true,
+      measurementsExpanded: true,
 
       maxMask: 1
     };
@@ -67,7 +67,7 @@ class AnalyseControl extends PureComponent {
     }
 
     if (!this.props.element) {
-      this.setState({ classesData: null, spectralIndicesData: {} });
+      this.setState({ classesData: null, measurementsData: {} });
       return;
     }
 
@@ -76,12 +76,12 @@ class AnalyseControl extends PureComponent {
     if (differentElement) {
       this.setState({ 
           classesData: null,
-          spectralIndicesData: {},
+          measurementsData: {},
           classesLoading: true, 
-          spectralIndicesLoading: true,  
+          measurementsLoading: true,  
         }, () => {
           this.getData(ViewerUtility.dataGraphType.classes);
-          this.getData(ViewerUtility.dataGraphType.spectralIndices, this.state.selectedClass)
+          this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass)
       });
     }
   }
@@ -149,15 +149,15 @@ class AnalyseControl extends PureComponent {
     if (type === ViewerUtility.dataGraphType.classes) {
       dataPromise = ApiManager.post(`/data/class/${urlType}/timestamps`, body, this.props.user);
     }
-    else if (type === ViewerUtility.dataGraphType.spectralIndices && className !== 'default') {
-      dataPromise = ApiManager.post(`/data/spectral/${urlType}/timestamps`, body, this.props.user);
+    else if (type === ViewerUtility.dataGraphType.measurements && className !== 'default') {
+      dataPromise = ApiManager.post(`/data/measurement/${urlType}/timestamps`, body, this.props.user);
     }
     else {
       if (type === ViewerUtility.dataGraphType.classes) {
         this.setState({ classesLoading: false });                    
       }
       else {
-        this.setState({ spectralIndicesLoading: false });                    
+        this.setState({ measurementsLoading: false });                    
       }
 
       return;
@@ -187,26 +187,26 @@ class AnalyseControl extends PureComponent {
         if (type === ViewerUtility.dataGraphType.classes) {
           this.setState({ classesData: data, classesLoading: false });          
         }
-        else if (type === ViewerUtility.dataGraphType.spectralIndices) {
-          let newSpectralIndicesData = {
-            ...this.state.spectralIndicesData
+        else if (type === ViewerUtility.dataGraphType.measurements) {
+          let newmeasurementsData = {
+            ...this.state.measurementsData
           };
 
-          newSpectralIndicesData[className] = data;
+          newmeasurementsData[className] = data;
 
-          this.setState({ spectralIndicesData: newSpectralIndicesData, spectralIndicesLoading: false });                    
+          this.setState({ measurementsData: newmeasurementsData, measurementsLoading: false });                    
         }
       })
       .catch(err => {
         if (type === ViewerUtility.dataGraphType.classes) {
           this.setState({ classesData: null, classesLoading: false });          
         }
-        else if (type === ViewerUtility.dataGraphType.spectralIndices) {
-          let newSpectralIndicesData = {
-            ...this.state.spectralIndicesData
+        else if (type === ViewerUtility.dataGraphType.measurements) {
+          let newmeasurementsData = {
+            ...this.state.measurementsData
           };
 
-          this.setState({ spectralIndicesData: newSpectralIndicesData, spectralIndicesLoading: false });                    
+          this.setState({ measurementsData: newmeasurementsData, measurementsLoading: false });                    
         }
       });
   }
@@ -234,12 +234,12 @@ class AnalyseControl extends PureComponent {
   onSelectClass = (e) => {
     let selectedClass = e.target.value;
 
-    if (!this.state.spectralIndicesData[selectedClass]) {
+    if (!this.state.measurementsData[selectedClass]) {
       this.setState({ 
         selectedClass: selectedClass, 
-        spectralIndicesLoading: true 
+        measurementsLoading: true 
         }, 
-        () => this.getData(ViewerUtility.dataGraphType.spectralIndices, selectedClass)
+        () => this.getData(ViewerUtility.dataGraphType.measurements, selectedClass)
       );
     }
     else {
@@ -251,14 +251,14 @@ class AnalyseControl extends PureComponent {
     this.setState({ maxMask: value });
   }
 
-  onDownloadData = (isSpectralIndices) => {
+  onDownloadData = (isMeasurements) => {
     let csvData = null;
 
-    if (!isSpectralIndices && this.state.classesData) {
+    if (!isMeasurements && this.state.classesData) {
       csvData = this.state.classesData.raw;
     }
-    else if (this.state.spectralIndicesData[this.state.selectedClass]) {
-      csvData = this.state.spectralIndicesData[this.state.selectedClass].raw;
+    else if (this.state.measurementsData[this.state.selectedClass]) {
+      csvData = this.state.measurementsData[this.state.selectedClass].raw;
     }
 
     let nameComponents = [this.props.map.name];
@@ -292,7 +292,7 @@ class AnalyseControl extends PureComponent {
       );
     }
 
-    if (!isSpectralIndices) {
+    if (!isMeasurements) {
       nameComponents.push('classes');
     }
     else {
@@ -384,16 +384,16 @@ class AnalyseControl extends PureComponent {
             }
             action={
               <IconButton
-                className={this.state.spectralIndicesExpanded ? 'expand-icon expanded' : 'expand-icon'}
-                onClick={() => this.setState({ spectralIndicesExpanded: !this.state.spectralIndicesExpanded })}
-                aria-expanded={this.state.spectralIndicesExpanded}
+                className={this.state.measurementsExpanded ? 'expand-icon expanded' : 'expand-icon'}
+                onClick={() => this.setState({ measurementsExpanded: !this.state.measurementsExpanded })}
+                aria-expanded={this.state.measurementsExpanded}
                 aria-label='Show'
               >
                 <ExpandMoreIcon />
               </IconButton>
             }
           />
-          <Collapse in={this.state.spectralIndicesExpanded}>
+          <Collapse in={this.state.measurementsExpanded}>
             <CardContent className='data-pane-card-content analyse-card-content'>
               {
                 this.state.availableClasses ?
@@ -401,29 +401,29 @@ class AnalyseControl extends PureComponent {
                     className='class-selector' 
                     value={this.state.selectedClass} 
                     onChange={this.onSelectClass}
-                    disabled={this.state.spectralIndicesLoading}>
+                    disabled={this.state.measurementsLoading}>
                     <MenuItem value={DEFAULT_SELECTED_CLASS} disabled hidden>Select a class</MenuItem>
                     {this.renderClassOptions()}
                   </Select> : null
               }
               {
-                !this.state.availableClasses || this.state.spectralIndicesLoading ? 
+                !this.state.availableClasses || this.state.measurementsLoading ? 
                   <div style={{ position: 'relative', height: '50px' }}>
                     <CircularProgress className='loading-spinner'/>
                   </div> : null
               }
               {
-                !this.state.spectralIndicesLoading && this.state.spectralIndicesData[this.state.selectedClass] ?
+                !this.state.measurementsLoading && this.state.measurementsData[this.state.selectedClass] ?
                   <LineChart 
                     map={this.props.map} 
-                    data={this.state.spectralIndicesData[this.state.selectedClass]} 
-                    type={ViewerUtility.dataGraphType.spectralIndices}
+                    data={this.state.measurementsData[this.state.selectedClass]} 
+                    type={ViewerUtility.dataGraphType.measurements}
                     maxMask={this.state.maxMask}
                   /> : null
               }
             </CardContent>
             {
-              !this.state.spectralIndicesLoading && this.state.spectralIndicesData[this.state.selectedClass] ?
+              !this.state.measurementsLoading && this.state.measurementsData[this.state.selectedClass] ?
                 <CardActions className='analyse-card-actions'>
                   <IconButton
                     onClick={() => this.onDownloadData(true)}

@@ -1,4 +1,4 @@
-const apiUrl = "https://api.ellipsis-earth.com";
+const apiUrl = "https://api.ellipsis-earth.com/v1";
 // const apiUrl = "https://dev.api.ellipsis-earth.com";
 // const apiUrl = "http://localhost:7552";
 

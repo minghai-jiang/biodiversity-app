@@ -81,7 +81,7 @@ class LegendControl extends PureComponent {
     let availableClasses = getTypes(map.classes, 'classes', [
       ViewerUtility.specialClassName.blanc, ViewerUtility.specialClassName.mask, ViewerUtility.specialClassName.noClass
     ]);
-    let availableMeasurements = getTypes(map.spectralIndices, 'indices');
+    let availableMeasurements = getTypes(map.measurements, 'measurements');
     let availablePolygonLayers = getTypes(map.layers.polygon, 'layers');
     let availableCustomPolygonLayers = map.layers.customPolygon;
 

@@ -80,7 +80,7 @@ export class MapSelector extends PureComponent {
     let customPolygonLayersPromise = ApiManager.post('/geoMessage/customPolygon/layers', body, this.props.user);
 
     let classesPromise = ApiManager.post('/metadata/classes', body, this.props.user);
-    let spectralIndicesPromise = ApiManager.post('/metadata/spectral', body, this.props.user);
+    let measurementsPromise = ApiManager.post('/metadata/measurements', body, this.props.user);
 
     let promises = [
       timestampsPromise,
@@ -89,7 +89,7 @@ export class MapSelector extends PureComponent {
       customPolygonLayersPromise,
 
       classesPromise, 
-      spectralIndicesPromise
+      measurementsPromise
     ];
 
     return Promise.all(promises)
@@ -102,7 +102,7 @@ export class MapSelector extends PureComponent {
         };
 
         map.classes = results[4];
-        map.spectralIndices = results[5];
+        map.measurements = results[5];
 
         if (this.props.user && map.accessLevel >= ApiManager.accessLevels.addGeoMessages) {
           return ApiManager.post('/geomessage/getForms', body, this.props.user);

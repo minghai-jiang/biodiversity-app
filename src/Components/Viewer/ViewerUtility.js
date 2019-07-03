@@ -31,7 +31,7 @@ const ViewerUtility = {
 
   dataGraphType: {
     classes: 'classes',
-    spectralIndices: 'spectral_indices'
+    measurements: 'measurements'
   },
 
   specialClassName: {

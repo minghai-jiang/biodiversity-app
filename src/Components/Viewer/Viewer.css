@@ -55,60 +55,9 @@ div.content {
   background-color: #f4f4f4;
 }
 
-.leaflet-container
-{
+.leaflet-container {
   height: 100%;
   position: relative;
-}
-
-.leaflet-control
-{
-  font-size: 12pt;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.map-selector-div {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  z-index: 999;
-  top: 10px;
-}
-
-.map-selector-div > * {
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-}
-
-.time-range-selector {
-  position: absolute;
-  margin: 1em 25vw;
-  text-align: center;
-  z-index: 650;
-  top: 40px;
-}
-
-#loading-label-div {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    z-index: 999;
-    top: 110px;
-}
-
-#loading-label
-{
-    padding: 3px;
-    width: 40%;
-    background-color: #EEEEEE;
-    border: #ee7405;
-    border-width: 2px;
-    border-style: solid;
 }
 
 .classes-data-graph {
@@ -119,60 +68,12 @@ div.content {
   bottom: 350px;
 }
 
-.indices-data-graph {
+.measurements-data-graph {
   position: absolute;
   width: 500px;
   text-align: left;
   z-index: 999;
   bottom: 50px;
-}
-
-.max-masked-slider-div {
-    position: absolute;
-    width: 500px;
-    height: 50px;
-    text-align: left;
-    z-index: 999;
-    bottom: 0px;
-    left: 0px;
-}
-
-.sidebar {
-  position: absolute;
-  display: inline-block;
-  left: 0;
-  max-height: 320px;
-  height: 100%;
-  width: 320px;
-  padding: 10px 10px 10px 10px;
-  top: 190px;
-  z-index: 999;
-  background-color: #fff;
-  border-radius: 5px;
-}
-
-.leaflet-map {
-  display: inline-block;
-}
-
-.leaflet-control-layers {
-  text-align: left
-}
-
-.leaflet-control-layers-expanded
-{
-  min-height: 48px;
-  min-width: 48px;
-}
-
-div.viewer-button {
-  position: absolute;
-  /* top: 40vh; */
-  right: 0px;
-  width: 150px;
-  padding: 0.2em 0.7em;
-
-  z-index: 100000;
 }
 
 div.loading-spinner {

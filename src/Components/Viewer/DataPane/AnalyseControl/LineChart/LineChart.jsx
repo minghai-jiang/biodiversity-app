@@ -53,7 +53,7 @@ export class LineChart extends PureComponent {
       return null;
     }
 
-    let isSpectralIndices = type === ViewerUtility.dataGraphType.spectralIndices;
+    let isMeasurements = type === ViewerUtility.dataGraphType.measurements;
     let parsedData = data.parsed;
 
     if (data.raw === NO_DATA_RESULT || !parsedData || parsedData.data.length === 0) {
@@ -66,12 +66,12 @@ export class LineChart extends PureComponent {
 
     let columnInfo = null;
 
-    if (!isSpectralIndices) {
+    if (!isMeasurements) {
       let mapClasses = getUniqueLabels(this.props.map.classes, 'classes');
       columnInfo = mapClasses.filter(x => x.name !== ViewerUtility.specialClassName.noClass && x.name !== ViewerUtility.specialClassName.blanc);    
     }
-    else if (type === ViewerUtility.dataGraphType.spectralIndices) {
-      columnInfo = getUniqueLabels(this.props.map.spectralIndices, 'indices');
+    else if (type === ViewerUtility.dataGraphType.measurements) {
+      columnInfo = getUniqueLabels(this.props.map.measurements, 'measurements');
     }
     else {
       return null;
@@ -92,7 +92,7 @@ export class LineChart extends PureComponent {
       });
     }
 
-    if (isSpectralIndices) {
+    if (isMeasurements) {
       adjustedColumnInfo.push(CLOUD_COVER_COLUMN_INFO);
     }
 
@@ -115,7 +115,7 @@ export class LineChart extends PureComponent {
         let value = row[columnName];
         let date = Moment(row[DATE_COLUMN_NAME]).unix() * 1000;
 
-        if (!isSpectralIndices && columnName === ViewerUtility.specialClassName.mask && 
+        if (!isMeasurements && columnName === ViewerUtility.specialClassName.mask && 
           row[ViewerUtility.specialClassName.blanc]) {
           value += row[ViewerUtility.specialClassName.blanc];
         }
@@ -232,35 +232,6 @@ export class LineChart extends PureComponent {
         orientation='horizontal'
         items={legendItems}
       />
-    );
-
-    let chartDrawArea = this.state.chartDrawArea;
-
-    let graph = (
-      <FlexibleXYPlot
-        key={'plot'}
-        height={200}
-        xDomain={
-          chartDrawArea && [
-            chartDrawArea.left,
-            chartDrawArea.right
-          ]
-        }
-        yDomain={
-          chartDrawArea && [
-            chartDrawArea.top,
-            chartDrawArea.bottom
-          ]
-        }
-      >
-        {xAxis}
-        {yAxis}
-        {series}
-        {legend}
-        <Highlight
-          onBrushEnd={ area => this.setState({ chartDrawArea: area }) }
-        />
-      </FlexibleXYPlot>
     );
 
     return [xAxis, yAxis, series, legend];

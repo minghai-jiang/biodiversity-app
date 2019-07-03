@@ -185,14 +185,17 @@ class DataPane extends PureComponent {
     return (
       <div className='viewer-pane data-pane' style={style}>
 
-        <Card className='data-pane-title-card'>
+        <Card className='data-pane-title-card'>        
           <CardActions className={actionsClassName}>
-            <IconButton
-              aria-label='Home'
-              onClick={() => this.setState({ home: !home })}
-            >
-              {home && action ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-            </IconButton>
+            {
+              !home || action ? 
+                <IconButton
+                  aria-label='Home'
+                  onClick={() => this.setState({ home: !home })}
+                >
+                  {home ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                </IconButton> : null
+            }
           </CardActions>
           <CardHeader
             className='data-pane-title-header'
