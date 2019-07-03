@@ -311,6 +311,10 @@ class GeoMessageForm extends PureComponent {
   }
 
   createEmptyFormAnswers = (selectedForm) => {
+    if (!selectedForm) {
+      return [];
+    }
+
     let formAnswers = [];
 
     for (let i = 0; i < selectedForm.form.questions.length; i++) {
