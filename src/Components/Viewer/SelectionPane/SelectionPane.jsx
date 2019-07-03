@@ -84,30 +84,45 @@ class SelectionPane extends PureComponent {
     }
   }
 
-  onDownload = (layerName) => {
-    let data = this.layerGeoJsons[layerName];
+  onDownload = () => {
+    let element = this.props.element;
 
-    if (!data) {
+    if (!element) {
       return;
     }
 
-    let bounds = data.bounds;
+    let type = element.type;
+    let feature = element.feature;
 
-    let decimals = 4;
+    let nameComponents = [this.props.map.name];
 
-    let nameComponents = [
-      this.props.map.name,
-      'customPolygons',
-      layerName,
-      bounds.xMin.toFixed(decimals),
-      bounds.xMax.toFixed(decimals),
-      bounds.yMin.toFixed(decimals),
-      bounds.yMax.toFixed(decimals)
-    ];
+    if (type === ViewerUtility.standardTileLayerType) {
+      nameComponents.push(
+        'tile', 
+        feature.properties.tileX, 
+        feature.properties.tileY, 
+        feature.properties.zoom
+      );
+    }
+    else if (type === ViewerUtility.polygonLayerType) {
+      nameComponents.push('polygon', feature.properties.id);
+    }
+    else if (type === ViewerUtility.customPolygonTileLayerType) {
+      nameComponents.push('customPolygon', feature.properties.id);
+    }
+    else if (type === ViewerUtility.drawnPolygonLayerType) {
+      nameComponents.push('drawnPolygon');
+    }
 
     let fileName = nameComponents.join('_').replace(' ', '_') + '.geojson';
 
-    ViewerUtility.download(fileName, JSON.stringify(data.geoJson), 'application/json');
+    let geoJson = {
+      type: 'FeatureCollection',
+      count: 1,
+      features: [feature]
+    };
+    
+    ViewerUtility.download(fileName, JSON.stringify(geoJson), 'application/json');
   }
 
   render() {
@@ -246,12 +261,20 @@ class SelectionPane extends PureComponent {
             </Button>
           }
           action={
-            <IconButton
-              onClick={this.onCloseClick}
-              aria-label='Close'
-            >
-              <ClearIcon />
-            </IconButton>
+            <div>
+              <IconButton
+                onClick={this.onDownload}
+                aria-label='Download'
+              >
+                <SaveAlt />
+              </IconButton>
+              <IconButton
+                onClick={this.onCloseClick}
+                aria-label='Close'
+              >
+                <ClearIcon />
+              </IconButton>
+            </div>
           }
         />
         <CardContent className={'card-content'}>
