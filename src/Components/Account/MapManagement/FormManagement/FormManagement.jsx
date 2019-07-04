@@ -43,7 +43,7 @@ class FormManagment extends PureComponent {
   }
 
   deleteFrom = (cellInfo) => {
-      ApiManager.fetch('POST', '/geoMessage/deleteForm', {"mapId": this.props.map.id, "formName":this.state.forms[cellInfo.index]['foformNamermname']}, this.props.user)
+      ApiManager.fetch('POST', '/geoMessage/deleteForm', {"mapId": this.props.map.id, "formName":this.state.forms[cellInfo.index]['formName']}, this.props.user)
         .then(() => {
           this.state.forms.splice(cellInfo.index,1)
         }).then(() => {
