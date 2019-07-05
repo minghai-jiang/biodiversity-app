@@ -7,6 +7,8 @@ const CUSTOM_POLYGON = 'custom_polygon'
 
 const ViewerUtility = {
 
+  admin: 'admin',
+
   tileLayerType: TILE,
   standardTileLayerType: STANDARD_TILE,
   polygonLayerType: POLYGON,

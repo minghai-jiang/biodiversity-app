@@ -7,6 +7,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 
 import './MapSelector.css';
+import ViewerUtility from '../../ViewerUtility';
+
+const ADMIN_ATLAS = 'Development';
 
 export class MapSelector extends PureComponent {
   constructor(props) {
@@ -14,9 +17,12 @@ export class MapSelector extends PureComponent {
 
     this.state = {
       maps: [],
-      mapOptions: [],
 
-      selectedMap: { id: 'default' }
+      atlasSelect: null,
+      mapselect: null,
+
+      selectedAtlas: 'default',
+      selectedMap: { id: 'default' },      
     };
   }
   
@@ -33,6 +39,7 @@ export class MapSelector extends PureComponent {
   getMaps = async () => {
     ApiManager.get('/account/myMaps', null, this.props.user)
       .then(maps => {
+        maps.sort((a, b) => { return a.name.localeCompare(b.name); });
         this.setState({ maps: maps });
       })
       .catch(err => {
@@ -40,7 +47,17 @@ export class MapSelector extends PureComponent {
       });
   }
 
-  selectMap = (e) => {
+  onSelectAtlas = (e) => {
+    let atlas = e.target.value;
+
+    if (this.state.selectedAtlas === atlas) {
+      return;
+    }
+
+    this.setState({ selectedAtlas: atlas, selectedMap: { id: 'default' }});
+  }
+
+  onSelectMap = (e) => {
     if (!e.target.value) {
       return;
     } 
@@ -50,7 +67,6 @@ export class MapSelector extends PureComponent {
     if (!map) {
       return;
     }
-
 
     this.setState({ selectedMap: map });
 
@@ -118,28 +134,91 @@ export class MapSelector extends PureComponent {
       });
   }
 
-  renderMapOptions = () => {
+  renderAtlasSelect = () => {
+    let maps = this.state.maps;
+
+    if (!maps || maps.length === 0) {
+      return null;
+    }
+
     let options = [];
-    if (this.state.maps.length > 0)
-    {
-      for (let i = 0; i < this.state.maps.length; i++)
-      {
-        let map = this.state.maps[i];
-        options.push(
-          <MenuItem value={map.id} key={i}>{map.name}</MenuItem>
-        );
+
+    let atlases = [];
+
+    for (let i = 0; i < maps.length; i++) {
+      let map = maps[i];
+
+      if (!map.atlases) {
+        continue;
+      }
+
+      for (let x = 0; x < map.atlases.length; x++) {
+        if (!atlases.includes(map.atlases[x])) {
+          atlases.push(map.atlases[x]);
+        }
       }
     }
 
-    return options;
+    atlases.sort();
+
+    if (this.props.user && this.props.user.username === ViewerUtility.admin) {
+      atlases.push(ADMIN_ATLAS);
+    }
+
+    for (let i = 0; i < atlases.length; i++) {
+      options.push(
+        <MenuItem value={atlases[i]} key={i}>{atlases[i]}</MenuItem>
+      );  
+    }
+
+    let atlasSelect = (
+      <Select className='selector map-selector-select' onChange={this.onSelectAtlas} value={this.state.selectedAtlas}>
+        <MenuItem value='default' disabled hidden>Select an Atlas</MenuItem>
+        {options}
+      </Select>
+    );    
+
+    return atlasSelect;
+  }
+
+  renderMapSelect = () => {
+    let maps = this.state.maps;
+    let selectedAtlas = this.state.selectedAtlas;
+
+    if (!maps || !selectedAtlas || selectedAtlas === 'default') {
+      return null;
+    }
+
+    let mapsOfAtlas = maps;
+    if (selectedAtlas !== ADMIN_ATLAS) {
+      mapsOfAtlas = maps.filter(x => x.atlases.includes(selectedAtlas));
+    } 
+
+    let options = [];
+
+    for (let i = 0; i < mapsOfAtlas.length; i++) {
+      let map = mapsOfAtlas[i];
+      options.push(
+        <MenuItem value={map.id} key={i}>{map.name}</MenuItem>
+      );
+    }
+
+    let mapSelect = (
+      <Select className='selector' onChange={this.onSelectMap} value={this.state.selectedMap.id}>
+        <MenuItem value='default' disabled hidden>Select a map</MenuItem>
+        {options}
+      </Select>
+    )
+
+    return mapSelect;
   };
 
   render() {
     return (
-      <Select key='map-selector' className='selector' onChange={this.selectMap} value={this.state.selectedMap.id}>
-        <MenuItem value='default' disabled hidden>Select a Map</MenuItem>
-        {this.renderMapOptions()}
-      </Select>
+      <div>
+        {this.renderAtlasSelect()}
+        {this.renderMapSelect()}
+      </div>
     );
   }
 }
