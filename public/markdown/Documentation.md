@@ -15,9 +15,9 @@ People wanting to use the API for analysis purposes can best visit the tutorial 
       5.1.1 <a href='#data_class_custom'>/data/class/customPolygon</a> <br/>
       5.1.2 <a href='#data_class_polygon'>/data/class/polygon</a> <br/>
       5.1.3 <a href='#data_class_tile'>/data/class/tile</a> <br/>
-      5.2 <a href='#data_index'>*/data/spectral*</a><br/>
-      5.2.1 <a href='#data_index'>/data/spectral/customPolygon</a> <br/>
-      5.2.2 <a href='#data_index'>/data/spectral/polygon</a> <br/>
+      5.2 <a href='#data_index'>*/data/measurement*</a><br/>
+      5.2.1 <a href='#data_index'>/data/measurement/customPolygon</a> <br/>
+      5.2.2 <a href='#data_index'>/data/measurement/polygon</a> <br/>
       5.2.3 <a href='#data_index'>/data/spectral/tile</a> <br/>
 6. <a href='#geometry'>**/geometry**</a><br/>
 7. <a href='#visual'>**/visual**</a>
@@ -57,7 +57,7 @@ The required access level is mentioned for each API call that requires them in t
 The API is throttled. Each user has a limited number of credits each minute. You can find the credit costs for each call in the documentation below. Credit is refilled each minute on the minute.
 
 <a id='Route'></a>
-# Routes
+# Route
 All requests should be directed to the following base url followed by the metntioned extension.
 
 
@@ -773,7 +773,7 @@ Image in base64 format of the geoMessage.
 
 <a id='forms'></a>
 ## /geoMessage/forms
-#### NEW Post /addForm
+#### Post /addForm
 
 
 ```python
@@ -790,7 +790,7 @@ type: Whether the property is boolean, numeric of character. <br/>
 **Returns**<br/>
 status 200 if form was added.
 
-#### NEW Post /deleteForm
+#### Post /deleteForm
 
 
 ```python
@@ -804,7 +804,7 @@ formName: The name of the form to be deleted. <br/>
 **Returns**<br/>
 status 200 if form was deleted.
 
-#### NEW Post /alterForm
+#### Post /alterForm
 
 
 ```python
@@ -821,7 +821,7 @@ type: Whether the property is boolean, numeric of character. <br/>
 **Returns**<br/>
 status 200 if form was deleted.
 
-#### NEW Post /getForms
+#### Post /getForms
 
 
 ```python
@@ -833,6 +833,20 @@ Retrieves all excisting forms of a map with properties. (Access level: 400, cred
 mapId: The id of the map.<br/>
 **Returns**<br/>
 Returns a JSON with form names and properties.
+
+When submitting a geoMessage, you can attach a form by adding the following json
+
+
+```python
+formJSON = {
+            "answers":[
+                        {"type":"boolean","answer":true,"question":"Boolean question"},
+                        {"type":"text","answer":"Hi!","question":"Text question"},
+                        {"type":"numeric","answer":321,"question":"Numeric question"}],
+            "formName":"Test form"
+            }
+
+```
 
 <a id='message_tile'></a>
 ## /geoMessage/tile

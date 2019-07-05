@@ -7,7 +7,7 @@ The acquisition of the data has been paid for and made publicly available by IUC
 
 ## Programming a deforestation alert bot
 
-Using python and the Ellipsis API we will write a bot program identifying all reserves that have suffered forest loss. The bot will request the total surface area of non-forest in all reserves at 1 july 2018 and flag all situations in which the total non-forest area seems suspicious.
+Using python and the Ellipsis API we will write a bot program to help us analyzing the deforestation in the Gran Chaco.
 
 We will be requiring the following python packages
 
@@ -40,7 +40,7 @@ Lastly we store the id of the chaco_demo map in a variable as well.
 ```python
 r = requests.get(url + 'account/myMaps')
 r = r.json()
-mapId = [map['uuid'] for map in r if map['name'] == 'Gran Chaco'][0]
+mapId = [map['id'] for map in r if map['name'] == 'Gran Chaco'][0]
 mapId
 ```
 
@@ -53,53 +53,19 @@ mapId
 
 Next we should request the available timestamps for this map.
 
+# Reserves lacking forest
+
+Let save the highest, and therefore most recent, timestamp into a variable.
+
 
 ```python
 r = requests.post(url + 'metadata/timestamps',
                  json = {"mapId":  mapId })
 
 r = r.json()
-r
-```
-
-
-
-
-    [{'timestampNumber': 0,
-      'dateFrom': '2016-07-01T00:00:00.000Z',
-      'dateTo': '2016-07-31T00:00:00.000Z'},
-     {'timestampNumber': 1,
-      'dateFrom': '2016-11-01T00:00:00.000Z',
-      'dateTo': '2016-12-01T00:00:00.000Z'},
-     {'timestampNumber': 2,
-      'dateFrom': '2017-01-01T00:00:00.000Z',
-      'dateTo': '2017-01-31T00:00:00.000Z'},
-     {'timestampNumber': 3,
-      'dateFrom': '2017-04-01T00:00:00.000Z',
-      'dateTo': '2017-05-01T00:00:00.000Z'},
-     {'timestampNumber': 4,
-      'dateFrom': '2017-07-01T00:00:00.000Z',
-      'dateTo': '2017-07-31T00:00:00.000Z'},
-     {'timestampNumber': 5,
-      'dateFrom': '2017-10-01T00:00:00.000Z',
-      'dateTo': '2017-10-31T00:00:00.000Z'},
-     {'timestampNumber': 6,
-      'dateFrom': '2018-01-01T00:00:00.000Z',
-      'dateTo': '2018-01-31T00:00:00.000Z'},
-     {'timestampNumber': 7,
-      'dateFrom': '2018-04-01T00:00:00.000Z',
-      'dateTo': '2018-05-01T00:00:00.000Z'},
-     {'timestampNumber': 8,
-      'dateFrom': '2018-07-01T00:00:00.000Z',
-      'dateTo': '2018-07-31T00:00:00.000Z'}]
-
-
-
-Let save the highest, and therefore most recent, timestamp into a variable.
-
-
-```python
+min_timestamp = 0
 max_timestamp = len(r)
+
 ```
 
 Having done this, we request all the id's of reserves.
@@ -116,50 +82,80 @@ A long list of almost 80.000 polygons! There is a max of 3000 polygons per reque
 
 
 ```python
+
 ids_chunks = chunks(ids, 3000)
 ```
 
-Now we are ready to obtain the total deforested surface area of all reserves. We will request the total deforested area for each reserve for all timestamps and take the minimum surface area as the value we were looking for. We do this as the model can make classification mistakes, by multilooking and taking the minimum we counter these one-off mistakes.
+Now we are ready to obtain the total deforested surface area of all reserves.
+
+We will request the total deforested area for each reserve for all timestamps and take the median surface area as the value we were looking for. All the while we will ignore all measurements in which there was any cloudcover.
+
+This strategy of multilooking counters the one off mistakes that the model may maken.
 
 
 ```python
 Data = list()
 for ids_chunk in ids_chunks:
     new_data = list()
-    for timestamp in np.arange(max_timestamp):
+    for timestamp in np.arange(min_timestamp, max_timestamp):
         r = requests.post(url + 'data/class/polygon/polygonIds',
                  json = {"mapId":  mapId, 'timestamp': int(timestamp), 'polygonIds': ids_chunk })
         new_data.append(pd.read_csv(StringIO(r.text)))
         
     deforested = [x['no class'].values for x in new_data]
-    deforested = np.minimum.reduce(deforested)
+    clouds = [x['mask'].values for x in new_data]
+
+    deforested_end = []
+    for i in np.arange(len(deforested[0])):
+        timeserie = []
+        for j in np.arange(len(deforested)):
+            if clouds[j][i] > 0:
+                pass
+            else:
+                timeserie = timeserie + [deforested[j][i] ]
+            
+        deforested_end = deforested_end +  [np.median(timeserie)]
         
-    new_data = pd.DataFrame({'id':new_data[0]['id'].values, 'area':new_data[0]['area'].values, 'deforested':deforested})
+    new_data = pd.DataFrame({'id':new_data[0]['id'].values, 'area':new_data[0]['area'].values, 'deforested':deforested_end})
     
     Data.append(new_data)
 Data = pd.concat(Data)
 ```
 
-Now let's select all reserves in which more than 0.5 km2 is non-forest.
+Let's calculate the total amount of non-natural vegetation within reserves in the Gran-Chaco.
 
 
 ```python
-Data_sub = Data.loc[Data['deforested'] > 0.5]
+Data['deforested'].sum()
 ```
 
-Let's only consider cases in which the reserve area is larger than 5km2
+
+
+
+    8876.581
+
+
+
+Now let's select all reserves in which lack mare than 1km2 of forest and count the number we are left with.
 
 
 ```python
-Data_sub = Data_sub.loc[Data_sub['area'] > 5 ]
+Data_sub = Data.loc[ Data['deforested'] > 1]
+Data_sub.shape[0]
 ```
 
-Now let's have a loot at the resereves we are now left with.
+
+
+
+    1475
+
+
+
+Let's sort the resutl and display it in a table.
 
 
 ```python
-Data_sub['id'] = [int(id) for id in Data_sub['id'].values]
-Data_sub.sort_values(by = 'deforested', ascending  = False).head(30)
+Data_sub.sort_values(by = 'deforested', ascending  = False).head(10)
 ```
 
 
@@ -190,184 +186,64 @@ Data_sub.sort_values(by = 'deforested', ascending  = False).head(30)
   </thead>
   <tbody>
     <tr>
-      <th>2220</th>
-      <td>92200</td>
-      <td>45.132</td>
-      <td>33.263</td>
-    </tr>
-    <tr>
-      <th>2033</th>
-      <td>59013</td>
-      <td>40.781</td>
-      <td>30.494</td>
-    </tr>
-    <tr>
       <th>279</th>
       <td>45259</td>
       <td>52.877</td>
-      <td>29.376</td>
+      <td>36.600</td>
+    </tr>
+    <tr>
+      <th>2220</th>
+      <td>92200</td>
+      <td>45.132</td>
+      <td>34.220</td>
     </tr>
     <tr>
       <th>991</th>
       <td>72971</td>
       <td>45.647</td>
-      <td>27.502</td>
+      <td>33.425</td>
     </tr>
     <tr>
-      <th>705</th>
-      <td>87685</td>
-      <td>59.407</td>
-      <td>26.034</td>
-    </tr>
-    <tr>
-      <th>725</th>
-      <td>87705</td>
-      <td>59.407</td>
-      <td>26.034</td>
+      <th>2033</th>
+      <td>59013</td>
+      <td>40.781</td>
+      <td>32.117</td>
     </tr>
     <tr>
       <th>800</th>
       <td>72780</td>
       <td>39.197</td>
-      <td>25.805</td>
+      <td>28.874</td>
     </tr>
     <tr>
-      <th>1788</th>
-      <td>115768</td>
-      <td>34.383</td>
-      <td>22.166</td>
+      <th>705</th>
+      <td>87685</td>
+      <td>59.407</td>
+      <td>28.613</td>
+    </tr>
+    <tr>
+      <th>725</th>
+      <td>87705</td>
+      <td>59.407</td>
+      <td>28.613</td>
     </tr>
     <tr>
       <th>2451</th>
       <td>68431</td>
       <td>34.383</td>
-      <td>22.166</td>
+      <td>24.893</td>
     </tr>
     <tr>
-      <th>1854</th>
-      <td>55834</td>
-      <td>22.229</td>
-      <td>17.331</td>
+      <th>1788</th>
+      <td>115768</td>
+      <td>34.383</td>
+      <td>24.893</td>
     </tr>
     <tr>
-      <th>1433</th>
-      <td>118413</td>
-      <td>36.178</td>
-      <td>16.958</td>
-    </tr>
-    <tr>
-      <th>2003</th>
-      <td>91983</td>
-      <td>18.325</td>
-      <td>15.230</td>
-    </tr>
-    <tr>
-      <th>456</th>
-      <td>93436</td>
-      <td>22.125</td>
-      <td>15.218</td>
-    </tr>
-    <tr>
-      <th>2239</th>
-      <td>92219</td>
-      <td>19.734</td>
-      <td>15.031</td>
-    </tr>
-    <tr>
-      <th>2351</th>
-      <td>92331</td>
-      <td>23.381</td>
-      <td>14.776</td>
-    </tr>
-    <tr>
-      <th>243</th>
-      <td>93223</td>
-      <td>24.285</td>
-      <td>14.214</td>
-    </tr>
-    <tr>
-      <th>1029</th>
-      <td>73009</td>
-      <td>18.452</td>
-      <td>13.590</td>
-    </tr>
-    <tr>
-      <th>356</th>
-      <td>114336</td>
-      <td>18.452</td>
-      <td>13.590</td>
-    </tr>
-    <tr>
-      <th>1305</th>
-      <td>58285</td>
-      <td>33.591</td>
-      <td>13.550</td>
-    </tr>
-    <tr>
-      <th>1603</th>
-      <td>94583</td>
-      <td>18.628</td>
-      <td>12.861</td>
-    </tr>
-    <tr>
-      <th>2009</th>
-      <td>91989</td>
-      <td>33.396</td>
-      <td>12.586</td>
-    </tr>
-    <tr>
-      <th>1346</th>
-      <td>79326</td>
-      <td>20.994</td>
-      <td>12.577</td>
-    </tr>
-    <tr>
-      <th>293</th>
-      <td>84273</td>
-      <td>26.191</td>
-      <td>12.350</td>
-    </tr>
-    <tr>
-      <th>2027</th>
-      <td>77007</td>
-      <td>26.191</td>
-      <td>12.350</td>
-    </tr>
-    <tr>
-      <th>177</th>
-      <td>108157</td>
-      <td>27.075</td>
-      <td>12.339</td>
-    </tr>
-    <tr>
-      <th>161</th>
-      <td>48141</td>
-      <td>38.709</td>
-      <td>12.164</td>
-    </tr>
-    <tr>
-      <th>2611</th>
-      <td>74591</td>
-      <td>26.902</td>
-      <td>12.044</td>
-    </tr>
-    <tr>
-      <th>1576</th>
-      <td>55556</td>
-      <td>20.706</td>
-      <td>11.854</td>
-    </tr>
-    <tr>
-      <th>1942</th>
-      <td>61922</td>
-      <td>24.145</td>
-      <td>11.200</td>
-    </tr>
-    <tr>
-      <th>2337</th>
-      <td>110317</td>
-      <td>31.271</td>
-      <td>10.782</td>
+      <th>2732</th>
+      <td>50712</td>
+      <td>45.748</td>
+      <td>20.182</td>
     </tr>
   </tbody>
 </table>
@@ -375,34 +251,330 @@ Data_sub.sort_values(by = 'deforested', ascending  = False).head(30)
 
 
 
-We found that about a 1000 of the 80.000 reserves seem to have sufered deforestation in some form. Let us now retrieve the polygons of these reserves to continue our analysis.
+We found that about a 1500 of the 80.000 reserves seem to have sufered deforestation in some form. In total all reserves together lost about 9000km2 of forest.
+
+# Deforestation
+
+In this example we search for all standard tiles that suffered forest loss.
+
+We compare the median between timestamp 0 to 2 and timestamp 7 to 9.
 
 
 ```python
-r = requests.post(url + 'geometry/polygons',
-                 json = {"mapId":  mapId, 'polygonIds':list(Data_sub['id']) })
-r.json()
-r  = gpd.GeoDataFrame.from_features(r.json()['features'])
+timestamp1 = 2
+timestamp2 = 10
 ```
 
-We finish by merging our deforestation data with this shape.
+The first step is to find all tiles present in the map and split them up in chunks that we can request at once.
 
 
 ```python
-r['id'] = [int(id) for id in r['id'].values]
-test = r.merge(Data_sub, on  = ['id'])
-test.plot()
+r = requests.post(url + 'metadata/tiles',
+                 json = {"mapId":  mapId })
+
+ids = r.json()['ids']
+
+def chunks(l, n = 3000):
+    result = list()
+    for i in range(0, len(l), n):
+        result.append(l[i:i+n])
+    return(result)
+
+
+
+ids_chunks = chunks(ids, 3000)
+```
+
+We now construct two dataframes. One for the median forest cover between timestamp 0 and 2 and another one for timestamp 7 to 9. We remove all timestamps in which the tile sufered cloudcover.
+
+
+```python
+Data = list()
+for ids_chunk in ids_chunks:
+    r = requests.post(url + 'data/class/tile/tileIds',
+                 json = {"mapId":  mapId, 'timestamp': int(timestamp1), 'tileIds': ids_chunk })
+    Data.append(pd.read_csv(StringIO(r.text)))
+    
+Data1 = pd.concat(Data)
+
+Data = list()
+for ids_chunk in ids_chunks:
+    r = requests.post(url + 'data/class/tile/tileIds',
+                 json = {"mapId":  mapId, 'timestamp': int(timestamp2), 'tileIds': ids_chunk })
+    Data.append(pd.read_csv(StringIO(r.text)))
+    
+Data2 = pd.concat(Data)
+
+
+```
+
+We merge the results into one dataframe. Simple subtraction gives us the amount of forest loss.
+
+
+```python
+Data2 = Data2.rename(columns = {'mask': 'mask 2','blanc':'blanc 2', 'no class':'no class 2', 'area':'area2', 'forest': 'forest 2', 'other': 'other 2'})
+Data = Data1.merge(Data2, on = ['tileX','tileY', 'zoom'])
+Data['forest loss'] = Data['no class 2'] - Data['no class']
+```
+
+Let's select all tiles that have lost over 0.6km2 of forest and display them in a table.
+
+
+```python
+Data_sub = Data.loc[Data['forest loss'] > 0.6]
+
+
+Data_sub.sort_values(by = 'forest loss', ascending  = False).head(10)
 ```
 
 
 
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f733bb9bc50>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tileX</th>
+      <th>tileY</th>
+      <th>zoom</th>
+      <th>blanc</th>
+      <th>forest</th>
+      <th>mask</th>
+      <th>no class</th>
+      <th>other</th>
+      <th>area</th>
+      <th>blanc 2</th>
+      <th>forest 2</th>
+      <th>mask 2</th>
+      <th>no class 2</th>
+      <th>other 2</th>
+      <th>area2</th>
+      <th>forest loss</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>97074</th>
+      <td>5339</td>
+      <td>9004</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>5.408</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.408</td>
+      <td>0.0</td>
+      <td>0.055</td>
+      <td>0.0</td>
+      <td>5.353</td>
+      <td>0.000</td>
+      <td>5.408</td>
+      <td>5.353</td>
+    </tr>
+    <tr>
+      <th>133094</th>
+      <td>5342</td>
+      <td>9006</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>5.405</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.405</td>
+      <td>0.0</td>
+      <td>0.091</td>
+      <td>0.0</td>
+      <td>5.294</td>
+      <td>0.020</td>
+      <td>5.405</td>
+      <td>5.294</td>
+    </tr>
+    <tr>
+      <th>181149</th>
+      <td>5350</td>
+      <td>9026</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>5.379</td>
+      <td>0.001</td>
+      <td>0.0</td>
+      <td>5.380</td>
+      <td>0.0</td>
+      <td>0.092</td>
+      <td>0.0</td>
+      <td>5.288</td>
+      <td>0.000</td>
+      <td>5.380</td>
+      <td>5.287</td>
+    </tr>
+    <tr>
+      <th>163079</th>
+      <td>5342</td>
+      <td>9008</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>5.402</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.402</td>
+      <td>0.0</td>
+      <td>0.118</td>
+      <td>0.0</td>
+      <td>5.284</td>
+      <td>0.000</td>
+      <td>5.402</td>
+      <td>5.284</td>
+    </tr>
+    <tr>
+      <th>172103</th>
+      <td>5342</td>
+      <td>9004</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>5.311</td>
+      <td>0.096</td>
+      <td>0.0</td>
+      <td>5.408</td>
+      <td>0.0</td>
+      <td>0.043</td>
+      <td>0.0</td>
+      <td>5.365</td>
+      <td>0.000</td>
+      <td>5.408</td>
+      <td>5.269</td>
+    </tr>
+    <tr>
+      <th>77641</th>
+      <td>5534</td>
+      <td>9114</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>5.265</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.265</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.265</td>
+      <td>0.000</td>
+      <td>5.265</td>
+      <td>5.265</td>
+    </tr>
+    <tr>
+      <th>116654</th>
+      <td>5529</td>
+      <td>9119</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>5.258</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.258</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.258</td>
+      <td>0.000</td>
+      <td>5.258</td>
+      <td>5.258</td>
+    </tr>
+    <tr>
+      <th>188684</th>
+      <td>5536</td>
+      <td>9119</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>5.258</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.258</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.258</td>
+      <td>0.000</td>
+      <td>5.258</td>
+      <td>5.258</td>
+    </tr>
+    <tr>
+      <th>136088</th>
+      <td>5342</td>
+      <td>9007</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>0.000</td>
+      <td>5.374</td>
+      <td>0.030</td>
+      <td>0.0</td>
+      <td>5.404</td>
+      <td>0.0</td>
+      <td>0.115</td>
+      <td>0.0</td>
+      <td>5.287</td>
+      <td>0.002</td>
+      <td>5.404</td>
+      <td>5.257</td>
+    </tr>
+    <tr>
+      <th>32612</th>
+      <td>5530</td>
+      <td>9119</td>
+      <td>14</td>
+      <td>0.0</td>
+      <td>5.258</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.258</td>
+      <td>0.0</td>
+      <td>0.004</td>
+      <td>0.0</td>
+      <td>5.254</td>
+      <td>0.000</td>
+      <td>5.258</td>
+      <td>5.254</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+In order to get a grasp of the magnitude we calculate the total forest loss of all of these tile combined.
+
+
+```python
+Data_sub['forest loss'].sum()
+```
 
 
 
 
-![png](output_27_1.png)
+    24320.201
+
 
 
 ## Looking at a specific case
@@ -439,7 +611,7 @@ plt.imshow(img)
 
 
 
-![png](output_32_2.png)
+![png](output_42_2.png)
 
 
 
@@ -464,7 +636,7 @@ plt.imshow(img)
 
 
 
-![png](output_33_2.png)
+![png](output_43_2.png)
 
 
 Yes there has indeed been some deforestation in the lower right corner there.
