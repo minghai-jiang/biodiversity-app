@@ -173,7 +173,9 @@ export class MapSelector extends PureComponent {
 
     atlases.sort();
 
-    if (this.props.user && this.props.user.username === ViewerUtility.admin) {
+    let user = this.props.user;
+
+    if (user && (user.username === ViewerUtility.admin || user.username === 'demo_user')) {
       atlases.push(ADMIN_ATLAS);
       atlasMapCount[ADMIN_ATLAS] = maps.length; 
     }

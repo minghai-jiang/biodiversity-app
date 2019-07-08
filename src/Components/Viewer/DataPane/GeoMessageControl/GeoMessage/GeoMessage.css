@@ -8,6 +8,10 @@
   margin-left: auto;
 }
 
+div.geomessage-card-private {
+  background-color: #eaeaea;
+}
+
 div.geomessage-card-header {
   padding: 8px;
 }

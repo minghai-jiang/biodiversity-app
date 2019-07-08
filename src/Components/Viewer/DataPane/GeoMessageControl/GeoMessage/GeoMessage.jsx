@@ -180,11 +180,14 @@ class GeoMessage extends PureComponent {
     let message = this.props.message;
 
     let isOwnCard = this.props.user && message.user.toLowerCase() === this.props.user.username.toLowerCase();
-    let mayDelete = isOwnCard || this.props.map.accessLevel >= ApiManager.accessLevels.deleteGeomessages;
+    let mayDelete = !message.noDelete && (isOwnCard || this.props.map.accessLevel >= ApiManager.accessLevels.deleteGeomessages);
 
     let cardClass = 'geomessage-card';
     if (isOwnCard) {
       cardClass += ' geomessage-card-own';
+    }
+    if (message.isPrivate) {
+      cardClass += ' geomessage-card-private';
     }
 
     let imageAttachment = null;

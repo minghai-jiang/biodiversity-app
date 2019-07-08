@@ -52,6 +52,7 @@ class GeoMessageForm extends PureComponent {
 
       hasPermissions: false,
       messageText: '',
+      private: false,
 
       selectedFormName: 'default',
 
@@ -154,6 +155,14 @@ class GeoMessageForm extends PureComponent {
     this.setState({ expanded: !this.state.expanded });
   }
 
+  onMessageChange = (e) => {
+    this.setState({ messageText: e.target.value });
+  }
+
+  onPrivateMessageChange = (e) => {
+    this.setState({ private: e.target.checked });
+  }
+
   onImageChange = (e) => {
     e.preventDefault();
 
@@ -227,7 +236,8 @@ class GeoMessageForm extends PureComponent {
         mapId: this.props.map.id,
         timestamp: timestamp.timestampNumber,
         message: this.state.messageText,
-        image: this.uploadedImage
+        image: this.uploadedImage,
+        private: this.state.private
       };
       
       let element = this.props.element;
@@ -299,6 +309,7 @@ class GeoMessageForm extends PureComponent {
             expanded: false, 
             loading: false, 
             messageText: '',
+            private: false,
             formAnswers: formAnswers
           });
         })
@@ -328,10 +339,6 @@ class GeoMessageForm extends PureComponent {
 
     return formAnswers
 
-  }
-
-  onMessageChange = (e) => {
-    this.setState({ messageText: e.target.value });
   }
 
   onSelectForm = (e) => {
@@ -364,6 +371,7 @@ class GeoMessageForm extends PureComponent {
     let user = this.props.user;
     let hasAddPermission = user && this.props.map.accessLevel >= ApiManager.accessLevels.addGeoMessages;
     let hasAddImagePermission = user && this.props.map.accessLevel >= ApiManager.accessLevels.addGeoMessageImage;
+    let hasPrivateMessagePermission = user && this.props.map.accessLevel >= ApiManager.accessLevels.addPrivateGeoMessage;
 
     let title = 'Add GeoMessage';
     if (!user) {
@@ -431,8 +439,18 @@ class GeoMessageForm extends PureComponent {
                     accept='image/*' 
                     onChange={this.onImageChange}
                   />
-                </div>
-                : 'Insufficient permissions to add image'
+                </div> : null
+            }
+            {
+              hasPrivateMessagePermission ?
+                <div>
+                  Private:
+                  <Checkbox
+                    color='primary'
+                    checked={this.state.private}
+                    onChange={this.onPrivateMessageChange}
+                  />
+                </div> : null
             }
             </div>  
             <div className='geomessage-form-section'>
