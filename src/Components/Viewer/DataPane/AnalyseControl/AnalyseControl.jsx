@@ -87,23 +87,30 @@ class AnalyseControl extends PureComponent {
   }
 
   getAvailableClasses = () => {
-    let availableClasses = [ViewerUtility.specialClassName.allClasses];
+    let availableClasses = [];
 
-    for (let i = 0; i < this.props.map.classes.length; i++) {
-      let timestampClasses = this.props.map.classes[i];
-
-      for (let x = 0; x < timestampClasses.classes.length; x++) {
-        let className = timestampClasses.classes[x].name;
-
-        if (className === ViewerUtility.specialClassName.blanc || className === ViewerUtility.specialClassName.mask) {
-          continue;
-        }
-
-        if (!availableClasses.includes(className)) {
-          availableClasses.push(className);
+    let map = this.props.map;
+    
+    if (!map.perClass) {
+      availableClasses.push(ViewerUtility.specialClassName.allClasses);
+    }
+    else {
+      for (let i = 0; i < map.classes.length; i++) {
+        let timestampClasses = map.classes[i];
+  
+        for (let x = 0; x < timestampClasses.classes.length; x++) {
+          let className = timestampClasses.classes[x].name;
+  
+          if (className === ViewerUtility.specialClassName.blanc || className === ViewerUtility.specialClassName.mask) {
+            continue;
+          }
+  
+          if (!availableClasses.includes(className)) {
+            availableClasses.push(className);
+          }
         }
       }
-    }
+    }  
 
     this.setState({ availableClasses: availableClasses });
   }
