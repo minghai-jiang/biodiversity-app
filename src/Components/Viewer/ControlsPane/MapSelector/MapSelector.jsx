@@ -144,6 +144,7 @@ export class MapSelector extends PureComponent {
     let options = [];
 
     let atlases = [];
+    let atlasMapCount = {};
 
     for (let i = 0; i < maps.length; i++) {
       let map = maps[i];
@@ -153,21 +154,33 @@ export class MapSelector extends PureComponent {
       }
 
       for (let x = 0; x < map.atlases.length; x++) {
-        if (!atlases.includes(map.atlases[x])) {
-          atlases.push(map.atlases[x]);
+        let atlas = map.atlases[x];
+
+        if (!atlases.includes(atlas)) {
+          atlases.push(atlas);
         }
+
+        if (!atlasMapCount[atlas]) {
+          atlasMapCount[atlas] = 1;
+        }
+        else {
+          atlasMapCount[atlas] += 1; 
+        }
+
       }
+
     }
 
     atlases.sort();
 
     if (this.props.user && this.props.user.username === ViewerUtility.admin) {
       atlases.push(ADMIN_ATLAS);
+      atlasMapCount[ADMIN_ATLAS] = maps.length; 
     }
 
     for (let i = 0; i < atlases.length; i++) {
       options.push(
-        <MenuItem value={atlases[i]} key={i}>{atlases[i]}</MenuItem>
+        <MenuItem value={atlases[i]} key={i}>{`${atlases[i]} (${atlasMapCount[atlases[i]]})`}</MenuItem>
       );  
     }
 
