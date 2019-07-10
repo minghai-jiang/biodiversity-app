@@ -64,8 +64,9 @@ const ViewerUtility = {
   download: (filename, text, mime) => {
     let blob = new Blob([text], {type: `${mime};charset=utf-8`});
     FileSaver.saveAs(blob, filename);
-  }
+  },
 
+  isPrivateProperty: 'isPrivate'
 
 }
 

@@ -297,7 +297,8 @@ class GeoMessageForm extends PureComponent {
             thumbnail: this.uploadedImage,
             fullImage: this.uploadedImage,
             date: Moment().format(),
-            form: body.form
+            form: body.form,
+            isPrivate: this.state.private
           };
 
           this.props.onNewMessage(newMessage);

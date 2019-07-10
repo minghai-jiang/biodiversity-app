@@ -11,7 +11,8 @@ import {
   MenuItem,
   Collapse,
   IconButton,
-  TextField
+  TextField,
+  Checkbox
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -31,6 +32,7 @@ class CustomPolygonControl extends PureComponent {
       loading: false,
 
       selectedLayer: 'default',
+      private: false,
       propertyValues: {},
     };
   }
@@ -73,7 +75,8 @@ class CustomPolygonControl extends PureComponent {
     if (!this.props.isEdit) {
       this.setState({
         selectedLayer: 'default',
-        propertyValues: {}
+        propertyValues: {},
+        private: false
       });
     }
     else {
@@ -87,7 +90,8 @@ class CustomPolygonControl extends PureComponent {
 
       this.setState({
         selectedLayer: layer,
-        propertyValues: properties
+        propertyValues: properties,
+        private: properties.isPrivate
       });
     }
   }
@@ -118,6 +122,10 @@ class CustomPolygonControl extends PureComponent {
     });
   }
 
+  onPrivateChange = (e) => {
+    this.setState({ private: e.target.checked });
+  }
+
   addCustomPolygon = () => {
     let layer = this.state.selectedLayer;
 
@@ -136,7 +144,8 @@ class CustomPolygonControl extends PureComponent {
       mapId: this.props.map.id,
       timestamp: timestampNumber,
       layer: layer,
-      geometry: geoJson
+      geometry: geoJson,
+      private: this.state.private,
     };
 
     ApiManager.post('/geomessage/customPolygon/addPolygon', body, this.props.user)
@@ -144,7 +153,8 @@ class CustomPolygonControl extends PureComponent {
         this.props.onCustomPolygonChange(true, false);        
         this.setState({
           loading: false,
-          propertyValues: {}
+          propertyValues: {},
+          private: false
         });
       })
       .catch(err => {
@@ -162,11 +172,13 @@ class CustomPolygonControl extends PureComponent {
       mapId: this.props.map.id,
       customPolygonId: this.props.element.feature.properties.id,
       newLayerName: layer,
-      newProperties: properties
+      newProperties: properties,
+      private: this.state.private
     };
 
     ApiManager.post('/geomessage/customPolygon/alterPolygon', body, this.props.user)
       .then(() => {
+        properties[ViewerUtility.isPrivateProperty] = this.state.private;
         this.props.onCustomPolygonChange(false, true, properties);
         this.setState({
           loading: false
@@ -256,6 +268,8 @@ class CustomPolygonControl extends PureComponent {
       );       
     }
 
+    let canAddPrivate = this.props.map.accessLevel >= ApiManager.accessLevels.addPrivateCustomPolygons;
+
     return (
       <div>
         <Card className={'data-pane-card'}>
@@ -268,6 +282,19 @@ class CustomPolygonControl extends PureComponent {
             }
           />
           <CardContent>
+            {
+              canAddPrivate ?
+              <div className='custom-polygons-private'>
+                <Checkbox 
+                  key='private' 
+                  color='primary'
+                  name='private'
+                  onChange={this.onPrivateChange}
+                  checked={this.state.private}
+                />
+                Private
+              </div> : null
+            }
             {layerSelect}
             {propertyInputs}
             { this.state.loading ? <CircularProgress className='loading-spinner'/> : null}

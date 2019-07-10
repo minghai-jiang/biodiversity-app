@@ -20,8 +20,6 @@ import ApiManager from '../../../ApiManager';
 
 const DELETE_CUSTOM_POLYGON_ACTION = 'delete_custom_polygon';
 
-const IS_PRIVATE_PROPERTY = 'isPrivate';
-
 class SelectionPane extends PureComponent {
 
   constructor(props, context) {
@@ -242,8 +240,10 @@ class SelectionPane extends PureComponent {
         continue;
       }
       if (element.type === ViewerUtility.customPolygonTileLayerType 
-        && property === IS_PRIVATE_PROPERTY && propertyValue === true) {
-        selectionPaneClass += ' selection-pane-private';
+        && property === ViewerUtility.isPrivateProperty) {
+        if (propertyValue === true) {
+          selectionPaneClass += ' selection-pane-private';
+        }
         continue;
       }
 
