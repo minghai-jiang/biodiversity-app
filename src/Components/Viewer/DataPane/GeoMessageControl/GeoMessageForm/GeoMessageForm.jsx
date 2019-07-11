@@ -369,10 +369,13 @@ class GeoMessageForm extends PureComponent {
   }
 
   render() {
+    
     let user = this.props.user;
-    let hasAddPermission = user && this.props.map.accessLevel >= ApiManager.accessLevels.addGeoMessages;
-    let hasAddImagePermission = user && this.props.map.accessLevel >= ApiManager.accessLevels.addGeoMessageImage;
-    let hasPrivateMessagePermission = user && this.props.map.accessLevel >= ApiManager.accessLevels.addPrivateGeoMessage;
+    let map = this.props.map;
+
+    let hasAddPermission = user && map.accessLevel >= ApiManager.accessLevels.addGeoMessages;
+    let hasAddImagePermission = user && map.accessLevel >= ApiManager.accessLevels.addGeoMessageImage;
+    let hasPrivateMessagePermission = user && map.accessLevel >= ApiManager.accessLevels.addPrivateGeoMessage;
 
     let title = 'Add GeoMessage';
     if (!user) {
