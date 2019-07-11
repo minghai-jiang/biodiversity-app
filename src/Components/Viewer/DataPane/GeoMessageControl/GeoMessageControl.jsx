@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { GeoJSON } from 'react-leaflet';
 
 import { 
   Card,  
@@ -33,13 +33,23 @@ import GeoMessageForm from './GeoMessageForm/GeoMessageForm';
 const SCROLL_LOAD_THRESHOLD = 1000;
 const NO_GROUP_NAME = 'no group';
 
+const REFRESH_MODE = {
+  applyToMap: 1,
+  reconstructOnly: 2,
+  full: 3
+};
+
 class GeoMessageControl extends PureComponent {
 
   geomessagesContainerCard = null;
 
+  rawGeoMessages = [];
+
   feedPage = 1;
   noMoreFeedMessages = false;
   feedScrollLoading = false;
+
+  geoJsonElements = [];
 
   constructor(props, context) {
     super(props, context);
@@ -49,19 +59,22 @@ class GeoMessageControl extends PureComponent {
     this.state = {
       loading: false,
 
-      rawGeoMessages: null,
-      geoMessageElements: null,
+      geoMessageElements: [],
       
       availableGroups: [],
-      selectedGroups: []
+
+      filtersExpanded: true,
+      filterSettings: this.createEmptyFilterSettings()
     };
   }
 
   componentDidMount() {
-    this.setState({ 
+    let newState = { 
       loading: true,
       availableGroups: [...this.props.map.groups, NO_GROUP_NAME]
-    }, this.getGeoMessages);
+    }; 
+
+    this.setState(newState, this.getGeoMessages);
   }
 
   componentDidUpdate(prevProps) {
@@ -70,11 +83,16 @@ class GeoMessageControl extends PureComponent {
     if (differentMap) {
       this.setState({ 
         availableGroups: [...this.props.map.groups, NO_GROUP_NAME], 
-        selectedGroups: []
+        filterSettings: this.createEmptyFilterSettings()
       });
     }
 
     let update = false;
+
+    if (this.props.isFeed && !prevProps.isFeed) {
+      this.rawGeoMessages = [];
+      this.setState({ geoMessageElements: [] });
+    }
 
     if (this.props.isFeed) {
       update = !prevProps.isFeed || differentMap;
@@ -84,8 +102,9 @@ class GeoMessageControl extends PureComponent {
       }
     }
     else {
-      if (!this.props.element && (this.state.rawGeoMessages || this.state.geoMessageElements)) {
-        this.setState({ rawGeoMessages: null, geoMessageElements: null });
+      if (!this.props.element && (this.rawGeoMessages || this.state.geoMessageElements)) {
+        this.rawGeoMessages = [];
+        this.setState({ geoMessageElements: [] });
         return;
       }
 
@@ -100,35 +119,40 @@ class GeoMessageControl extends PureComponent {
     }
   }
 
+  createEmptyFilterSettings = () => {
+    return {
+      applyToMap: false,
+      selectedGroups: [],
+      selectedForms: []
+    };
+  }
+
   getGeoMessages = () => {
     let geoMessagesPromise = null;
 
+    let cb = () => {
+      this.setState({ loading: false }, () => {
+        if (!this.props.isFeed) {
+          this.scrollGeoMessagesToBottom();
+        }
+      });
+    }
+
     if (!this.props.isFeed) {
-      geoMessagesPromise = this.getElementMessages();
+      geoMessagesPromise = this.getElementMessages(cb);
     }
     else {
-      geoMessagesPromise = this.getFeedMessages();
+      geoMessagesPromise = this.getFeedMessages(cb);
     }
 
     geoMessagesPromise
-      .then(results => {
-        this.setState({ 
-          loading: false, 
-          rawGeoMessages: results.rawGeoMessages, 
-          geoMessageElements: results.geoMessageElements 
-        }, () => {
-          if (!this.props.isFeed) {
-            this.scrollGeoMessagesToBottom();
-          }
-        });
-      })
       .catch(err => {
         console.error(err);
-        this.setState({ loading: false, rawGeoMessages: null, geoMessageElements: null });
+        this.setState({ loading: false });
       });
   }
 
-  getElementMessages = () => {
+  getElementMessages = (cb) => {
     let urlType = null;
     let body = {
       mapId: this.props.map.id
@@ -185,45 +209,139 @@ class GeoMessageControl extends PureComponent {
           );
         };
 
-        return {
-          rawGeoMessages: rawGeoMessages,
-          geoMessageElements: geoMessageElements
-        };
+        this.rawGeoMessages = rawGeoMessages;
+        this.setState({ geoMessageElements: geoMessageElements }, cb);
       }); 
   }
 
-  getFeedMessages = () => {
+  getFeedMessages = (cb) => {
     let body = {
       mapId: this.props.map.id,
       page: this.feedPage,
-      userGroups: this.state.selectedGroups
+      userGroups: this.state.filterSettings.selectedGroups
     };
 
     this.feedPage = this.feedPage + 1;
 
     return ApiManager.post(`/geoMessage/feed`, body, this.props.user)
       .then(result => {
-        let rawGeoMessages = result;
-        let geoMessageElements = [];
+        this.rawGeoMessages = this.rawGeoMessages.concat(result);
 
         if (result.length === 0) {
           this.noMoreFeedMessages = true;
         }
 
-        for (let i = 0; i < rawGeoMessages.length; i++) {
-          let message = rawGeoMessages[i];
-          let deleted = message.deleteDate;
+        this.constructGeoMessageElements(cb);
+      });
+  }
 
-          if (!deleted) {
-            geoMessageElements.push(this.createGeomessageElement(message, true));
+  constructGeoMessageElements = (cb) => {
+    let geoMessageElements = [];
+
+    let rawGeoMessages = this.rawGeoMessages;
+    let filterSettings = this.state.filterSettings;
+
+    let filteredElements = [];
+
+    for (let i = 0; i < rawGeoMessages.length; i++) {
+      let message = rawGeoMessages[i];
+
+      if (filterSettings.selectedForms.length > 0 && 
+        (!message.form || !filterSettings.selectedForms.includes(message.form.formName))) {
+        continue;
+      }
+
+      let deleted = message.deleteDate;
+
+      if (!deleted) {
+        geoMessageElements.push(this.createGeomessageElement(message, true));
+
+        let findFunc = (x) => {
+          if (x.type !== message.type) {
+            return false;
           }
+
+          if (x.type !== ViewerUtility.standardTileLayerType) {
+            return x.elementId === message.elementId;
+          }
+          else {
+            return x.elementId.tileX === message.elementId.tileX &&
+              x.elementId.tileY === message.elementId.tileY &&
+              x.elementId.zoom === message.elementId.zoom;
+          }
+        };
+
+        if (!filteredElements.find(findFunc)) {
+          filteredElements.push({
+            elementId: message.elementId,
+            type: message.type
+          });
+        }        
+      }
+    }
+
+    let getGeometry = (type) => {
+      let elementsOfType = filteredElements.filter(x => x.type === type);
+
+      if (elementsOfType.length === 0) {
+        return [];
+      }
+
+      let map = this.props.map;
+      let timestampRange = this.props.timestampRange;
+
+      let elementIds = [];
+      for (let i = 0; i < elementsOfType.length; i++){
+        elementIds.push(elementsOfType[i].elementId);
+      }
+
+      let body = {
+        mapId: map.id,
+        timestamp: map.timestamps[timestampRange.end].timestampNumber
+      };
+
+      let url = '';
+      if (type === ViewerUtility.standardTileLayerType) {
+        url = '/geometry/tiles';
+        body.tileIds = elementIds;
+      }
+      else if (type === ViewerUtility.polygonLayerType) {
+        url = '/geometry/polygons';
+        body.polygonIds = elementIds;
+      }
+      else if (type === ViewerUtility.customPolygonTileLayerType) {
+        url = '/geoMessage/customPolygon/geometries';
+        body.customPolygonIds = elementIds;
+      }
+
+      return ApiManager.post(url, body, this.props.user)
+        .then(geoJson => {
+          return (
+            <GeoJSON
+              key={Math.random()}
+              data={geoJson}
+              style={{ color: `#ff0000`, weight: 1, opacity: 0.3 }}
+              zIndex={ViewerUtility.customPolygonLayerZIndex}
+              onEachFeature={(feature, layer) => layer.on({ click: () => this.props.onFeatureClick(feature) })}
+            />
+          );        
+        });
+    }
+
+    let standardTilesPromise = getGeometry(ViewerUtility.standardTileLayerType);
+    let polygonPromise = getGeometry(ViewerUtility.polygonLayerType);
+    let customPolygonPromise = getGeometry(ViewerUtility.customPolygonTileLayerType);
+
+    Promise.all([standardTilesPromise, polygonPromise, customPolygonPromise])
+      .then(results => {
+        this.geoJsonElements = results;
+        if (this.state.filterSettings.applyToMap) {
+          this.props.onLayersChange(results, true);
         }
 
-        return {
-          rawGeoMessages: rawGeoMessages,
-          geoMessageElements: geoMessageElements
-        };
-      });    
+        this.setState({ geoMessageElements: geoMessageElements}, cb);
+      });
+
   }
 
   createGeomessageElement = (message, feedMode) => {
@@ -282,49 +400,146 @@ class GeoMessageControl extends PureComponent {
 
     let oldScrollHeight = messagesContainer.scrollHeight;
 
-    this.getFeedMessages()
-      .then(results => {
-        this.setState({ 
-          loading: false, 
-          rawGeoMessages: [...this.state.rawGeoMessages, ...results.rawGeoMessages], 
-          geoMessageElements: [...this.state.geoMessageElements, ...results.geoMessageElements] 
-        }, () => {
-          setTimeout(messagesContainer.scrollTop = oldScrollHeight, 100);
-          this.feedScrollLoading = false;
-        });
-      })
+    this.getFeedMessages(() => {
+      this.setState({ loading: false})
+      setTimeout(messagesContainer.scrollTop = oldScrollHeight, 100);
+      this.feedScrollLoading = false;
+    })
       .catch(err => {
         console.error(err);
-        this.setState({ loading: false, rawGeoMessages: null, geoMessageElements: null });
+        this.setState({ loading: false });
       });
   }
 
-  onSelectGroup = (e) => {
-    let selectedGroups = e.target.value;
-    this.setState({ selectedGroups: selectedGroups });
+  onFilterChange = (e, property, isCheckbox, refreshMode) => {
+    let filterSettings = {
+      ...this.state.filterSettings
+    };
+
+    if (!isCheckbox) {
+      filterSettings[property] = e.target.value;
+    }
+    else {
+      filterSettings[property] = e.target.checked;
+    }
 
     if (this.getFeedMessagesTimer) {
       clearTimeout(this.getFeedMessagesTimer);
     }
 
-    this.getFeedMessagesTimer = setTimeout(() => {
-      this.feedPage = 1;
-      this.noMoreFeedMessages = false;
-      this.setState({ loading: true }, () => {
-        this.getFeedMessages()
-          .then(results => {
-            this.setState({ 
-              loading: false, 
-              rawGeoMessages: [results.rawGeoMessages], 
-              geoMessageElements: [results.geoMessageElements] 
+    this.setState({ filterSettings: filterSettings }, () => {
+      let refreshFunc = null;
+
+      if (refreshMode === REFRESH_MODE.applyToMap) {
+        if (this.state.filterSettings.applyToMap) {
+          this.props.onLayersChange(this.geoJsonElements, true);
+        }
+        else {
+          this.props.onLayersChange(null, true);
+        }
+        return;
+      }
+      else if (refreshMode === REFRESH_MODE.reconstructOnly) {
+        refreshFunc = (cb) => this.constructGeoMessageElements(cb);
+      }
+      else if (refreshMode === REFRESH_MODE.full) {
+        refreshFunc = (cb) => {
+          this.feedPage = 1;
+          this.noMoreFeedMessages = false;
+          this.rawGeoMessages = [];
+          this.getFeedMessages(cb)
+            .catch(err => {
+              console.error(err);
+              this.setState({ loading: false });
             });
-          })
-          .catch(err => {
-            console.error(err);
-            this.setState({ loading: false, rawGeoMessages: null, geoMessageElements: null });
-          });;
-      })
-    }, 1000)
+        };
+      }
+
+      let updateGeoMessages = () => {
+        this.setState({ loading: true }, () => {
+          refreshFunc(() => { this.setState({ loading: false })});
+        });
+      };
+  
+      this.getFeedMessagesTimer = setTimeout(updateGeoMessages, 1000);
+    });    
+  }
+
+  onExpandClick = () => {
+    this.setState({ filtersExpanded: !this.state.filtersExpanded});
+  }
+
+  renderFilterSection = () => {
+    let filterSection = (
+      <Card className='data-pane-card groups-filter-card'>
+        <CardHeader
+          className='data-pane-title-header groups-filter-card-header'
+          title={
+            <Typography variant="h6" component="h2" className='no-text-transform'>
+              Filters
+            </Typography>
+          }
+          action={
+            <IconButton
+              className={this.state.filtersExpanded ? 'expand-icon expanded' : 'expand-icon'}
+              onClick={this.onExpandClick}
+              aria-expanded={this.state.filtersExpanded}
+              aria-label='Show'
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          }
+        />
+        <Collapse in={this.state.filtersExpanded}>
+          <CardContent className='data-pane-card-content'>
+            <Checkbox 
+              color='primary'              
+              onChange={(e) => this.onFilterChange(e, 'applyToMap', true, REFRESH_MODE.applyToMap)}
+              checked={this.state.filterSettings.applyToMap}
+            />
+            Apply to map
+            <FormControl className='card-form-control selector-single'>
+              <InputLabel htmlFor='select-multiple-checkbox-groups'>Groups filter</InputLabel>
+              <Select
+                className='selector'
+                multiple
+                value={this.state.filterSettings.selectedGroups}
+                onChange={(e) => this.onFilterChange(e, 'selectedGroups', false, REFRESH_MODE.full)}
+                input={<Input id='select-multiple-checkbox-groups' />}
+                renderValue={selected => selected.join(', ')}
+              >
+                {this.state.availableGroups.map(name => (
+                  <MenuItem key={name} value={name}>
+                    <Checkbox checked={this.state.filterSettings.selectedGroups.includes(name)} />
+                    <ListItemText primary={name} />
+                  </MenuItem>
+                ))}
+              </Select>              
+            </FormControl>
+            <FormControl className='card-form-control selector-single'>
+              <InputLabel htmlFor='select-multiple-checkbox-forms'>Forms filter</InputLabel>
+              <Select
+                className='selector'
+                multiple
+                value={this.state.filterSettings.selectedForms}
+                onChange={(e) => this.onFilterChange(e, 'selectedForms', false, REFRESH_MODE.reconstructOnly)}
+                input={<Input id='select-multiple-checkbox-forms' />}
+                renderValue={selected => selected.join(', ')}
+              >
+                {this.props.map.forms.map(form => (
+                  <MenuItem key={form.formName} value={form.formName}>
+                    <Checkbox checked={this.state.filterSettings.selectedForms.includes(form.formName)} />
+                    <ListItemText primary={form.formName} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </CardContent>
+        </Collapse>              
+      </Card>
+    );
+
+    return filterSection;
   }
 
   render() {
@@ -340,31 +555,7 @@ class GeoMessageControl extends PureComponent {
 
     return (
       <div className='geomessage-control'>
-        {
-          isFeed ? 
-            <Card className='data-pane-card groups-filter-card'>
-              <CardContent>
-                <FormControl className='card-form-control selector-single'>
-                  <InputLabel htmlFor='select-multiple-checkbox'>Groups filter</InputLabel>
-                  <Select
-                    className='selector'
-                    multiple
-                    value={this.state.selectedGroups}
-                    onChange={this.onSelectGroup}
-                    input={<Input id='select-multiple-checkbox' />}
-                    renderValue={selected => selected.join(', ')}
-                  >
-                    {this.state.availableGroups.map(name => (
-                      <MenuItem key={name} value={name}>
-                        <Checkbox checked={this.state.selectedGroups.includes(name)} />
-                        <ListItemText primary={name} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </CardContent>
-            </Card> : null
-        }
+        {isFeed ? this.renderFilterSection() : null}
         <Card 
           ref={this.geomessagesContainerCard} 
           className={className}

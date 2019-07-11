@@ -12,6 +12,8 @@ div.data-pane-card-content {
   position: relative;
   padding-top: 0px;
   min-height: 70px;
+  text-align: left;
+  font-size: 15px;
 }
 
 div.data-pane-title-card {

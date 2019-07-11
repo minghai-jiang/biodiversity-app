@@ -232,7 +232,7 @@ class GeoMessage extends PureComponent {
         elementIdText = `polygon: ${message.elementId}`;
       }
       else if (type === ViewerUtility.customPolygonTileLayerType) {
-        elementIdText = `custom polygon: ${message.elementId}`;
+        elementIdText = `custom polygon: ${message.elementId.substring(0, 8)}...`;
       }
 
       subheaderElementButton = (

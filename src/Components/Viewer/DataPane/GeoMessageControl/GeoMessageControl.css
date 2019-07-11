@@ -11,8 +11,14 @@ div.card-form-control {
   width: 100%;
 }
 
-div.groups-filter-card {
-  height: 74px;
+div.card-form-control:not(:first-of-type) {
+  margin-top: 12px;
+}
+
+div.groups-filter-card-header {
+  padding-top: 12px;
+  padding-right: 12px;
+  padding-left: 12px;
 }
 
 div.geomessage-messages-card {

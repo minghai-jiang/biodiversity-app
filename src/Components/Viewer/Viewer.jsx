@@ -81,6 +81,8 @@ class Viewer extends PureComponent {
       selectedElement: null,
 
       geolocation: null,
+
+      overrideLeafletLayers: null
     };
   }
 
@@ -256,15 +258,21 @@ class Viewer extends PureComponent {
       timestampRange: {
         start: map.timestamps.length - 1,
         end: map.timestamps.length - 1
-      }
+      },
+      overrideLeafletLayers: null
     }, () => {
       this.onFlyTo({ type: ViewerUtility.flyToType.map, delay: true });
     });
   }
 
-  onLayersChange = (layers) => {
-    this.leafletLayers = layers;
-    this.rebuildAllLayers();
+  onLayersChange = (layers, isOverride) => {
+    if (!isOverride) {
+      this.leafletLayers = layers;
+      this.rebuildAllLayers();
+    }
+    else {
+      this.setState({ overrideLeafletLayers: layers }, this.rebuildAllLayers);
+    }
   }
 
   onSelectTimestamp = (timestampRange) => {
@@ -358,9 +366,10 @@ class Viewer extends PureComponent {
   rebuildAllLayers = () => {
     let allLayers = [
       this.leafletLayers, 
+      this.state.overrideLeafletLayers,
       this.selectedElementLayer, 
-      this.drawnPolygonLayer
-    ]
+      this.drawnPolygonLayer,
+    ];
     
     this.setState({ allLayers: allLayers });
   }
@@ -586,6 +595,7 @@ class Viewer extends PureComponent {
             leafletMapViewport={this.state.leafletMapViewport}
             timestampRange={this.state.timestampRange}
             geolocation={this.state.geolocation}
+            override={this.state.overrideLeafletLayers ? true : false}
             onSelectMap={this.onSelectMap}
             onDataPaneAction={this.onDataPaneAction}
             onLayersChange={this.onLayersChange}
@@ -630,7 +640,8 @@ class Viewer extends PureComponent {
             element={this.state.selectedElement}
             onDataPaneAction={this.onDataPaneAction}
             onFlyTo={this.onFlyTo}
-            onCustomPolygonChange={this.onCustomPolygonChange}          
+            onCustomPolygonChange={this.onCustomPolygonChange}
+            onLayersChange={this.onLayersChange}
           />
         </div>
 

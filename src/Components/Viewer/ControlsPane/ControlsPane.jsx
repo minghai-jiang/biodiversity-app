@@ -46,6 +46,13 @@ class ControlsPane extends PureComponent {
   }  
 
   componentDidUpdate(prevProps) {
+    if (!prevProps.override && this.props.override) {
+      this.props.onLayersChange(this.tileLayers);
+    }
+    else if (prevProps.override && !this.props.override) {
+      let allLayers = this.tileLayers.concat(this.standardTileLayers, this.polygonLayers, this.customPolygonLayers);
+      this.props.onLayersChange(allLayers);
+    }
   }
 
   selectLayer = (type, layer) => {

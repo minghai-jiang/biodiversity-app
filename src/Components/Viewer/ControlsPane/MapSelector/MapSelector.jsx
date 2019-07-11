@@ -166,9 +166,7 @@ export class MapSelector extends PureComponent {
         else {
           atlasMapCount[atlas] += 1; 
         }
-
       }
-
     }
 
     atlases.sort();

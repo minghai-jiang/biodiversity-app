@@ -158,6 +158,7 @@ class DataPane extends PureComponent {
           isFeed={action === ViewerUtility.dataPaneAction.feed}
           home={home}
           onFlyTo={this.props.onFlyTo}
+          onLayersChange={this.props.onLayersChange}
         />
       );
     }
