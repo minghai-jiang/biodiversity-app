@@ -517,13 +517,13 @@ class GeoMessageControl extends PureComponent {
     let allFeatures = [];
     for (let i = 0; i < this.geometryResults.length; i++) {
       if (this.geometryResults[i].geoJson) {
-        allFeatures.concat(this.geometryResults[i].geoJson.features);
+        allFeatures =  allFeatures.concat(this.geometryResults[i].geoJson.features);
       }
     }
 
     let geoJson = {
       type: 'FeatureCollection',
-      count: this.state.coutn,
+      count: this.state.count,
       features: allFeatures
     };
 
