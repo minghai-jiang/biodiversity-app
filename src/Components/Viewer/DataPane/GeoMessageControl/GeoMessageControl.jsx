@@ -19,6 +19,8 @@ import {
   FormControl
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+
 
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
@@ -49,7 +51,7 @@ class GeoMessageControl extends PureComponent {
   noMoreFeedMessages = false;
   feedScrollLoading = false;
 
-  geoJsonElements = [];
+  geometryResults = [];
 
   constructor(props, context) {
     super(props, context);
@@ -64,7 +66,8 @@ class GeoMessageControl extends PureComponent {
       availableGroups: [],
 
       filtersExpanded: true,
-      filterSettings: this.createEmptyFilterSettings()
+      filterSettings: this.createEmptyFilterSettings(),
+      count: 0
     };
   }
 
@@ -274,7 +277,8 @@ class GeoMessageControl extends PureComponent {
         if (!filteredElements.find(findFunc)) {
           filteredElements.push({
             elementId: message.elementId,
-            type: message.type
+            type: message.type,
+            layer: message.layer
           });
         }        
       }
@@ -301,30 +305,48 @@ class GeoMessageControl extends PureComponent {
       };
 
       let url = '';
+      let hasAggregatedData = false;
+
       if (type === ViewerUtility.standardTileLayerType) {
         url = '/geometry/tiles';
         body.tileIds = elementIds;
+        hasAggregatedData = false;        
       }
       else if (type === ViewerUtility.polygonLayerType) {
         url = '/geometry/polygons';
         body.polygonIds = elementIds;
+
+        // debugger;
+
+        let layers = map.layers.polygon[map.layers.polygon.length - 1].layers;
+        // let elementL
+
+        // WIP
+
+        hasAggregatedData = true;
       }
       else if (type === ViewerUtility.customPolygonTileLayerType) {
         url = '/geoMessage/customPolygon/geometries';
         body.customPolygonIds = elementIds;
+        hasAggregatedData = true;
       }
 
       return ApiManager.post(url, body, this.props.user)
         .then(geoJson => {
-          return (
-            <GeoJSON
-              key={Math.random()}
-              data={geoJson}
-              style={{ color: `#ff0000`, weight: 1, opacity: 0.3 }}
-              zIndex={ViewerUtility.customPolygonLayerZIndex}
-              onEachFeature={(feature, layer) => layer.on({ click: () => this.props.onFeatureClick(feature) })}
-            />
-          );        
+          return {
+            geoJson: geoJson,
+            element: (
+              <GeoJSON
+                key={Math.random()}
+                data={geoJson}
+                style={{ color: `#ff0000`, weight: 1, opacity: 0.3 }}
+                zIndex={ViewerUtility.customPolygonLayerZIndex}
+                onEachFeature={(feature, layer) => 
+                  layer.on({ click: () => this.props.onFeatureClick(type, feature, hasAggregatedData) })
+                }
+              />
+            )
+          }       
         });
     }
 
@@ -334,12 +356,16 @@ class GeoMessageControl extends PureComponent {
 
     Promise.all([standardTilesPromise, polygonPromise, customPolygonPromise])
       .then(results => {
-        this.geoJsonElements = results;
+        this.geometryResults = results;
+        let geoJsonElements = [results[0].element, results[1].element, results[2].element];
+
+        let count = results[0].geoJson.count + results[1].geoJson.count + results[2].geoJson.count;
+
         if (this.state.filterSettings.applyToMap) {
-          this.props.onLayersChange(results, true);
+          this.props.onLayersChange(geoJsonElements, true);
         }
 
-        this.setState({ geoMessageElements: geoMessageElements}, cb);
+        this.setState({ geoMessageElements: geoMessageElements, count: count }, cb);
       });
 
   }
@@ -432,7 +458,13 @@ class GeoMessageControl extends PureComponent {
 
       if (refreshMode === REFRESH_MODE.applyToMap) {
         if (this.state.filterSettings.applyToMap) {
-          this.props.onLayersChange(this.geoJsonElements, true);
+          let geoJsonElements = [
+            this.geometryResults[0].element,
+            this.geometryResults[1].element,
+            this.geometryResults[2].element
+          ];
+
+          this.props.onLayersChange(geoJsonElements, true);
         }
         else {
           this.props.onLayersChange(null, true);
@@ -469,7 +501,49 @@ class GeoMessageControl extends PureComponent {
     this.setState({ filtersExpanded: !this.state.filtersExpanded});
   }
 
+  onDownloadClick = () => {
+    if (!this.geometryResults || this.geometryResults.length === 0) {
+      return;
+    }
+
+    let allFeatures = this.geometryResults[0].geoJson.features.concat(
+      this.geometryResults[1].geoJson.features, this.geometryResults[2].geoJson.features);
+
+    let geoJson = {
+      type: 'FeatureCollection',
+      count: this.state.coutn,
+      features: allFeatures
+    };
+
+    let nameComponents = [
+      this.props.map.name,
+      'feed',
+    ];
+
+    let fileName = nameComponents.join('_') + '.geojson';
+
+    ViewerUtility.download(fileName, JSON.stringify(geoJson), 'application/json');
+  }
+
   renderFilterSection = () => {
+    let downloadGeometries = null;
+    if (this.state.filterSettings.applyToMap) {
+      downloadGeometries = (
+        <span>
+          {`Apply to map (${this.state.count})`}
+          <IconButton 
+            className='feed-download-geometry-button'
+            onClick={() => this.onDownloadClick()}
+          >
+            <SaveAlt className='download-geometry-button-icon'/>
+          </IconButton>
+        </span>
+      );    
+    }
+    else {
+      downloadGeometries = (<span>Apply to map</span>);
+    }
+
     let filterSection = (
       <Card className='data-pane-card groups-filter-card'>
         <CardHeader
@@ -497,7 +571,7 @@ class GeoMessageControl extends PureComponent {
               onChange={(e) => this.onFilterChange(e, 'applyToMap', true, REFRESH_MODE.applyToMap)}
               checked={this.state.filterSettings.applyToMap}
             />
-            Apply to map
+            {downloadGeometries}
             <FormControl className='card-form-control selector-single'>
               <InputLabel htmlFor='select-multiple-checkbox-groups'>Groups filter</InputLabel>
               <Select

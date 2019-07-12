@@ -29,3 +29,7 @@ div.geomessage-messages-card {
 div.geomessage-messages-card-feed {
   height: calc(100% - 80px);
 }
+
+button.feed-download-geometry-button {
+  margin-left: 8px;
+}

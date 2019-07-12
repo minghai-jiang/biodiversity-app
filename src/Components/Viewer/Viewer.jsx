@@ -642,6 +642,7 @@ class Viewer extends PureComponent {
             onFlyTo={this.onFlyTo}
             onCustomPolygonChange={this.onCustomPolygonChange}
             onLayersChange={this.onLayersChange}
+            onFeatureClick={this.selectFeature}
           />
         </div>
 
