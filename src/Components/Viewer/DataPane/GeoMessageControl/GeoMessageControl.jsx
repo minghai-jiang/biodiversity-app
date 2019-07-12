@@ -288,7 +288,10 @@ class GeoMessageControl extends PureComponent {
       let elementsOfType = filteredElements.filter(x => x.type === type);
 
       if (elementsOfType.length === 0) {
-        return [];
+        return {
+          geoJson: null,
+          elements: null
+        };
       }
 
       let map = this.props.map;
@@ -359,7 +362,12 @@ class GeoMessageControl extends PureComponent {
         this.geometryResults = results;
         let geoJsonElements = [results[0].element, results[1].element, results[2].element];
 
-        let count = results[0].geoJson.count + results[1].geoJson.count + results[2].geoJson.count;
+        let count = 0;
+        for (let i = 0; i < results.length; i++) {
+          if (results[i].geoJson) {
+            count += results[i].geoJson.count;
+          }
+        }
 
         if (this.state.filterSettings.applyToMap) {
           this.props.onLayersChange(geoJsonElements, true);
@@ -506,8 +514,12 @@ class GeoMessageControl extends PureComponent {
       return;
     }
 
-    let allFeatures = this.geometryResults[0].geoJson.features.concat(
-      this.geometryResults[1].geoJson.features, this.geometryResults[2].geoJson.features);
+    let allFeatures = [];
+    for (let i = 0; i < this.geometryResults.length; i++) {
+      if (this.geometryResults[i].geoJson) {
+        allFeatures.concat(this.geometryResults[i].geoJson.features);
+      }
+    }
 
     let geoJson = {
       type: 'FeatureCollection',
