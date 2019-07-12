@@ -27,7 +27,11 @@ div.geomessage-messages-card {
 }
 
 div.geomessage-messages-card-feed {
-  height: calc(100% - 80px);
+  height: calc(100% - 53px);
+}
+
+div.geomessage-messages-card-feed-filters {
+  height: calc(100% - 225px);
 }
 
 button.feed-download-geometry-button {

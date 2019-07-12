@@ -336,6 +336,10 @@ class GeoMessageControl extends PureComponent {
 
       return ApiManager.post(url, body, this.props.user)
         .then(geoJson => {
+          for (let i = 0; i < geoJson.features.length; i++) {
+            geoJson.features[i].properties.type = type;
+          }
+
           return {
             geoJson: geoJson,
             element: (
@@ -349,7 +353,7 @@ class GeoMessageControl extends PureComponent {
                 }
               />
             )
-          }       
+          }; 
         });
     }
 
@@ -636,7 +640,12 @@ class GeoMessageControl extends PureComponent {
     let isFeed = this.props.isFeed;
     let className = 'data-pane-card geomessage-messages-card';
     if (isFeed) {
-      className += ' geomessage-messages-card-feed';
+      if (this.state.filtersExpanded) {
+        className += ' geomessage-messages-card-feed-filters';
+      }
+      else {
+        className += ' geomessage-messages-card-feed';
+      }
     }
 
     return (

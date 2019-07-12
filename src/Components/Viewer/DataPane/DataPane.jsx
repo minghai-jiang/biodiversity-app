@@ -179,13 +179,18 @@ class DataPane extends PureComponent {
         );
     }
 
+    let dataPaneClassName = 'viewer-pane data-pane';
+    if (action === ViewerUtility.dataPaneAction.feed) {
+      dataPaneClassName += ' no-scroll';
+    }
+
     let actionsClassName = 'data-pane-title-actions';
     if (home) {
       actionsClassName += ' data-pane-title-actions-right'
     }
     
     return (
-      <div className='viewer-pane data-pane' style={style}>
+      <div className={dataPaneClassName} style={style}>
 
         <Card className='data-pane-title-card'>        
           <CardActions className={actionsClassName}>

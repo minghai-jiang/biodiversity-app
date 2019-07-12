@@ -4,6 +4,10 @@
   overflow-y: auto;
 }
 
+.no-scroll {
+  overflow: hidden;
+}
+
 .data-pane-card {
   margin-top: 8px;
 }
