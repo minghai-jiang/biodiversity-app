@@ -97,6 +97,10 @@ export class MapSelector extends PureComponent {
 
     let classesPromise = ApiManager.post('/metadata/classes', body, this.props.user);
     let measurementsPromise = ApiManager.post('/metadata/measurements', body, this.props.user);
+    let formsPromise = null;
+    if (map.accessLevel >= ApiManager.accessLevels.viewGeoMessages) {
+      formsPromise = ApiManager.post('/geomessage/getForms', body, this.props.user);
+    }
 
     let promises = [
       timestampsPromise,
@@ -105,7 +109,8 @@ export class MapSelector extends PureComponent {
       customPolygonLayersPromise,
 
       classesPromise, 
-      measurementsPromise
+      measurementsPromise,
+      formsPromise
     ];
 
     return Promise.all(promises)
@@ -119,19 +124,12 @@ export class MapSelector extends PureComponent {
 
         map.classes = results[4];
         map.measurements = results[5];
-
-        if (this.props.user && map.accessLevel >= ApiManager.accessLevels.addGeoMessages) {
-          return ApiManager.post('/geomessage/getForms', body, this.props.user);
+        if (results[6]) {
+          map.forms = results[6]
         }
-        else {
-          return null;
-        }
-      })      
-      .then(forms => {
-        map.forms = forms;
 
         map.metadataLoaded = true;
-      });
+      })
   }
 
   renderAtlasSelect = () => {
