@@ -149,9 +149,9 @@ class CustomPolygonLayersControl extends PureComponent {
 
         counter = (
           <span className='geometry-counter'>
-            {downloadButton}
             <span className={className}>{count}</span>
             <span>/{MAX_CUSTOM_POLYGONS}</span>
+            {downloadButton}
           </span>
         )
       }
@@ -364,7 +364,11 @@ class CustomPolygonLayersControl extends PureComponent {
           <CardContent
             className={'card-content'}
           >
-            {this.createLayerCheckboxes()}
+            {
+              !this.props.override ? 
+                this.createLayerCheckboxes() : 
+                <div className='controls-pane-background-text'>Controlled by feed</div>
+            }
           </CardContent>
         </Collapse>
       </Card>

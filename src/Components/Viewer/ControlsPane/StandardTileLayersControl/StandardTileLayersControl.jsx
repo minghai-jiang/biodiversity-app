@@ -134,9 +134,9 @@ class StandardTileLayersControl extends PureComponent {
 
         counter = (
           <span className='geometry-counter'>
-            {downloadButton}
             <span className={className}>{this.state.count}</span>
             <span>/{MAX_TILES}</span>
+            {downloadButton}
           </span>
         )
       }
@@ -318,7 +318,11 @@ class StandardTileLayersControl extends PureComponent {
           <CardContent
             className={'card-content'}
           >
-            {this.createLayerCheckboxes()}
+            {
+              !this.props.override ? 
+                this.createLayerCheckboxes() : 
+                <div className='controls-pane-background-text'>Controlled by feed</div>
+            }
           </CardContent>
         </Collapse>
       </Card>

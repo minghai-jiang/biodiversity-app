@@ -130,6 +130,7 @@ class ControlsPane extends PureComponent {
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
+          override={this.props.override}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.standardTileLayerType, layers)}
           onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.standardTileLayerType, feature, true)}
         />
@@ -140,6 +141,7 @@ class ControlsPane extends PureComponent {
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
+          override={this.props.override}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.polygonLayerType, layers)}
           onFeatureClick={(feature, hasAggregatedData) => this.props.onFeatureClick(ViewerUtility.polygonLayerType, feature, hasAggregatedData)}
         />
@@ -150,6 +152,7 @@ class ControlsPane extends PureComponent {
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
           timestampRange={this.props.timestampRange}
+          override={this.props.override}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.customPolygonTileLayerType, layers)}
           onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.customPolygonTileLayerType, feature, true)}
         />

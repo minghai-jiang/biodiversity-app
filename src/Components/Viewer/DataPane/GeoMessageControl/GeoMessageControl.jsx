@@ -32,7 +32,7 @@ import ApiManager from '../../../../ApiManager';
 import GeoMessage from './GeoMessage/GeoMessage';
 import GeoMessageForm from './GeoMessageForm/GeoMessageForm';
 
-const SCROLL_LOAD_THRESHOLD = 1000;
+const SCROLL_LOAD_THRESHOLD = 2000;
 const NO_GROUP_NAME = 'no group';
 
 const REFRESH_MODE = {
@@ -308,30 +308,18 @@ class GeoMessageControl extends PureComponent {
       };
 
       let url = '';
-      let hasAggregatedData = false;
 
       if (type === ViewerUtility.standardTileLayerType) {
         url = '/geometry/tiles';
-        body.tileIds = elementIds;
-        hasAggregatedData = false;        
+        body.tileIds = elementIds;    
       }
       else if (type === ViewerUtility.polygonLayerType) {
         url = '/geometry/polygons';
         body.polygonIds = elementIds;
-
-        // debugger;
-
-        let layers = map.layers.polygon[map.layers.polygon.length - 1].layers;
-        // let elementL
-
-        // WIP
-
-        hasAggregatedData = true;
       }
       else if (type === ViewerUtility.customPolygonTileLayerType) {
         url = '/geoMessage/customPolygon/geometries';
         body.customPolygonIds = elementIds;
-        hasAggregatedData = true;
       }
 
       return ApiManager.post(url, body, this.props.user)
@@ -349,10 +337,24 @@ class GeoMessageControl extends PureComponent {
                 style={{ color: `#ff0000`, weight: 1, opacity: 0.3 }}
                 zIndex={ViewerUtility.customPolygonLayerZIndex}
                 onEachFeature={(feature, layer) => 
-                  layer.on({ click: () => this.props.onFeatureClick(type, feature, hasAggregatedData) })
+                  layer.on({ click: () => {
+                    let hasAggregatedData = false;
+
+                    if (feature.properties.type === ViewerUtility.polygonLayerType) {
+                      let layerName = feature.properties.layer;
+                      let layers = map.layers.polygon[map.layers.polygon.length - 1].layers;
+
+                      let layer = layers.find(x => x.name === layerName);
+                      
+                      if (layer) {
+                        hasAggregatedData = layer.hasAggregatedData;
+                      }
+                    }
+
+                    this.props.onFeatureClick(type, feature, hasAggregatedData) }
+                  })
                 }
-              />
-            )
+              />)
           }; 
         });
     }
@@ -377,7 +379,10 @@ class GeoMessageControl extends PureComponent {
           this.props.onLayersChange(geoJsonElements, true);
         }
 
-        this.setState({ geoMessageElements: geoMessageElements, count: count }, cb);
+        this.setState({ geoMessageElements: geoMessageElements, count: count }, () => {
+          cb();
+          setTimeout(this.onGeoMessagesScroll, 1000);
+        });
       });
 
   }
@@ -429,8 +434,9 @@ class GeoMessageControl extends PureComponent {
     let messagesContainer = this.geomessagesContainerCard.current;
 
     let diff = messagesContainer.scrollHeight - messagesContainer.scrollTop;
+    let tooFewMessages = messagesContainer.scrollHeight === messagesContainer.clientHeight;
 
-    if (diff > SCROLL_LOAD_THRESHOLD) {
+    if (!(diff < SCROLL_LOAD_THRESHOLD || tooFewMessages)) {  
       return;
     }
 
@@ -448,6 +454,7 @@ class GeoMessageControl extends PureComponent {
         this.setState({ loading: false });
       });
   }
+
 
   onFilterChange = (e, property, isCheckbox, refreshMode) => {
     let filterSettings = {
@@ -506,7 +513,7 @@ class GeoMessageControl extends PureComponent {
       };
   
       this.getFeedMessagesTimer = setTimeout(updateGeoMessages, 1000);
-    });    
+    });
   }
 
   onExpandClick = () => {

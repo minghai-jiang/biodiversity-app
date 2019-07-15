@@ -35,6 +35,10 @@ div.card-content:last-child {
   padding-bottom: 16px;
 }
 
+.controls-pane-background-text {
+  color: #b2b2b2
+}
+
 .geometry-counter {
   position: absolute;
   right: 0px;
@@ -47,6 +51,7 @@ div.card-content:last-child {
 }
 
 button.download-geometry-button {
+  margin-left: 4px;
   padding: 8px;
 }
 
