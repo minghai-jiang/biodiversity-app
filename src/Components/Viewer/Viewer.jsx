@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { isMobile } from 'react-device-detect';
 
 import { Map, Marker, GeoJSON } from 'react-leaflet';
 import 'leaflet-draw';
@@ -68,9 +67,9 @@ class Viewer extends PureComponent {
 
     this.state = {
       leafletMapViewport: DEFAULT_VIEWPORT,
-      isSmallWindow: isMobile,
+      isSmallWindow: false,
 
-      panes: isMobile ? [MAP_PANE_NAME] : [CONTROL_PANE_NAME, MAP_PANE_NAME],
+      panes: [CONTROL_PANE_NAME, MAP_PANE_NAME],
 
       map: null,
       timestampRange: {
@@ -120,14 +119,15 @@ class Viewer extends PureComponent {
 
     this.onLeafletMapViewportChanged(DEFAULT_VIEWPORT);
 
-    if (!isMobile) {
-      window.addEventListener('resize', this.onWindowResize);  
-      this.onWindowResize(null, () => {
-        if (this.state.isSmallWindow) {
-          this.setState({ panes: [MAP_PANE_NAME] }, () => this.leafletMap.current.leafletElement.invalidateSize());
-        }
-      });
-    }
+    window.addEventListener('resize', this.onWindowResize);  
+    this.onWindowResize(null, () => {
+      let panes = this.state.panes;
+      if (panes.length > 1 && this.state.isSmallWindow) {
+        panes = [MAP_PANE_NAME];
+      }
+
+      this.setState({ panes: panes }, () => this.leafletMap.current.leafletElement.invalidateSize());
+    });
 
     this.initializeDrawingControl();
   }
@@ -156,15 +156,15 @@ class Viewer extends PureComponent {
   }
 
   onWindowResize = (_, cb) => {
-    let isSmallWindow = window.innerWidth <= 600;
+    let isSmallWindow = window.innerWidth <= 700;
     
     if (this.state.isSmallWindow !== isSmallWindow) {
-      let panes = this.state.panes;
-      if (isSmallWindow) {
-        panes = [MAP_PANE_NAME];
-      }
-
-      this.setState({ isSmallWindow: isSmallWindow, panes: panes }, cb);
+      this.setState({ isSmallWindow: isSmallWindow }, () => {
+        this.openPane(MAP_PANE_NAME);
+        if (cb) {
+          cb();
+        }
+      });
     }
     else if (cb) {
       cb();
@@ -211,17 +211,17 @@ class Viewer extends PureComponent {
     });    
   }  
 
-  openPane = (paneName) => {
+  openPane = (paneName, closePane) => {
     let currentPanes = this.state.panes;
 
     let changed = false;
 
-    if (!isMobile && !this.state.isSmallWindow) {
+    if (!this.state.isSmallWindow) {
       if (!currentPanes.includes(paneName)) {
         currentPanes.push(paneName);
         changed = true;
       }
-      else if (paneName !== MAP_PANE_NAME) {
+      else if (paneName !== MAP_PANE_NAME && closePane) {
         currentPanes = Utility.arrayRemove(currentPanes, paneName);
         changed = true;
       }
@@ -299,7 +299,7 @@ class Viewer extends PureComponent {
 
     viewport.bounds = getLeafletMapBounds(this.leafletMap);
 
-    if ((isMobile || this.state.isSmallWindow) && this.state.panes.includes(MAP_PANE_NAME)) {
+    if (this.state.isSmallWindow && this.state.panes.includes(MAP_PANE_NAME)) {
       this.setNewViewportTimer = setTimeout(
         () => { this.setState({ leafletMapViewport: viewport }) }, 
         400
@@ -404,7 +404,7 @@ class Viewer extends PureComponent {
 
   onDataPaneAction = (action) => {   
     this.openPane(DATA_PANE_NAME);
-
+    
     if (this.state.dataPaneAction === action) {
       this.dataPane.current.goToAction();
     }
@@ -484,7 +484,7 @@ class Viewer extends PureComponent {
 
           this.selectFeature(this.flyToInfo.type, feature, hasAggregatedData);
 
-          if (!this.flyToInfo.delay && isMobile && !this.state.panes.includes(MAP_PANE_NAME)) {
+          if (!this.flyToInfo.delay && this.state.isSmallWindow && !this.state.panes.includes(MAP_PANE_NAME)) {
             this.openPane(MAP_PANE_NAME);
           }
           else {
@@ -493,7 +493,7 @@ class Viewer extends PureComponent {
         });
     }
 
-    if (!this.flyToInfo.delay && isMobile && !this.state.panes.includes(MAP_PANE_NAME)) {
+    if (!this.flyToInfo.delay && this.state.isSmallWindow && !this.state.panes.includes(MAP_PANE_NAME)) {
       this.openPane(MAP_PANE_NAME);
     }
     else {
@@ -572,15 +572,13 @@ class Viewer extends PureComponent {
   }
 
   render() {
-
     let mapPaneStyle = {
       display: 'block',
       width: '100vw'
     };
 
     if (this.state.panes.includes(MAP_PANE_NAME)) {
-
-      if (!isMobile) {
+      if (!this.state.isSmallWindow) {
         if (this.state.panes.length === 2) {
           mapPaneStyle.width = '75vw';
         }
@@ -588,7 +586,6 @@ class Viewer extends PureComponent {
           mapPaneStyle.width = '50vw';
         }
       }
-
     }
     else {
       mapPaneStyle.display = 'none';
@@ -657,17 +654,17 @@ class Viewer extends PureComponent {
         </div>
 
         <div className='viewer-menu'>
-          <div className='button viewer-menu-button' onClick={() => this.openPane(CONTROL_PANE_NAME)}>
+          <div className='button viewer-menu-button' onClick={() => this.openPane(CONTROL_PANE_NAME, true)}>
             <div className='viewer-menu-button-content'>
               {this.props.localization['ViewerControlsPane']}
             </div>
           </div>
-          <div className='button viewer-menu-button' onClick={() => this.openPane(MAP_PANE_NAME)}>
+          <div className='button viewer-menu-button' onClick={() => this.openPane(MAP_PANE_NAME, true)}>
             <div className='viewer-menu-button-content'>
               {this.props.localization['ViewerMapPane']}           
             </div>
           </div>
-          <div className='button viewer-menu-button' onClick={() => this.openPane(DATA_PANE_NAME)}>
+          <div className='button viewer-menu-button' onClick={() => this.openPane(DATA_PANE_NAME, true)}>
             <div className='viewer-menu-button-content'>
               {this.props.localization['ViewerDataPane']}        
             </div>

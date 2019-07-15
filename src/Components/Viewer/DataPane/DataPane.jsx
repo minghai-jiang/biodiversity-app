@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { isMobile } from 'react-device-detect';
 
 import { 
   Card,  
@@ -188,6 +187,8 @@ class DataPane extends PureComponent {
     if (home) {
       actionsClassName += ' data-pane-title-actions-right'
     }
+
+    let titleFontSize = 1.9 - 0.03 * title.length;
     
     return (
       <div className={dataPaneClassName} style={style}>
@@ -197,6 +198,7 @@ class DataPane extends PureComponent {
             {
               !home || action ? 
                 <IconButton
+                  className='data-pane-title-actions-button'
                   aria-label='Home'
                   onClick={() => this.setState({ home: !home })}
                 >
@@ -207,7 +209,12 @@ class DataPane extends PureComponent {
           <CardHeader
             className='data-pane-title-header'
             title={
-              <Typography variant="h6" component="h2" className='no-text-transform'>
+              <Typography 
+                variant="h6" 
+                component="h2" 
+                className='no-text-transform data-pane-title'
+                style={{ fontSize: `${titleFontSize}vw`}}
+              >
                 {title}
               </Typography>
             }

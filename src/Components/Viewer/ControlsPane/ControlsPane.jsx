@@ -1,11 +1,4 @@
 import React, { PureComponent } from 'react';
-import { isMobile } from 'react-device-detect';
-import { 
-  Card,
-  CardContent,
-  Button
-} from '@material-ui/core';
-import L from 'leaflet';
 
 import MapSelector from './MapSelector/MapSelector';
 import FlyToControl from './FlyToControl/FlyToControl'
@@ -17,8 +10,6 @@ import CustomPolygonLayersControl from './CustomPolygonLayersControl/CustomPolyg
 import ViewerUtility from '../ViewerUtility';
 
 import './ControlsPane.css';
-import ApiManager from '../../../ApiManager';
-
 
 class ControlsPane extends PureComponent {
 

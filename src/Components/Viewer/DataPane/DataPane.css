@@ -29,8 +29,20 @@ div.data-pane-title-header {
   padding-top: 8px;
 }
 
+h2.data-pane-title {
+  width: 60%;
+  height: 32px;
+  margin: auto;
+  font-size: 1.2vw;
+  line-height: 32px;
+}
+
 div.data-pane-title-actions {
   position: absolute;
+}
+
+button.data-pane-title-actions-button {
+  padding: 8px;
 }
 
 div.data-pane-title-actions-right {
@@ -38,7 +50,7 @@ div.data-pane-title-actions-right {
 }
 
 div.data-pane-title-card-subtitle {
-  font-size: 12px;
+  font-size: 0.9vw;
 }
 
 div.data-pane-card-content .loading-spinner {
