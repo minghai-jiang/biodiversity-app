@@ -109,7 +109,10 @@ class Viewer extends PureComponent {
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(
       this.setLocation, 
-      () => this.setLocation(null), 
+      (err) => {
+        console.warn(`Error ${err.code}: ${err.message}`);
+        this.setLocation(null);
+      }, 
       { enableHighAccuracy: true }
     );
 
@@ -139,7 +142,10 @@ class Viewer extends PureComponent {
     setTimeout(() => {
         navigator.geolocation.getCurrentPosition(
           this.setLocation, 
-          () => this.setLocation(null), 
+          (err) => {
+            console.warn(`Error ${err.code}: ${err.message}`);
+            this.setLocation(null);
+          }, 
           { enableHighAccuracy: true }
         );
       }, 
