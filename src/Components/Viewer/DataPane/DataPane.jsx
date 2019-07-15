@@ -73,7 +73,7 @@ class DataPane extends PureComponent {
 
     let element = this.props.element;
     let action = this.props.action;
-    let title = null;
+    let title = '';
     let idText = null;    
     let homeElement = null;
     let actionControl = null;
@@ -188,7 +188,7 @@ class DataPane extends PureComponent {
       actionsClassName += ' data-pane-title-actions-right'
     }
 
-    let titleFontSize = 1.9 - 0.03 * title.length;
+    let titleFontSize = 1.8 - 0.03 * title.length;
     
     return (
       <div className={dataPaneClassName} style={style}>
