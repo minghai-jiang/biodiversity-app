@@ -35,6 +35,8 @@ import GeoMessageForm from './GeoMessageForm/GeoMessageForm';
 const SCROLL_LOAD_THRESHOLD = 2000;
 const NO_GROUP_NAME = 'no group';
 
+const FILTER_POLYGON_COLOR = '#ff3030'
+
 const REFRESH_MODE = {
   applyToMap: 1,
   reconstructOnly: 2,
@@ -334,7 +336,7 @@ class GeoMessageControl extends PureComponent {
               <GeoJSON
                 key={Math.random()}
                 data={geoJson}
-                style={ViewerUtility.createGeoJsonLayerStyle(`#ff0000`)}
+                style={ViewerUtility.createGeoJsonLayerStyle(FILTER_POLYGON_COLOR)}
                 zIndex={ViewerUtility.customPolygonLayerZIndex}
                 onEachFeature={(feature, layer) => 
                   layer.on({ click: () => {
@@ -351,7 +353,7 @@ class GeoMessageControl extends PureComponent {
                       }
                     }
 
-                    this.props.onFeatureClick(type, feature, hasAggregatedData) }
+                    this.props.onFeatureClick(type, feature, hasAggregatedData, FILTER_POLYGON_COLOR) }
                   })
                 }
               />)

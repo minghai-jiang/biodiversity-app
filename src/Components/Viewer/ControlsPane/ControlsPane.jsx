@@ -46,12 +46,8 @@ class ControlsPane extends PureComponent {
   }  
 
   componentDidUpdate(prevProps) {
-    if (!prevProps.override && this.props.override) {
-      this.props.onLayersChange(this.tileLayers);
-    }
-    else if (prevProps.override && !this.props.override) {
-      let allLayers = this.tileLayers.concat(this.standardTileLayers, this.polygonLayers, this.customPolygonLayers);
-      this.props.onLayersChange(allLayers);
+    if (prevProps.override !== this.props.override) {
+      this.onLayersChange(null, null);
     }
   }
 
@@ -79,7 +75,6 @@ class ControlsPane extends PureComponent {
   }
 
   onLayersChange = (type, layers) => {
-
     if (type === ViewerUtility.tileLayerType) {
       this.tileLayers = layers;
     }
@@ -93,7 +88,10 @@ class ControlsPane extends PureComponent {
       this.customPolygonLayers = layers;
     }
 
-    let allLayers = this.tileLayers.concat(this.standardTileLayers, this.polygonLayers, this.customPolygonLayers);
+    let allLayers = this.tileLayers;
+    if (!this.props.override) {
+      allLayers = allLayers.concat(this.standardTileLayers, this.polygonLayers, this.customPolygonLayers);
+    }
 
     this.props.onLayersChange(allLayers);
   }

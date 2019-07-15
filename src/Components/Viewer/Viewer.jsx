@@ -299,15 +299,15 @@ class Viewer extends PureComponent {
 
     viewport.bounds = getLeafletMapBounds(this.leafletMap);
 
-    this.setNewViewportTimer = setTimeout(
-      () => {
-        this.setState({ leafletMapViewport: viewport })
-      }, 
-      400
-    );
+    if ((isMobile || this.state.isSmallWindow) && this.state.panes.includes(MAP_PANE_NAME)) {
+      this.setNewViewportTimer = setTimeout(
+        () => { this.setState({ leafletMapViewport: viewport }) }, 
+        400
+      );
+    }    
   }
 
-  selectFeature = (type, feature, hasAggregatedData) => {
+  selectFeature = (type, feature, hasAggregatedData, color) => {
     let element = {
       type: type,
       hasAggregatedData: hasAggregatedData,
@@ -325,28 +325,29 @@ class Viewer extends PureComponent {
     let markerPane = this.leafletMap.current.leafletElement.getPane('markerPane');
 
     let map = this.state.map;
-    let color = null;
     let layerCollection = null;
 
-    if (type === ViewerUtility.polygonLayerType) {
-      layerCollection = map.layers.polygon[map.layers.polygon.length - 1].layers;
-    }
-    else if (type === ViewerUtility.customPolygonTileLayerType) {
-      layerCollection = map.layers.customPolygon;
-    }
-
-    if (layerCollection) {
-      let layerName = feature.properties.layer;
-      let layer = layerCollection.find(x => x.name === layerName);
-
-      color = `#${layer.color}`;
-    }
+    if (!color) {
+      if (type === ViewerUtility.polygonLayerType) {
+        layerCollection = map.layers.polygon[map.layers.polygon.length - 1].layers;
+      }
+      else if (type === ViewerUtility.customPolygonTileLayerType) {
+        layerCollection = map.layers.customPolygon;
+      }
+  
+      if (layerCollection) {
+        let layerName = feature.properties.layer;
+        let layer = layerCollection.find(x => x.name === layerName);
+  
+        color = `#${layer.color}`;
+      }
+    }   
 
     let selectedElementLayer = (
       <GeoJSON
         key={Math.random()}
         data={geoJson}
-        style={ViewerUtility.createGeoJsonLayerStyle(color, 3, 0.3)}
+        style={ViewerUtility.createGeoJsonLayerStyle(color, 2, 0.3)}
         pane={markerPane}
         onEachFeature={(_, layer) => layer.on({ click: () => this.selectionPane.current.open() })}
       />
@@ -401,30 +402,16 @@ class Viewer extends PureComponent {
     this.controlsPane.current.updateCustomPolygons();
   }
 
-  onDataPaneAction = (action) => {
-    if (this.state.dataPaneAction !== action) {
+  onDataPaneAction = (action) => {   
+    this.openPane(DATA_PANE_NAME);
 
-      let panes = this.state.panes;
-      let cb = null;
-      
-      if (!panes.includes(DATA_PANE_NAME)) {
-        panes = [...panes];
-
-        if (!isMobile && !this.state.isSmallWindow) {
-          panes.push(DATA_PANE_NAME);
-        }
-        else {
-          panes = [DATA_PANE_NAME];
-        }
-        
-        cb = () => this.leafletMap.current.leafletElement.invalidateSize();
-      }
-
-      this.setState({ panes: panes, dataPaneAction: action }, cb);
-    }
-    else {
+    if (this.state.dataPaneAction === action) {
       this.dataPane.current.goToAction();
     }
+
+    if (action !== this.state.dataPaneAction) {
+      this.setState({ dataPaneAction: action });
+    } 
   }
 
   onFlyTo = (flyToInfo) => {
