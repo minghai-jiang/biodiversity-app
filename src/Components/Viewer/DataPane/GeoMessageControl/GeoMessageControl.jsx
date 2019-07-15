@@ -367,8 +367,15 @@ class GeoMessageControl extends PureComponent {
 
     Promise.all([standardTilesPromise, polygonPromise, customPolygonPromise])
       .then(results => {
-        this.geometryResults = results;
-        let geoJsonElements = [results[0].element, results[1].element, results[2].element];
+        let geoJsonElements = [];
+
+        for (let i = 0; i < results.length; i++) {
+          let result = results[i];
+
+          if (result) {
+            geoJsonElements.push(result.element);
+          }
+        }
 
         let count = 0;
         for (let i = 0; i < results.length; i++) {
@@ -479,11 +486,15 @@ class GeoMessageControl extends PureComponent {
 
       if (refreshMode === REFRESH_MODE.applyToMap) {
         if (this.state.filterSettings.applyToMap) {
-          let geoJsonElements = [
-            this.geometryResults[0].element,
-            this.geometryResults[1].element,
-            this.geometryResults[2].element
-          ];
+          let geoJsonElements = [];
+
+          for (let i = 0; i < this.geometryResults.length; i++) {
+            let result = this.geometryResults[i];
+
+            if (result) {
+              geoJsonElements.push(result.element);
+            }
+          }
 
           this.props.onLayersChange(geoJsonElements, true);
         }

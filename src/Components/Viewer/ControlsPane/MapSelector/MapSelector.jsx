@@ -167,7 +167,9 @@ export class MapSelector extends PureComponent {
       }
     }
 
-    atlases.sort();
+    atlases.sort((a, b) => {
+      return a.toLowerCase().localeCompare(b.toLowerCase());
+    });
 
     let user = this.props.user;
 
