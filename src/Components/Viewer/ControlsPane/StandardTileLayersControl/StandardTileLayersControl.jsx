@@ -215,7 +215,7 @@ class StandardTileLayersControl extends PureComponent {
           <GeoJSON
             key={Math.random()}
             data={standardTilesGeoJson}
-            style={{ color: 'cornflowerblue', weight: 1, opacity: 0.3 }}
+            style={ViewerUtility.createGeoJsonLayerStyle('cornflowerblue')}
             zIndex={ViewerUtility.standardTileLayerZIndex}
             onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
           />

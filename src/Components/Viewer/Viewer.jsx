@@ -191,7 +191,6 @@ class Viewer extends PureComponent {
       <GeoJSON
         key={Math.random()}
         data={geoJson}
-        style={'#00ffff'}
         zIndex={ViewerUtility.drawnPolygonLayerZIndex}
         onEachFeature={(_, layer) => layer.on({ click: selectDrawnPolygon })}
       />
@@ -325,11 +324,29 @@ class Viewer extends PureComponent {
 
     let markerPane = this.leafletMap.current.leafletElement.getPane('markerPane');
 
+    let map = this.state.map;
+    let color = null;
+    let layerCollection = null;
+
+    if (type === ViewerUtility.polygonLayerType) {
+      layerCollection = map.layers.polygon[map.layers.polygon.length - 1].layers;
+    }
+    else if (type === ViewerUtility.customPolygonTileLayerType) {
+      layerCollection = map.layers.customPolygon;
+    }
+
+    if (layerCollection) {
+      let layerName = feature.properties.layer;
+      let layer = layerCollection.find(x => x.name === layerName);
+
+      color = `#${layer.color}`;
+    }
+
     let selectedElementLayer = (
       <GeoJSON
         key={Math.random()}
         data={geoJson}
-        style={'#00ffff'}
+        style={ViewerUtility.createGeoJsonLayerStyle(color, 3, 0.3)}
         pane={markerPane}
         onEachFeature={(_, layer) => layer.on({ click: () => this.selectionPane.current.open() })}
       />
@@ -556,7 +573,7 @@ class Viewer extends PureComponent {
         this.leafletMap.current.leafletElement.flyTo(this.flyToInfo.target);
       }
       else {
-        this.leafletMap.current.leafletElement.flyToBounds(this.flyToInfo.target);
+        this.leafletMap.current.leafletElement.flyToBounds(this.flyToInfo.target, { maxZoom: this.state.map.zoom });
       }
 
       if (this.flyToInfo.layer) {

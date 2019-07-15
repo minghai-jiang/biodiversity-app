@@ -66,6 +66,14 @@ const ViewerUtility = {
     FileSaver.saveAs(blob, filename);
   },
 
+  createGeoJsonLayerStyle: (color, weight, fillOpacity) => {
+    return {
+      color: color ? color : '#3388ff',
+      weight: weight ? weight : 1, 
+      fillOpacity: fillOpacity ? fillOpacity : 0.06
+    };
+  },
+
   isPrivateProperty: 'isPrivate'
 
 }

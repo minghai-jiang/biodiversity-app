@@ -334,7 +334,7 @@ class GeoMessageControl extends PureComponent {
               <GeoJSON
                 key={Math.random()}
                 data={geoJson}
-                style={{ color: `#ff0000`, weight: 1, opacity: 0.3 }}
+                style={ViewerUtility.createGeoJsonLayerStyle(`#ff0000`)}
                 zIndex={ViewerUtility.customPolygonLayerZIndex}
                 onEachFeature={(feature, layer) => 
                   layer.on({ click: () => {

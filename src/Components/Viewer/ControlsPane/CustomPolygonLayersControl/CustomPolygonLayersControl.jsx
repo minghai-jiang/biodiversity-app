@@ -251,7 +251,7 @@ class CustomPolygonLayersControl extends PureComponent {
             <GeoJSON
               key={Math.random()}
               data={customPolygonsGeoJson}
-              style={{ color: `#${customPolygonLayer.color}`, weight: 1, opacity: 0.3 }}
+              style={ViewerUtility.createGeoJsonLayerStyle(`#${customPolygonLayer.color}`)}
               zIndex={ViewerUtility.customPolygonLayerZIndex + i}
               onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
             />
