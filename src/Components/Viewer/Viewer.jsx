@@ -293,18 +293,20 @@ class Viewer extends PureComponent {
   }
 
   onLeafletMapViewportChanged = (viewport) => {
+    if (!this.state.panes.includes(MAP_PANE_NAME)) {
+      return;
+    }
+
     if (this.setNewViewportTimer) {
       clearTimeout(this.setNewViewportTimer);
     }    
 
     viewport.bounds = getLeafletMapBounds(this.leafletMap);
 
-    if (this.state.isSmallWindow && this.state.panes.includes(MAP_PANE_NAME)) {
-      this.setNewViewportTimer = setTimeout(
-        () => { this.setState({ leafletMapViewport: viewport }) }, 
-        400
-      );
-    }    
+    this.setNewViewportTimer = setTimeout(
+      () => { this.setState({ leafletMapViewport: viewport }) }, 
+      400
+    );    
   }
 
   selectFeature = (type, feature, hasAggregatedData, color) => {

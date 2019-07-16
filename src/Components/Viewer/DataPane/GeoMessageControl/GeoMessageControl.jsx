@@ -230,7 +230,8 @@ class GeoMessageControl extends PureComponent {
 
     return ApiManager.post(`/geoMessage/feed`, body, this.props.user)
       .then(result => {
-        this.rawGeoMessages = this.rawGeoMessages.concat(result);
+        let newRawGeoMessages = this.rawGeoMessages.concat(result);
+        this.rawGeoMessages = newRawGeoMessages;
 
         if (result.length === 0) {
           this.noMoreFeedMessages = true;
@@ -367,6 +368,7 @@ class GeoMessageControl extends PureComponent {
 
     Promise.all([standardTilesPromise, polygonPromise, customPolygonPromise])
       .then(results => {
+        debugger;
         let geoJsonElements = [];
 
         for (let i = 0; i < results.length; i++) {
@@ -388,6 +390,7 @@ class GeoMessageControl extends PureComponent {
           this.props.onLayersChange(geoJsonElements, true);
         }
 
+        this.geometryResults = results;
         this.setState({ geoMessageElements: geoMessageElements, count: count }, () => {
           cb();
           setTimeout(this.onGeoMessagesScroll, 1000);
@@ -463,7 +466,6 @@ class GeoMessageControl extends PureComponent {
         this.setState({ loading: false });
       });
   }
-
 
   onFilterChange = (e, property, isCheckbox, refreshMode) => {
     let filterSettings = {
