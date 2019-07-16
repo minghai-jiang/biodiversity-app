@@ -85,6 +85,7 @@ class CreateForm extends PureComponent {
              this.setState({x})
             }}>
             <option  value="text">{this.props.localization["Text"]}</option>
+            <option value="date">{this.props.localization["Date"]}</option>
             <option value="numeric">{this.props.localization["Numeric"]}</option>
             <option value="boolean">{this.props.localization["Boolean"]}</option>
           </select>

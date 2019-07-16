@@ -155,6 +155,7 @@ ApiManager.fetch('POST', '/geoMessage/alterForm', {"mapId": this.props.map.id, "
             }}>
             <option  value="text">{this.props.localization["Text"]}</option>
             <option value="numeric">{this.props.localization["Numeric"]}</option>
+            <option value="date">{this.props.localization["Date"]}</option>
             <option value="boolean">{this.props.localization["Boolean"]}</option>
           </select>
           </div>

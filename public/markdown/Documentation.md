@@ -38,9 +38,8 @@ level 300: The right to view geoMessages<br/>
 level 400: The right to add geoMessages<br/>
 level 410: The right to include photos in geoMessages<br/>
 level 420: The right to add private geoMessages<br/>
-level 430: The right to add private geoMessages with photos<br/>
-level 440: The right to view private geoMessages<br/>
 level 500: The right to add custom polygons <br/>
+level 510: The right to view private geoMessages<br/>
 level 600: The right to delete geoMessages<br/>
 level 700: The right to alter or delete custom polygons<br/>
 level 750: The right to add or delete forms <br/>
