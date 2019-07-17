@@ -134,8 +134,8 @@ class Viewer extends PureComponent {
 
   setLocation = (position) => {
     if (position) {      
-      if (!this.state.geolocation || this.state.geolocation.latitude !== position.latitude || 
-        this.state.geolocation.longitude !== position.longitude) {
+      if (!this.state.geolocation || this.state.geolocation.latitude !== position.coords.latitude || 
+        this.state.geolocation.longitude !== position.coords.longitude) {
           let newGeolocation = [position.coords.latitude, position.coords.longitude];
           this.setState({ geolocation: newGeolocation });
       }
