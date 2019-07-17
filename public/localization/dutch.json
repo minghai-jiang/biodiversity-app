@@ -66,6 +66,7 @@
   "No":"Nee",
   "Text":"Tekst",
   "Numeric":"Getal",
+  "Date":"Datum",
   "Boolean":"Ja/Nee",
   "Move": "Verplaats",
   "Creating": "Bezig met",
@@ -101,7 +102,7 @@
   "Actions": "Acties",
   "new user": "nieuwe gebruiker",
 
-  "levels": "Ieder toegangsniveau impliceert alle lagere toegangsniveaus.<br/><br/>Niveau 100: Het recht om een kaart te zien.<br/>Niveau 200: Het recht om de geaggregeerde data van een kaart te zien..<br/>Niveau 300: Het recht om geoMessages te zien.<br/>Niveau 400: Het recht om geoMessages te schrijven.<br/>Niveau 410: Het recht om fotos toe te voegen aan geoMessages.<br/>Niveau 500: Het recht op polygonen toe te voegen.<br/>Niveau 600: Het recht om geoMessages te verwijdren. <br/>Niveau 700: Het recht om polygonen te wijzigen of verwijderen.<br/>Niveau 750: Het recht om formulieren te maken en verwijderen.<br/>Niveau 800: Het recht om polygonlagen te wijzigen of verwijdren.<br/>Niveau 900: Het recht om gebruikers toe te voegen aan groepen tot niveau 900. <br/>Niveau 1000: Het recht om een kaart te publiceren en gebruikersgroepen te maken.<br/>",
+  "levels": "Ieder toegangsniveau impliceert alle lagere toegangsniveaus.<br/><br/>Niveau 100: Het recht om een kaart te zien.<br/>Niveau 200: Het recht om de geaggregeerde data van een kaart te zien..<br/>Niveau 300: Het recht om geoMessages te zien.<br/>Niveau 400: Het recht om geoMessages te schrijven.<br/>Niveau 410: Het recht om fotos toe te voegen aan geoMessages.<br/>Niveau 420: Het recht om niet publieke geoMessages toe te voegen. <br/>Niveau 500: Het recht op polygonen toe te voegen.<br/><br/>Niveau 510: Het recht om niet publieke geoMessages te zien.<br/>Niveau 600: Het recht om geoMessages te verwijdren. <br/>Niveau 700: Het recht om polygonen te wijzigen of verwijderen.<br/>Niveau 750: Het recht om formulieren te maken en verwijderen.<br/>Niveau 800: Het recht om polygonlagen te wijzigen of verwijdren.<br/>Niveau 900: Het recht om gebruikers toe te voegen aan groepen tot niveau 900. <br/>Niveau 1000: Het recht om een kaart te publiceren en gebruikersgroepen te maken.<br/>",
 
   "ViewerControlsPane": "Besturing",
   "ViewerMapPane": "Kaart",

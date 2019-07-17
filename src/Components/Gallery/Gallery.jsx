@@ -67,8 +67,6 @@ export class Gallery extends Component {
             <h1>{this.props.localization['monitoring']}</h1>
             <select defaultValue="default" onChange={this.onMonitoringServiceChange}>
               <option value="default" disabled hidden>{this.props.localization['ChoosePrompt']}</option>
-              <option value="tutorial">{this.props.localization['ApiTutorial']}</option>
-              <option value="Documentation">{this.props.localization['Documentation']}</option>
               <option value="Northern Paraguay deforestation">{this.props.localization['Northern Paraguay deforestation']}</option>
               <option value="Flora management in the Netherlands">{this.props.localization['Flora management in the Netherlands']}</option>
               <option value="Appendix">{this.props.localization['Appendix']}</option>
