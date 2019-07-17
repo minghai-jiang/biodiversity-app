@@ -32,7 +32,7 @@ import ApiManager from '../../../../ApiManager';
 import GeoMessage from './GeoMessage/GeoMessage';
 import GeoMessageForm from './GeoMessageForm/GeoMessageForm';
 
-const SCROLL_LOAD_THRESHOLD = 2000;
+const SCROLL_LOAD_THRESHOLD = 1000;
 const NO_GROUP_NAME = 'no group';
 
 const FILTER_POLYGON_COLOR = '#ff3030'
@@ -67,7 +67,7 @@ class GeoMessageControl extends PureComponent {
       
       availableGroups: [],
 
-      filtersExpanded: true,
+      filtersExpanded: false,
       filterSettings: this.createEmptyFilterSettings(),
       count: 0
     };
@@ -368,7 +368,6 @@ class GeoMessageControl extends PureComponent {
 
     Promise.all([standardTilesPromise, polygonPromise, customPolygonPromise])
       .then(results => {
-        debugger;
         let geoJsonElements = [];
 
         for (let i = 0; i < results.length; i++) {
@@ -452,13 +451,10 @@ class GeoMessageControl extends PureComponent {
       return;
     }
 
-    this.feedScrollLoading = true;    
-
-    let oldScrollHeight = messagesContainer.scrollHeight;
+    this.feedScrollLoading = true;
 
     this.getFeedMessages(() => {
       this.setState({ loading: false})
-      setTimeout(messagesContainer.scrollTop = oldScrollHeight, 100);
       this.feedScrollLoading = false;
     })
       .catch(err => {
@@ -582,8 +578,13 @@ class GeoMessageControl extends PureComponent {
       downloadGeometries = (<span>Apply to map</span>);
     }
 
+    let filtersSectionClass = 'data-pane-card groups-filter-card';
+    if (this.state.filtersExpanded) {
+      filtersSectionClass += ' groups-filter-card-expanded';
+    }
+
     let filterSection = (
-      <Card className='data-pane-card groups-filter-card'>
+      <Card className={filtersSectionClass}>
         <CardHeader
           className='data-pane-title-header groups-filter-card-header'
           title={

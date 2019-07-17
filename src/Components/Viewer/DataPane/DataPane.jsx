@@ -188,8 +188,6 @@ class DataPane extends PureComponent {
       actionsClassName += ' data-pane-title-actions-right'
     }
 
-    let titleFontSize = 1.8 - 0.03 * title.length;
-    
     return (
       <div className={dataPaneClassName} style={style}>
 
@@ -213,7 +211,6 @@ class DataPane extends PureComponent {
                 variant="h6" 
                 component="h2" 
                 className='no-text-transform data-pane-title'
-                style={{ fontSize: `${titleFontSize}vw`}}
               >
                 {title}
               </Typography>
@@ -223,7 +220,7 @@ class DataPane extends PureComponent {
                 <Button
                   onClick={this.onFlyTo}
                 >
-                  <div className='data-pane-title-card-subtitle'>
+                  <div>
                     {idText}
                   </div>
                 </Button> : null

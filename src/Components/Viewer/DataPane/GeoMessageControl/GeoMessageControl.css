@@ -16,6 +16,11 @@ div.card-form-control:not(:first-of-type) {
 }
 
 div.groups-filter-card {
+  height: 50px;
+  transition: height 300ms ease-out;
+}
+
+div.groups-filter-card-expanded {
   height: 220px;
 }
 
