@@ -391,7 +391,9 @@ class GeoMessageControl extends PureComponent {
 
         this.geometryResults = results;
         this.setState({ geoMessageElements: geoMessageElements, count: count }, () => {
-          cb();
+          if (cb){
+            cb();
+          }
           setTimeout(this.onGeoMessagesScroll, 1000);
         });
       });
@@ -422,11 +424,54 @@ class GeoMessageControl extends PureComponent {
   }
 
   onDeleteMessage = (deletedMessage) => {
-    let newGeoMessageElements = this.state.geoMessageElements.filter(
-      x => x.props.message.id !== deletedMessage.id
-    );
-    
-    this.setState({ geoMessageElements: newGeoMessageElements }, this.scrollGeoMessagesToBottom);
+    this.rawGeoMessages = this.rawGeoMessages.filter(x => x.id !== deletedMessage.id);
+
+    if (!this.props.isFeed) {    
+      let newGeoMessageElements = this.state.geoMessageElements.filter(
+        x => x.props.message.id !== deletedMessage.id
+      );
+      this.setState({ geoMessageElements: newGeoMessageElements }, () => {
+        if (!this.props.isFeed) {
+          this.scrollGeoMessagesToBottom();
+        }
+      });
+    }
+    else {
+      this.constructGeoMessageElements();
+
+      let selectedElement = this.props.element;
+
+      if (selectedElement) {
+        let sameElement = selectedElement.type === deletedMessage.type;
+
+        if (sameElement) {
+          let properties = selectedElement.feature.properties;
+          let elementId = deletedMessage.elementId;
+
+          let hasOtherMessages = false;
+
+          if (selectedElement.type === ViewerUtility.standardTileLayerType) {
+            sameElement = properties.tileX === elementId.tileX && 
+              properties.tileY === elementId.tileY && properties.zoom === elementId.zoom;
+
+            hasOtherMessages = this.rawGeoMessages.find(x => {
+              return x.type === selectedElement.type && x.elementId.tileX === properties.tileX &&
+                x.elementId.tileY === properties.tileY && x.elementId.zoom === properties.zoom;
+            });
+          }
+          else {
+            sameElement = properties.id === elementId;
+            hasOtherMessages = this.rawGeoMessages.find(x => {
+              return x.type === selectedElement.type && x.id === properties.id
+            });
+          }
+
+          if (sameElement && !hasOtherMessages) {
+            this.props.onDeselect();
+          }
+        }
+      }
+    }
   }
 
   scrollGeoMessagesToBottom = () => {

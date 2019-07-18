@@ -610,6 +610,7 @@ class Viewer extends PureComponent {
             onLayersChange={this.onLayersChange}
             onFeatureClick={this.selectFeature}
             onFlyTo={this.onFlyTo}
+            onDeselect={this.deselectCurrentElement}
           />
           
           <div className='viewer-pane map-pane' style={mapPaneStyle}>
