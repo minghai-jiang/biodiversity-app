@@ -102,7 +102,7 @@
   "Actions": "Actions",
   "new user": "new user",
 
-  "levels": "A higher access level implies all lower levels.<br/><br/>Level 100: The right to view the map.<br/>Level 200: The right to access aggregated data of a map.<br/>Level 300: The right to view geoMessages.<br/>Level 400: The right to add geoMessages.<br/>Level 410: The right to include photos in a geoMessages.<br/>Level 420: The right to add private geoMessages.<br/>Level 500: The right to add polygons.<br/>Level 510: The right to view private messages.<br/>  Level 600: The right to delete geoMessages.<br/>Level 700: The right to alter or delete polygons.<br/>Level 800: The right to alter polygon layers.<br/>Level 900: The right to add users to user groups up till level 900.<br/>Level 1000: The right to make content public and to create or alter user groups.<br/>",
+  "levels": "A higher access level implies all lower levels.<br/><br/>Level 100: The right to view the map.<br/>Level 200: The right to access aggregated data of a map.<br/>Level 300: The right to view geoMessages.<br/>Level 400: The right to add geoMessages.<br/>Level 410: The right to include photos in a geoMessages.<br/>Level 420: The right to add private geoMessages.<br/>Level 500: The right to add polygons.<br/>Level 550: The right to view private messages.<br/>  Level 600: The right to delete geoMessages.<br/>Level 700: The right to alter or delete polygons.<br/>Level 800: The right to alter polygon layers.<br/>Level 900: The right to add users to user groups up till level 900.<br/>Level 1000: The right to make content public and to create or alter user groups.<br/>",
 
   "ViewerControlsPane": "Controls",
   "ViewerMapPane": "Map",
