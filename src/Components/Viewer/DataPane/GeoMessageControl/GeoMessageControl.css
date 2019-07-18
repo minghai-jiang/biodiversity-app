@@ -21,7 +21,7 @@ div.groups-filter-card {
 }
 
 div.groups-filter-card-expanded {
-  height: 220px;
+  height: 280px;
 }
 
 div.groups-filter-card-header {
@@ -40,7 +40,7 @@ div.geomessage-messages-card-feed {
 }
 
 div.geomessage-messages-card-feed-filters {
-  height: calc(100% - 225px);
+  height: calc(100% - 285px);
 }
 
 button.feed-download-geometry-button {
