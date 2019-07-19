@@ -1,4 +1,8 @@
 import FileSaver from 'file-saver';
+import streamSaver from 'streamsaver';
+import { isAndroid, isMobile } from 'react-device-detect';
+
+// const download = require("downloadjs")(data, strFileName, strMimeType);
 
 const TILE = 'tile';
 const STANDARD_TILE = 'standard_tile';
@@ -61,9 +65,22 @@ const ViewerUtility = {
     customPolygon: CUSTOM_POLYGON
   },
 
-  download: (filename, text, mime) => {
-    let blob = new Blob([text], {type: `${mime};charset=utf-8`});
-    FileSaver.saveAs(blob, filename);
+  download: (fileName, text, mime) => {
+    if (isMobile && isAndroid) {
+      const fileStream = streamSaver.createWriteStream(fileName);
+    
+      new Response(text).body
+        .pipeTo(fileStream)
+        .then(() => {
+        }, 
+        (e) => {
+          console.warn(e);
+        });
+    }
+    else {
+      let file = new File([text], fileName, {type: `${mime};charset=utf-8}`}); 
+      FileSaver.saveAs(file);
+    }
   },
 
   createGeoJsonLayerStyle: (color, weight, fillOpacity) => {

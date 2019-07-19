@@ -160,7 +160,7 @@ class Viewer extends PureComponent {
     
     if (this.state.isSmallWindow !== isSmallWindow) {
       this.setState({ isSmallWindow: isSmallWindow }, () => {
-        this.openPane(MAP_PANE_NAME);
+        this.openPane(MAP_PANE_NAME, isSmallWindow);
         if (cb) {
           cb();
         }
@@ -229,12 +229,13 @@ class Viewer extends PureComponent {
     else {
       if (!currentPanes.includes(paneName)) {
         currentPanes = [paneName];
+        changed = true;
       }
-      else {
+      else if (closePane) {
         currentPanes = [MAP_PANE_NAME];
+        changed = true;
       }
 
-      changed = true;
     }
 
     if (changed) {
@@ -610,6 +611,7 @@ class Viewer extends PureComponent {
             onLayersChange={this.onLayersChange}
             onFeatureClick={this.selectFeature}
             onFlyTo={this.onFlyTo}
+            onDeselect={this.deselectCurrentElement}
           />
           
           <div className='viewer-pane map-pane' style={mapPaneStyle}>

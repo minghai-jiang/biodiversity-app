@@ -128,6 +128,7 @@ class GeoMessageControl extends PureComponent {
     return {
       applyToMap: false,
       selectedGroups: [],
+      selectedTypes: [],
       selectedForms: []
     };
   }
@@ -251,6 +252,10 @@ class GeoMessageControl extends PureComponent {
 
     for (let i = 0; i < rawGeoMessages.length; i++) {
       let message = rawGeoMessages[i];
+
+      if (filterSettings.selectedTypes.length > 0 && !filterSettings.selectedTypes.includes(message.type)) {
+        continue;
+      }
 
       if (filterSettings.selectedForms.length > 0 && 
         (!message.form || !filterSettings.selectedForms.includes(message.form.formName))) {
@@ -391,11 +396,12 @@ class GeoMessageControl extends PureComponent {
 
         this.geometryResults = results;
         this.setState({ geoMessageElements: geoMessageElements, count: count }, () => {
-          cb();
+          if (cb){
+            cb();
+          }
           setTimeout(this.onGeoMessagesScroll, 1000);
         });
       });
-
   }
 
   createGeomessageElement = (message, feedMode) => {
@@ -422,11 +428,54 @@ class GeoMessageControl extends PureComponent {
   }
 
   onDeleteMessage = (deletedMessage) => {
-    let newGeoMessageElements = this.state.geoMessageElements.filter(
-      x => x.props.message.id !== deletedMessage.id
-    );
-    
-    this.setState({ geoMessageElements: newGeoMessageElements }, this.scrollGeoMessagesToBottom);
+    this.rawGeoMessages = this.rawGeoMessages.filter(x => x.id !== deletedMessage.id);
+
+    if (!this.props.isFeed) {    
+      let newGeoMessageElements = this.state.geoMessageElements.filter(
+        x => x.props.message.id !== deletedMessage.id
+      );
+      this.setState({ geoMessageElements: newGeoMessageElements }, () => {
+        if (!this.props.isFeed) {
+          this.scrollGeoMessagesToBottom();
+        }
+      });
+    }
+    else {
+      this.constructGeoMessageElements();
+
+      let selectedElement = this.props.element;
+
+      if (selectedElement) {
+        let sameElement = selectedElement.type === deletedMessage.type;
+
+        if (sameElement) {
+          let properties = selectedElement.feature.properties;
+          let elementId = deletedMessage.elementId;
+
+          let hasOtherMessages = false;
+
+          if (selectedElement.type === ViewerUtility.standardTileLayerType) {
+            sameElement = properties.tileX === elementId.tileX && 
+              properties.tileY === elementId.tileY && properties.zoom === elementId.zoom;
+
+            hasOtherMessages = this.rawGeoMessages.find(x => {
+              return x.type === selectedElement.type && x.elementId.tileX === properties.tileX &&
+                x.elementId.tileY === properties.tileY && x.elementId.zoom === properties.zoom;
+            });
+          }
+          else {
+            sameElement = properties.id === elementId;
+            hasOtherMessages = this.rawGeoMessages.find(x => {
+              return x.type === selectedElement.type && x.id === properties.id
+            });
+          }
+
+          if (sameElement && !hasOtherMessages) {
+            this.props.onDeselect();
+          }
+        }
+      }
+    }
   }
 
   scrollGeoMessagesToBottom = () => {
@@ -630,6 +679,24 @@ class GeoMessageControl extends PureComponent {
               </Select>              
             </FormControl>
             <FormControl className='card-form-control selector-single'>
+              <InputLabel htmlFor='select-multiple-checkbox-forms'>Type filter</InputLabel>
+              <Select
+                className='selector'
+                multiple
+                value={this.state.filterSettings.selectedTypes}
+                onChange={(e) => this.onFilterChange(e, 'selectedTypes', false, REFRESH_MODE.reconstructOnly)}
+                input={<Input id='select-multiple-checkbox-forms' />}
+                renderValue={selected => selected.join(', ')}
+              >
+                {[ViewerUtility.standardTileLayerType, ViewerUtility.polygonLayerType, ViewerUtility.customPolygonTileLayerType].map(type => (
+                  <MenuItem key={type} value={type}>
+                    <Checkbox checked={this.state.filterSettings.selectedTypes.includes(type)} />
+                    <ListItemText primary={type} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl className='card-form-control selector-single'>
               <InputLabel htmlFor='select-multiple-checkbox-forms'>Forms filter</InputLabel>
               <Select
                 className='selector'
@@ -700,7 +767,5 @@ class GeoMessageControl extends PureComponent {
     );
   }
 }
-
-
 
 export default GeoMessageControl;

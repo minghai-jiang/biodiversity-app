@@ -88,7 +88,7 @@ class GeoMessageForm extends PureComponent {
 
     let formSelect = (
       <Select key='form-selector' className='selector' onChange={this.onSelectForm} value={this.state.selectedFormName}>
-        <MenuItem key='default' value='default' disabled hidden>(Optional) Select a form</MenuItem>
+        <MenuItem key='default' value='default'>(Optional) Select a form</MenuItem>
         {formOptions}
       </Select>
     )
