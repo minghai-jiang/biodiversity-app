@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 
-import { 
+import {
   Card,
   Checkbox,
   CardHeader,
@@ -54,7 +54,7 @@ class CustomPolygonLayersControl extends PureComponent {
 
     let differentMap = this.props.map !== prevProps.map;
 
-    let differentTimestamp = !prevProps.timestampRange || 
+    let differentTimestamp = !prevProps.timestampRange ||
       this.props.timestampRange.start !== prevProps.timestampRange.start ||
       this.props.timestampRange.end !== prevProps.timestampRange.end;
 
@@ -74,8 +74,8 @@ class CustomPolygonLayersControl extends PureComponent {
         selectedLayers = [];
         this.layerGeoJsons = {};
 
-        this.setState({ 
-          availableLayers: availableLayers, 
+        this.setState({
+          availableLayers: availableLayers,
           selectedLayers: selectedLayers,
           count: {}
         });
@@ -110,9 +110,9 @@ class CustomPolygonLayersControl extends PureComponent {
           color: layer.color
         });
       }
-    }    
+    }
 
-    return availableLayers;  
+    return availableLayers;
   }
 
   createLayerCheckboxes = () => {
@@ -138,7 +138,7 @@ class CustomPolygonLayersControl extends PureComponent {
         }
         else {
           downloadButton = (
-            <IconButton 
+            <IconButton
               className='download-geometry-button'
               onClick={() => this.onDownload(availableLayer.name)}
             >
@@ -158,11 +158,11 @@ class CustomPolygonLayersControl extends PureComponent {
 
       let option = (
         <div key={availableLayer.name} className='layer-checkboxes'>
-          <Checkbox 
-            key={availableLayer.name} 
+          <Checkbox
+            key={availableLayer.name}
             classes={{ root: 'layers-control-checkbox' }}
             color='primary'
-            value={availableLayer.name} 
+            value={availableLayer.name}
             name={availableLayer.name}
             onChange={this.onLayerChange}
             checked={checked}
@@ -191,7 +191,7 @@ class CustomPolygonLayersControl extends PureComponent {
 
   prepareLayers = async (map, timestampRange, availableLayers, selectedLayers) => {
     let promises = [];
-    
+
     for (let i = 0; i < availableLayers.length; i++) {
 
       let customPolygonLayer = availableLayers[i]
@@ -255,7 +255,7 @@ class CustomPolygonLayersControl extends PureComponent {
               zIndex={ViewerUtility.customPolygonLayerZIndex + i}
               onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
             />
-          );        
+          );
         });
 
       promises.push(leafletGeojsonLayerPromise);
@@ -280,7 +280,7 @@ class CustomPolygonLayersControl extends PureComponent {
 
       newSelectedLayers = [...this.state.selectedLayers, availableLayer];
 
-      changed = true; 
+      changed = true;
     }
     else if (!checked && isSelected) {
       newSelectedLayers = Utility.arrayRemove(this.state.selectedLayers, isSelected);
@@ -365,8 +365,8 @@ class CustomPolygonLayersControl extends PureComponent {
             className={'card-content'}
           >
             {
-              !this.props.override ? 
-                this.createLayerCheckboxes() : 
+              !this.props.override ?
+                this.createLayerCheckboxes() :
                 <div className='controls-pane-background-text'>Controlled by feed</div>
             }
           </CardContent>
