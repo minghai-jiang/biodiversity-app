@@ -106,5 +106,41 @@
 
   "ViewerControlsPane": "Besturing",
   "ViewerMapPane": "Kaart",
-  "ViewerDataPane": "Data"
+  "ViewerDataPane": "Data",
+
+
+  "Select an Atlas":"Kies een Atlas",
+  "Select a map":"Kies een kaart",
+  "Fly to":"Vlieg naar",
+  "Current map":"Huidige kaart",
+  "Layers":"Lagen",
+  "Standard tiles":"Standaard tegels",
+  "base":"basis laag",
+  "Polygons":"Polygonen",
+  "Custom polygons":"Getekende polygonen",
+  "Timestamps":"Intervallen",
+  "Range":"Tijdvlak",
+  "Map":"Kaart",
+  "GEOMESSAGE FEED":"GEOMESSAGE historie",
+  "Legend":"Legenda",
+  "Classes":"Klassen",
+  "Measurements":"Metingen",
+  "Polygon layers":"Polygoon lagen",
+  "Custom polygon layers":"Getekende polygoon lagen",
+  "GeoMessage":"GeoMessage",
+  "Filters":"Filters",
+  "Apply to map":"Toon op kaart",
+  "Groups filter":"Groepen filter",
+  "Forms filter":"Formulieren filter",
+  "Type filter":"type filter",
+  "standard tile":"standaard tegels",
+  "polygon":"polygoon",
+  "custom polygon":"getekend polygoon",
+  "Drawn polygon":"Ingetekend polygoon",
+  "ANALYSE":"ANALYSE",
+  "ADD":"VOEG TOE",
+  "DELETE":"VERWIJDER",
+  "GEOMESSAGE":"GEOMESSAGE",
+  "UPDATE":"PAS AAN"
+  
 }
