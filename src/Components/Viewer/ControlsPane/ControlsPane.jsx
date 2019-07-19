@@ -96,17 +96,20 @@ class ControlsPane extends PureComponent {
     return (
       <div className='viewer-pane controls-pane' style={style}>
         <MapSelector
+          localization={this.props.localization}
           user={this.props.user}
           onSelectMap={this.onSelectMap}
         />
 
         <FlyToControl
+          localization={this.props.localization}
           user={this.props.user}
           map={this.state.map}
           onFlyTo={this.props.onFlyTo}
         />
 
         <TileLayersControl
+          localization={this.props.localization}
           user={this.props.user}
           map={this.state.map}
           timestampRange={this.props.timestampRange}
@@ -115,6 +118,7 @@ class ControlsPane extends PureComponent {
 
         <StandardTileLayersControl
           ref={this.standardTileLayersControl}
+          localization={this.props.localization}
           user={this.props.user}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
@@ -126,6 +130,7 @@ class ControlsPane extends PureComponent {
 
         <PolygonLayersControl
           ref={this.polygonLayersControl}
+          localization={this.props.localization}
           user={this.props.user}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}
@@ -137,6 +142,7 @@ class ControlsPane extends PureComponent {
 
         <CustomPolygonLayersControl
           ref={this.customPolygonLayersControl}
+          localization={this.props.localization}
           user={this.props.user}
           map={this.state.map}
           leafletMapViewport={this.props.leafletMapViewport}

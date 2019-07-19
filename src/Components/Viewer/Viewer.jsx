@@ -595,11 +595,11 @@ class Viewer extends PureComponent {
     }
 
     return (
-      <div className='viewer'>
-        
+      <div className='viewer'>        
         <div className='viewer-main-container'>
           <ControlsPane
             ref={this.controlsPane}
+            localization={this.props.localization}
             user={this.props.user}
             isOpen={this.state.panes.includes(CONTROL_PANE_NAME)}
             leafletMapViewport={this.state.leafletMapViewport}
@@ -616,11 +616,13 @@ class Viewer extends PureComponent {
           
           <div className='viewer-pane map-pane' style={mapPaneStyle}>
             <TimestampSelector
+              localization={this.props.localization}
               map={this.state.map}
               onSelectTimestamp={this.onSelectTimestamp}
             />
             <SelectionPane
               ref={this.selectionPane}
+              localization={this.props.localization}
               user={this.props.user}
               map={this.state.map}
               element={this.state.selectedElement}
@@ -643,6 +645,7 @@ class Viewer extends PureComponent {
 
           <DataPane
             ref={this.dataPane}
+            localization={this.props.localization}
             user={this.props.user}
             isOpen={this.state.panes.includes(DATA_PANE_NAME)}
             map={this.state.map}

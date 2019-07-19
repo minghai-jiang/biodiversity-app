@@ -99,6 +99,7 @@ class DataPane extends PureComponent {
               GeoMessage Feed
             </Button>
             <LegendControl
+              localization={this.props.localization}
               map={this.props.map}
             />
           </div>
@@ -139,6 +140,7 @@ class DataPane extends PureComponent {
     if (action === ViewerUtility.dataPaneAction.analyse) {
       actionControl = (
         <AnalyseControl
+          localization={this.props.localization}
           user={this.props.user}
           map={this.props.map}
           element={this.props.element}    
@@ -150,6 +152,7 @@ class DataPane extends PureComponent {
       action === ViewerUtility.dataPaneAction.feed) {
       actionControl = (
         <GeoMessageControl
+          localization={this.props.localization}
           user={this.props.user}
           map={this.props.map}
           timestampRange={this.props.timestampRange}
@@ -167,6 +170,7 @@ class DataPane extends PureComponent {
       action === ViewerUtility.dataPaneAction.editCustomPolygon) {
         actionControl = (
           <CustomPolygonControl
+            localization={this.props.localization}
             user={this.props.user}
             map={this.props.map}
             timestampRange={this.props.timestampRange}

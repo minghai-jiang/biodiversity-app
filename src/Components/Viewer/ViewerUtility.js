@@ -2,8 +2,6 @@ import FileSaver from 'file-saver';
 import streamSaver from 'streamsaver';
 import { isAndroid, isMobile } from 'react-device-detect';
 
-// const download = require("downloadjs")(data, strFileName, strMimeType);
-
 const TILE = 'tile';
 const STANDARD_TILE = 'standard_tile';
 const POLYGON = 'polygon';

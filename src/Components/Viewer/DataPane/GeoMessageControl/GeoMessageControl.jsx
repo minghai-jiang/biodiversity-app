@@ -21,7 +21,6 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 
-
 import Utility from '../../../../Utility';
 import ViewerUtility from '../../ViewerUtility';
 import DataPaneUtility from '../DataPaneUtility';
@@ -408,6 +407,7 @@ class GeoMessageControl extends PureComponent {
     return (
       <GeoMessage
         key={message.id}
+        localization={this.props.localization}
         user={this.props.user}
         map={this.props.map}
         message={message}
@@ -755,6 +755,7 @@ class GeoMessageControl extends PureComponent {
         {
           !isFeed ? 
             <GeoMessageForm
+              localization={this.props.localization}
               user={this.props.user}
               map={this.props.map}
               timestampRange={this.props.timestampRange}
