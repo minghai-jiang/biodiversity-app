@@ -346,7 +346,7 @@ class CustomPolygonLayersControl extends PureComponent {
           className='card-header'
           title={
             <Typography gutterBottom variant="h6" component="h2">
-              Custom polygons
+              {this.props.localization['Custom polygons']}
             </Typography>
           }
           action={

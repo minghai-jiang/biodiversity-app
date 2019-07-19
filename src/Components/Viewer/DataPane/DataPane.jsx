@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 
-import { 
-  Card,  
+import {
+  Card,
   CardHeader,
   CardActions,
   Typography,
@@ -56,7 +56,7 @@ class DataPane extends PureComponent {
     let action = this.props.action;
 
     if (action === ViewerUtility.dataPaneAction.feed) {
-      this.props.onFlyTo({ type: ViewerUtility.flyToType.map });      
+      this.props.onFlyTo({ type: ViewerUtility.flyToType.map });
     }
     else {
       this.props.onFlyTo({ type: ViewerUtility.flyToType.currentElement });
@@ -74,13 +74,13 @@ class DataPane extends PureComponent {
     let element = this.props.element;
     let action = this.props.action;
     let title = '';
-    let idText = null;    
+    let idText = null;
     let homeElement = null;
     let actionControl = null;
 
     if (home) {
       title = 'Map';
-      let map = this.props.map; 
+      let map = this.props.map;
 
       if (map) {
         idText = map.name;
@@ -96,7 +96,7 @@ class DataPane extends PureComponent {
               disabled={!hasGeoMessageAccess}
               onClick={() => this.props.onDataPaneAction(ViewerUtility.dataPaneAction.feed)}
             >
-              GeoMessage Feed
+              {this.props.localization['GEOMESSAGE FEED']}
             </Button>
             <LegendControl
               localization={this.props.localization}
@@ -109,7 +109,7 @@ class DataPane extends PureComponent {
       else {
         return (
           <div className='viewer-pane data-pane' style={style}>
-            Please select a map first.
+            {this.props.localization['Please select a map first.']}
           </div>
         )
       }
@@ -117,7 +117,7 @@ class DataPane extends PureComponent {
     else if (action === ViewerUtility.dataPaneAction.feed) {
       title = 'GeoMessage Feed';
       idText = this.props.map.name;
-    }    
+    }
     else if (element) {
       if (element.type === ViewerUtility.standardTileLayerType) {
         title = 'Standard tile';
@@ -143,12 +143,12 @@ class DataPane extends PureComponent {
           localization={this.props.localization}
           user={this.props.user}
           map={this.props.map}
-          element={this.props.element}    
+          element={this.props.element}
           home={home}
         />
       );
     }
-    else if (action === ViewerUtility.dataPaneAction.geoMessage || 
+    else if (action === ViewerUtility.dataPaneAction.geoMessage ||
       action === ViewerUtility.dataPaneAction.feed) {
       actionControl = (
         <GeoMessageControl
@@ -196,10 +196,10 @@ class DataPane extends PureComponent {
     return (
       <div className={dataPaneClassName} style={style}>
 
-        <Card className='data-pane-title-card'>        
+        <Card className='data-pane-title-card'>
           <CardActions className={actionsClassName}>
             {
-              !home || action ? 
+              !home || action ?
                 <IconButton
                   className='data-pane-title-actions-button'
                   aria-label='Home'
@@ -212,16 +212,16 @@ class DataPane extends PureComponent {
           <CardHeader
             className='data-pane-title-header'
             title={
-              <Typography 
-                variant="h6" 
-                component="h2" 
+              <Typography
+                variant="h6"
+                component="h2"
                 className='no-text-transform data-pane-title'
               >
                 {title}
               </Typography>
             }
             subheader={
-              idText ? 
+              idText ?
                 <Button
                   onClick={this.onFlyTo}
                 >

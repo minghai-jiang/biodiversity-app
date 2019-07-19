@@ -22,10 +22,10 @@ export class MapSelector extends PureComponent {
       mapselect: null,
 
       selectedAtlas: 'default',
-      selectedMap: { id: 'default' },      
+      selectedMap: { id: 'default' },
     };
   }
-  
+
   componentDidUpdate(prevProps) {
     if (this.props.user !== prevProps.user) {
       this.getMaps();
@@ -60,8 +60,8 @@ export class MapSelector extends PureComponent {
   onSelectMap = (e) => {
     if (!e.target.value) {
       return;
-    } 
-    
+    }
+
     let map = this.state.maps.find(x => x.id === e.target.value);
 
     if (!map) {
@@ -70,7 +70,7 @@ export class MapSelector extends PureComponent {
 
     this.setState({ selectedMap: map });
 
-    if (!map.timestamps || !map.layer) {      
+    if (!map.timestamps || !map.layer) {
       this.getMapMetadata(map)
         .then(() => {
           this.props.onSelectMap(map);
@@ -78,7 +78,7 @@ export class MapSelector extends PureComponent {
         .catch(err => {
           ErrorHandler.alert(err);
         });
-    }    
+    }
   };
 
   getMapMetadata = (map) => {
@@ -104,11 +104,11 @@ export class MapSelector extends PureComponent {
 
     let promises = [
       timestampsPromise,
-      tileLayersPromise, 
-      polygonLayersPromise, 
+      tileLayersPromise,
+      polygonLayersPromise,
       customPolygonLayersPromise,
 
-      classesPromise, 
+      classesPromise,
       measurementsPromise,
       formsPromise
     ];
@@ -162,7 +162,7 @@ export class MapSelector extends PureComponent {
           atlasMapCount[atlas] = 1;
         }
         else {
-          atlasMapCount[atlas] += 1; 
+          atlasMapCount[atlas] += 1;
         }
       }
     }
@@ -175,21 +175,21 @@ export class MapSelector extends PureComponent {
 
     if (user && (user.username === ViewerUtility.admin || user.username === 'demo_user' || user.username === 'minghai')) {
       atlases.push(ADMIN_ATLAS);
-      atlasMapCount[ADMIN_ATLAS] = maps.length; 
+      atlasMapCount[ADMIN_ATLAS] = maps.length;
     }
 
     for (let i = 0; i < atlases.length; i++) {
       options.push(
         <MenuItem value={atlases[i]} key={i}>{`${atlases[i]} (${atlasMapCount[atlases[i]]})`}</MenuItem>
-      );  
+      );
     }
 
     let atlasSelect = (
       <Select className='selector map-selector-select' onChange={this.onSelectAtlas} value={this.state.selectedAtlas}>
-        <MenuItem value='default' disabled hidden>Select an Atlas</MenuItem>
+        <MenuItem value='default' disabled hidden>{this.props.localization['Select an Atlas']}</MenuItem>
         {options}
       </Select>
-    );    
+    );
 
     return atlasSelect;
   }
@@ -205,7 +205,7 @@ export class MapSelector extends PureComponent {
     let mapsOfAtlas = maps;
     if (selectedAtlas !== ADMIN_ATLAS) {
       mapsOfAtlas = maps.filter(x => x.atlases.includes(selectedAtlas));
-    } 
+    }
 
     let options = [];
 
@@ -218,7 +218,7 @@ export class MapSelector extends PureComponent {
 
     let mapSelect = (
       <Select className='selector' onChange={this.onSelectMap} value={this.state.selectedMap.id}>
-        <MenuItem value='default' disabled hidden>Select a map</MenuItem>
+        <MenuItem value='default' disabled hidden>{this.props.localization['Select a map']}</MenuItem>
         {options}
       </Select>
     )

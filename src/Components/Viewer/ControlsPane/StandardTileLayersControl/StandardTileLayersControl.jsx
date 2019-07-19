@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { GeoJSON } from 'react-leaflet';
 
-import { 
+import {
   Card,
   Checkbox,
   CardHeader,
@@ -21,9 +21,9 @@ import './StandardTileLayersControl.css';
 import ApiManager from '../../../../ApiManager';
 
 const STANDARD_TILES_LAYERS_DISPLAY_NAME = 'standard tiles';
-const STANDARD_TILES_LAYER = { 
-  type: STANDARD_TILES_LAYERS_DISPLAY_NAME, 
-  name: STANDARD_TILES_LAYERS_DISPLAY_NAME 
+const STANDARD_TILES_LAYER = {
+  type: STANDARD_TILES_LAYERS_DISPLAY_NAME,
+  name: STANDARD_TILES_LAYERS_DISPLAY_NAME
 };
 
 const MAX_TILES = 500;
@@ -59,7 +59,7 @@ class StandardTileLayersControl extends PureComponent {
 
     let differentMap = this.props.map !== prevProps.map;
 
-    let differentTimestamp = !prevProps.timestampRange || 
+    let differentTimestamp = !prevProps.timestampRange ||
       this.props.timestampRange.start !== prevProps.timestampRange.start ||
       this.props.timestampRange.end !== prevProps.timestampRange.end;
 
@@ -80,13 +80,13 @@ class StandardTileLayersControl extends PureComponent {
         selectedLayers = [];
 
         this.standardTilesGeoJson = null;
-        this.setState({ 
-          availableLayers: availableLayers, 
+        this.setState({
+          availableLayers: availableLayers,
           selectedLayers: selectedLayers,
           count: null
         });
       }
-      
+
       this.prepareLayers(this.props.map, this.props.timestampRange, selectedLayers)
         .then(leafletLayers => {
           this.props.onLayersChange(leafletLayers);
@@ -95,7 +95,7 @@ class StandardTileLayersControl extends PureComponent {
   }
 
   selectLayer = (layer) => {
-    if (layer === ViewerUtility.standardTileLayerType && 
+    if (layer === ViewerUtility.standardTileLayerType &&
       !this.state.selectedLayers.includes[STANDARD_TILES_LAYER]
       ) {
       this.setState({ selectedLayers: [STANDARD_TILES_LAYER] });
@@ -123,7 +123,7 @@ class StandardTileLayersControl extends PureComponent {
         }
         else {
           downloadButton = (
-            <IconButton 
+            <IconButton
               className='download-geometry-button'
               onClick={() => this.onDownload()}
             >
@@ -143,11 +143,11 @@ class StandardTileLayersControl extends PureComponent {
 
       let option = (
         <div key={availableLayer.name} className='layer-checkboxes'>
-          <Checkbox 
-            key={availableLayer.name} 
+          <Checkbox
+            key={availableLayer.name}
             classes={{ root: 'layers-control-checkbox' }}
             color='primary'
-            value={availableLayer.name} 
+            value={availableLayer.name}
             name={availableLayer.name}
             onChange={this.onLayerChange}
             checked={checked}
@@ -219,7 +219,7 @@ class StandardTileLayersControl extends PureComponent {
             zIndex={ViewerUtility.standardTileLayerZIndex}
             onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature) })}
           />
-        );        
+        );
       });
 
     return leafletGeojsonLayer;
@@ -239,7 +239,7 @@ class StandardTileLayersControl extends PureComponent {
 
       newSelectedLayers = [...this.state.selectedLayers, availableLayer];
 
-      changed = true; 
+      changed = true;
     }
     else if (!checked && isSelected) {
       newSelectedLayers = Utility.arrayRemove(this.state.selectedLayers, isSelected);
@@ -251,7 +251,7 @@ class StandardTileLayersControl extends PureComponent {
 
     if (changed) {
       this.setState({ selectedLayers: newSelectedLayers });
-      this.prepareLayers(this.props.map, this.props.timestampRange, newSelectedLayers) 
+      this.prepareLayers(this.props.map, this.props.timestampRange, newSelectedLayers)
         .then(standardTilesLayers => {
           this.props.onLayersChange(standardTilesLayers);
         });
@@ -300,7 +300,7 @@ class StandardTileLayersControl extends PureComponent {
           className='card-header'
           title={
             <Typography gutterBottom variant="h6" component="h2">
-              Standard tiles
+              {this.props.localization['Standard tiles']}
             </Typography>
           }
           action={
@@ -319,8 +319,8 @@ class StandardTileLayersControl extends PureComponent {
             className={'card-content'}
           >
             {
-              !this.props.override ? 
-                this.createLayerCheckboxes() : 
+              !this.props.override ?
+                this.createLayerCheckboxes() :
                 <div className='controls-pane-background-text'>Controlled by feed</div>
             }
           </CardContent>

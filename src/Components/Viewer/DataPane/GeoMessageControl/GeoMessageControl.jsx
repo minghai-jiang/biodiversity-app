@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import { GeoJSON } from 'react-leaflet';
 
-import { 
-  Card,  
+import {
+  Card,
   CardHeader,
   CardContent,
   Typography,
@@ -63,7 +63,7 @@ class GeoMessageControl extends PureComponent {
       loading: false,
 
       geoMessageElements: [],
-      
+
       availableGroups: [],
 
       filtersExpanded: false,
@@ -73,10 +73,10 @@ class GeoMessageControl extends PureComponent {
   }
 
   componentDidMount() {
-    let newState = { 
+    let newState = {
       loading: true,
       availableGroups: [...this.props.map.groups, NO_GROUP_NAME]
-    }; 
+    };
 
     this.setState(newState, this.getGeoMessages);
   }
@@ -85,8 +85,8 @@ class GeoMessageControl extends PureComponent {
     let differentMap = this.props.map !== prevProps.map;
 
     if (differentMap) {
-      this.setState({ 
-        availableGroups: [...this.props.map.groups, NO_GROUP_NAME], 
+      this.setState({
+        availableGroups: [...this.props.map.groups, NO_GROUP_NAME],
         filterSettings: this.createEmptyFilterSettings()
       });
     }
@@ -216,7 +216,7 @@ class GeoMessageControl extends PureComponent {
 
         this.rawGeoMessages = rawGeoMessages;
         this.setState({ geoMessageElements: geoMessageElements }, cb);
-      }); 
+      });
   }
 
   getFeedMessages = (cb) => {
@@ -256,7 +256,7 @@ class GeoMessageControl extends PureComponent {
         continue;
       }
 
-      if (filterSettings.selectedForms.length > 0 && 
+      if (filterSettings.selectedForms.length > 0 &&
         (!message.form || !filterSettings.selectedForms.includes(message.form.formName))) {
         continue;
       }
@@ -287,7 +287,7 @@ class GeoMessageControl extends PureComponent {
             type: message.type,
             layer: message.layer
           });
-        }        
+        }
       }
     }
 
@@ -318,7 +318,7 @@ class GeoMessageControl extends PureComponent {
 
       if (type === ViewerUtility.standardTileLayerType) {
         url = '/geometry/tiles';
-        body.tileIds = elementIds;    
+        body.tileIds = elementIds;
       }
       else if (type === ViewerUtility.polygonLayerType) {
         url = '/geometry/polygons';
@@ -343,7 +343,7 @@ class GeoMessageControl extends PureComponent {
                 data={geoJson}
                 style={ViewerUtility.createGeoJsonLayerStyle(FILTER_POLYGON_COLOR)}
                 zIndex={ViewerUtility.customPolygonLayerZIndex}
-                onEachFeature={(feature, layer) => 
+                onEachFeature={(feature, layer) =>
                   layer.on({ click: () => {
                     let hasAggregatedData = false;
 
@@ -352,7 +352,7 @@ class GeoMessageControl extends PureComponent {
                       let layers = map.layers.polygon[map.layers.polygon.length - 1].layers;
 
                       let layer = layers.find(x => x.name === layerName);
-                      
+
                       if (layer) {
                         hasAggregatedData = layer.hasAggregatedData;
                       }
@@ -362,7 +362,7 @@ class GeoMessageControl extends PureComponent {
                   })
                 }
               />)
-          }; 
+          };
         });
     }
 
@@ -430,7 +430,7 @@ class GeoMessageControl extends PureComponent {
   onDeleteMessage = (deletedMessage) => {
     this.rawGeoMessages = this.rawGeoMessages.filter(x => x.id !== deletedMessage.id);
 
-    if (!this.props.isFeed) {    
+    if (!this.props.isFeed) {
       let newGeoMessageElements = this.state.geoMessageElements.filter(
         x => x.props.message.id !== deletedMessage.id
       );
@@ -455,7 +455,7 @@ class GeoMessageControl extends PureComponent {
           let hasOtherMessages = false;
 
           if (selectedElement.type === ViewerUtility.standardTileLayerType) {
-            sameElement = properties.tileX === elementId.tileX && 
+            sameElement = properties.tileX === elementId.tileX &&
               properties.tileY === elementId.tileY && properties.zoom === elementId.zoom;
 
             hasOtherMessages = this.rawGeoMessages.find(x => {
@@ -486,7 +486,7 @@ class GeoMessageControl extends PureComponent {
   }
 
   onGeoMessagesScroll = () => {
-    if (!this.props.isFeed || this.noMoreFeedMessages || this.state.loading 
+    if (!this.props.isFeed || this.noMoreFeedMessages || this.state.loading
       || this.feedScrollLoading) {
       return;
     }
@@ -496,7 +496,7 @@ class GeoMessageControl extends PureComponent {
     let diff = messagesContainer.scrollHeight - messagesContainer.scrollTop;
     let tooFewMessages = messagesContainer.scrollHeight === messagesContainer.clientHeight;
 
-    if (!(diff < SCROLL_LOAD_THRESHOLD || tooFewMessages)) {  
+    if (!(diff < SCROLL_LOAD_THRESHOLD || tooFewMessages)) {
       return;
     }
 
@@ -571,7 +571,7 @@ class GeoMessageControl extends PureComponent {
           refreshFunc(() => { this.setState({ loading: false })});
         });
       };
-  
+
       this.getFeedMessagesTimer = setTimeout(updateGeoMessages, 1000);
     });
   }
@@ -613,18 +613,18 @@ class GeoMessageControl extends PureComponent {
     if (this.state.filterSettings.applyToMap) {
       downloadGeometries = (
         <span>
-          {`Apply to map (${this.state.count})`}
-          <IconButton 
+          {`this.props.localization['Apply to map'] (${this.state.count})`}
+          <IconButton
             className='feed-download-geometry-button'
             onClick={() => this.onDownloadClick()}
           >
             <SaveAlt className='download-geometry-button-icon'/>
           </IconButton>
         </span>
-      );    
+      );
     }
     else {
-      downloadGeometries = (<span>Apply to map</span>);
+      downloadGeometries = (<span>{this.props.localization['Apply to map']}</span>);
     }
 
     let filtersSectionClass = 'data-pane-card groups-filter-card';
@@ -638,7 +638,7 @@ class GeoMessageControl extends PureComponent {
           className='data-pane-title-header groups-filter-card-header'
           title={
             <Typography variant="h6" component="h2" className='no-text-transform'>
-              Filters
+              {this.props.localization['Filters']}
             </Typography>
           }
           action={
@@ -654,14 +654,14 @@ class GeoMessageControl extends PureComponent {
         />
         <Collapse in={this.state.filtersExpanded}>
           <CardContent className='data-pane-card-content'>
-            <Checkbox 
-              color='primary'              
+            <Checkbox
+              color='primary'
               onChange={(e) => this.onFilterChange(e, 'applyToMap', true, REFRESH_MODE.applyToMap)}
               checked={this.state.filterSettings.applyToMap}
             />
             {downloadGeometries}
             <FormControl className='card-form-control selector-single'>
-              <InputLabel htmlFor='select-multiple-checkbox-groups'>Groups filter</InputLabel>
+              <InputLabel htmlFor='select-multiple-checkbox-groups'>{this.props.localization['Groups filter']}</InputLabel>
               <Select
                 className='selector'
                 multiple
@@ -676,10 +676,10 @@ class GeoMessageControl extends PureComponent {
                     <ListItemText primary={name} />
                   </MenuItem>
                 ))}
-              </Select>              
+              </Select>
             </FormControl>
             <FormControl className='card-form-control selector-single'>
-              <InputLabel htmlFor='select-multiple-checkbox-forms'>Type filter</InputLabel>
+              <InputLabel htmlFor='select-multiple-checkbox-forms'>{this.props.localization['Type filter']}</InputLabel>
               <Select
                 className='selector'
                 multiple
@@ -697,7 +697,7 @@ class GeoMessageControl extends PureComponent {
               </Select>
             </FormControl>
             <FormControl className='card-form-control selector-single'>
-              <InputLabel htmlFor='select-multiple-checkbox-forms'>Forms filter</InputLabel>
+              <InputLabel htmlFor='select-multiple-checkbox-forms'>{this.props.localization['Forms filter']}</InputLabel>
               <Select
                 className='selector'
                 multiple
@@ -715,7 +715,7 @@ class GeoMessageControl extends PureComponent {
               </Select>
             </FormControl>
           </CardContent>
-        </Collapse>              
+        </Collapse>
       </Card>
     );
 
@@ -741,19 +741,19 @@ class GeoMessageControl extends PureComponent {
     return (
       <div className='geomessage-control'>
         {isFeed ? this.renderFilterSection() : null}
-        <Card 
-          ref={this.geomessagesContainerCard} 
+        <Card
+          ref={this.geomessagesContainerCard}
           className={className}
           onScroll={this.onGeoMessagesScroll}
         >
           {
             this.state.loading ?
-              <CircularProgress className='loading-spinner'/> : 
+              <CircularProgress className='loading-spinner'/> :
               this.state.geoMessageElements
           }
         </Card>
         {
-          !isFeed ? 
+          !isFeed ?
             <GeoMessageForm
               localization={this.props.localization}
               user={this.props.user}

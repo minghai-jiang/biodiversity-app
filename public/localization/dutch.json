@@ -112,6 +112,7 @@
   "Select an Atlas":"Kies een Atlas",
   "Select a map":"Kies een kaart",
   "Fly to":"Vlieg naar",
+  "Please select a map first.":"Kies een kaart.",
   "Current map":"Huidige kaart",
   "Layers":"Lagen",
   "Standard tiles":"Standaard tegels",
@@ -134,13 +135,21 @@
   "Forms filter":"Formulieren filter",
   "Type filter":"type filter",
   "standard tile":"standaard tegels",
+  "Max masked":"Max wolkendek",
   "polygon":"polygoon",
   "custom polygon":"getekend polygoon",
   "Drawn polygon":"Ingetekend polygoon",
+  "Select a class":"Selecteer een klasse",
+    "Add GeoMessage":"Voeg GeoMessage toe",
+    "EDIT": "PAS AAN",
+    "Private":"Prive",
+      "Submit":"Voeg toe",
+      "(Optional) Select a form":"(Optioneel) Selecteer formulier",
+    "Upload image":"Upload foto",
   "ANALYSE":"ANALYSE",
   "ADD":"VOEG TOE",
   "DELETE":"VERWIJDER",
   "GEOMESSAGE":"GEOMESSAGE",
   "UPDATE":"PAS AAN"
-  
+
 }

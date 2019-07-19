@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 
-import { 
+import {
   Card,
   Checkbox,
   CardHeader,
@@ -23,7 +23,7 @@ import './FlyToControl.css';
 
 import ApiManager from '../../../../ApiManager';
 
-class FlyToControl extends PureComponent {  
+class FlyToControl extends PureComponent {
 
   constructor(props, context) {
     super(props, context);
@@ -54,7 +54,7 @@ class FlyToControl extends PureComponent {
       };
     }
 
-    this.setState({ 
+    this.setState({
       selectedFlyToType: type,
       elementId: elementIdReset
     });
@@ -65,20 +65,20 @@ class FlyToControl extends PureComponent {
   }
 
   onFlyTo = () => {
-    let flyToInfo = { 
+    let flyToInfo = {
       type: this.state.selectedFlyToType,
       elementId: this.state.elementId
     };
 
     navigator.geolocation.getCurrentPosition(
-      (position) => console.log(`${position.coords.longitude} ${position.coords.latitude}`), 
+      (position) => console.log(`${position.coords.longitude} ${position.coords.latitude}`),
       (err) => {
         console.warn(`Error ${err.code}: ${err.message}`);
         window.postMessage(`Error ${err.code}: ${err.message}`, '*');
         if (window.ReactNativeWebView) {
           window.ReactNativeWebView.postMessage(`Error ${err.code}: ${err.message}`);
         }
-      }, 
+      },
       { enableHighAccuracy: true }
     );
 
@@ -104,7 +104,7 @@ class FlyToControl extends PureComponent {
             required={true}
             onChange={(e) => this.setState({
               elementId: {
-                ...this.state.elementId, 
+                ...this.state.elementId,
                 tileX: parseInt(e.target.value)
             }})}
           />
@@ -115,7 +115,7 @@ class FlyToControl extends PureComponent {
             required={true}
             onChange={(e) => this.setState({
               elementId: {
-                ...this.state.elementId, 
+                ...this.state.elementId,
                 tileY: parseInt(e.target.value)
             }})}
           />
@@ -154,7 +154,7 @@ class FlyToControl extends PureComponent {
           className='card-header'
           title={
             <Typography gutterBottom variant="h6" component="h2">
-              Fly to
+              {this.props.localization['Fly to']}
             </Typography>
           }
           action={
@@ -172,10 +172,10 @@ class FlyToControl extends PureComponent {
           <CardContent
             className={'card-content'}
           >
-            <Select 
-              key='fly-to-type-selector' 
-              className='selector' 
-              onChange={this.onSelectFlyTo} 
+            <Select
+              key='fly-to-type-selector'
+              className='selector'
+              onChange={this.onSelectFlyTo}
               value={this.state.selectedFlyToType}
             >
                <MenuItem value={ViewerUtility.flyToType.map}>Current map</MenuItem>
@@ -187,12 +187,12 @@ class FlyToControl extends PureComponent {
             {elementIdInput}
           </CardContent>
           <CardActions>
-            <Button 
-              variant='contained' 
+            <Button
+              variant='contained'
               color='primary'
               onClick={this.onFlyTo}
             >
-              Fly to
+            {this.props.localization['Fly to']}
             </Button>
           </CardActions>
         </Collapse>

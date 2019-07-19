@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 
-import { 
+import {
   Card,
   CardHeader,
   CardContent,
@@ -59,14 +59,14 @@ class LegendControl extends PureComponent {
         if (property) {
           timestampTypes = timestamp[property];
         }
-  
+
         for (let x = 0; x < timestampTypes.length; x++) {
           let type = timestampTypes[x];
-  
+
           if (filter && filter.includes(type.name)) {
             continue;
           }
-  
+
           if (!types.find(x => x.name === type.name)) {
             types.push(type);
           }
@@ -96,23 +96,23 @@ class LegendControl extends PureComponent {
             <span className='legend-label' style={{ backgroundColor: `#${type.color}`}}></span>
           </div>
         )
-      } 
+      }
     }
 
     if (availableClasses.length > 0) {
-      legendElements.push(<div key='classes' className='legend-line legend-line-header'>Classes</div>)
+      legendElements.push(<div key='classes' className='legend-line legend-line-header'>{this.props.localization['Classes']}</div>)
       createLegendLines(availableClasses);
     }
     if (availableMeasurements.length > 0) {
-      legendElements.push(<div key='measurements' className='legend-line legend-line-header'>Measurements</div>)
+      legendElements.push(<div key='measurements' className='legend-line legend-line-header'>{this.props.localization['Measurements']}</div>)
       createLegendLines(availableMeasurements);
     }
     if (availablePolygonLayers.length > 0) {
-      legendElements.push(<div key='polygon_layers' className='legend-line legend-line-header'>Polygon layers</div>);
+      legendElements.push(<div key='polygon_layers' className='legend-line legend-line-header'>{this.props.localization['Polygon layers']}</div>);
       createLegendLines(availablePolygonLayers);
     }
     if (availableCustomPolygonLayers.length > 0) {
-      legendElements.push(<div key='custom_polygon_layers' className='legend-line legend-line-header'>Custom polygon layers</div>);
+      legendElements.push(<div key='custom_polygon_layers' className='legend-line legend-line-header'>{this.props.localization['Custom polygon layers']}</div>);
       createLegendLines(availableCustomPolygonLayers);
     }
 
@@ -130,7 +130,7 @@ class LegendControl extends PureComponent {
           className='card-header'
           title={
             <Typography variant="h6" component="h2" className='no-text-transform'>
-              Legend
+              {this.props.localization['Legend']}
             </Typography>
           }
         />

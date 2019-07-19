@@ -2,8 +2,8 @@ import React, { PureComponent } from 'react';
 import Moment from 'moment';
 import { readAndCompressImage } from 'browser-image-resizer';
 
-import { 
-  Card,  
+import {
+  Card,
   CardHeader,
   CardContent,
   CardActions,
@@ -88,7 +88,7 @@ class GeoMessageForm extends PureComponent {
 
     let formSelect = (
       <Select key='form-selector' className='selector' onChange={this.onSelectForm} value={this.state.selectedFormName}>
-        <MenuItem key='default' value='default'>(Optional) Select a form</MenuItem>
+        <MenuItem key='default' value='default'>{this.props.localization['(Optional) Select a form']}</MenuItem>
         {formOptions}
       </Select>
     )
@@ -140,7 +140,7 @@ class GeoMessageForm extends PureComponent {
                 onChange={(e) => this.onFormAnswer(e, i, true)}
               />
             </div>
- 
+
           )
         }
 
@@ -167,7 +167,7 @@ class GeoMessageForm extends PureComponent {
     e.preventDefault();
 
     let file = e.target.files[0];
-    
+
     if (!IMAGE_MIME_TYPES.includes(file.type)) {
       alert('Invalid image type.');
       return;
@@ -203,7 +203,7 @@ class GeoMessageForm extends PureComponent {
           this.setState({ loading: false });
         })
         .catch(err => {
-          this.setState({ loading: false });          
+          this.setState({ loading: false });
           alert('Invalid image type.');
         });
     });
@@ -239,7 +239,7 @@ class GeoMessageForm extends PureComponent {
         image: this.uploadedImage,
         private: this.state.private
       };
-      
+
       let element = this.props.element;
       let elementProperties = element.feature.properties;
       let urlType = null;
@@ -248,17 +248,17 @@ class GeoMessageForm extends PureComponent {
         body.tileX = elementProperties.tileX;
         body.tileY = elementProperties.tileY;
         body.zoom = elementProperties.zoom;
-  
+
         urlType = 'tile';
       }
       else if (element.type === ViewerUtility.polygonLayerType) {
         body.polygonId = elementProperties.id;
-  
+
         urlType = 'polygon';
       }
       else if (element.type === ViewerUtility.customPolygonTileLayerType) {
-        body.customPolygonId = elementProperties.id;        
-  
+        body.customPolygonId = elementProperties.id;
+
         urlType = 'customPolygon';
       }
       else {
@@ -306,9 +306,9 @@ class GeoMessageForm extends PureComponent {
           this.fileUploadRef.current.value = '';
           this.uploadedImage = null;
           let formAnswers = this.createEmptyFormAnswers(selectedForm);
-          this.setState({ 
-            expanded: false, 
-            loading: false, 
+          this.setState({
+            expanded: false,
+            loading: false,
             messageText: '',
             private: false,
             formAnswers: formAnswers
@@ -369,7 +369,7 @@ class GeoMessageForm extends PureComponent {
   }
 
   render() {
-    
+
     let user = this.props.user;
     let map = this.props.map;
 
@@ -377,9 +377,9 @@ class GeoMessageForm extends PureComponent {
     let hasAddImagePermission = user && map.accessLevel >= ApiManager.accessLevels.addGeoMessageImage;
     let hasPrivateMessagePermission = user && map.accessLevel >= ApiManager.accessLevels.addPrivateGeoMessage;
 
-    let title = 'Add GeoMessage';
+    let title = this.props.localization['Add GeoMessage'];
     if (!user) {
-      title = 'Please login';
+      title = this.props.localization['Please login'];
     }
     else if (!hasAddPermission) {
       title = 'Insufficient access';
@@ -395,18 +395,18 @@ class GeoMessageForm extends PureComponent {
         <CardHeader
           className='geomessage-form-card-header'
           title={
-            !this.state.expanded ? 
-              <Button 
+            !this.state.expanded ?
+              <Button
                 className='geomessage-add-expand-button'
                 variant='contained'
                 color='primary'
-                onClick={this.toggleExpand} 
+                onClick={this.toggleExpand}
                 disabled={!hasAddPermission}
               >
                 {title}
-              </Button> : 
+              </Button> :
               <div className='geomessage-expanded-title'>
-                Add GeoMessage
+                {this.props.localization['Add GeoMessage']}
               </div>
           }
           action={
@@ -425,7 +425,7 @@ class GeoMessageForm extends PureComponent {
           <CardContent className='data-pane-card-content'>
             <TextField
               className='data-pane-text-field'
-              label='Message'
+              label={this.props.localization['GeoMessage']}
               multiline
               value={this.state.messageText}
               onChange={this.onMessageChange}
@@ -435,12 +435,12 @@ class GeoMessageForm extends PureComponent {
               hasAddImagePermission ?
                 <div>
                   <div className='geomessage-upload-image-label'>
-                    Upload image
+                    {this.props.localization['Upload image']}
                   </div>
-                  <input 
-                    ref={this.fileUploadRef} 
-                    type='file' 
-                    accept='image/*' 
+                  <input
+                    ref={this.fileUploadRef}
+                    type='file'
+                    accept='image/*'
                     onChange={this.onImageChange}
                   />
                 </div> : null
@@ -448,7 +448,7 @@ class GeoMessageForm extends PureComponent {
             {
               hasPrivateMessagePermission ?
                 <div>
-                  Private:
+                  {this.props.localization['Private']}:
                   <Checkbox
                     color='primary'
                     checked={this.state.private}
@@ -456,19 +456,19 @@ class GeoMessageForm extends PureComponent {
                   />
                 </div> : null
             }
-            </div>  
+            </div>
             <div className='geomessage-form-section'>
               {this.renderFormSection()}
             </div>
             <div className='geomessage-form-section'>
-              <Button 
+              <Button
                 className='card-content-item geomessage-form-card-item card-submit-button'
-                variant='contained' 
+                variant='contained'
                 color='primary'
                 onClick={this.onGeoMessageSubmit}
                 disabled={this.state.loading}
               >
-                Submit
+                {this.props.localization['Submit']}
               </Button>
             </div>
             { this.state.loading ? <CircularProgress className='loading-spinner'/> : null}

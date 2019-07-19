@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { GeoJSON } from 'react-leaflet';
 
-import { 
+import {
   Card,
   Checkbox,
   CardHeader,
@@ -53,7 +53,7 @@ class PolygonLayersControl extends PureComponent {
 
     let differentMap = this.props.map !== prevProps.map;
 
-    let differentTimestamp = !prevProps.timestampRange || 
+    let differentTimestamp = !prevProps.timestampRange ||
       this.props.timestampRange.start !== prevProps.timestampRange.start ||
       this.props.timestampRange.end !== prevProps.timestampRange.end;
 
@@ -73,8 +73,8 @@ class PolygonLayersControl extends PureComponent {
         selectedLayers = [];
         this.layerGeoJsons = {};
 
-        this.setState({ 
-          availableLayers: availableLayers, 
+        this.setState({
+          availableLayers: availableLayers,
           selectedLayers: selectedLayers,
           count: {}
         });
@@ -116,7 +116,7 @@ class PolygonLayersControl extends PureComponent {
       }
     }
 
-    return availableLayers;  
+    return availableLayers;
   }
 
   createLayerCheckboxes = () => {
@@ -141,7 +141,7 @@ class PolygonLayersControl extends PureComponent {
         }
         else {
           downloadButton = (
-            <IconButton 
+            <IconButton
               className='download-geometry-button'
               onClick={() => this.onDownload(availableLayer.name)}
             >
@@ -161,11 +161,11 @@ class PolygonLayersControl extends PureComponent {
 
       let option = (
         <div key={availableLayer.name} className='layer-checkboxes'>
-          <Checkbox 
-            key={availableLayer.name} 
+          <Checkbox
+            key={availableLayer.name}
             classes={{ root: 'layers-control-checkbox' }}
             color='primary'
-            value={availableLayer.name} 
+            value={availableLayer.name}
             name={availableLayer.name}
             onChange={this.onLayerChange}
             checked={checked}
@@ -185,7 +185,7 @@ class PolygonLayersControl extends PureComponent {
 
   prepareLayers = async (map, timestampRange, availableLayers, selectedLayers) => {
     let promises = [];
-    
+
     for (let i = 0; i < availableLayers.length; i++) {
 
       let polygonLayer = availableLayers[i]
@@ -236,9 +236,9 @@ class PolygonLayersControl extends PureComponent {
             return null;
           }
 
-          this.layerGeoJsons[polygonLayer.name] = { 
-            geoJson: polygonsGeoJson, 
-            bounds: bounds 
+          this.layerGeoJsons[polygonLayer.name] = {
+            geoJson: polygonsGeoJson,
+            bounds: bounds
           };
 
           return (
@@ -249,7 +249,7 @@ class PolygonLayersControl extends PureComponent {
               zIndex={ViewerUtility.polygonLayerZIndex + i}
               onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature, polygonLayer.hasAggregatedData) })}
             />
-          );        
+          );
         });
 
       promises.push(leafletGeojsonLayerPromise);
@@ -274,7 +274,7 @@ class PolygonLayersControl extends PureComponent {
 
       newSelectedLayers = [...this.state.selectedLayers, availableLayer];
 
-      changed = true; 
+      changed = true;
     }
     else if (!checked && isSelected) {
       newSelectedLayers = Utility.arrayRemove(this.state.selectedLayers, isSelected);
@@ -340,7 +340,7 @@ class PolygonLayersControl extends PureComponent {
           className='card-header'
           title={
             <Typography gutterBottom variant="h6" component="h2">
-              Polygons
+              {this.props.localization['Polygons']}
             </Typography>
           }
           action={
@@ -359,8 +359,8 @@ class PolygonLayersControl extends PureComponent {
             className={'card-content'}
           >
             {
-              !this.props.override ? 
-                this.createLayerCheckboxes() : 
+              !this.props.override ?
+                this.createLayerCheckboxes() :
                 <div className='controls-pane-background-text'>Controlled by feed</div>
             }
           </CardContent>

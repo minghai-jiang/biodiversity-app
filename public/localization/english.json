@@ -93,6 +93,7 @@
   "Edit users": "Edit users",
   "Delete":"Delete",
   "Add": "Add",
+  "EDIT": "EDIT",
   "new group": "new group",
   "Layer name": "Layer name",
   "Color": "Color",
@@ -137,9 +138,16 @@
   "custom polygon":"custom polygon",
   "Drawn polygon":"Drawn polygon",
   "ANALYSE":"ANALYSE",
+  "Select a class":"Select a class",
+  "Max masked":"Max masked",
+  "Add GeoMessage":"Add GeoMessage",
   "ADD":"ADD",
+  "Private":"Private",
+"(Optional) Select a form":"(Optional) Select a form",
+  "Upload image":"Upload image",
   "DELETE":"DELETE",
   "GEOMESSAGE":"GEOMESSAGE",
+  "Please select a map first.":"Please select a map first.",
   "UPDATE":"UPDATE"
 
 
