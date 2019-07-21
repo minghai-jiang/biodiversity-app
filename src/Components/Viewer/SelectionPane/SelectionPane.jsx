@@ -175,13 +175,13 @@ class SelectionPane extends PureComponent {
 
 
     if (element.type === ViewerUtility.standardTileLayerType) {
-      title = 'Standard tile';
+      title = this.props.localization['Standard tile'];
     }
     else if (element.type === ViewerUtility.polygonLayerType) {
-      title = 'Polygon';
+      title = this.props.localization['Polygon'];
     }
     else if (element.type === ViewerUtility.customPolygonTileLayerType) {
-      title = 'Custom polygon';
+      title = this.props.localization['Custom polygon'];
 
       secondRowButtons.push(
         <Button
@@ -207,7 +207,7 @@ class SelectionPane extends PureComponent {
       );
     }
     else if (element.type === ViewerUtility.drawnPolygonLayerType) {
-      title = 'Drawn polygon';
+      title = this.props.localization['Drawn polygon'];
 
       firstRowButtons.push(
         <Button
