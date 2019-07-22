@@ -149,7 +149,8 @@
   "DELETE":"DELETE",
   "GEOMESSAGE":"GEOMESSAGE",
   "Please select a map first.":"Please select a map first.",
-  "UPDATE":"UPDATE"
+  "UPDATE":"UPDATE",
+  "Submit":"Submit"
 
 
 }
