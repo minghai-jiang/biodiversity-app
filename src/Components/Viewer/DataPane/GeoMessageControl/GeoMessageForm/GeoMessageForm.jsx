@@ -338,8 +338,7 @@ class GeoMessageForm extends PureComponent {
       }
     }
 
-    return formAnswers
-
+    return formAnswers;
   }
 
   onSelectForm = (e) => {
@@ -347,6 +346,9 @@ class GeoMessageForm extends PureComponent {
     let selectedForm = this.props.map.forms.find(x => x.formName === selectedFormName);
 
     if (!selectedForm) {
+      if (selectedFormName === 'default') {
+        this.setState({ selectedFormName: selectedFormName });
+      }
       return;
     }
 
