@@ -111,6 +111,8 @@
 .main-block-single-button {
     margin-left: auto;
     margin-right: auto;
+    margin-top: 6px;
+    margin-bottom: 6px;
     width: 50%;
 }
 

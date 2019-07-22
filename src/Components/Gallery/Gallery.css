@@ -3,17 +3,16 @@
 }
 
 .galleryItem .button {
-	display: inline-block;
 	width: inherit;
-	margin: 0 auto;
 }
 
 .buttonContainer {
-	display: inline-flex;
-	width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+	width: 300px;
 }
 
 .buttonContainer a {
-	width: 90%;
+	width: 100%;
 	text-align: center;
 }
