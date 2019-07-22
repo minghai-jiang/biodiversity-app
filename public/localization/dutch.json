@@ -151,6 +151,9 @@
   "ADD":"VOEG TOE",
   "DELETE":"VERWIJDER",
   "GEOMESSAGE":"GEOMESSAGE",
-  "UPDATE":"PAS AAN"
+  "UPDATE":"PAS AAN",
+  "Insufficient access":"Onvoldoende toegang",
+  "Please login":"Login"
+
 
 }

@@ -150,7 +150,9 @@
   "GEOMESSAGE":"GEOMESSAGE",
   "Please select a map first.":"Please select a map first.",
   "UPDATE":"UPDATE",
-  "Submit":"Submit"
+  "Submit":"Submit",
+  "Insufficient access":"Insufficient access",
+  "Please login":"Please login"
 
 
 }
