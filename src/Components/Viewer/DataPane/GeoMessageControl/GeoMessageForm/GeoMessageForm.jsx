@@ -384,7 +384,7 @@ class GeoMessageForm extends PureComponent {
       title = this.props.localization['Please login'];
     }
     else if (!hasAddPermission) {
-      title = 'Insufficient access';
+      title = this.props.localization['Insufficient access'];
     }
 
     let cardClassName = 'data-pane-card geomessage-form-card';

@@ -151,6 +151,8 @@
   "ADD":"AÑADIR",
   "DELETE":"BORRAR",
   "GEOMESSAGE":"GEOMESSAGE",
-  "UPDATE":"ACTUALIZAR"
+  "UPDATE":"ACTUALIZAR",
+    "Insufficient access":"Acceso insuficiente",
+    "Please login":"Login"
 
 }
