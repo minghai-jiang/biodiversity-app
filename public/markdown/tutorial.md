@@ -12,12 +12,13 @@ This tutorial is directed to Python users, but should be readable for people usi
 1. <a href='#Ellipsis'>**Ellipsis-Earht Data**</a>
 2. <a href='#setup'>**Setting things up**</a>
 3. <a href='#requests'>**The requests package**</a>
-4. <a href='#login'>**Loggin in**</a>
-5. <a href='#content'>**Acquiring metadata**</a>
-6. <a href='#data'>**Acquiring data**</a>
-7. <a href='#geometry'>**Acquiring geometries**</a>
-8. <a href='#visual'>**Acquiring visualisations**</a>
-9. <a href='#geomessage'>**Acquiring geoMessaging**</a>
+4. <a href='#inter'>**Interpreting responses**</a>
+5. <a href='#login'>**Loggin in**</a>
+6. <a href='#content'>**Acquiring metadata**</a>
+7. <a href='#data'>**Acquiring data**</a>
+8. <a href='#geometry'>**Acquiring geometries**</a>
+9. <a href='#visual'>**Acquiring visualisations**</a>
+10. <a href='#geomessage'>**Acquiring geoMessaging**</a>
 
 <a id='Ellipsis'></a>
 # Ellipsis-Earth Data
@@ -136,7 +137,8 @@ r = requests.post('http://www.example.com',
 
 In case we do not want to wait forever for a return from the server we can add an additional timeout argument to the request. This argument should be a float indicating the number of seconds that you are willing to wait for the response.
 
-## Interpreting responses
+# Interpreting responses
+<a id='inter'></a>
 
 Now let's have a look at the response r. If we print it directly we get the response code of our request.
 
@@ -158,7 +160,7 @@ The ellipsis API returns data in JSON, geoJSON, CSV and PNG. We can interpret th
 
 #python_dataFrame = pd.read_csv(StringIO(r.text))
 
-#python_geoDataFrame = gpd.read_file(StringIO(r.text))
+#python_geoDataFrame = gpd.GeoDataFrame.from_features(r.json())
 
 #python_image = mpimg.imread(BytesIO(response.content))
 ```
@@ -179,7 +181,7 @@ r =requests.post(url + '/account/login',
 print(r.text)
 ```
 
-    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MjE1ODQ1OSwiZXhwIjoxNTYyMjQ0ODU5fQ.JCcWVs88dDU0r-in2GXHcKLzZ_8uXY4N9IDGdix2jbU"}
+    {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MjkyODI0OCwiZXhwIjoxNTYzMDE0NjQ4fQ.AQYuZbB0wzKGA3XbQwSPTuu09YvdyhlzH0QpKlqIGVs"}
 
 
 Our token is quite long, so let's save the token to a variable that we can send with our other requests.
@@ -198,7 +200,7 @@ token = 'Bearer ' + token
 print(token)
 ```
 
-    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MjE1ODQ1OSwiZXhwIjoxNTYyMjQ0ODU5fQ.JCcWVs88dDU0r-in2GXHcKLzZ_8uXY4N9IDGdix2jbU
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlbW9fdXNlciIsImlhdCI6MTU2MjkyODI0OCwiZXhwIjoxNTYzMDE0NjQ4fQ.AQYuZbB0wzKGA3XbQwSPTuu09YvdyhlzH0QpKlqIGVs
 
 
 Now let's quickly test wether our token is valid.
@@ -233,7 +235,7 @@ map_names[1:4]
 
 
 
-    ['Earthquake Palu', 'verkeer Rotterdam', 'Suriname']
+    ['Suriname', 'Gran Chaco', 'Earthquake Palu']
 
 
 
