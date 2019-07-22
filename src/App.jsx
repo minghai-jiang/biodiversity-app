@@ -45,12 +45,19 @@ class App extends Component {
 
     this.state = {
       init: false,
+      hideMenu: false,
+
       user: null,
     };
   }
 
   componentDidMount() {
     Modal.setAppElement('body');
+
+    let url = new URL(window.location.href);
+    let hideMenu = url.searchParams.get('hideMenu') === '1';
+
+    this.setState({ hideMenu: hideMenu });
 
     this.retrieveLanguage()
       .then(() => {
@@ -135,98 +142,108 @@ class App extends Component {
   }
 
   render() {
-    if (this.state.init) {
-      return (
-        <div className='App' onClick={this.closeMenu}>
-          <ThemeProvider theme={theme}>
-            <MainMenu
-              user={this.state.user}
-              language={this.state.language}
-              localization={this.state.localization}
-              onLanguageChange={this.onLanguageChange}
-            />
-            <div className='content' ref={ref => this.el = ref}>
-              <Route exact path='/'
-                render={() =>
-                  <Home
-                    language={this.state.language}
-                  />
-                }
-              />
-              <Route
-                path='/viewer'
-                render={() =>
-                  <Viewer 
-                    user={this.state.user}
-                    language={this.state.language}
-                    localization={this.state.localization}
-                  />
-                }
-              />
-              <Route path='/products'
-                render={() =>
-                  <Products
-                    language={this.state.language}
-                    localization={this.state.localization}
-                  />
-                }
-              />
-              <Route
-                path='/sectors'
-                render={() =>
-                  <Sector
-                    language={this.state.language}
-                    localization={this.state.localization}
-                  />
-                }
-              />
-              <Route
-                path='/gallery'
-                render={() =>
-                  <Gallery
-                    language={this.state.language}
-                    localization={this.state.localization}
-                  />
-                }
-              />
-              <Route
-                path='/about'
-                render={() =>
-                  <About
-                    language={this.state.language}
-                    localization={this.state.localization}
-                  />
-              }
-              />
-              <Route
-                path='/login'
-                render={() =>
-                  <Login
-                    onLogin={this.onLogin}
-                    language={this.state.language}
-                    localization={this.state.localization}
-                  />
-                }
-              />
-              <Route
-                path='/account'
-                render={() =>
-                  <Account
-                    user={this.state.user}
-                    language={this.state.language}
-                    localization={this.state.localization}
-                    onLogout={this.onLogout}
-                  />
-                }
-              />
-            </div>
-          </ThemeProvider>          
-        </div>
-      );
-    }
-    else {
+    if (!this.state.init) {
       return null;
     }
+
+    let contentClassName = 'content';
+    if (this.state.hideMenu) {
+      contentClassName += ' content-full';
+    }
+
+    return (
+      <div className='App' onClick={this.closeMenu}>
+        <ThemeProvider theme={theme}>
+          {
+            this.state.hideMenu ? 
+              null :
+              <MainMenu
+                user={this.state.user}
+                language={this.state.language}
+                localization={this.state.localization}
+                onLanguageChange={this.onLanguageChange}
+              />
+          }
+
+          <div className={contentClassName} ref={ref => this.el = ref}>
+            <Route exact path='/'
+              render={() =>
+                <Home
+                  language={this.state.language}
+                />
+              }
+            />
+            <Route
+              path='/viewer'
+              render={() =>
+                <Viewer 
+                  user={this.state.user}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              }
+            />
+            <Route path='/products'
+              render={() =>
+                <Products
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              }
+            />
+            <Route
+              path='/sectors'
+              render={() =>
+                <Sector
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              }
+            />
+            <Route
+              path='/gallery'
+              render={() =>
+                <Gallery
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              }
+            />
+            <Route
+              path='/about'
+              render={() =>
+                <About
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+            }
+            />
+            <Route
+              path='/login'
+              render={() =>
+                <Login
+                  onLogin={this.onLogin}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                />
+              }
+            />
+            <Route
+              path='/account'
+              render={() =>
+                <Account
+                  user={this.state.user}
+                  language={this.state.language}
+                  localization={this.state.localization}
+                  onLogout={this.onLogout}
+                />
+              }
+            />
+          </div>
+        </ThemeProvider>          
+      </div>
+    );
+    
   }
 
 }
