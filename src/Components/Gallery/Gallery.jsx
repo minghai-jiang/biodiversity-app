@@ -48,13 +48,8 @@ export class Gallery extends Component {
           <h1>{this.props.localization['Apps']}</h1>
           <div className="galleryItem">
             <h2>Ellipsis Viewer</h2>
-            <a href='https://ellipsis-earth.com/viewer' target="_blank"><img src="/images/GalleryScreen.jpg"/></a>
+            <embed src="https://ellipsis-earth.com/viewer?map=Gran%20Chaco&hideMenu=1" width="800px" height="500px"/>
             <div className="buttonContainer">
-              <a href="https://ellipsis-earth.com/viewer" target="_blank" className="button-a">
-                <div className="button button-accented main-block-single-button">
-                  Ellipsis Viewer
-                </div>
-              </a>
               <a href="https://github.com/ellipsis-earth/ellipsis-app" target="_blank" className="button-a">
                 <div className="button button-accented main-block-single-button">
                   Source code
@@ -64,7 +59,7 @@ export class Gallery extends Component {
           </div>
 
 
-            <h1>{this.props.localization['monitoring']}</h1>
+            <h1>{this.props.localization['Monitoring']}</h1>
             <select defaultValue="default" onChange={this.onMonitoringServiceChange}>
               <option value="default" disabled hidden>{this.props.localization['ChoosePrompt']}</option>
               <option value="Northern Paraguay deforestation">{this.props.localization['Northern Paraguay deforestation']}</option>
