@@ -30,6 +30,8 @@ export class MapSelector extends PureComponent {
     if (this.props.user !== prevProps.user) {
       this.getMaps();
     }
+
+
   }
 
   componentDidMount = () => {
@@ -40,7 +42,27 @@ export class MapSelector extends PureComponent {
     ApiManager.get('/account/myMaps', null, this.props.user)
       .then(maps => {
         maps.sort((a, b) => { return a.name.localeCompare(b.name); });
-        this.setState({ maps: maps });
+
+        let url = new URL(window.location.href);
+        let urlSelectedMapName = url.searchParams.get('map');
+
+        let urlSelectedMap = maps.find(x => x.name === urlSelectedMapName);
+
+        let selectedAtlas = this.state.selectedAtlas;
+        if (urlSelectedMap) {
+          if (urlSelectedMap.atlases.length > 0) {
+            selectedAtlas = urlSelectedMap.atlases[0];
+          }
+          else {
+            selectedAtlas = ADMIN_ATLAS;
+          }
+        }
+
+        this.setState({ maps: maps, selectedAtlas: selectedAtlas }, () => {
+          if (urlSelectedMap) {
+            this.onSelectMap({ target: { value: urlSelectedMap.id } })
+          }
+        });
       })
       .catch(err => {
         ErrorHandler.alert(err);
