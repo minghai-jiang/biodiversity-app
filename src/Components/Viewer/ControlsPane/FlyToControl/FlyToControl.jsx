@@ -70,17 +70,17 @@ class FlyToControl extends PureComponent {
       elementId: this.state.elementId
     };
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => console.log(`${position.coords.longitude} ${position.coords.latitude}`),
-      (err) => {
-        console.warn(`Error ${err.code}: ${err.message}`);
-        window.postMessage(`Error ${err.code}: ${err.message}`, '*');
-        if (window.ReactNativeWebView) {
-          window.ReactNativeWebView.postMessage(`Error ${err.code}: ${err.message}`);
-        }
-      },
-      { enableHighAccuracy: true }
-    );
+    // navigator.geolocation.getCurrentPosition(
+    //   (position) => console.log(`${position.coords.longitude} ${position.coords.latitude}`),
+    //   (err) => {
+    //     console.warn(`Error ${err.code}: ${err.message}`);
+    //     window.postMessage(`Error ${err.code}: ${err.message}`, '*');
+    //     if (window.ReactNativeWebView) {
+    //       window.ReactNativeWebView.postMessage(`Error ${err.code}: ${err.message}`);
+    //     }
+    //   },
+    //   { enableHighAccuracy: true }
+    // );
 
     this.props.onFlyTo(flyToInfo);
   }

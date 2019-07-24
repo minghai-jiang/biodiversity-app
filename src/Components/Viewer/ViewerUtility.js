@@ -1,6 +1,6 @@
 import FileSaver from 'file-saver';
 import streamSaver from 'streamsaver';
-import { isAndroid, isMobile } from 'react-device-detect';
+import { isAndroid, isIOS, isMobile } from 'react-device-detect';
 
 const TILE = 'tile';
 const STANDARD_TILE = 'standard_tile';
@@ -74,6 +74,13 @@ const ViewerUtility = {
         (e) => {
           console.warn(e);
         });
+    }
+    else if (isMobile && isIOS) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        fileName: fileName,
+        data: text,
+        mime: mime
+      }));
     }
     else {
       let file = new File([text], fileName, {type: `${mime};charset=utf-8}`}); 
