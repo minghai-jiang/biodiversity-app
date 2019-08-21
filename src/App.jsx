@@ -15,12 +15,7 @@ import ErrorHandler from './ErrorHandler';
 
 import MainMenu from './Components/MainMenu/MainMenu';
 import Viewer from './Components/Viewer/Viewer';
-import Home from './Components/Home/Home';
-import About from './Components/About/About';
-import Products from './Components/Products/Products';
 import Login from './Components/Login/Login';
-import Sector from './Components/Sectors/Sectors';
-import Gallery from './Components/Gallery/Gallery';
 import Account from './Components/Account/Account';
 
 import './App.css';
@@ -30,7 +25,7 @@ const localStorageUserItem = 'user';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#026464'
+      main: '#b3ce8c'
     },
     secondary: {
       main: '#f5f5f5'
@@ -41,7 +36,7 @@ const theme = createMuiTheme({
 class App extends Component {
   constructor(props, context) {
     super(props, context)
-    document.title = 'Ellipsis Earth Intelligence';
+    document.title = 'Biodiversiteitsmonitor';
 
     this.state = {
       init: false,
@@ -168,55 +163,12 @@ class App extends Component {
           <div className={contentClassName} ref={ref => this.el = ref}>
             <Route exact path='/'
               render={() =>
-                <Home
-                  language={this.state.language}
-                />
-              }
-            />
-            <Route
-              path='/viewer'
-              render={() =>
                 <Viewer 
                   user={this.state.user}
                   language={this.state.language}
                   localization={this.state.localization}
                 />
               }
-            />
-            <Route path='/products'
-              render={() =>
-                <Products
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path='/sectors'
-              render={() =>
-                <Sector
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path='/gallery'
-              render={() =>
-                <Gallery
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-              }
-            />
-            <Route
-              path='/about'
-              render={() =>
-                <About
-                  language={this.state.language}
-                  localization={this.state.localization}
-                />
-            }
             />
             <Route
               path='/login'

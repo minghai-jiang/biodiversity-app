@@ -41,19 +41,19 @@ const tileLayerTypes = [
   BASE_SATELLITE_LAYER_TYPE,
   {
     name: IMAGES_TILE_LAYER_NAME, 
-    defaultSelected: true,
+    defaultSelected: false,
     stacking: true,
     zIndex: ViewerUtility.tileLayerZIndex + 1
   },
   {
     name: LABELS_TILE_LAYER_NAME, 
-    defaultSelected: true,
+    defaultSelected: false,
     stacking: false,
     zIndex: ViewerUtility.tileLayerZIndex + 1 + 300,
   },
   {
     name: IMAGES2_TILE_LAYER_NAME,
-    defaultSelected: true,
+    defaultSelected: false,
     stacking: false,
     zIndex: ViewerUtility.tileLayerZIndex + 1 + 400
   }
@@ -335,7 +335,7 @@ class TileLayersControl extends PureComponent {
           className='card-header'
           title={
             <Typography gutterBottom variant="h6" component="h2">
-              Layers
+              {this.props.localization['Layers']}
             </Typography>
           }
           action={

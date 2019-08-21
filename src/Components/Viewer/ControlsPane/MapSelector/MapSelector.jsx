@@ -3,9 +3,6 @@ import React, { PureComponent } from 'react';
 import ApiManager from '../../../../ApiManager';
 import ErrorHandler from '../../../../ErrorHandler';
 
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-
 import './MapSelector.css';
 import ViewerUtility from '../../ViewerUtility';
 
@@ -17,102 +14,108 @@ export class MapSelector extends PureComponent {
 
     this.state = {
       maps: [],
-
-      atlasSelect: null,
-      mapselect: null,
-
-      selectedAtlas: 'default',
-      selectedMap: { id: 'default' },
     };
+
+    this.selectionOptions = {
+      "ea53987e-842d-4467-91c3-9e23b3e5e2e8":
+      {
+        "name": "WNF biodiversiteitsmonitor",
+        "options": ["timestamps", "polygonLayers", "getForms"]
+      },
+      "d9903b33-f5d1-4d57-992f-3d8172460126":
+      {
+        "name": "LNV maai en oogst kaart",
+        "options": ["timestamps", "tileLayers", "classes"]
+      },
+      "4a925aef-469b-4aac-995b-46be2dc2779f":
+      {
+        "name": "Netherlands soil",
+        "options": ["timestamps", "measurements"]
+      },
+      "c4c9dbd9-d1e8-44ec-bf7f-e61b67ed0a8e": {
+        "name": "Netherlands high resolution",
+        "options": ["timestamps", "tileLayers"]
+      }
+    }
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.user !== prevProps.user) {
       this.getMaps();
     }
-
-
   }
 
   componentDidMount = () => {
-    this.getMaps();
+    this.getMaps().then(this.getMetadata());
   }
 
   getMaps = async () => {
     ApiManager.get('/account/myMaps', null, this.props.user)
       .then(maps => {
-        maps.sort((a, b) => { return a.name.localeCompare(b.name); });
+        let mapsToSelect = Object.keys(this.selectionOptions);
+        let newMaps = maps.filter(el => {return mapsToSelect.includes(el.id)});
 
-        let url = new URL(window.location.href);
-        let urlSelectedMapName = url.searchParams.get('map');
-
-        let urlSelectedMap = maps.find(x => x.name === urlSelectedMapName);
-
-        let selectedAtlas = this.state.selectedAtlas;
-        if (urlSelectedMap) {
-          if (urlSelectedMap.atlases.length > 0) {
-            selectedAtlas = urlSelectedMap.atlases[0];
-          }
-          else {
-            selectedAtlas = ADMIN_ATLAS;
-          }
-        }
-
-        this.setState({ maps: maps, selectedAtlas: selectedAtlas }, () => {
-          if (urlSelectedMap) {
-            this.onSelectMap({ target: { value: urlSelectedMap.id } })
-          }
-        });
+        this.getMetadata(newMaps);
       })
       .catch(err => {
         ErrorHandler.alert(err);
       });
   }
 
-  onSelectAtlas = (e) => {
-    let atlas = e.target.value;
+  getMetadata = async(maps) => {
+    if (typeof(maps) !== 'undefined' && maps.length > 0)
+    {
+      let promises = [];
+      for(let key in this.selectionOptions)
+      {
+        promises.push(this.getMapMetadata(maps, key));
+      }
 
-    if (this.state.selectedAtlas === atlas) {
-      return;
+      Promise.all(promises)
+        .then(result => {
+          let maps = {};
+          for (var i = 0; i < result.length; i++)
+          {
+            let map = result[i];
+            maps[map.id] = map;
+          }
+          
+          this.props.onSelectMap(maps)
+        })
     }
-
-    this.setState({ selectedAtlas: atlas, selectedMap: { id: 'default' }});
   }
 
-  onSelectMap = (e) => {
-    if (!e.target.value) {
-      return;
+  getMapMetadata = (maps, mapId) => {
+    let map = maps.filter(el => {return el.id === mapId})[0];
+    let body = {mapId: mapId};
+
+    let promises = [];
+    let mapOptions = this.selectionOptions[mapId].options;
+    for (var i = 0; i < mapOptions.length; i++)
+    {
+      let type = mapOptions[i];
+      let url = type === 'getForms' ? '/geomessage/getForms' : '/metadata/' + type;
+      promises.push(ApiManager.post(url, body, this.props.user));
     }
 
-    let map = this.state.maps.find(x => x.id === e.target.value);
+    return Promise.all(promises)
+      .then(results => {
+        map.layers = {};
 
-    if (!map) {
-      return;
-    }
+        map.timestamps = results[0];
 
-    this.setState({ selectedMap: map });
+        mapOptions.includes('polygonLayers') ? map.layers.polygon = results[mapOptions.indexOf('polygonLayers')] : map.layers.polygon = [];
+        mapOptions.includes('tileLayers') ? map.layers.tile = results[mapOptions.indexOf('tileLayers')] : map.layers.tile = [];
 
-    if (!map.timestamps || !map.layer) {
-      this.getMapMetadata(map)
-        .then(() => {
-          this.props.onSelectMap(map);
-        })
-        .catch(err => {
-          ErrorHandler.alert(err);
-        });
-    }
-  };
+        mapOptions.includes('classes') ? map.classes = results[mapOptions.indexOf('classes')] : map.classes = [];
+        mapOptions.includes('measurements') ? map.measurements = results[mapOptions.indexOf('measurements')] : map.measurements = [];
+        mapOptions.includes('getForms') ? map.forms = results[mapOptions.indexOf('getForms')] : map.forms = [];
 
-  getMapMetadata = (map) => {
-    if (map.metadataLoaded) {
-      return Promise.resolve();
-    }
+        return map;
+      })
+      .catch(error => {console.log(error)})
 
-    let body = {
-      mapId: map.id
-    };
-
-    let timestampsPromise = ApiManager.post('/metadata/timestamps', body, this.props.user);
+    /*let timestampsPromise = ApiManager.post('/metadata/timestamps', body, this.props.user);
     let tileLayersPromise = ApiManager.post('/metadata/tileLayers', body, this.props.user);
     let polygonLayersPromise = ApiManager.post('/metadata/polygonLayers', body, this.props.user);
     let customPolygonLayersPromise = ApiManager.post('/geoMessage/customPolygon/layers', body, this.props.user);
@@ -151,110 +154,11 @@ export class MapSelector extends PureComponent {
         }
 
         map.metadataLoaded = true;
-      })
+      })*/
   }
-
-  renderAtlasSelect = () => {
-    let maps = this.state.maps;
-
-    if (!maps || maps.length === 0) {
-      return null;
-    }
-
-    let options = [];
-
-    let atlases = [];
-    let atlasMapCount = {};
-
-    for (let i = 0; i < maps.length; i++) {
-      let map = maps[i];
-
-      if (!map.atlases) {
-        continue;
-      }
-
-      for (let x = 0; x < map.atlases.length; x++) {
-        let atlas = map.atlases[x];
-
-        if (!atlases.includes(atlas)) {
-          atlases.push(atlas);
-        }
-
-        if (!atlasMapCount[atlas]) {
-          atlasMapCount[atlas] = 1;
-        }
-        else {
-          atlasMapCount[atlas] += 1;
-        }
-      }
-    }
-
-    atlases.sort((a, b) => {
-      return a.toLowerCase().localeCompare(b.toLowerCase());
-    });
-
-    let user = this.props.user;
-
-    if (user && (user.username === ViewerUtility.admin || user.username === 'demo_user' || user.username === 'minghai')) {
-      atlases.push(ADMIN_ATLAS);
-      atlasMapCount[ADMIN_ATLAS] = maps.length;
-    }
-
-    for (let i = 0; i < atlases.length; i++) {
-      options.push(
-        <MenuItem value={atlases[i]} key={i}>{`${atlases[i]} (${atlasMapCount[atlases[i]]})`}</MenuItem>
-      );
-    }
-
-    let atlasSelect = (
-      <Select className='selector map-selector-select' onChange={this.onSelectAtlas} value={this.state.selectedAtlas}>
-        <MenuItem value='default' disabled hidden>{this.props.localization['Select an Atlas']}</MenuItem>
-        {options}
-      </Select>
-    );
-
-    return atlasSelect;
-  }
-
-  renderMapSelect = () => {
-    let maps = this.state.maps;
-    let selectedAtlas = this.state.selectedAtlas;
-
-    if (!maps || !selectedAtlas || selectedAtlas === 'default') {
-      return null;
-    }
-
-    let mapsOfAtlas = maps;
-    if (selectedAtlas !== ADMIN_ATLAS) {
-      mapsOfAtlas = maps.filter(x => x.atlases.includes(selectedAtlas));
-    }
-
-    let options = [];
-
-    for (let i = 0; i < mapsOfAtlas.length; i++) {
-      let map = mapsOfAtlas[i];
-      options.push(
-        <MenuItem value={map.id} key={i}>{map.name}</MenuItem>
-      );
-    }
-
-    let mapSelect = (
-      <Select className='selector' onChange={this.onSelectMap} value={this.state.selectedMap.id}>
-        <MenuItem value='default' disabled hidden>{this.props.localization['Select a map']}</MenuItem>
-        {options}
-      </Select>
-    )
-
-    return mapSelect;
-  };
 
   render() {
-    return (
-      <div>
-        {this.renderAtlasSelect()}
-        {this.renderMapSelect()}
-      </div>
-    );
+    return null;
   }
 }
 

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import Moment from 'moment';
 
 import {
   Card,
@@ -27,7 +28,8 @@ class SelectionPane extends PureComponent {
 
     this.state = {
       isOpen: false,
-      loading: false
+      loading: true,
+      data: null,
     };
   }
 
@@ -37,7 +39,50 @@ class SelectionPane extends PureComponent {
     }
     else if (prevProps.element !== this.props.element) {
       this.setState({ isOpen: true });
+      this.getData();
     }
+  }
+
+  getData = () =>
+  {
+    let element = this.props.element;
+
+    let body = {
+      mapId: 'ea53987e-842d-4467-91c3-9e23b3e5e2e8',
+      polygonIds: [element.feature.id]
+    };
+
+    let dataPromise = ApiManager.post(`/geoMessage/${element.type}/getMessages`, body, this.props.user);
+    let messages = [];
+
+    dataPromise
+      .then(result => {
+        if (result.length === 0)
+        {
+          this.setState({ data: <p>{ViewerUtility.noScore}</p>, loading: false});
+        }
+        else
+        {
+          for (var i = 0; i < result[0].messages.length; i++)
+          {
+            if(result && result[0].messages[i].form && result[0].messages[i].form.formName === "Kruidenrijkheid")
+            {
+              messages.push(result[0].messages[i]);
+            }
+          }
+
+          messages.sort(function(a,b){return Moment(b.form.answers[0].answer).format('X') - Moment(a.form.answers[0].answer).format('X')});
+          
+          let score = messages[messages.length - 1].form.answers[1].answer;
+          let data = [<p key='scoreHeader'>{ViewerUtility.score}</p>, <div className={'score score_' + score} key={element.feature.id + '_score_' + score}><span>{score}</span></div>]
+          
+          this.setState({ data: data, loading: false});
+        }
+
+      })
+      .catch(err => {
+        console.error(err);
+      });
   }
 
   open = () => {
@@ -274,12 +319,6 @@ class SelectionPane extends PureComponent {
           action={
             <div>
               <IconButton
-                onClick={this.onDownload}
-                aria-label='Download'
-              >
-                <SaveAlt />
-              </IconButton>
-              <IconButton
                 onClick={this.onCloseClick}
                 aria-label='Close'
               >
@@ -289,17 +328,18 @@ class SelectionPane extends PureComponent {
           }
         />
         <CardContent className={'card-content'}>
-          {properties}
-          { this.state.loading ? <CircularProgress className='loading-spinner'/> : null}
+          { this.state.loading ? <CircularProgress className='loading-spinner'/> : this.state.data}
         </CardContent>
-        <CardActions className={'selection-pane-card-actions'}>
-          <div key='first_row_buttons'>
-            {firstRowButtons}
-          </div>
-          <div key='secont_row_buttons' style={ {marginLeft: '0px' }}>
-            {secondRowButtons}
-          </div>
-        </CardActions>
+        {
+          !this.state.loading ? (<CardActions className={'selection-pane-card-actions'}>
+            <div key='first_row_buttons'>
+              {firstRowButtons}
+            </div>
+            <div key='secont_row_buttons' style={ {marginLeft: '0px' }}>
+              {secondRowButtons}
+            </div>
+          </CardActions>) : null
+      }
       </Card>
     );
   }

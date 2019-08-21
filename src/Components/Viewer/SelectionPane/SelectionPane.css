@@ -6,8 +6,23 @@
   margin-bottom: 10px;
   max-width: 100%;
   max-height: 100%;
-  z-index: 2000;
-  background-color: #f4f4f4;
+  z-index: 1300;
+  background-color: #f6fbfe;
+}
+
+.selection-pane .MuiPaper-root
+{
+  background-color: #fff;
+}
+
+.selection-pane .MuiCardHeader-content
+{
+  width: 100%;
+}
+
+.selection-pane .MuiCardHeader-content button
+{
+  margin-left: 36px;
 }
 
 div.selection-pane-private {
@@ -17,7 +32,7 @@ div.selection-pane-private {
 .selection-pane .card-content {
   overflow: auto;
   font-size: 15px;
-  text-align: left;
+  text-align: center;
 }
 
 div.selection-pane-card-actions {
@@ -29,12 +44,70 @@ div.specific-actions {
 }
 
 button.selection-pane-button {
-  color: #026464;
-  width: 42%;
-  margin-right: 18px;
+  color: #b3ce8c;
+  width: 45%;
+  margin-right: 2.5%;
   margin-bottom: 8px;
+}
+
+.selection-pane-card-actions div:last-child
+{
+  margin-right: 0px;
+  margin-left: 2.5%;
 }
 
 .no-text-transform {
   text-transform: none;
+}
+
+.selection-pane .loading-spinner
+{
+  margin-top: 20px;
+}
+
+.selection-pane p
+{
+  margin: 0;
+}
+
+.selection-pane .score
+{
+  margin: auto;
+  margin-top: 10px;
+  height: 40px;
+  width: 40px;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 40px;
+}
+
+.selection-pane .score span
+{
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+}
+
+.score_0
+{
+  background-color: #e37458;
+}
+
+.score_1
+{
+  background-color: #e99261;
+}
+
+.score_2
+{
+  background-color: #fff14b;
+}
+
+.score_3
+{
+  background-color: #8dc27e;
+}
+
+.score_4
+{
+  background-color: #62b57e;
 }

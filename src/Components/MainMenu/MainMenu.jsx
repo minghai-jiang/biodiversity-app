@@ -51,45 +51,8 @@ export class MainMenu extends Component {
         <ul>
           <li>
             <NavLink exact to="/" className="main-menu-logo-item">
-              <img className="main-menu-logo" src="/images/logo-white.png" alt="Ellipsis Earth Intelligence logo white"/>
+              <img className="main-menu-logo" src="/images/Logo_wide_small.png" alt="logo Biodiversiteitsmonitor"/>
             </NavLink>
-          </li>
-          <li>
-            <NavLink to="/products" className="main-menu-item">
-              {this.props.localization['Products']}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/viewer" className="main-menu-item">
-              {this.props.localization['Viewer']}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/gallery" className="main-menu-item">
-              {this.props.localization['Gallery']}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/sectors" className="main-menu-item">
-              {this.props.localization['Sectors']}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/about" className="main-menu-item">
-              {this.props.localization['AboutUs']}
-            </NavLink>
-          </li>
-          <li style={{float: "right", display: 'block'}}>
-            <div className="main-menu-item dropdown" style={{ width: '100%'}}>
-              <button className="dropbtn">
-                <img src='/images/language.png' style={{width: '25%', verticalAlign: 'middle'}}/>
-              </button>
-              <div className="dropdown-content">
-                <a href="#" onClick={() => this.changeLanguage('english')}>English</a>
-                <a href="#" onClick={() => this.changeLanguage('spanish')}>Español</a>
-                <a href="#" onClick={() => this.changeLanguage('dutch')}>Nederlands</a>
-              </div>
-            </div>
           </li>
           <li style={{display: this.props.user ? 'none' : 'block', float: "right"}}>
             <NavLink to="/login" className="main-menu-item">

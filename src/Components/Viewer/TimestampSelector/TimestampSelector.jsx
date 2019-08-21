@@ -74,6 +74,26 @@ export class TimestampSelector extends PureComponent {
     this.props.onSelectTimestamp(timestampRange);
   }
 
+  componentDidMount() {
+    if (this.props.map) 
+    {
+      let lastTimestamp = this.props.map.timestamps.length - 1;
+      let timestamps = this.props.map.timestamps;
+      let dateFormat = 'YYYY-MM-DD';
+
+      let dates = [];
+      for (let i = 0; i < timestamps.length; i++) {
+        dates[i] = Moment(timestamps[i].dateTo).format(dateFormat);
+      }
+
+      this.setState({
+        start: lastTimestamp,
+        end: lastTimestamp,
+        dates: dates
+      });
+    }
+  }
+
   render() {
     if (!this.props.map) {
       return null;
@@ -123,7 +143,7 @@ export class TimestampSelector extends PureComponent {
         <div>
           {this.props.localization['Timestamps']} (
           <input type='checkbox' id='timestamp-range' onChange={this.onRangeToggleChange} checked={this.state.range}/>
-          {this.props.localization['Range']});
+          {this.props.localization['Range']})
         </div>
         {slider}
         <div>{dateText}</div>

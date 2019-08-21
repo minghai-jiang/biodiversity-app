@@ -4,6 +4,8 @@ import { Map, Marker, GeoJSON } from 'react-leaflet';
 import 'leaflet-draw';
 import L from 'leaflet';
 
+import Control from 'react-leaflet-control';
+
 import ApiManager from '../../ApiManager';
 
 import Utility from '../../Utility';
@@ -14,9 +16,9 @@ import TimestampSelector from './TimestampSelector/TimestampSelector';
 import ControlsPane from './ControlsPane/ControlsPane';
 import DataPane from './DataPane/DataPane';
 import SelectionPane from './SelectionPane/SelectionPane';
+import FlyToControl from './ControlsPane/FlyToControl/FlyToControl'
 
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-draw/dist/leaflet.draw.css';
 
 import './Viewer.css';
 
@@ -81,30 +83,10 @@ class Viewer extends PureComponent {
 
       geolocation: null,
 
-      overrideLeafletLayers: null
+      overrideLeafletLayers: null,
+
+      selectedMap: 'd9903b33-f5d1-4d57-992f-3d8172460126',
     };
-  }
-
-  initializeDrawingControl = () => {
-    let map = this.leafletMap.current.leafletElement;
-  
-    let drawControl = new L.Control.Draw({
-      draw: {
-        polygon: {
-          allowIntersection: false
-        },
-        rectangle: false,
-        marker: false,
-        polyline: false,
-        circle: false,
-        circlemarker: false
-      },
-      edit: false
-    });
-    
-    map.addControl(drawControl);
-    map.on(L.Draw.Event.CREATED, this.onShapeDrawnClosure);
-
   }
 
   componentDidMount() {
@@ -128,11 +110,14 @@ class Viewer extends PureComponent {
 
       this.setState({ panes: panes }, () => this.leafletMap.current.leafletElement.invalidateSize());
     });
-
-    this.initializeDrawingControl();
   }
 
-  setLocation = (position) => {
+  setLocation = (position, type = null) => {
+    if (type !== null)
+    {
+      console.log(type);
+    }
+
     if (position) {      
       if (!this.state.geolocation || this.state.geolocation.latitude !== position.coords.latitude || 
         this.state.geolocation.longitude !== position.coords.longitude) {
@@ -169,47 +154,7 @@ class Viewer extends PureComponent {
     else if (cb) {
       cb();
     }
-  }
-
-  onShapeDrawnClosure = (e) => {
-    let layer = e.layer;
-    
-    let geoJson = layer.toGeoJSON();
-    geoJson.geometry.type = 'MultiPolygon';
-    geoJson.geometry.coordinates = [geoJson.geometry.coordinates];
-    geoJson.properties.id = Math.random();
-
-    let selectDrawnPolygon = () => {
-      if (!this.state.map) {
-        return;
-      }
-
-      this.selectFeature(ViewerUtility.drawnPolygonLayerType, geoJson, true);    
-    }
-
-    let drawnPolygonLayer = (
-      <GeoJSON
-        key={Math.random()}
-        data={geoJson}
-        zIndex={ViewerUtility.drawnPolygonLayerZIndex}
-        onEachFeature={(_, layer) => layer.on({ click: selectDrawnPolygon })}
-      />
-    );
-
-    this.drawnPolygonGeoJson = geoJson;
-    let dataPaneAction = this.state.dataPaneAction;
-    if (dataPaneAction !== ViewerUtility.dataPaneAction.createCustomPolygon) {
-      dataPaneAction = null;
-    }
-
-    this.setState({ 
-      drawnPolygonLayer: drawnPolygonLayer ,
-      dataPaneAction: dataPaneAction
-    }, () => {
-      this.rebuildAllLayers();
-      selectDrawnPolygon();
-    });    
-  }  
+  } 
 
   openPane = (paneName, closePane) => {
     let currentPanes = this.state.panes;
@@ -262,8 +207,8 @@ class Viewer extends PureComponent {
       dataPaneAction: dataPaneAction,
       selectedElement: null,
       timestampRange: {
-        start: map.timestamps.length - 1,
-        end: map.timestamps.length - 1
+        start: map[this.state.selectedMap].timestamps.length - 1,
+        end: map[this.state.selectedMap].timestamps.length - 1
       },
       overrideLeafletLayers: null
     }, () => {
@@ -310,7 +255,7 @@ class Viewer extends PureComponent {
     );    
   }
 
-  selectFeature = (type, feature, hasAggregatedData, color) => {
+  selectFeature = (type, feature, hasAggregatedData, map, color) => {
     let element = {
       type: type,
       hasAggregatedData: hasAggregatedData,
@@ -327,7 +272,6 @@ class Viewer extends PureComponent {
 
     let markerPane = this.leafletMap.current.leafletElement.getPane('markerPane');
 
-    let map = this.state.map;
     let layerCollection = null;
 
     if (!color) {
@@ -422,8 +366,26 @@ class Viewer extends PureComponent {
     let type = flyToInfo.type;
 
     if (type === ViewerUtility.flyToType.map) {
-      let map = this.state.map;
-      this.flyToInfo.target = L.latLngBounds(L.latLng(map.yMin, map.xMin), L.latLng(map.yMax, map.xMax));
+      if (!this.state.geolocation)
+      {
+        let type = 'map';
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            let newGeolocation = [position.coords.latitude, position.coords.longitude];
+            this.flyToInfo.target = newGeolocation;
+            this.setState({ geolocation: newGeolocation }, this.attemptFlyTo());
+          }, 
+          (err) => {
+            console.warn(`Error ${err.code}: ${err.message}`);
+            this.setLocation(null);
+          }, 
+          { enableHighAccuracy: true }
+        );
+      }
+      else
+      {
+        this.flyToInfo.target = this.state.geolocation;
+      }
     }
     else if (type === ViewerUtility.flyToType.currentLocation) {
       this.flyToInfo.target = this.state.geolocation;
@@ -473,7 +435,7 @@ class Viewer extends PureComponent {
             this.flyToInfo.layer = feature.properties.layer;
 
             if (this.flyToInfo.type === ViewerUtility.polygonLayerType) {
-              let mapPolygonlayers = this.state.map.layers.polygon;
+              let mapPolygonlayers = this.state.map['ea53987e-842d-4467-91c3-9e23b3e5e2e8'].layers.polygon;
 
               for (let i = 0; i < mapPolygonlayers.length; i++) {
                 let timestampPolygonLayers = mapPolygonlayers[i].layers;
@@ -485,7 +447,7 @@ class Viewer extends PureComponent {
             }
           }
 
-          this.selectFeature(this.flyToInfo.type, feature, hasAggregatedData);
+          this.selectFeature(this.flyToInfo.type, feature, hasAggregatedData, this.state.map['ea53987e-842d-4467-91c3-9e23b3e5e2e8']);
 
           if (!this.flyToInfo.delay && this.state.isSmallWindow && !this.state.panes.includes(MAP_PANE_NAME)) {
             this.openPane(MAP_PANE_NAME);
@@ -505,10 +467,10 @@ class Viewer extends PureComponent {
   }
 
   getElementGeoJson = () => {
-    let map = this.state.map;
+    let map = this.state.map['ea53987e-842d-4467-91c3-9e23b3e5e2e8'];
     let body = {
       mapId: map.id,
-      timestamp: map.timestamps[this.state.timestampRange.end].timestampNumber
+      timestamp: 0
     };
 
     let type = this.flyToInfo.type;
@@ -559,8 +521,8 @@ class Viewer extends PureComponent {
 
     if (this.state.panes.includes(MAP_PANE_NAME)) {
 
-      if (this.flyToInfo.type === ViewerUtility.flyToType.currentLocation) {
-        this.leafletMap.current.leafletElement.flyTo(this.flyToInfo.target);
+      if (this.flyToInfo.type === ViewerUtility.flyToType.currentLocation || this.flyToInfo.type === ViewerUtility.flyToType.map) {
+        this.leafletMap.current.leafletElement.flyTo(this.flyToInfo.target, 16);
       }
       else {
         this.leafletMap.current.leafletElement.flyToBounds(this.flyToInfo.target, { maxZoom: this.state.map.zoom });
@@ -617,9 +579,11 @@ class Viewer extends PureComponent {
           <div className='viewer-pane map-pane' style={mapPaneStyle}>
             <TimestampSelector
               localization={this.props.localization}
-              map={this.state.map}
+              map={this.state.map ? this.state.map[this.state.selectedMap] : null}
               onSelectTimestamp={this.onSelectTimestamp}
+              key={this.state.map ? 'timestampSelector' + this.state.selectedMap : 'timestampSelector'}
             />
+
             <SelectionPane
               ref={this.selectionPane}
               localization={this.props.localization}
@@ -638,6 +602,14 @@ class Viewer extends PureComponent {
               maxZoom={19}
               onViewportChanged={this.onLeafletMapViewportChanged}
             >
+              <Control position="topleft" >
+                <FlyToControl
+                  localization={this.props.localization}
+                  user={this.props.user}
+                  map={this.state.map}
+                  onFlyTo={this.onFlyTo}
+                />
+              </Control>
               {this.state.allLayers}
               {this.state.geolocation ? <Marker position={this.state.geolocation}/> : null}
             </Map>

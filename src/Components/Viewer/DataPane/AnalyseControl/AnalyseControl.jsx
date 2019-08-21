@@ -1,7 +1,10 @@
 import React, { PureComponent } from 'react';
 import Papa from 'papaparse';
 import LineChart from './LineChart/LineChart';
+import LineChartScore from './LineChart/LineChartScore';
+import SoilTable from './Table/SoilTable';
 import Slider from 'rc-slider';
+import Moment from 'moment';
 
 import {
   Card,
@@ -29,7 +32,7 @@ import ApiManager from '../../../../ApiManager';
 
 const Single = Slider.createSliderWithTooltip(Slider);
 
-const DEFAULT_SELECTED_CLASS = 'default';
+const DEFAULT_SELECTED_CLASS = 'all classes';
 
 class AnalyseControl extends PureComponent {
 
@@ -37,17 +40,20 @@ class AnalyseControl extends PureComponent {
     super(props, context);
 
     this.state = {
+      scoreLoading: true,
       classesLoading: false,
-      measurementsLoading: false,
+      measurementsLoading: true,
 
       availableClasses: null,
       selectedClass: DEFAULT_SELECTED_CLASS,
 
       classesData: null,
       measurementsData: {},
+      scoreData: null,
 
       classesExpanded: true,
       measurementsExpanded: true,
+      scoreExpanded: true,
 
       maxMask: 1
     };
@@ -55,8 +61,14 @@ class AnalyseControl extends PureComponent {
 
   componentDidMount() {
     this.setState({ classesLoading: true }, () => {
-      this.getAvailableClasses();
-      this.getData(ViewerUtility.dataGraphType.classes);
+      let map = 'd9903b33-f5d1-4d57-992f-3d8172460126';
+      let map2 = '4a925aef-469b-4aac-995b-46be2dc2779f';
+      let map3 = 'ea53987e-842d-4467-91c3-9e23b3e5e2e8';
+
+      this.getAvailableClasses(map);
+      this.getData(ViewerUtility.dataGraphType.classes, null, map);
+      this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass, map2)
+      this.getData(ViewerUtility.score, null, map3)
     });
   }
 
@@ -74,22 +86,27 @@ class AnalyseControl extends PureComponent {
     let differentElement = differentMap || DataPaneUtility.isDifferentElement(prevProps.element, this.props.element);
 
     if (differentElement) {
+      let map = 'd9903b33-f5d1-4d57-992f-3d8172460126';
+      let map2 = '4a925aef-469b-4aac-995b-46be2dc2779f';
+      let map3 = 'ea53987e-842d-4467-91c3-9e23b3e5e2e8';
+
       this.setState({
           classesData: null,
           measurementsData: {},
           classesLoading: true,
           measurementsLoading: true,
         }, () => {
-          this.getData(ViewerUtility.dataGraphType.classes);
-          this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass)
+          this.getData(ViewerUtility.dataGraphType.classes, null, map);
+          this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass, map2)
+          this.getData(ViewerUtility.score, null, map3)
       });
     }
   }
 
-  getAvailableClasses = () => {
+  getAvailableClasses = (mapID) => {
     let availableClasses = [];
 
-    let map = this.props.map;
+    let map = this.props.map[mapID];
 
     if (!map.perClass) {
       availableClasses.push(ViewerUtility.specialClassName.allClasses);
@@ -115,13 +132,14 @@ class AnalyseControl extends PureComponent {
     this.setState({ availableClasses: availableClasses });
   }
 
-  getData = async (type, className) => {
+  getData = async (type, className, mapID) => {
     let element = this.props.element;
 
     let body = {
-      mapId: this.props.map.id,
+      mapId: this.props.map[mapID].id,
       class: className
     };
+
     let urlType = null;
 
     if (element.type === ViewerUtility.standardTileLayerType) {
@@ -130,6 +148,10 @@ class AnalyseControl extends PureComponent {
       body.zoom = element.feature.properties.zoom;
 
       urlType = 'tile';
+    }
+    else if (type === ViewerUtility.score)
+    {
+      body['polygonIds'] = [element.feature.id];
     }
     else if (element.type === ViewerUtility.polygonLayerType && element.hasAggregatedData) {
       body.polygonId = element.feature.properties.id;
@@ -159,9 +181,17 @@ class AnalyseControl extends PureComponent {
     else if (type === ViewerUtility.dataGraphType.measurements && className !== 'default') {
       dataPromise = ApiManager.post(`/data/measurement/${urlType}/timestamps`, body, this.props.user);
     }
+    else if (type === ViewerUtility.score)
+    {
+      dataPromise = ApiManager.post(`/geoMessage/${element.type}/getMessages`, body, this.props.user);
+    }
     else {
       if (type === ViewerUtility.dataGraphType.classes) {
         this.setState({ classesLoading: false });
+      }
+      else if (type === ViewerUtility.score)
+      {
+        this.setState({ scoreLoading: false });
       }
       else {
         this.setState({ measurementsLoading: false });
@@ -174,19 +204,48 @@ class AnalyseControl extends PureComponent {
 
     dataPromise
       .then(result => {
-        data.raw = result;
+        if (type === ViewerUtility.score)
+        {
+          let messages = [];
 
-        let parseFunc = async () => {
-          let parsedData = Papa.parse(data.raw, {
-            dynamicTyping: true,
-            skipEmptyLines: true,
-            header: true
-          });
+          if (result.length === 0)
+          {
+            this.setState({ scoreData: <p>Dit perceel heeft nog geen score</p>, scoreLoading: false});
+          }
+          else
+          {
+            for (var i = 0; i < result[0].messages.length; i++)
+            {
+              if(result && result[0].messages[i].form && result[0].messages[i].form.formName === "Kruidenrijkheid")
+              {
+                let tempObj = {
+                  date: result[0].messages[i].form.answers[0].answer,
+                  score: result[0].messages[i].form.answers[1].answer
+                };
+                messages.push(tempObj);
+              }
+            }
 
-          return parsedData;
-        };
+            messages.sort(function(a,b){return Moment(b.date).format('X') - Moment(a.date).format('X')});
+            
+            return { data: messages};
+          }
+        }
+        else
+        {
+          data.raw = result;
+          let parseFunc = async () => {
+            let parsedData = Papa.parse(data.raw, {
+              dynamicTyping: true,
+              skipEmptyLines: true,
+              header: true
+            });
+  
+            return parsedData;
+          };
 
-        return parseFunc();
+          return parseFunc();
+        }
       })
       .then(result => {
         data.parsed = result;
@@ -202,6 +261,10 @@ class AnalyseControl extends PureComponent {
           newmeasurementsData[className] = data;
 
           this.setState({ measurementsData: newmeasurementsData, measurementsLoading: false });
+        }
+        else
+        {
+          this.setState({ scoreData: result, scoreLoading: false });
         }
       })
       .catch(err => {
@@ -318,9 +381,40 @@ class AnalyseControl extends PureComponent {
     if (this.props.home) {
       return null;
     }
+    
+    let measurementsData = Object.entries(this.state.measurementsData).length === 0 && this.state.measurementsData.constructor === Object;
 
     return (
       <div>
+      <Card className='data-pane-card'>
+          <CardHeader
+            title={
+              <Typography variant="h6" component="h2" className='no-text-transform'>
+                {ViewerUtility.score}
+              </Typography>
+            }
+            action={
+              <IconButton
+                className={this.state.scoreExpanded ? 'expand-icon expanded' : 'expand-icon'}
+                onClick={() => this.setState({ scoreExpanded: !this.state.scoreExpanded })}
+                aria-expanded={this.state.scoreExpanded}
+                aria-label='Show'
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            }
+          />
+          <Collapse in={this.state.scoreExpanded}>
+            <CardContent className='data-pane-card-content'>
+              {this.state.scoreLoading ? <CircularProgress className='loading-spinner'/> : null}
+              {
+                !this.state.scoreLoading && this.state.scoreData ?
+                  <LineChartScore data={this.state.scoreData}/> : <p>{ViewerUtility.noScore}</p>
+              }
+            </CardContent>
+          </Collapse>
+        </Card>
+
         <Card className='data-pane-card'>
           <CardContent>
             <div>{this.props.localization['Max masked']}: {Math.round(this.state.maxMask * 100)}%</div>
@@ -357,29 +451,19 @@ class AnalyseControl extends PureComponent {
             }
           />
           <Collapse in={this.state.classesExpanded}>
-            <CardContent className='data-pane-card-content'>
+            <CardContent className='data-pane-card-content' key={this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126'] ? 'LineChartClassesCard-d9903b33-f5d1-4d57-992f-3d8172460126' : 'LineChartClassesCard'}>
               {this.state.classesLoading ? <CircularProgress className='loading-spinner'/> : null}
               {
-                !this.state.classesLoading && this.state.classesData ?
+                !this.state.classesLoading && this.state.classesData && this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126'] ?
                   <LineChart
-                    map={this.props.map}
+                    map={this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126'] ? this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126'] : null}
                     data={this.state.classesData}
                     type={ViewerUtility.dataGraphType.classes}
                     maxMask={this.state.maxMask}
+                    key={this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126'] ? 'LineChartClasses-d9903b33-f5d1-4d57-992f-3d8172460126' : 'LineChartClasses'}
                   /> : null
               }
             </CardContent>
-            {
-              !this.state.classesLoading && this.state.classesData ?
-                <CardActions className='analyse-card-actions'>
-                  <IconButton
-                    onClick={() => this.onDownloadData(false)}
-                    aria-label='Download data'
-                  >
-                    <SaveAlt />
-                  </IconButton>
-                </CardActions> : null
-            }
           </Collapse>
         </Card>
         <Card className='data-pane-card'>
@@ -402,44 +486,17 @@ class AnalyseControl extends PureComponent {
           />
           <Collapse in={this.state.measurementsExpanded}>
             <CardContent className='data-pane-card-content analyse-card-content'>
+              { this.state.measurementsLoading ? <CircularProgress className='loading-spinner'/> : null }
               {
-                this.state.availableClasses ?
-                  <Select
-                    className='class-selector'
-                    value={this.state.selectedClass}
-                    onChange={this.onSelectClass}
-                    disabled={this.state.measurementsLoading}>
-                    <MenuItem value={DEFAULT_SELECTED_CLASS} disabled hidden>{this.props.localization['Select a class']}</MenuItem>
-                    {this.renderClassOptions()}
-                  </Select> : null
-              }
-              {
-                !this.state.availableClasses || this.state.measurementsLoading ?
-                  <div style={{ position: 'relative', height: '50px' }}>
-                    <CircularProgress className='loading-spinner'/>
-                  </div> : null
-              }
-              {
-                !this.state.measurementsLoading && this.state.measurementsData[this.state.selectedClass] ?
-                  <LineChart
-                    map={this.props.map}
-                    data={this.state.measurementsData[this.state.selectedClass]}
-                    type={ViewerUtility.dataGraphType.measurements}
-                    maxMask={this.state.maxMask}
-                  /> : null
+                !this.state.measurementsLoading ?
+                <SoilTable
+                  map={this.props.map['4a925aef-469b-4aac-995b-46be2dc2779f'] ? this.props.map['4a925aef-469b-4aac-995b-46be2dc2779f'] : null}
+                  key={this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126'] ? 'Soil-d9903b33-f5d1-4d57-992f-3d8172460126' : 'NoSoilTable'}
+                  data={this.state.measurementsData}
+                  element={this.props.element}
+                /> : null
               }
             </CardContent>
-            {
-              !this.state.measurementsLoading && this.state.measurementsData[this.state.selectedClass] ?
-                <CardActions className='analyse-card-actions'>
-                  <IconButton
-                    onClick={() => this.onDownloadData(true)}
-                    aria-label='Download data'
-                  >
-                    <SaveAlt />
-                  </IconButton>
-                </CardActions> : null
-            }
           </Collapse>
         </Card>
       </div>

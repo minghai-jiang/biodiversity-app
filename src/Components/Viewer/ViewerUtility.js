@@ -11,6 +11,9 @@ const ViewerUtility = {
 
   admin: 'admin',
 
+  score: 'Biodiversiteitsscore',
+  noScore: 'Dit perceel heeft nog geen score',
+
   tileLayerType: TILE,
   standardTileLayerType: STANDARD_TILE,
   polygonLayerType: POLYGON,
@@ -49,7 +52,8 @@ const ViewerUtility = {
   geomessageFormType: {
     text: 'text',
     numeric: 'numeric',
-    boolean: 'boolean'
+    boolean: 'boolean',
+    date: 'date'
   },
 
   flyToType: {
@@ -92,7 +96,7 @@ const ViewerUtility = {
     return {
       color: color ? color : '#3388ff',
       weight: weight ? weight : 1, 
-      fillOpacity: fillOpacity ? fillOpacity : 0.06
+      fillOpacity: fillOpacity || fillOpacity === 0 ? fillOpacity : 0.06
     };
   },
 

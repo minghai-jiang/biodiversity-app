@@ -83,24 +83,16 @@ class DataPane extends PureComponent {
       let map = this.props.map;
 
       if (map) {
-        idText = map.name;
+        idText = 'WNF Biodiversiteit';
 
         let hasGeoMessageAccess = map && map.accessLevel >= ApiManager.accessLevels.viewGeoMessages;
 
         homeElement = (
           <div>
-            <Button
-              className='geomessage-feed-button'
-              variant='contained'
-              color='primary'
-              disabled={!hasGeoMessageAccess}
-              onClick={() => this.props.onDataPaneAction(ViewerUtility.dataPaneAction.feed)}
-            >
-              {this.props.localization['GEOMESSAGE FEED']}
-            </Button>
             <LegendControl
               localization={this.props.localization}
-              map={this.props.map}
+              map={this.props.map ? this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126'] : null}
+              key={this.props.map ? 'legendControl-d9903b33-f5d1-4d57-992f-3d8172460126' : 'legendControl'}
             />
           </div>
 
@@ -154,7 +146,7 @@ class DataPane extends PureComponent {
         <GeoMessageControl
           localization={this.props.localization}
           user={this.props.user}
-          map={this.props.map}
+          map={this.props.map['ea53987e-842d-4467-91c3-9e23b3e5e2e8']}
           timestampRange={this.props.timestampRange}
           element={this.props.element}
           isFeed={action === ViewerUtility.dataPaneAction.feed}
@@ -193,6 +185,12 @@ class DataPane extends PureComponent {
       actionsClassName += ' data-pane-title-actions-right'
     }
 
+    let subheader;
+    if (idText)
+    {
+      subheader = home ? <div>{idText}</div> : <Button onClick={this.onFlyTo}> <div>{idText}</div></Button>;
+    }
+
     return (
       <div className={dataPaneClassName} style={style}>
 
@@ -220,16 +218,7 @@ class DataPane extends PureComponent {
                 {title}
               </Typography>
             }
-            subheader={
-              idText ?
-                <Button
-                  onClick={this.onFlyTo}
-                >
-                  <div>
-                    {idText}
-                  </div>
-                </Button> : null
-            }
+            subheader={subheader}
           />
         </Card>
         {homeElement}

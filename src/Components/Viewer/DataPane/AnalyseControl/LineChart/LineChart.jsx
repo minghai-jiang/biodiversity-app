@@ -39,7 +39,7 @@ export class LineChart extends PureComponent {
 
   componentDidUpdate(prevProps) {
     if (this.props.data !== prevProps.data || this.props.type !== prevProps.type ||
-      this.props.maxMask !== prevProps.maxMask) {
+      this.props.maxMask !== prevProps.maxMask || this.props.map !== prevProps.map) {
       let graphElements = this.prepareGraph();
       this.setState({ graphElements: graphElements });
     }
@@ -49,7 +49,7 @@ export class LineChart extends PureComponent {
     let data = this.props.data;
     let type = this.props.type;
 
-    if (!data || !type) {
+    if (!data || !type || !this.props.map) {
       return null;
     }
 
@@ -68,7 +68,7 @@ export class LineChart extends PureComponent {
 
     if (!isMeasurements) {
       let mapClasses = getUniqueLabels(this.props.map.classes, 'classes');
-      columnInfo = mapClasses.filter(x => x.name !== ViewerUtility.specialClassName.noClass && x.name !== ViewerUtility.specialClassName.blanc);    
+      columnInfo = mapClasses.filter(x => x.name !== ViewerUtility.specialClassName.noClass && x.name !== ViewerUtility.specialClassName.blanc);
     }
     else if (type === ViewerUtility.dataGraphType.measurements) {
       columnInfo = getUniqueLabels(this.props.map.measurements, 'measurements');

@@ -43,6 +43,15 @@ class PolygonLayersControl extends PureComponent {
 
   componentDidMount() {
     this.props.onLayersChange([]);
+    if (this.props.map && this.state.availableLayers.length === 0)
+    {
+      let  availableLayers = this.getAvailableLayers(this.props.map);
+      this.setState({
+        availableLayers: availableLayers,
+        selectedLayers: availableLayers,
+        count: {}
+      });
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -75,7 +84,7 @@ class PolygonLayersControl extends PureComponent {
 
         this.setState({
           availableLayers: availableLayers,
-          selectedLayers: selectedLayers,
+          selectedLayers: availableLayers,
           count: {}
         });
       }
@@ -198,7 +207,7 @@ class PolygonLayersControl extends PureComponent {
 
       let body = {
         mapId: map.id,
-        timestamp: map.timestamps[timestampRange.end].timestampNumber,
+        timestamp: timestampRange.end,
         layer: polygonLayer.name,
         xMin: bounds.xMin,
         xMax: bounds.xMax,
@@ -224,7 +233,7 @@ class PolygonLayersControl extends PureComponent {
 
           body = {
             mapId: map.id,
-            timestamp: map.timestamps[timestampRange.end].timestampNumber,
+            timestamp: timestampRange.end,
             polygonIds: polygonIds.ids
           }
 
@@ -245,7 +254,7 @@ class PolygonLayersControl extends PureComponent {
             <GeoJSON
               key={Math.random()}
               data={polygonsGeoJson}
-              style={ViewerUtility.createGeoJsonLayerStyle(`#${polygonLayer.color}`)}
+              style={ViewerUtility.createGeoJsonLayerStyle(`#${polygonLayer.color}`, 1.5, 0)}
               zIndex={ViewerUtility.polygonLayerZIndex + i}
               onEachFeature={(feature, layer) => layer.on({ click: () => this.onFeatureClick(feature, polygonLayer.hasAggregatedData) })}
             />
@@ -299,7 +308,7 @@ class PolygonLayersControl extends PureComponent {
   }
 
   onFeatureClick = (feature, hasAggregatedData) => {
-    this.props.onFeatureClick(feature, hasAggregatedData);
+    this.props.onFeatureClick(feature, hasAggregatedData, this.props.map);
   }
 
   onDownload = (layerName) => {
@@ -335,37 +344,7 @@ class PolygonLayersControl extends PureComponent {
     }
 
     return (
-      <Card className='layers-contol'>
-        <CardHeader
-          className='card-header'
-          title={
-            <Typography gutterBottom variant="h6" component="h2">
-              {this.props.localization['Polygons']}
-            </Typography>
-          }
-          action={
-            <IconButton
-              className={this.state.expanded ? 'expand-icon expanded' : 'expand-icon'}
-              onClick={this.onExpandClick}
-              aria-expanded={this.state.expanded}
-              aria-label='Show'
-            >
-              <ExpandMoreIcon />
-            </IconButton>
-          }
-        />
-        <Collapse in={this.state.expanded}>
-          <CardContent
-            className={'card-content'}
-          >
-            {
-              !this.props.override ?
-                this.createLayerCheckboxes() :
-                <div className='controls-pane-background-text'>Controlled by feed</div>
-            }
-          </CardContent>
-        </Collapse>
-      </Card>
+      <div></div>
     );
   }
 }

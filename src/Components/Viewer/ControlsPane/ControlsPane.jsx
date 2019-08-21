@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react';
 
 import MapSelector from './MapSelector/MapSelector';
-import FlyToControl from './FlyToControl/FlyToControl'
 import TileLayersControl from './TileLayersControl/TileLayersControl';
-import StandardTileLayersControl from './StandardTileLayersControl/StandardTileLayersControl';
 import PolygonLayersControl from './PolygonLayersControl/PolygonLayersControl';
-import CustomPolygonLayersControl from './CustomPolygonLayersControl/CustomPolygonLayersControl';
 
 import ViewerUtility from '../ViewerUtility';
 
@@ -62,7 +59,10 @@ class ControlsPane extends PureComponent {
   }
 
   onSelectMap = (map) => {
-    this.setState({ map: map }, () => this.props.onSelectMap(map));
+    if (map)
+    {
+      this.setState({ map: map }, () => this.props.onSelectMap(map));
+    }
   }
 
   onLayersChange = (type, layers) => {
@@ -101,56 +101,27 @@ class ControlsPane extends PureComponent {
           onSelectMap={this.onSelectMap}
         />
 
-        <FlyToControl
-          localization={this.props.localization}
-          user={this.props.user}
-          map={this.state.map}
-          onFlyTo={this.props.onFlyTo}
-        />
-
         <TileLayersControl
           localization={this.props.localization}
           user={this.props.user}
-          map={this.state.map}
+          map={this.state.map && this.state.map['d9903b33-f5d1-4d57-992f-3d8172460126'] ? this.state.map['d9903b33-f5d1-4d57-992f-3d8172460126'] : null}
           timestampRange={this.props.timestampRange}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.tileLayerType, layers)}
-        />
-
-        <StandardTileLayersControl
-          ref={this.standardTileLayersControl}
-          localization={this.props.localization}
-          user={this.props.user}
-          map={this.state.map}
-          leafletMapViewport={this.props.leafletMapViewport}
-          timestampRange={this.props.timestampRange}
-          override={this.props.override}
-          onLayersChange={(layers) => this.onLayersChange(ViewerUtility.standardTileLayerType, layers)}
-          onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.standardTileLayerType, feature, true)}
         />
 
         <PolygonLayersControl
           ref={this.polygonLayersControl}
           localization={this.props.localization}
           user={this.props.user}
-          map={this.state.map}
+          map={this.state.map && this.state.map['ea53987e-842d-4467-91c3-9e23b3e5e2e8'] ? this.state.map['ea53987e-842d-4467-91c3-9e23b3e5e2e8'] : null}
           leafletMapViewport={this.props.leafletMapViewport}
-          timestampRange={this.props.timestampRange}
+          timestampRange={{start: 0, end: 0}}
           override={this.props.override}
           onLayersChange={(layers) => this.onLayersChange(ViewerUtility.polygonLayerType, layers)}
-          onFeatureClick={(feature, hasAggregatedData) => this.props.onFeatureClick(ViewerUtility.polygonLayerType, feature, hasAggregatedData)}
+          onFeatureClick={(feature, hasAggregatedData, map) => this.props.onFeatureClick(ViewerUtility.polygonLayerType, feature, hasAggregatedData, map)}
+          key={this.state.map && this.state.map['ea53987e-842d-4467-91c3-9e23b3e5e2e8'] ? 'polygonLayersControl' + 'ea53987e-842d-4467-91c3-9e23b3e5e2e8' : null}
         />
 
-        <CustomPolygonLayersControl
-          ref={this.customPolygonLayersControl}
-          localization={this.props.localization}
-          user={this.props.user}
-          map={this.state.map}
-          leafletMapViewport={this.props.leafletMapViewport}
-          timestampRange={this.props.timestampRange}
-          override={this.props.override}
-          onLayersChange={(layers) => this.onLayersChange(ViewerUtility.customPolygonTileLayerType, layers)}
-          onFeatureClick={(feature) => this.props.onFeatureClick(ViewerUtility.customPolygonTileLayerType, feature, true)}
-        />
       </div>
     );
   }

@@ -70,7 +70,7 @@ class GeoMessage extends PureComponent {
     }
 
     let answers = [
-      <h4>{message.form.formName}</h4>
+      <h4 key={'header_' + message.id + '_' + message.form.formName}>{message.form.formName}</h4>
     ];
 
     for (let i = 0; i < message.form.answers.length; i++) {

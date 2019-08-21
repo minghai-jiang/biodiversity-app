@@ -52,28 +52,31 @@ class LegendControl extends PureComponent {
     let getTypes = (collection, property, filter) => {
       let types = [];
 
-      for (let i = 0; i < collection.length; i++) {
-        let timestamp = collection[i];
+      if (collection)
+      {
+        for (let i = 0; i < collection.length; i++) {
+          let timestamp = collection[i];
 
-        let timestampTypes = timestamp;
-        if (property) {
-          timestampTypes = timestamp[property];
-        }
-
-        for (let x = 0; x < timestampTypes.length; x++) {
-          let type = timestampTypes[x];
-
-          if (filter && filter.includes(type.name)) {
-            continue;
+          let timestampTypes = timestamp;
+          if (property) {
+            timestampTypes = timestamp[property];
           }
 
-          if (!types.find(x => x.name === type.name)) {
-            types.push(type);
+          for (let x = 0; x < timestampTypes.length; x++) {
+            let type = timestampTypes[x];
+
+            if (filter && filter.includes(type.name)) {
+              continue;
+            }
+
+            if (!types.find(x => x.name === type.name)) {
+              types.push(type);
+            }
           }
         }
+
+        return types;
       }
-
-      return types;
     }
 
     let map = this.props.map;
@@ -99,19 +102,19 @@ class LegendControl extends PureComponent {
       }
     }
 
-    if (availableClasses.length > 0) {
+    if (availableClasses && availableClasses.length > 0) {
       legendElements.push(<div key='classes' className='legend-line legend-line-header'>{this.props.localization['Classes']}</div>)
       createLegendLines(availableClasses);
     }
-    if (availableMeasurements.length > 0) {
+    if (availableMeasurements && availableMeasurements.length > 0) {
       legendElements.push(<div key='measurements' className='legend-line legend-line-header'>{this.props.localization['Measurements']}</div>)
       createLegendLines(availableMeasurements);
     }
-    if (availablePolygonLayers.length > 0) {
+    if (availablePolygonLayers && availablePolygonLayers.length > 0) {
       legendElements.push(<div key='polygon_layers' className='legend-line legend-line-header'>{this.props.localization['Polygon layers']}</div>);
       createLegendLines(availablePolygonLayers);
     }
-    if (availableCustomPolygonLayers.length > 0) {
+    if (availableCustomPolygonLayers && availableCustomPolygonLayers.length > 0) {
       legendElements.push(<div key='custom_polygon_layers' className='legend-line legend-line-header'>{this.props.localization['Custom polygon layers']}</div>);
       createLegendLines(availableCustomPolygonLayers);
     }

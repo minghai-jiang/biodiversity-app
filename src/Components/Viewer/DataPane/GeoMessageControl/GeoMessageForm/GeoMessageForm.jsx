@@ -20,6 +20,9 @@ import {
 import ClearIcon from '@material-ui/icons/Clear';
 import DeleteIcon from '@material-ui/icons/Delete';
 
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
+
 import Utility from '../../../../../Utility';
 import ViewerUtility from '../../../ViewerUtility';
 import DataPaneUtility from '../../DataPaneUtility';
@@ -52,7 +55,7 @@ class GeoMessageForm extends PureComponent {
 
       hasPermissions: false,
       messageText: '',
-      private: false,
+      private: true,
 
       selectedFormName: 'default',
 
@@ -67,34 +70,14 @@ class GeoMessageForm extends PureComponent {
   }
 
   renderFormSection = () => {
-    let mapForms = this.props.map.forms;
+   let mapForms = this.props.map.forms;
 
     if (!mapForms || mapForms.length === 0) {
       return null;
     }
 
-    let formOptions = [
-    ];
-
-    for (let i = 0; i < mapForms.length; i++) {
-      let formName = mapForms[i].formName;
-
-      formOptions.push(
-        <MenuItem key={formName} value={formName}>
-          {formName}
-        </MenuItem>
-      );
-    }
-
-    let formSelect = (
-      <Select key='form-selector' className='selector' onChange={this.onSelectForm} value={this.state.selectedFormName}>
-        <MenuItem key='default' value='default'>{this.props.localization['(Optional) Select a form']}</MenuItem>
-        {formOptions}
-      </Select>
-    )
-
     let formQuestions = [];
-    let selectedForm = mapForms.find(x => x.formName === this.state.selectedFormName);
+    let selectedForm = mapForms.find(x => x.formName === 'Foto');
 
     if (selectedForm) {
       let questions = selectedForm.form.questions;
@@ -113,6 +96,7 @@ class GeoMessageForm extends PureComponent {
               value={this.state.formAnswers[i]}
               required={question.obligatory === 'yes'}
               onChange={(e) => this.onFormAnswer(e, i, false)}
+              key={'form-' + i + '-' + ViewerUtility.geomessageFormType.text}
             />
           );
         }
@@ -125,12 +109,13 @@ class GeoMessageForm extends PureComponent {
               value={this.state.formAnswers[i]}
               required={question.obligatory === 'yes'}
               onChange={(e) => this.onFormAnswer(e, i, false)}
+              key={'form-' + i + '-' + ViewerUtility.geomessageFormType.numeric}
             />
           )
         }
         else if (question.type === ViewerUtility.geomessageFormType.boolean) {
           questionElement = (
-            <div className='geomessage-form-question geomessage-checkbox-question'>
+            <div className='geomessage-form-question geomessage-checkbox-question' key={'form-' + i + '-' + ViewerUtility.geomessageFormType.boolean}>
               {question.question}
               {question.obligatory === 'yes' ? '*' : null}
               <Checkbox
@@ -143,12 +128,32 @@ class GeoMessageForm extends PureComponent {
 
           )
         }
+        else if (question.type === ViewerUtility.geomessageFormType.date) {
+          let value = this.state.formAnswers[i] ? Moment(this.state.formAnswers[i]) : Moment();
+          let label = String(question.question) + ' ' + String(question.obligatory === 'yes' ? '*' : '');
+
+          questionElement = (
+            <div className='geomessage-form-question geomessage-date-question' key={'form-' + i + '-' + ViewerUtility.geomessageFormType.date}>
+              {<MuiPickersUtilsProvider utils={MomentUtils}>
+                <DatePicker
+                  disableFuture
+                  variant="inline"
+                  format="DD/MM/YYYY"
+                  margin="normal"
+                  id="date-picker-inline"
+                  label={label}
+                  onChange={(e) => this.onFormAnswer(e, i, false)}
+                />
+              </MuiPickersUtilsProvider>}
+            </div>
+          )
+        }
 
         formQuestions.push(questionElement);
       }
     }
 
-    return [formSelect, formQuestions];
+    return ['', formQuestions];
   }
 
   toggleExpand = () => {
@@ -210,20 +215,22 @@ class GeoMessageForm extends PureComponent {
   }
 
   onGeoMessageSubmit = () => {
-    let selectedForm = null;
+    let selectedForm = this.props.map.forms.find(x => x.formName === 'Foto');
 
-    if (this.state.selectedFormName) {
-      selectedForm = this.props.map.forms.find(x => x.formName === this.state.selectedFormName);
+    if (selectedForm) {
+      for (let i = 0; i < selectedForm.form.questions.length; i++) {
+        let question = selectedForm.form.questions[i];
+        let answer = this.state.formAnswers[i];
+        console.log(question, answer);
 
-      if (selectedForm) {
-        for (let i = 0; i < selectedForm.form.questions.length; i++) {
-          let question = selectedForm.form.questions[i];
-          let answer = this.state.formAnswers[i];
+        if (question.type === ViewerUtility.geomessageFormType.date && (answer === undefined || answer === null || answer === ''))
+        {
+          answer = Moment().format();
+        }
 
-          if (question.obligatory === 'yes' && (answer === undefined || answer === null || answer === '')) {
-            alert('Not all mandatory fields are filled.');
-            return;
-          }
+        if (question.obligatory === 'yes' && (answer === undefined || answer === null || answer === '')) {
+          alert('Not all mandatory fields are filled.');
+          return;
         }
       }
     }
@@ -234,8 +241,7 @@ class GeoMessageForm extends PureComponent {
 
       let body = {
         mapId: this.props.map.id,
-        timestamp: timestamp.timestampNumber,
-        message: this.state.messageText,
+        timestamp: 0,
         image: this.uploadedImage,
         private: this.state.private
       };
@@ -361,7 +367,9 @@ class GeoMessageForm extends PureComponent {
     let newAnswers = [...this.state.formAnswers];
 
     if (!isCheckbox) {
-      newAnswers[answerIndex] = e.target.value;
+      let value = e.target ? e.target.value : e.format();
+      console.log(value);
+      newAnswers[answerIndex] = value;
     }
     else {
       newAnswers[answerIndex] = e.target.checked;
@@ -425,13 +433,6 @@ class GeoMessageForm extends PureComponent {
         />
         <Collapse in={this.state.expanded}>
           <CardContent className='data-pane-card-content'>
-            <TextField
-              className='data-pane-text-field'
-              label={this.props.localization['GeoMessage']}
-              multiline
-              value={this.state.messageText}
-              onChange={this.onMessageChange}
-            />
             <div className='card-content-item geomessage-form-card-item'>
             {
               hasAddImagePermission ?
@@ -444,17 +445,6 @@ class GeoMessageForm extends PureComponent {
                     type='file'
                     accept='image/*'
                     onChange={this.onImageChange}
-                  />
-                </div> : null
-            }
-            {
-              hasPrivateMessagePermission ?
-                <div>
-                  {this.props.localization['Private']}:
-                  <Checkbox
-                    color='primary'
-                    checked={this.state.private}
-                    onChange={this.onPrivateMessageChange}
                   />
                 </div> : null
             }

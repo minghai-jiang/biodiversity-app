@@ -3,7 +3,9 @@
   z-index: 3000000;
   width: 100vw;
   height: 3.5em;
-  background-color: #333;
+  background-image: linear-gradient(to right, #4daeb1, #4daeb1, #4daeb1, #b3ce8c, #b3ce8c);
+  background-color: #4daeb1;
+  box-shadow: 0 0px 2px 0px rgba(0, 0, 0, 0.25);
 }
 
 #main-menu > ul {
@@ -23,22 +25,21 @@
   height: 3.5em;
   width: auto;
   position: relative;
-  padding: 1em;
-  top: -3px;
+  padding: 0.5em;
 }
 
 #main-menu > ul > li a
 {
-  border-bottom: #333 1px solid;
+  border-bottom: #4daeb1 1px solid;
 }
 
 #main-menu > ul > li a:hover {
-  border-color: #00a3a3;
+  border-color: #d7d746;
 }
 
 #main-menu > ul > li a.active
 {
-  border-color: #00a3a3;
+  border-color: #d7d746;
 }
 
 #main-menu > ul > li a.main-menu-logo-item {
@@ -49,7 +50,7 @@
   text-align: left;
   text-decoration: none;
   margin-right: 2em;
-  padding-left: 3vw;
+  padding-left: 2vw;
 }
 
 #main-menu > ul > li .main-menu-item {
@@ -74,7 +75,7 @@
 /* Navbar container */
 .navbar {
   overflow: hidden;
-  background-color: #333;
+  background-color: #4daeb1;
   font-family: Arial;
 }
 
@@ -112,7 +113,7 @@
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #333;
+  background-color: #4daeb1;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
@@ -213,7 +214,7 @@
     float: none;
     display: block;
     text-align: left;
-    background-color: #333;
+    background-color: #4daeb1;
     height: 2.5em;
     width: 100%;
     margin-left: 0;
