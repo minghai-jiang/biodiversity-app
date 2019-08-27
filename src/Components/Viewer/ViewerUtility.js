@@ -38,7 +38,8 @@ const ViewerUtility = {
 
   dataGraphType: {
     classes: 'classes',
-    measurements: 'measurements'
+    measurements: 'measurements',
+    soil: 'soil'
   },
 
   specialClassName: {

@@ -32,7 +32,7 @@ import ApiManager from '../../../../ApiManager';
 
 const Single = Slider.createSliderWithTooltip(Slider);
 
-const DEFAULT_SELECTED_CLASS = 'all classes';
+const DEFAULT_SELECTED_CLASS = 'default';
 
 class AnalyseControl extends PureComponent {
 
@@ -43,16 +43,19 @@ class AnalyseControl extends PureComponent {
       scoreLoading: true,
       classesLoading: false,
       measurementsLoading: true,
+      soilLoading: true,
 
       availableClasses: null,
       selectedClass: DEFAULT_SELECTED_CLASS,
 
       classesData: null,
       measurementsData: {},
+      soilData: {},
       scoreData: null,
 
       classesExpanded: true,
       measurementsExpanded: true,
+      soilExpanded: true,
       scoreExpanded: true,
 
       maxMask: 1
@@ -67,7 +70,8 @@ class AnalyseControl extends PureComponent {
 
       this.getAvailableClasses(map);
       this.getData(ViewerUtility.dataGraphType.classes, null, map);
-      this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass, map2)
+      this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass, map)
+      this.getData(ViewerUtility.dataGraphType.soil, 'all classes', map2)
       this.getData(ViewerUtility.score, null, map3)
     });
   }
@@ -75,7 +79,7 @@ class AnalyseControl extends PureComponent {
   componentDidUpdate(prevProps) {
     let differentMap = this.props.map !== prevProps.map;
     if (differentMap) {
-      this.getAvailableClasses();
+      this.getAvailableClasses('d9903b33-f5d1-4d57-992f-3d8172460126');
     }
 
     if (!this.props.element) {
@@ -97,7 +101,8 @@ class AnalyseControl extends PureComponent {
           measurementsLoading: true,
         }, () => {
           this.getData(ViewerUtility.dataGraphType.classes, null, map);
-          this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass, map2)
+          this.getData(ViewerUtility.dataGraphType.measurements, this.state.selectedClass, map)
+          this.getData(ViewerUtility.dataGraphType.soil, 'all classes', map2)
           this.getData(ViewerUtility.score, null, map3)
       });
     }
@@ -152,6 +157,7 @@ class AnalyseControl extends PureComponent {
     else if (type === ViewerUtility.score)
     {
       body['polygonIds'] = [element.feature.id];
+      urlType = 'polygon';
     }
     else if (element.type === ViewerUtility.polygonLayerType && element.hasAggregatedData) {
       body.polygonId = element.feature.properties.id;
@@ -170,6 +176,12 @@ class AnalyseControl extends PureComponent {
 
       urlType = 'customPolygon';
     }
+    else if (type === ViewerUtility.dataGraphType.soil)
+    {
+      body.polygonId = element.feature.properties.id;
+
+      urlType = 'polygon';
+    }
     else {
       return;
     }
@@ -178,12 +190,12 @@ class AnalyseControl extends PureComponent {
     if (type === ViewerUtility.dataGraphType.classes) {
       dataPromise = ApiManager.post(`/data/class/${urlType}/timestamps`, body, this.props.user);
     }
-    else if (type === ViewerUtility.dataGraphType.measurements && className !== 'default') {
-      dataPromise = ApiManager.post(`/data/measurement/${urlType}/timestamps`, body, this.props.user);
-    }
     else if (type === ViewerUtility.score)
     {
-      dataPromise = ApiManager.post(`/geoMessage/${element.type}/getMessages`, body, this.props.user);
+      dataPromise = ApiManager.post(`/geoMessage/${urlType}/getMessages`, body, this.props.user);
+    }
+    else if ((type === ViewerUtility.dataGraphType.measurements || ViewerUtility.dataGraphType.soil) && className !== 'default') {
+      dataPromise = ApiManager.post(`/data/measurement/${urlType}/timestamps`, body, this.props.user);
     }
     else {
       if (type === ViewerUtility.dataGraphType.classes) {
@@ -262,6 +274,9 @@ class AnalyseControl extends PureComponent {
 
           this.setState({ measurementsData: newmeasurementsData, measurementsLoading: false });
         }
+        else if (type === ViewerUtility.dataGraphType.soil) {
+          this.setState({ soilData: result, soilLoading: false });
+        }
         else
         {
           this.setState({ scoreData: result, scoreLoading: false });
@@ -303,13 +318,14 @@ class AnalyseControl extends PureComponent {
 
   onSelectClass = (e) => {
     let selectedClass = e.target.value;
+    let map = 'd9903b33-f5d1-4d57-992f-3d8172460126';
 
     if (!this.state.measurementsData[selectedClass]) {
       this.setState({
         selectedClass: selectedClass,
         measurementsLoading: true
         },
-        () => this.getData(ViewerUtility.dataGraphType.measurements, selectedClass)
+        () => this.getData(ViewerUtility.dataGraphType.measurements, selectedClass, map)
       );
     }
     else {
@@ -383,7 +399,6 @@ class AnalyseControl extends PureComponent {
     }
     
     let measurementsData = Object.entries(this.state.measurementsData).length === 0 && this.state.measurementsData.constructor === Object;
-
     return (
       <div>
       <Card className='data-pane-card'>
@@ -465,8 +480,9 @@ class AnalyseControl extends PureComponent {
               }
             </CardContent>
           </Collapse>
-        </Card>
-        <Card className='data-pane-card'>
+          </Card>
+
+          <Card className='data-pane-card'>
           <CardHeader
             title={
               <Typography variant="h6" component="h2" className='no-text-transform'>
@@ -486,13 +502,63 @@ class AnalyseControl extends PureComponent {
           />
           <Collapse in={this.state.measurementsExpanded}>
             <CardContent className='data-pane-card-content analyse-card-content'>
-              { this.state.measurementsLoading ? <CircularProgress className='loading-spinner'/> : null }
               {
-                !this.state.measurementsLoading ?
+                this.state.availableClasses ?
+                  <Select
+                    className='class-selector'
+                    value={this.state.selectedClass}
+                    onChange={this.onSelectClass}
+                    disabled={this.state.measurementsLoading}>
+                    <MenuItem value={DEFAULT_SELECTED_CLASS} disabled hidden>{this.props.localization['Select a class']}</MenuItem>
+                    {this.renderClassOptions()}
+                  </Select> : null
+              }
+              {
+                !this.state.availableClasses || this.state.measurementsLoading ?
+                  <div style={{ position: 'relative', height: '50px' }}>
+                    <CircularProgress className='loading-spinner'/>
+                  </div> : null
+              }
+              {
+                !this.state.measurementsLoading && this.state.measurementsData[this.state.selectedClass] ?
+                  <LineChart
+                    map={this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126']}
+                    data={this.state.measurementsData[this.state.selectedClass]}
+                    type={ViewerUtility.dataGraphType.measurements}
+                    maxMask={this.state.maxMask}
+                  /> : null
+              }
+            </CardContent>
+          </Collapse>
+        </Card>
+
+        <Card className='data-pane-card'>
+          <CardHeader
+            title={
+              <Typography variant="h6" component="h2" className='no-text-transform'>
+                {this.props.localization['Soil']}
+              </Typography>
+            }
+            action={
+              <IconButton
+                className={this.state.soilExpanded ? 'expand-icon expanded' : 'expand-icon'}
+                onClick={() => this.setState({ soilExpanded: !this.state.soilExpanded })}
+                aria-expanded={this.state.soilExpanded}
+                aria-label='Show'
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            }
+          />
+          <Collapse in={this.state.soilExpanded}>
+            <CardContent className='data-pane-card-content analyse-card-content'>
+              { this.state.soilLoading ? <CircularProgress className='loading-spinner'/> : null }
+              {
+                !this.state.soilLoading ?
                 <SoilTable
                   map={this.props.map['4a925aef-469b-4aac-995b-46be2dc2779f'] ? this.props.map['4a925aef-469b-4aac-995b-46be2dc2779f'] : null}
                   key={this.props.map['d9903b33-f5d1-4d57-992f-3d8172460126'] ? 'Soil-d9903b33-f5d1-4d57-992f-3d8172460126' : 'NoSoilTable'}
-                  data={this.state.measurementsData}
+                  data={this.state.soilData}
                   element={this.props.element}
                 /> : null
               }

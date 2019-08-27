@@ -28,12 +28,15 @@ export class SoilTable extends PureComponent {
 
     if (this.props.data && !hasData)
     {
-      let parsed = this.props.data['all classes'].parsed.data[this.props.data['all classes'].parsed.data.length - 1];
+      let parsed = this.props.data.data[this.props.data.data.length - 1];
       let tableData = [];
 
       for (var key in parsed)
       {
-        tableData.push(<TableRow key={key + parsed[key]}><TableCell>{key}</TableCell><TableCell>{parsed[key]}</TableCell></TableRow>)
+        if (key !== 'area' && key !== 'date_from' && key !== 'date_to')
+        {
+          tableData.push(<TableRow key={key + parsed[key]}><TableCell>{key}</TableCell><TableCell>{parsed[key]}</TableCell></TableRow>)
+        }
       }
 
       let head = <TableHead><TableRow><TableCell>key</TableCell><TableCell>value</TableCell></TableRow></TableHead>;

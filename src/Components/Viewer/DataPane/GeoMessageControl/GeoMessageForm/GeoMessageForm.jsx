@@ -76,8 +76,27 @@ class GeoMessageForm extends PureComponent {
       return null;
     }
 
+    let formOptions = [];
+
+    for (let i = 0; i < mapForms.length; i++) {
+      let formName = mapForms[i].formName;
+
+      formOptions.push(
+        <MenuItem key={formName} value={formName}>
+          {formName}
+        </MenuItem>
+      );
+    }
+
+    let formSelect = (
+      <Select key='form-selector' className='selector' onChange={this.onSelectForm} value={this.state.selectedFormName}>
+        <MenuItem key='default' value='default'>{this.props.localization['(Optional) Select a form']}</MenuItem>
+        {formOptions}
+      </Select>
+    )
+
     let formQuestions = [];
-    let selectedForm = mapForms.find(x => x.formName === 'Foto');
+    let selectedForm = mapForms.find(x => x.formName === this.state.selectedFormName);
 
     if (selectedForm) {
       let questions = selectedForm.form.questions;
@@ -153,7 +172,7 @@ class GeoMessageForm extends PureComponent {
       }
     }
 
-    return ['', formQuestions];
+    return [formSelect, formQuestions];
   }
 
   toggleExpand = () => {
@@ -215,22 +234,31 @@ class GeoMessageForm extends PureComponent {
   }
 
   onGeoMessageSubmit = () => {
-    let selectedForm = this.props.map.forms.find(x => x.formName === 'Foto');
+    let selectedForm = null;
 
-    if (selectedForm) {
-      for (let i = 0; i < selectedForm.form.questions.length; i++) {
-        let question = selectedForm.form.questions[i];
-        let answer = this.state.formAnswers[i];
-        console.log(question, answer);
+    if (this.state.selectedFormName)
+    {
+      selectedForm = this.props.map.forms.find(x => x.formName === this.state.selectedFormName);
 
-        if (question.type === ViewerUtility.geomessageFormType.date && (answer === undefined || answer === null || answer === ''))
+      if (selectedForm)
+      {
+        for (let i = 0; i < selectedForm.form.questions.length; i++)
         {
-          answer = Moment().format();
-        }
+          let question = selectedForm.form.questions[i];
+          let answer = this.state.formAnswers[i];
 
-        if (question.obligatory === 'yes' && (answer === undefined || answer === null || answer === '')) {
-          alert('Not all mandatory fields are filled.');
-          return;
+          if (question.obligatory === 'yes' && (answer === undefined || answer === null || answer === '')) {
+            if (question.type === ViewerUtility.geomessageFormType.date)
+            {
+              this.state.formAnswers[i] = Moment().format();
+            }
+            else
+            {
+              console.log(question);
+              alert('Not all mandatory fields are filled.');
+              return;
+            }
+          }
         }
       }
     }

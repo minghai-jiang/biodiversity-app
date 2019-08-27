@@ -110,6 +110,7 @@ export class LineChartScore extends PureComponent {
         key={'plot'}
         height={200}
         yDomain={[0, 4]}
+        xDomain={[Moment('01-01-2015').format('X')*1000, Moment().format('X')*1000]}
       >
         {this.state.graphElements}
       </FlexibleXYPlot>

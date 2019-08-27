@@ -72,11 +72,25 @@ class SelectionPane extends PureComponent {
           }
 
           messages.sort(function(a,b){return Moment(b.form.answers[0].answer).format('X') - Moment(a.form.answers[0].answer).format('X')});
-          
-          let score = messages[messages.length - 1].form.answers[1].answer;
-          let data = [<p key='scoreHeader'>{ViewerUtility.score}</p>, <div className={'score score_' + score} key={element.feature.id + '_score_' + score}><span>{score}</span></div>]
-          
-          this.setState({ data: data, loading: false});
+
+          if (messages.length > 0)
+          {
+            console.log(messages)
+            
+            let score = messages[messages.length - 1].form.answers[1].answer;
+            let scoreText = messages[messages.length - 1].form.answers[2].answer;
+            let data = [
+              <p key='scoreHeader'>{ViewerUtility.score}</p>,
+              <div className={'score score_' + score} key={element.feature.id + '_score_' + score}><span>{score}</span></div>,
+              <p key={element.feature.id + '_scoreText_' + scoreText}>{scoreText}</p>
+            ]
+            
+            this.setState({ data: data, loading: false});
+          }
+          else
+          {
+            this.setState({ data: <p>{ViewerUtility.noScore}</p>, loading: false});
+          }
         }
 
       })

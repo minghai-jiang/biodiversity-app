@@ -8,6 +8,7 @@
   max-height: 100%;
   z-index: 1300;
   background-color: #f6fbfe;
+  min-height: 162px;
 }
 
 .selection-pane .MuiPaper-root

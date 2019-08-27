@@ -20,7 +20,7 @@ import './TileLayersControl.css';
 
 import ApiManager from '../../../../ApiManager';
 
-const BASE_SATELLITE_LAYER_NAME = 'base';
+const BASE_SATELLITE_LAYER_NAME = 'Achtergrondkaart';
 const IMAGES_TILE_LAYER_NAME = 'images';
 const LABELS_TILE_LAYER_NAME = 'labels';
 const IMAGES2_TILE_LAYER_NAME = 'images2';
@@ -149,6 +149,13 @@ class TileLayersControl extends PureComponent {
     let images2Layers = availableLayersUnsorted.filter(x => x.type === IMAGES2_TILE_LAYER_NAME);
 
     let availableLayers = [BASE_SATELLITE_AVAILABLE_LAYER, ...imageLayers, ...labelLayers, ...images2Layers];
+
+    for (var i = 0; i < availableLayers.length; i++) 
+    {
+      if (availableLayers[i].name === 'rgb') {availableLayers[i].name = 'Satelliet'};
+      if (availableLayers[i].name === 'label') {availableLayers[i].name = 'Kleurschakering'};
+      
+    }
 
     return availableLayers;
   

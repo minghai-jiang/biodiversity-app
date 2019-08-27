@@ -116,7 +116,8 @@ class DataPane extends PureComponent {
         idText = `${element.feature.properties.tileX}, ${element.feature.properties.tileY}, ${element.feature.properties.zoom}`;
       }
       else if (element.type === ViewerUtility.polygonLayerType) {
-        title = 'Polygon';
+        //title = 'Polygon';
+        title = 'Perceel';
         idText = element.feature.properties.id;
       }
       else if (element.type === ViewerUtility.customPolygonTileLayerType) {

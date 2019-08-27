@@ -25,7 +25,7 @@ export class MapSelector extends PureComponent {
       "d9903b33-f5d1-4d57-992f-3d8172460126":
       {
         "name": "LNV maai en oogst kaart",
-        "options": ["timestamps", "tileLayers", "classes"]
+        "options": ["timestamps", "tileLayers", "classes", "measurements"]
       },
       "4a925aef-469b-4aac-995b-46be2dc2779f":
       {
